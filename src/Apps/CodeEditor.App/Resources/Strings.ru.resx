@@ -7,4 +7,6 @@
   <data name="InternalError" xml:space="preserve"><value>Внутренняя ошибка. Подробности — в журнале: «Разработчик: открыть журнал»</value></data>
   <data name="StartupTime" xml:space="preserve"><value>Запуск: {0} мс</value></data>
   <data name="OpenInBreeze" xml:space="preserve"><value>Открыть в Breeze</value></data>
+  <data name="FileTypeName" xml:space="preserve"><value>Файл {0}</value></data>
+  <data name="AppDescription" xml:space="preserve"><value>Лёгкий редактор кода с ИИ-агентом</value></data>
 </root>

@@ -82,6 +82,7 @@ internal static partial class Program
         {
             await session.RestoreTabsAsync();
             await instance.StartAsync(window, plan.File);
+            await ExplorerRegistration.RepairAsync(bootstrapLogging.CreateLogger(typeof(ExplorerRegistration)));
         };
 
         var exitCode = app.Run(window);
