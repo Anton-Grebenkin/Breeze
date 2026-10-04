@@ -1,3 +1,4 @@
+using System.Globalization;
 using CodeEditor.App.Diagnostics;
 using CodeEditor.App.Instances;
 using CodeEditor.App.Startup;
@@ -23,21 +24,26 @@ internal static partial class Program
     private static int Main(string[] args)
     {
         var paths = new UserDataPaths();
+
+        // Language comes before anything that shows text, the installer hooks' Explorer items included.
+        var language = StartupLanguage.Apply(paths);
         var others = StartupRouting.OtherWindows(paths);
 
-        // First of all: the installer starts the app with hook arguments (install, update, uninstall) and expects a
-        // quick exit. A downloaded update is applied at startup only when no other window runs from the installation.
-        VelopackApp.Build().SetAutoApplyOnStartup(others.Count == 0).Run();
+        // The installer starts the app with hook arguments (install, update, uninstall) and expects a quick exit. A
+        // downloaded update is applied at startup only when no other window runs from the installation.
+        VelopackApp.Build()
+            .SetAutoApplyOnStartup(others.Count == 0)
+            .OnAfterInstallFastCallback(_ => ExplorerRegistration.Register())
+            .OnAfterUpdateFastCallback(_ => ExplorerRegistration.Register())
+            .OnBeforeUninstallFastCallback(_ => ExplorerRegistration.Unregister())
+            .Run();
 
-        return StartupRouting.Route(args, others) is { } plan ? Run(plan, paths) : 0;
+        return StartupRouting.Route(args, others) is { } plan ? Run(plan, paths, language) : 0;
     }
 
-    private static int Run(LaunchPlan plan, UserDataPaths paths)
+    private static int Run(LaunchPlan plan, UserDataPaths paths, CultureInfo language)
     {
         var clock = new StartupClock();
-
-        // Language comes before anything that shows text: resource strings follow the thread culture.
-        var language = StartupLanguage.Apply(paths);
 
         // Logging right after language, so host build and module load failures are logged too.
         using var logFile = new LogFileWriter(paths.File(LogFileWriter.FolderName), SessionInfo.Describe(), TimeProvider.System);

@@ -62,6 +62,19 @@ public sealed class WindowsTests : IDisposable
         session.WaitFor("EditorTab.notes.md");
     }
 
+    // "Open in Breeze" on a file while no window is open: the file alone, as in VS Code.
+    [Fact]
+    public void FileArgument_NoWindows_OpensTheFileWithoutFolder()
+    {
+        var file = Path.Combine(_folder, "todo.txt");
+        File.WriteAllText(file, "купить молоко");
+
+        using var session = AppSession.WithArguments(file);
+
+        session.WaitFor("EditorTab.todo.txt");
+        Assert.Equal("Breeze", session.MainWindow.Title);
+    }
+
     [Fact]
     public void NewWindow_StartsAnotherProcess()
     {

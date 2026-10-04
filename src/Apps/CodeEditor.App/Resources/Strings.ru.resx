@@ -6,4 +6,5 @@
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <data name="InternalError" xml:space="preserve"><value>Внутренняя ошибка. Подробности — в журнале: «Разработчик: открыть журнал»</value></data>
   <data name="StartupTime" xml:space="preserve"><value>Запуск: {0} мс</value></data>
+  <data name="OpenInBreeze" xml:space="preserve"><value>Открыть в Breeze</value></data>
 </root>
