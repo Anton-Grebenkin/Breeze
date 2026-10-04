@@ -74,7 +74,7 @@ public static class AgentServices
 
     public static AgentService Aitunnel { get; } = new("AITUNNEL", AitunnelEndpoint, AgentSecrets.AitunnelApiKey, ModelCatalog.AitunnelModels, AitunnelDialect)
     {
-        KeyPage = new Uri("https://aitunnel.ru/"),
+        KeyPage = new Uri("https://aitunnel.ru/?r=58933"),
     };
 
     public static IReadOnlyList<AgentService> All { get; } = [Aitunnel, ProxyApi, Provod];
