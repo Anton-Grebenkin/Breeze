@@ -245,7 +245,7 @@ internal sealed class AgentFixture : IDisposable
             new QueuedMessagesViewModel(Queue, new InlineUiDispatcher()));
         var services = new AgentTurnServices(Conversation, new ApprovalCards(Previewers, Policies, Rules), usage, new AgentActivityLog(ActivityLog), Budget, FileState, Todos, Questions, Checks, Compaction, HelperUsage, new ToolViews(Presenters, NullLogger<ToolViews>.Instance), Deep, MemoryExtractor, Queue, Images);
         var session = new ChatSession(services, history, Options, new TurnMessageBuilder(ContextProviders, Start, Attachments, Options, TimeProvider.System, NullLogger<TurnMessageBuilder>.Instance), new InlineUiDispatcher());
-        var links = new ChatLinkOpener(Workspace, FileSystem, Commands, Shell, StatusBar);
+        var links = new ChatLinkOpener(Workspace, FileSystem, Index, QuickPick, Commands, Shell, StatusBar);
         return new ChatViewModel(session, history, parts, links, QuickPick, Shell, Workspace, ApiKey, Commands, TimeProvider.System);
     }
 

@@ -431,4 +431,5 @@ description: Стили XAML
 --&gt;
 </value></data>
   <data name="ApiKeyDialogPromptCustom" xml:space="preserve"><value>Вставьте API-ключ сервиса {0} (настройка agent.endpoint). Сервис должен поддерживать OpenAI Chat Completions с вызовом инструментов и потоковыми ответами; агент проверен на AITUNNEL.</value></data>
+  <data name="PickLinkedFile" xml:space="preserve"><value>Несколько файлов подходят под «{0}» — выберите нужный</value></data>
 </root>

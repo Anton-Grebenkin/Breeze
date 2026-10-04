@@ -431,4 +431,5 @@ The agent gets the text when it reads or edits a matching file.
 --&gt;
 </value></data>
   <data name="ApiKeyDialogPromptCustom" xml:space="preserve"><value>Paste the API key of {0} (the agent.endpoint setting). The service must support the OpenAI Chat Completions API with tool calls and streaming; the agent is tested with AITUNNEL.</value></data>
+  <data name="PickLinkedFile" xml:space="preserve"><value>Several files match "{0}": pick one</value></data>
 </root>
