@@ -17,6 +17,9 @@ public sealed class WorkbenchContributions(CommandPaletteViewModel palette) : ID
     private const string AppearanceGroup = "2_appearance";
     private const string GoGroup = "1_go";
 
+    // The last menu: modules add theirs before it (Terminal is 5).
+    private const int HelpMenuOrder = 9;
+
     private readonly List<IDisposable> _registrations = [];
 
     public void Register(ICommandRegistry commands, IKeybindingRegistry keybindings, IMenuRegistry menus)
@@ -53,7 +56,7 @@ public sealed class WorkbenchContributions(CommandPaletteViewModel palette) : ID
         _registrations.Add(menus.Register(MenuItemDefinition.ForSubmenu(MenuIds.MenuBar, MenuIds.Edit, Strings.EditMenu, order: 2)));
         _registrations.Add(menus.Register(MenuItemDefinition.ForSubmenu(MenuIds.MenuBar, MenuIds.View, Strings.ViewMenu, order: 3)));
         _registrations.Add(menus.Register(MenuItemDefinition.ForSubmenu(MenuIds.MenuBar, MenuIds.Go, Strings.GoMenu, order: 4)));
-        _registrations.Add(menus.Register(MenuItemDefinition.ForSubmenu(MenuIds.MenuBar, MenuIds.Help, Strings.HelpMenu, order: 5)));
+        _registrations.Add(menus.Register(MenuItemDefinition.ForSubmenu(MenuIds.MenuBar, MenuIds.Help, Strings.HelpMenu, order: HelpMenuOrder)));
     }
 
     private void RegisterViewMenu(IMenuRegistry menus)

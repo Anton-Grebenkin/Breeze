@@ -28,6 +28,7 @@ using CodeEditor.Modules.Output.Wpf;
 using CodeEditor.Modules.TextEditor;
 using CodeEditor.Modules.TextEditor.Wpf;
 using CodeEditor.Modules.Terminal;
+using CodeEditor.Modules.Terminal.Wpf;
 using CodeEditor.Modules.Updates;
 using CodeEditor.Modules.Viewers;
 using CodeEditor.Modules.Viewers.Wpf;
@@ -105,6 +106,7 @@ internal static class AppHost
         new TextEditorModule(),
         new TextEditorWpfModule(),
         new TerminalModule(),
+        new TerminalWpfModule(),
         new GitModule(),
         new GitWpfModule(),
         new DockerModule(),

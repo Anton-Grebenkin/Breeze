@@ -5,14 +5,16 @@ using CodeEditor.Core.Keybindings;
 using CodeEditor.Core.Menus;
 using CodeEditor.Modules.Explorer.Resources;
 using CodeEditor.Modules.Explorer.ViewModels;
+using CodeEditor.Shell.Commands;
 
 namespace CodeEditor.Modules.Explorer.Commands;
 
 /// <summary>
 /// Explorer commands with VS Code keybindings and the tree context menu. Commands act on the selected node;
-/// <c>F2</c>, <c>Del</c> and <c>Enter</c> apply only when the tree is focused and no name is being edited.
+/// <c>F2</c>, <c>Del</c> and <c>Enter</c> apply only when the tree is focused and no name is being edited. "Open in
+/// Terminal" hands the folder to the terminal module through <see cref="ShellCommandIds.NewTerminal"/>.
 /// </summary>
-public sealed class ExplorerCommands(ExplorerViewModel explorer, ExplorerEditor editor) : IDisposable
+public sealed class ExplorerCommands(ExplorerViewModel explorer, ExplorerEditor editor, ICommandService commandService) : IDisposable
 {
     public const string ContextMenuId = "explorer.context";
 
@@ -24,6 +26,7 @@ public sealed class ExplorerCommands(ExplorerViewModel explorer, ExplorerEditor 
     public const string CopyPathId = "explorer.copyPath";
     public const string CopyRelativePathId = "explorer.copyRelativePath";
     public const string RevealId = "explorer.revealInFileManager";
+    public const string OpenInTerminalId = "explorer.openInTerminal";
     public const string RefreshId = "explorer.refresh";
     public const string CollapseAllId = "explorer.collapseAll";
 
@@ -43,6 +46,7 @@ public sealed class ExplorerCommands(ExplorerViewModel explorer, ExplorerEditor 
         Add(commands, CopyPathId, Strings.CopyPath, () => editor.CopyPath(relative: false), workspaceOpen);
         Add(commands, CopyRelativePathId, Strings.CopyRelativePath, () => editor.CopyPath(relative: true), workspaceOpen);
         Add(commands, RevealId, Strings.RevealInFileManager, editor.RevealInFileManager, workspaceOpen);
+        Add(commands, OpenInTerminalId, Strings.OpenInTerminal, OpenInTerminalAsync, workspaceOpen);
         Add(commands, RefreshId, Strings.Refresh, async () => await explorer.RefreshAsync(), workspaceOpen);
         Add(commands, CollapseAllId, Strings.CollapseAll, explorer.CollapseAll, workspaceOpen);
 
@@ -71,6 +75,7 @@ public sealed class ExplorerCommands(ExplorerViewModel explorer, ExplorerEditor 
             (NewFolderId, "1_new", Strings.MenuNewFolder, null),
             (OpenId, "2_open", Strings.MenuOpen, fileSelected),
             (RevealId, "3_reveal", Strings.MenuRevealInFileManager, null),
+            (OpenInTerminalId, "3_reveal", Strings.MenuOpenInTerminal, null),
             (CopyPathId, "4_path", Strings.MenuCopyPath, null),
             (CopyRelativePathId, "4_path", Strings.MenuCopyRelativePath, null),
             (RenameId, "5_edit", Strings.MenuRename, null),
@@ -81,6 +86,15 @@ public sealed class ExplorerCommands(ExplorerViewModel explorer, ExplorerEditor 
         {
             var (id, group, title, when) = items[i];
             _registrations.Add(menus.Register(MenuItemDefinition.ForCommand(ContextMenuId, id, group, i, title, when)));
+        }
+    }
+
+    // The selected folder, or the folder of the selected file.
+    private async Task OpenInTerminalAsync()
+    {
+        if (explorer.TargetFolder is { } folder)
+        {
+            await commandService.ExecuteAsync(ShellCommandIds.NewTerminal, folder.FullPath);
         }
     }
 

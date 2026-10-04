@@ -26,6 +26,7 @@ internal static class Layers
     public const string AgentModule = "CodeEditor.Modules.Agent";
     public const string AgentModuleWpf = "CodeEditor.Modules.Agent.Wpf";
     public const string TerminalModule = "CodeEditor.Modules.Terminal";
+    public const string TerminalModuleWpf = "CodeEditor.Modules.Terminal.Wpf";
     public const string GitModule = "CodeEditor.Modules.Git";
     public const string GitModuleWpf = "CodeEditor.Modules.Git.Wpf";
     public const string DockerModule = "CodeEditor.Modules.Docker";
@@ -75,6 +76,7 @@ internal static class Layers
             [AgentModule] = [Core, Shell, AgentContracts],
             [AgentModuleWpf] = [Core, Shell, UI, ShellWpf, AgentContracts, AgentModule],
             [TerminalModule] = [Core, Shell, AgentContracts],
+            [TerminalModuleWpf] = [Core, Shell, UI, ShellWpf, AgentContracts, TerminalModule],
             [GitModule] = [Core, Shell, AgentContracts],
             [GitModuleWpf] = [Core, Shell, UI, ShellWpf, AgentContracts, GitModule],
             [DockerModule] = [Core, Shell, AgentContracts],
@@ -89,7 +91,7 @@ internal static class Layers
             [ViewersModuleWpf] = [Core, Shell, UI, ShellWpf, ViewersModule],
             [ToolsModule] = [Core, Shell, AgentContracts],
             [UpdatesModule] = [Core, Shell],
-            [App] = [Core, Shell, UI, ShellWpf, OutputModule, OutputModuleWpf, ExplorerModule, ExplorerModuleWpf, TextEditorModule, TextEditorModuleWpf, SearchModule, SearchModuleWpf, AgentContracts, AgentModule, AgentModuleWpf, TerminalModule, GitModule, GitModuleWpf, DockerModule, DockerModuleWpf, BrowserModule, BrowserModuleWpf, DiagramsModule, DiagramsModuleWpf, DocumentsModule, DocumentsModuleWpf, ViewersModule, ViewersModuleWpf, ToolsModule, UpdatesModule],
+            [App] = [Core, Shell, UI, ShellWpf, OutputModule, OutputModuleWpf, ExplorerModule, ExplorerModuleWpf, TextEditorModule, TextEditorModuleWpf, SearchModule, SearchModuleWpf, AgentContracts, AgentModule, AgentModuleWpf, TerminalModule, TerminalModuleWpf, GitModule, GitModuleWpf, DockerModule, DockerModuleWpf, BrowserModule, BrowserModuleWpf, DiagramsModule, DiagramsModuleWpf, DocumentsModule, DocumentsModuleWpf, ViewersModule, ViewersModuleWpf, ToolsModule, UpdatesModule],
         }.ToFrozenDictionary(
             pair => pair.Key,
             pair => pair.Value.ToFrozenSet(StringComparer.Ordinal),

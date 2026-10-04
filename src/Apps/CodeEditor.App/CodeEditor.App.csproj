@@ -62,6 +62,7 @@
     <ProjectReference Include="..\..\Modules\CodeEditor.Modules.TextEditor\CodeEditor.Modules.TextEditor.csproj" />
     <ProjectReference Include="..\..\Modules\CodeEditor.Modules.TextEditor.Wpf\CodeEditor.Modules.TextEditor.Wpf.csproj" />
     <ProjectReference Include="..\..\Modules\CodeEditor.Modules.Terminal\CodeEditor.Modules.Terminal.csproj" />
+    <ProjectReference Include="..\..\Modules\CodeEditor.Modules.Terminal.Wpf\CodeEditor.Modules.Terminal.Wpf.csproj" />
     <ProjectReference Include="..\..\Modules\CodeEditor.Modules.Git\CodeEditor.Modules.Git.csproj" />
     <ProjectReference Include="..\..\Modules\CodeEditor.Modules.Git.Wpf\CodeEditor.Modules.Git.Wpf.csproj" />
     <ProjectReference Include="..\..\Modules\CodeEditor.Modules.Docker\CodeEditor.Modules.Docker.csproj" />

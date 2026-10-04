@@ -17,3 +17,5 @@
 
 # Third-party script bundles (Mermaid) stay as is: line endings unchanged, hash matches the source.
 *.min.js binary
+src/Modules/CodeEditor.Modules.Terminal.Wpf/Assets/xterm.* binary
+src/Modules/CodeEditor.Modules.Terminal.Wpf/Assets/addon-fit.js binary

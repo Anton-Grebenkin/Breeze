@@ -28,6 +28,7 @@
     <Project Path="src/Modules/CodeEditor.Modules.Agent/CodeEditor.Modules.Agent.csproj" />
     <Project Path="src/Modules/CodeEditor.Modules.Agent.Wpf/CodeEditor.Modules.Agent.Wpf.csproj" />
     <Project Path="src/Modules/CodeEditor.Modules.Terminal/CodeEditor.Modules.Terminal.csproj" />
+    <Project Path="src/Modules/CodeEditor.Modules.Terminal.Wpf/CodeEditor.Modules.Terminal.Wpf.csproj" />
     <Project Path="src/Modules/CodeEditor.Modules.Git/CodeEditor.Modules.Git.csproj" />
     <Project Path="src/Modules/CodeEditor.Modules.Git.Wpf/CodeEditor.Modules.Git.Wpf.csproj" />
     <Project Path="src/Modules/CodeEditor.Modules.Docker/CodeEditor.Modules.Docker.csproj" />

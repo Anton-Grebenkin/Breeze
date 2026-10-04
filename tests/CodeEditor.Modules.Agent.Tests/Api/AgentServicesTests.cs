@@ -91,7 +91,7 @@ public sealed class AgentServicesTests : IDisposable
     {
         Use(AgentServices.AitunnelEndpoint);
         Assert.Equal("Вставьте API-ключ AITUNNEL.", _fixture.ApiKey.KeyPrompt());
-        Assert.Equal(new Uri("https://aitunnel.ru/"), _fixture.ApiKey.KeyPage);
+        Assert.Equal(new Uri("https://aitunnel.ru/?r=58933"), _fixture.ApiKey.KeyPage);
 
         Use("http://localhost:8080/v1");
         Assert.StartsWith("Вставьте API-ключ сервиса localhost (настройка agent.endpoint).", _fixture.ApiKey.KeyPrompt(), StringComparison.Ordinal);

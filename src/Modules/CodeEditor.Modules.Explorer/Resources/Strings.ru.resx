@@ -79,4 +79,6 @@
   <data name="ReplaceHint" xml:space="preserve"><value>Заменяемый элемент уйдёт в корзину.</value></data>
   <data name="Replace" xml:space="preserve"><value>Заменить</value></data>
   <data name="CannotReplaceParent" xml:space="preserve"><value>Нельзя заменить «{0}»: перемещаемый элемент лежит внутри.</value></data>
+  <data name="OpenInTerminal" xml:space="preserve"><value>Открыть в терминале</value></data>
+  <data name="MenuOpenInTerminal" xml:space="preserve"><value>Открыть в _терминале</value></data>
 </root>
