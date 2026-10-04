@@ -7,4 +7,6 @@
   <data name="InternalError" xml:space="preserve"><value>An internal error occurred. See the log for details: "Developer: Open Log File"</value></data>
   <data name="StartupTime" xml:space="preserve"><value>Startup: {0} ms</value></data>
   <data name="OpenInBreeze" xml:space="preserve"><value>Open in Breeze</value></data>
+  <data name="FileTypeName" xml:space="preserve"><value>{0} File</value></data>
+  <data name="AppDescription" xml:space="preserve"><value>Lightweight code editor with an AI agent</value></data>
 </root>
