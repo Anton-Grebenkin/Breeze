@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="ModuleName" xml:space="preserve"><value>Терминал</value></data>
+  <data name="Build" xml:space="preserve"><value>Сборка</value></data>
+  <data name="Tests" xml:space="preserve"><value>Тесты</value></data>
+  <data name="Commands" xml:space="preserve"><value>Команды</value></data>
+  <data name="BuildCommand" xml:space="preserve"><value>Собрать</value></data>
+  <data name="RunTestsCommand" xml:space="preserve"><value>Запустить тесты</value></data>
+  <data name="Building" xml:space="preserve"><value>Сборка…</value></data>
+  <data name="RunningTests" xml:space="preserve"><value>Тесты…</value></data>
+  <data name="LastBuild" xml:space="preserve"><value>Последняя сборка ({0:HH:mm}): {1}</value></data>
+  <data name="LastTestRun" xml:space="preserve"><value>Последний прогон тестов: {0}</value></data>
+  <data name="NoBuildYet" xml:space="preserve"><value>Сборки в этом сеансе ещё не было — вызовите build.</value></data>
+  <data name="ErrorsHeader" xml:space="preserve"><value>По сборке {0} в {1:HH:mm:ss} (правки после неё не учтены):</value></data>
+  <data name="NoDiagnostics" xml:space="preserve"><value> ошибок и предупреждений нет.</value></data>
+  <data name="BuildTimedOut" xml:space="preserve"><value>Сборка {0} прервана по тайм-ауту через {1} с.</value></data>
+  <data name="BuildSucceeded" xml:space="preserve"><value>Сборка {0} успешна за {1} с.</value></data>
+  <data name="BuildSucceededWithWarnings" xml:space="preserve"><value>Сборка {0} успешна за {1} с, предупреждений: {2}.</value></data>
+  <data name="BuildFailed" xml:space="preserve"><value>Сборка {0} не удалась за {1} с: ошибок {2}, предупреждений {3}.</value></data>
+  <data name="MoreDiagnostics" xml:space="preserve"><value>…(ещё {0}; исправьте эти и соберите снова)</value></data>
+  <data name="BuildOutputTail" xml:space="preserve"><value>Вывод сборки (конец):</value></data>
+  <data name="TestsTimedOut" xml:space="preserve"><value>Тесты ({0}) прерваны по тайм-ауту через {1} с.</value></data>
+  <data name="TestsNotStarted" xml:space="preserve"><value>Тесты ({0}) не запустились: ошибок сборки {1}.</value></data>
+  <data name="TestsSummary" xml:space="preserve"><value>Тесты ({0}): успешно {1} из {2}, не прошло {3}, пропущено {4} за {5} с.</value></data>
+  <data name="TestsNoTotals" xml:space="preserve"><value>Тесты ({0}): итоги не найдены в выводе за {1} с.</value></data>
+  <data name="TestFailed" xml:space="preserve"><value>Не прошёл {0}</value></data>
+  <data name="MoreFailures" xml:space="preserve"><value>…(ещё упавших тестов: {0})</value></data>
+  <data name="OutputTail" xml:space="preserve"><value>Вывод (конец):</value></data>
+  <data name="TestFilter" xml:space="preserve"><value> (фильтр «{0}»)</value></data>
+  <data name="CommandTimedOut" xml:space="preserve"><value>Команда прервана по тайм-ауту через {0} с.</value></data>
+  <data name="CommandExitCode" xml:space="preserve"><value>Код выхода {0} за {1} с.</value></data>
+  <data name="NoOutput" xml:space="preserve"><value> Вывода нет.</value></data>
+  <data name="FolderNotFound" xml:space="preserve"><value>Папки «{0}» нет.</value></data>
+  <data name="CommandForbidden" xml:space="preserve"><value>Команда запрещена политикой редактора: {0}. Если она действительно нужна, пользователь выполнит её сам.</value></data>
+  <data name="BackgroundRunning" xml:space="preserve"><value>Фоновая команда #{0} идёт ({1} с).</value></data>
+  <data name="BackgroundExited" xml:space="preserve"><value>Фоновая команда #{0} завершилась с кодом {1} за {2} с.</value></data>
+  <data name="BackgroundStopped" xml:space="preserve"><value>Фоновая команда #{0} остановлена через {1} с.</value></data>
+  <data name="BackgroundHowTo" xml:space="preserve"><value>Новый вывод — command_output(id: {0}), остановить — stop_command(id: {0}).</value></data>
+  <data name="BackgroundNoNewOutput" xml:space="preserve"><value>(нового вывода нет)</value></data>
+  <data name="BackgroundDropped" xml:space="preserve"><value>(первые строки уже не хранятся: {0}; весь вывод — в канале «Команды»)</value></data>
+  <data name="BackgroundLimit" xml:space="preserve"><value>Не запущено: уже идут {0} фоновые команды. Сначала останови одну через stop_command.</value></data>
+  <data name="BackgroundNotFound" xml:space="preserve"><value>Фоновой команды #{0} нет.</value></data>
+  <data name="BackgroundBadPattern" xml:space="preserve"><value>Неверное регулярное выражение в waitFor: {0}</value></data>
+  <data name="BackgroundOutputTitle" xml:space="preserve"><value>Вывод фоновой команды #{0}</value></data>
+  <data name="BackgroundStopTitle" xml:space="preserve"><value>Остановка фоновой команды #{0}</value></data>
+  <data name="DetailRunning" xml:space="preserve"><value>идёт</value></data>
+  <data name="DetailStopped" xml:space="preserve"><value>остановлена</value></data>
+  <data name="DetailBackground" xml:space="preserve"><value>в фоне #{0}</value></data>
+  <data name="ExitNoMatches" xml:space="preserve"><value>Код 1 у команды поиска значит «совпадений нет», это не ошибка.</value></data>
+  <data name="ExitDifferences" xml:space="preserve"><value>Код 1 у git diff --exit-code значит «есть различия».</value></data>
+  <data name="ExitRobocopySuccess" xml:space="preserve"><value>Коды 1–7 у robocopy значат успех: файлы скопированы или пропущены.</value></data>
+  <data name="PolicyFormatDisk" xml:space="preserve"><value>форматирование диска</value></data>
+  <data name="PolicyPowerOff" xml:space="preserve"><value>выключение или перезагрузка компьютера</value></data>
+  <data name="PolicyForcePush" xml:space="preserve"><value>принудительная отправка в git (--force)</value></data>
+  <data name="PolicyWipeRoot" xml:space="preserve"><value>удаление корня диска или профиля</value></data>
+  <data name="PolicyRemoteScript" xml:space="preserve"><value>запуск скрипта, скачанного из сети</value></data>
+  <data name="PolicyRegistry" xml:space="preserve"><value>изменение реестра Windows</value></data>
+  <data name="PolicyExecutionPolicy" xml:space="preserve"><value>изменение политики выполнения PowerShell</value></data>
+  <data name="NoWorkspace" xml:space="preserve"><value>Рабочая папка не открыта.</value></data>
+  <data name="NotBuildable" xml:space="preserve"><value>«{0}» — не решение и не проект (.slnx, .sln, .csproj) или его нет.</value></data>
+  <data name="NothingToBuild" xml:space="preserve"><value>В корне папки нет решения или единственного проекта. Укажите project — путь к .slnx, .sln или .csproj.</value></data>
+  <data name="LastBuildErrors" xml:space="preserve"><value>Ошибки последней сборки</value></data>
+  <data name="DetailSucceeded" xml:space="preserve"><value>успешно</value></data>
+  <data name="DetailSucceededWithWarnings" xml:space="preserve"><value>успешно, предупреждений: {0}</value></data>
+  <data name="DetailErrors" xml:space="preserve"><value>ошибок: {0}</value></data>
+  <data name="DetailTimedOut" xml:space="preserve"><value>тайм-аут</value></data>
+  <data name="DetailNotBuilt" xml:space="preserve"><value>не собрались</value></data>
+  <data name="DetailNoTotals" xml:space="preserve"><value>итогов нет</value></data>
+  <data name="DetailPassed" xml:space="preserve"><value>прошло {0} из {1}</value></data>
+  <data name="DetailFailed" xml:space="preserve"><value>не прошло {0} из {1}</value></data>
+  <data name="DetailExitCode" xml:space="preserve"><value>код {0}</value></data>
+  <data name="TestsWithFilter" xml:space="preserve"><value>Тесты «{0}»</value></data>
+  <data name="CommandTitle" xml:space="preserve"><value>Команда {0}</value></data>
+</root>

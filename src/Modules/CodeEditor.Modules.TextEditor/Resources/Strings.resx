@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="ModuleName" xml:space="preserve"><value>Text Editor</value></data>
+  <data name="ViewModuleName" xml:space="preserve"><value>Text Editor: view</value></data>
+  <data name="CategoryEdit" xml:space="preserve"><value>Edit</value></data>
+  <data name="CategoryView" xml:space="preserve"><value>View</value></data>
+  <data name="Undo" xml:space="preserve"><value>Undo</value></data>
+  <data name="Redo" xml:space="preserve"><value>Redo</value></data>
+  <data name="ZoomIn" xml:space="preserve"><value>Editor Font Zoom In</value></data>
+  <data name="ZoomOut" xml:space="preserve"><value>Editor Font Zoom Out</value></data>
+  <data name="ZoomReset" xml:space="preserve"><value>Editor Font Zoom Reset</value></data>
+  <data name="GoToLine" xml:space="preserve"><value>Go to Line</value></data>
+  <data name="FocusEditor" xml:space="preserve"><value>Focus Active Editor</value></data>
+  <data name="MenuUndo" xml:space="preserve"><value>_Undo</value></data>
+  <data name="MenuRedo" xml:space="preserve"><value>_Redo</value></data>
+  <data name="IndentationSpaces" xml:space="preserve"><value>Spaces: {0}</value></data>
+  <data name="IndentationTabs" xml:space="preserve"><value>Tab Size: {0}</value></data>
+  <data name="Position" xml:space="preserve"><value>Ln {0}, Col {1}</value></data>
+  <data name="PositionWithSelection" xml:space="preserve"><value>Ln {0}, Col {1} ({2} selected)</value></data>
+  <data name="PlainText" xml:space="preserve"><value>Plain Text</value></data>
+  <data name="IndentationToolTip" xml:space="preserve"><value>Indentation: editor.tabSize and editor.insertSpaces in settings</value></data>
+  <data name="EncodingToolTip" xml:space="preserve"><value>File Encoding</value></data>
+  <data name="LineEndingToolTip" xml:space="preserve"><value>End of Line Sequence</value></data>
+  <data name="LanguageToolTip" xml:space="preserve"><value>Language Mode</value></data>
+  <data name="OpenDocumentsTitle" xml:space="preserve"><value>Open files</value></data>
+  <data name="SelectionTitle" xml:space="preserve"><value>Editor selection</value></data>
+  <data name="FileForms" xml:space="preserve"><value>file|files</value></data>
+  <data name="EditedTitle" xml:space="preserve"><value>Edited {0}</value></data>
+  <data name="EditingTitle" xml:space="preserve"><value>Editing {0}</value></data>
+  <data name="CreatedTitle" xml:space="preserve"><value>Created {0}</value></data>
+  <data name="CreatingTitle" xml:space="preserve"><value>Creating {0}</value></data>
+  <data name="NoOpenFiles" xml:space="preserve"><value>(no open files)</value></data>
+  <data name="NoActiveEditor" xml:space="preserve"><value>(no active text editor)</value></data>
+  <data name="ContextUnsaved" xml:space="preserve"><value> (has unsaved changes)</value></data>
+  <data name="ContextOpenFile" xml:space="preserve"><value>Open file: {0}{1}.</value></data>
+  <data name="ContextOpenFileAtCaret" xml:space="preserve"><value>Open file: {0}{1}, caret on line {2}{3}.</value></data>
+  <data name="ContextSelectionInLine" xml:space="preserve"><value>; a fragment is selected on line {0}</value></data>
+  <data name="ContextSelectedLines" xml:space="preserve"><value>; lines {0}–{1} are selected</value></data>
+  <data name="FileChangedDuringEdit" xml:space="preserve"><value>{0} changed during the edit. Read it again.</value></data>
+  <data name="FilesEdited" xml:space="preserve"><value>Edited files: {0}. The edits are open in tabs and not saved yet; the user can undo them with Ctrl+Z. No need to re-read the files to check the edit: build and tests do that.</value></data>
+  <data name="FilesCreated" xml:space="preserve"><value>Created files: {0}.</value></data>
+  <data name="FileCreated" xml:space="preserve"><value>Created file {0}.</value></data>
+  <data name="FileAlreadyExists" xml:space="preserve"><value>'{0}' already exists. Use apply_edits or apply_patch to change it.</value></data>
+  <data name="CannotOpenFile" xml:space="preserve"><value>Could not open {0}.</value></data>
+  <data name="NoEdits" xml:space="preserve"><value>No edits.</value></data>
+  <data name="EditWithoutPath" xml:space="preserve"><value>An edit has no path: set "path" in each edit or once at the top level of the call.</value></data>
+  <data name="EditTooLarge" xml:space="preserve"><value>The edit is too large (more than {0} characters). Split it by file or location.</value></data>
+  <data name="EmptyOldText" xml:space="preserve"><value>{0}: oldText is empty. Use create_file for a new file.</value></data>
+  <data name="AnchorNotFound" xml:space="preserve"><value>{0}: the '@@' line '{1}' was not found. Copy it from read_file.</value></data>
+  <data name="EditsOverlap" xml:space="preserve"><value>{0}: the edits overlap. Merge them into one.</value></data>
+  <data name="FileNotFound" xml:space="preserve"><value>File '{0}' does not exist. Use create_file for a new file.</value></data>
+  <data name="BinaryFile" xml:space="preserve"><value>'{0}' is a binary file.</value></data>
+  <data name="QuotesUnescaped" xml:space="preserve"><value>{0}: quotes in oldText and newText were escaped once too often (\"); the escaping was removed — check the result.</value></data>
+  <data name="FoundIgnoringIndent" xml:space="preserve"><value>{0}: the fragment was found ignoring indentation (lines {1}–{2}); the indentation was adapted to the file style — check the result.</value></data>
+  <data name="FoundIgnoringTypography" xml:space="preserve"><value>{0}: the fragment was found ignoring indentation and the difference between dashes, quotes and special spaces (lines {1}–{2}); unchanged lines kept the file characters — check the result.</value></data>
+  <data name="AndMore" xml:space="preserve"><value> and more</value></data>
+  <data name="FragmentAmbiguous" xml:space="preserve"><value>{0}: oldText occurs more than once (lines {1}{2}). Add neighboring lines to make it unique.</value></data>
+  <data name="FragmentNotFound" xml:space="preserve"><value>{0}: oldText was not found. Read the file again (read_file) and copy the fragment exactly, without line numbers.</value></data>
+  <data name="FragmentSimilarAt" xml:space="preserve"><value>{0}: oldText was not found as a whole. A similar place starts on line {1}:</value></data>
+  <data name="CopyFragmentExactly" xml:space="preserve"><value>Copy the fragment from the file exactly, without line numbers.</value></data>
+  <data name="PatchStart" xml:space="preserve"><value>A patch must start with '{0}', and files with '{1} path' or '{2} path'.</value></data>
+  <data name="PatchNoDelete" xml:space="preserve"><value>apply_patch does not delete files: use delete_file.</value></data>
+  <data name="PatchUnknownLine" xml:space="preserve"><value>Unexpected patch line '{0}': expected '{1} path' or '{2} path'.</value></data>
+  <data name="PatchEmpty" xml:space="preserve"><value>The patch has no changes.</value></data>
+  <data name="PatchNoPath" xml:space="preserve"><value>'{0}' has no file path.</value></data>
+  <data name="PatchNoMove" xml:space="preserve"><value>apply_patch does not move files: move {0} with move_file, then edit it.</value></data>
+  <data name="PatchNoContext" xml:space="preserve"><value>{0}: the insertion has no context — add an '@@ …' line or context lines starting with a space.</value></data>
+  <data name="AgentChangesSummary" xml:space="preserve"><value>Agent changes: {0} · +{1} −{2}</value></data>
+  <data name="AcceptAgentChange" xml:space="preserve"><value>Accept Agent Change at Caret</value></data>
+  <data name="RejectAgentChange" xml:space="preserve"><value>Reject Agent Change at Caret</value></data>
+  <data name="AcceptAgentChanges" xml:space="preserve"><value>Accept All Agent Changes in File</value></data>
+  <data name="RejectAgentChanges" xml:space="preserve"><value>Reject All Agent Changes in File</value></data>
+  <data name="NextAgentChange" xml:space="preserve"><value>Next Agent Change</value></data>
+  <data name="PreviousAgentChange" xml:space="preserve"><value>Previous Agent Change</value></data>
+  <data name="MenuAcceptAgentChange" xml:space="preserve"><value>Accept Agent _Change</value></data>
+  <data name="MenuRejectAgentChange" xml:space="preserve"><value>Re_ject Agent Change</value></data>
+  <data name="MenuAcceptAgentChanges" xml:space="preserve"><value>Accept All Agent Changes in File</value></data>
+  <data name="MenuRejectAgentChanges" xml:space="preserve"><value>Reject All Agent Changes in File</value></data>
+  <data name="MenuNextAgentChange" xml:space="preserve"><value>Next Agent Change</value></data>
+  <data name="MenuPreviousAgentChange" xml:space="preserve"><value>Previous Agent Change</value></data>
+  <data name="AcceptHunk" xml:space="preserve"><value>Accept</value></data>
+  <data name="AcceptHunkToolTip" xml:space="preserve"><value>Accept this change (Ctrl+Alt+Y)</value></data>
+  <data name="RejectHunk" xml:space="preserve"><value>Reject</value></data>
+  <data name="RejectHunkToolTip" xml:space="preserve"><value>Reject this change (Ctrl+Alt+N)</value></data>
+  <data name="AcceptAll" xml:space="preserve"><value>Accept all</value></data>
+  <data name="AcceptAllToolTip" xml:space="preserve"><value>Accept all changes in the file and save it (Ctrl+Alt+Shift+Y)</value></data>
+  <data name="RejectAll" xml:space="preserve"><value>Reject all</value></data>
+  <data name="RejectAllToolTip" xml:space="preserve"><value>Restore the file as it was before the agent (Ctrl+Alt+Shift+N)</value></data>
+  <data name="NextChangeToolTip" xml:space="preserve"><value>Next change (F7)</value></data>
+  <data name="PreviousChangeToolTip" xml:space="preserve"><value>Previous change (Shift+F7)</value></data>
+  <data name="Cut" xml:space="preserve"><value>Cut</value></data>
+  <data name="MenuCut" xml:space="preserve"><value>Cu_t</value></data>
+  <data name="Copy" xml:space="preserve"><value>Copy</value></data>
+  <data name="MenuCopy" xml:space="preserve"><value>_Copy</value></data>
+  <data name="Paste" xml:space="preserve"><value>Paste</value></data>
+  <data name="MenuPaste" xml:space="preserve"><value>_Paste</value></data>
+  <data name="SelectAll" xml:space="preserve"><value>Select All</value></data>
+  <data name="MenuSelectAll" xml:space="preserve"><value>Select _All</value></data>
+  <data name="FindInFile" xml:space="preserve"><value>Find in File</value></data>
+  <data name="MenuFind" xml:space="preserve"><value>_Find</value></data>
+  <data name="ReplaceInFile" xml:space="preserve"><value>Replace in File</value></data>
+  <data name="MenuReplace" xml:space="preserve"><value>_Replace</value></data>
+  <data name="ToggleReplace" xml:space="preserve"><value>Toggle Replace</value></data>
+  <data name="ToggleReplaceToolTip" xml:space="preserve"><value>Toggle Replace (Ctrl+H)</value></data>
+  <data name="Find" xml:space="preserve"><value>Find</value></data>
+  <data name="MatchCase" xml:space="preserve"><value>Match Case</value></data>
+  <data name="MatchWholeWord" xml:space="preserve"><value>Match Whole Word</value></data>
+  <data name="UseRegularExpression" xml:space="preserve"><value>Use Regular Expression</value></data>
+  <data name="PreviousMatch" xml:space="preserve"><value>Previous Match (Shift+F3)</value></data>
+  <data name="NextMatch" xml:space="preserve"><value>Next Match (F3)</value></data>
+  <data name="CloseSearch" xml:space="preserve"><value>Close (Escape)</value></data>
+  <data name="Replace" xml:space="preserve"><value>Replace</value></data>
+  <data name="ReplaceToolTip" xml:space="preserve"><value>Replace (Ctrl+Shift+1)</value></data>
+  <data name="ReplaceAll" xml:space="preserve"><value>Replace All</value></data>
+  <data name="ReplaceAllToolTip" xml:space="preserve"><value>Replace All (Ctrl+Alt+Enter)</value></data>
+  <data name="EditNotSaved" xml:space="preserve"><value>{0} was changed in the editor but not saved: {1}</value></data>
+  <data name="EditorFontSize" xml:space="preserve"><value>Editor font size: {0}</value></data>
+</root>

@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Shared test doubles: in-memory file system, collecting logger and other fakes. -->
+
+  <PropertyGroup>
+    <IsTestProject>false</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Platform\CodeEditor.Core\CodeEditor.Core.csproj" />
+    <ProjectReference Include="..\..\src\Platform\CodeEditor.Shell\CodeEditor.Shell.csproj" />
+  </ItemGroup>
+
+</Project>

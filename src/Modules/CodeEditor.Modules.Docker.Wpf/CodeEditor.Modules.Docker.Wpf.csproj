@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Docker panel views (ADR 0033): the container, image and compose tree, plus container logs and inspect in tabs.
+    Logs and inspect use AvalonEdit: the editor already ships it, so no new assemblies are added.
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AvalonEdit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CodeEditor.Modules.Docker\CodeEditor.Modules.Docker.csproj" />
+    <ProjectReference Include="..\..\Platform\CodeEditor.UI\CodeEditor.UI.csproj" />
+    <ProjectReference Include="..\..\Platform\CodeEditor.Shell.Wpf\CodeEditor.Shell.Wpf.csproj" />
+  </ItemGroup>
+
+</Project>

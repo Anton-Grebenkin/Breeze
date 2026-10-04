@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+<!--
+  Go: comments, "…" and `…` strings, runes, keywords, built-in types, the type name after type, function calls
+  (including generic f[T](…)), numbers in all notations. Color names are theme tokens (ADR 0036).
+-->
+<SyntaxDefinition name="Go" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+  <Color name="Comment" />
+  <Color name="String" />
+  <Color name="Number" />
+  <Color name="Keyword" />
+  <Color name="ControlKeyword" />
+  <Color name="Function" />
+  <Color name="Type" />
+
+  <RuleSet>
+    <Span color="Comment" begin="//" />
+    <Span color="Comment" multiline="true" begin="/\*" end="\*/" />
+    <Span color="String" begin="&quot;" end="&quot;" ruleSet="Escapes" />
+    <Span color="String" multiline="true" begin="`" end="`" />
+    <Rule color="String">'(?:\\(?:[abfnrtv\\'&quot;]|[0-7]{3}|x[\da-fA-F]{2}|u[\da-fA-F]{4}|U[\da-fA-F]{8})|[^'\\])'</Rule>
+
+    <Keywords color="ControlKeyword">
+      <Word>break</Word>
+      <Word>case</Word>
+      <Word>continue</Word>
+      <Word>default</Word>
+      <Word>defer</Word>
+      <Word>else</Word>
+      <Word>fallthrough</Word>
+      <Word>for</Word>
+      <Word>go</Word>
+      <Word>goto</Word>
+      <Word>if</Word>
+      <Word>range</Word>
+      <Word>return</Word>
+      <Word>select</Word>
+      <Word>switch</Word>
+    </Keywords>
+    <Keywords color="Keyword">
+      <Word>chan</Word>
+      <Word>const</Word>
+      <Word>func</Word>
+      <Word>import</Word>
+      <Word>interface</Word>
+      <Word>map</Word>
+      <Word>package</Word>
+      <Word>struct</Word>
+      <Word>type</Word>
+      <Word>var</Word>
+      <Word>true</Word>
+      <Word>false</Word>
+      <Word>nil</Word>
+      <Word>iota</Word>
+    </Keywords>
+    <Keywords color="Type">
+      <Word>bool</Word>
+      <Word>byte</Word>
+      <Word>complex64</Word>
+      <Word>complex128</Word>
+      <Word>error</Word>
+      <Word>float32</Word>
+      <Word>float64</Word>
+      <Word>int</Word>
+      <Word>int8</Word>
+      <Word>int16</Word>
+      <Word>int32</Word>
+      <Word>int64</Word>
+      <Word>rune</Word>
+      <Word>string</Word>
+      <Word>uint</Word>
+      <Word>uint8</Word>
+      <Word>uint16</Word>
+      <Word>uint32</Word>
+      <Word>uint64</Word>
+      <Word>uintptr</Word>
+      <Word>any</Word>
+      <Word>comparable</Word>
+    </Keywords>
+    <Rule color="Type">(?&lt;=\btype\s+)[A-Za-z_]\w*</Rule>
+    <Rule color="Function">\b[A-Za-z_]\w*(?=\s*(?:\[[^\[\]()]*\]\s*)?\()</Rule>
+    <Rule color="Number">
+      \b(?:0[xX][\da-fA-F_]*(?:\.[\da-fA-F_]*)?(?:[pP][+-]?\d+)?|0[bB][01_]+|0[oO][0-7_]+|\d[\d_]*(?:\.[\d_]*)?(?:[eE][+-]?\d[\d_]*)?)i?
+      | (?&lt;!\w)\.\d[\d_]*(?:[eE][+-]?\d[\d_]*)?i?
+    </Rule>
+  </RuleSet>
+
+  <RuleSet name="Escapes">
+    <Span begin="\\" end="." />
+  </RuleSet>
+</SyntaxDefinition>

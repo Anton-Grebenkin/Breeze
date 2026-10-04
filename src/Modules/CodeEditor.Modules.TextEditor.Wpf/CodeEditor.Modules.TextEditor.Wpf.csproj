@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- AvalonEdit-based editor and document buffers over its TextDocument (ADR 0003). -->
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AvalonEdit" />
+  </ItemGroup>
+
+  <!-- Custom highlighting definitions (ADR 0036): resource Highlighting.<Name>.xshd, named after the file. -->
+  <ItemGroup>
+    <None Remove="Highlighting\Definitions\*.xshd" />
+    <EmbeddedResource Include="Highlighting\Definitions\*.xshd" LogicalName="Highlighting.%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <!-- Module tests check the highlighting definitions and the color classifier. -->
+  <ItemGroup>
+    <InternalsVisibleTo Include="CodeEditor.Modules.TextEditor.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CodeEditor.Modules.TextEditor\CodeEditor.Modules.TextEditor.csproj" />
+    <ProjectReference Include="..\..\Platform\CodeEditor.UI\CodeEditor.UI.csproj" />
+    <ProjectReference Include="..\..\Platform\CodeEditor.Shell.Wpf\CodeEditor.Shell.Wpf.csproj" />
+  </ItemGroup>
+
+</Project>

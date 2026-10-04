@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="ArgumentMissing" xml:space="preserve"><value>Missing argument "{0}".</value></data>
+  <data name="ArgumentEmpty" xml:space="preserve"><value>Argument "{0}" is empty.</value></data>
+  <data name="ArgumentInvalid" xml:space="preserve"><value>Argument "{0}" has an invalid format: {1}</value></data>
+  <data name="FileForgottenAfterCompaction" xml:space="preserve"><value>{0}: after context compaction the file text is no longer in the conversation. Read the relevant part again with read_file, then edit.</value></data>
+  <data name="FileNotRead" xml:space="preserve"><value>{0}: the file has not been read in this chat yet. Read the relevant part with read_file first, then edit.</value></data>
+  <data name="FileChangedSinceRead" xml:space="preserve"><value>{0} has changed since your last read (the user edited it or it changed on disk). Read the relevant part again.</value></data>
+  <data name="WorkspaceNotOpen" xml:space="preserve"><value>No workspace folder is open.</value></data>
+  <data name="PathOutsideWorkspace" xml:space="preserve"><value>Path "{0}" is outside the workspace folder: only files inside it are accessible.</value></data>
+  <data name="SecretFile" xml:space="preserve"><value>"{0}" looks like a secrets file: the agent does not read or edit it. If it is needed, ask the user.</value></data>
+  <data name="ProtectedFolder" xml:space="preserve"><value>"{0}" is in a service folder (git history, build output, chat history): the agent does not edit it.</value></data>
+  <data name="OutputTruncated" xml:space="preserve"><value>…(truncated: showing {0} of {1} characters; narrow the request)</value></data>
+  <data name="OutputOmittedLines" xml:space="preserve"><value>… {0} lines omitted …</value></data>
+  <data name="FrontMatterNotClosed" xml:space="preserve"><value>The header is not closed: add a line with --- after the settings.</value></data>
+  <data name="FrontMatterBadLine" xml:space="preserve"><value>Line {0}: expected "key: value", a list item "- value" or "name: value" under a key.</value></data>
+  <data name="FrontMatterDuplicateKey" xml:space="preserve"><value>Line {0}: "{1}" is already set above.</value></data>
+</root>

@@ -1,0 +1,434 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <!-- Self-check: build and test gate (CorrectionHints). -->
+  <data name="HintBuildFailing" xml:space="preserve"><value>The build is failing</value></data>
+  <data name="HintTestsFailing" xml:space="preserve"><value>Tests are failing</value></data>
+  <data name="HintSecondFailure" xml:space="preserve"><value>{0} for the second time in a row. Before editing further: name the class of the cause (typo, wrong assumption about the code, API, environment) and which of your assumptions turned out to be false; fix exactly that.</value></data>
+  <data name="HintRepeatedFailure" xml:space="preserve"><value>{0} three or more times in a row: this approach is not working. Change the approach or ask the user via ask_user; do not repeat the same edits.</value></data>
+  <data name="ListAndMore" xml:space="preserve"><value>{0}, etc.</value></data>
+  <data name="ReminderBuildFailed" xml:space="preserve"><value>The build failed after your edits. Fix the errors (get_errors shows them) and run build again. If the errors are unrelated to your edits, prove it with a path:line reference and say so in the summary.</value></data>
+  <data name="ReminderBuildMissing" xml:space="preserve"><value>You changed code ({0}) but have not run build since the last edit. Run build, fix the errors, and only then summarize. If it cannot be verified, explain why.</value></data>
+  <data name="ReminderTestsFailed" xml:space="preserve"><value>Tests failed after your edits. Fix the cause and run run_tests again. If the failure is unrelated to your edits, prove it and say so in the summary.</value></data>
+  <data name="ReminderTestsMissing" xml:space="preserve"><value>You changed code ({0}) but have not run run_tests since the last edit. Run the tests of the affected project and only then summarize.</value></data>
+  <data name="CheckBuildFailed" xml:space="preserve"><value>Check: the build failed after edits — the agent is fixing it</value></data>
+  <data name="CheckBuildMissing" xml:space="preserve"><value>Check: no build after edits — the agent is verifying</value></data>
+  <data name="CheckTestsFailed" xml:space="preserve"><value>Check: tests failed after edits — the agent is fixing them</value></data>
+  <data name="CheckTestsMissing" xml:space="preserve"><value>Check: tests were not run after edits — the agent is verifying</value></data>
+  <data name="UnverifiedBuildFailed" xml:space="preserve"><value>Edits not verified: the build failed after them.</value></data>
+  <data name="UnverifiedBuildMissing" xml:space="preserve"><value>Edits not verified: no build after them.</value></data>
+  <data name="UnverifiedTestsFailed" xml:space="preserve"><value>Edits not verified: tests failed after them.</value></data>
+  <data name="UnverifiedTestsMissing" xml:space="preserve"><value>Edits not verified: tests were not run after them.</value></data>
+  <!-- Tool and harness replies to the model. -->
+  <data name="ToolErrorPrefix" xml:space="preserve"><value>Error:</value></data>
+  <data name="ToolBudgetExhausted" xml:space="preserve"><value>Not executed: the step limit for this turn is exhausted. Summarize without calling tools.</value></data>
+  <data name="ToolRepeatNote" xml:space="preserve"><value>(An identical call with the same arguments was already made in this turn. Do not repeat it — use the previous result or change the approach.)</value></data>
+  <data name="ToolRepeatBlocked" xml:space="preserve"><value>Not executed: this call with the same arguments is repeated for the third time in this turn. Change the approach or ask the user.</value></data>
+  <data name="ToolArgumentsInvalid" xml:space="preserve"><value>Not executed: the arguments don't match the tool's parameters ({0}). Parameters: {1}. Pass arrays and objects as JSON values, not as strings, and fix the call instead of working around it.</value></data>
+  <data name="AdvisorBeforeEditResult" xml:space="preserve"><value>Not applied yet: before the first edit, an advisor (another model) reviewed your approach:
+
+{0}
+
+Weigh it against the code, adjust the approach if the advisor is right, and make the edit again.</value></data>
+  <data name="AdvisorBeforeEditNotice" xml:space="preserve"><value>**Advisor** · risks before the first edit
+
+{0}</value></data>
+  <data name="AdvisorStuckResult" xml:space="preserve"><value>An advisor (another model) looked at this because {0}:
+
+{1}</value></data>
+  <data name="AdvisorStuckNotice" xml:space="preserve"><value>**Advisor** · {0}
+
+{1}</value></data>
+  <data name="StuckRepeatedBuild" xml:space="preserve"><value>the build failed twice in a row</value></data>
+  <data name="StuckRepeatedTests" xml:space="preserve"><value>the tests failed twice in a row</value></data>
+  <data name="StuckSameFile" xml:space="preserve"><value>{0} is being edited for the third time</value></data>
+  <data name="StuckHalfBudget" xml:space="preserve"><value>half of the step limit is spent and the checks still fail</value></data>
+  <data name="ReviewPassedStatus" xml:space="preserve"><value>Independent review: no proven defects</value></data>
+  <data name="ReviewFindingsStatus" xml:space="preserve"><value>Independent review: blocking findings — {0}; the agent is checking them</value></data>
+  <data name="ReviewNotice" xml:space="preserve"><value>**Reviewer** · findings
+
+{0}</value></data>
+  <data name="ReviewFindingsPrompt" xml:space="preserve"><value>An independent reviewer (another model, fresh context) checked your changes and reports:
+{0}
+For each blocking finding: if it is right, fix it and verify with build and tests; if it is wrong, rebut it with evidence (path:line, a command or test output). Advisory findings are optional. Don't change anything beyond these findings.</value></data>
+  <data name="OpenPlanItemsPrompt" xml:space="preserve"><value>Your plan still has open items:
+{0}
+Continue with them, or update the plan if they are done or no longer needed.</value></data>
+  <data name="OpenPlanItemsStatus" xml:space="preserve"><value>Plan: open items remain — the agent continues</value></data>
+  <data name="EmptyAnswerPrompt" xml:space="preserve"><value>Your last reply was empty: no text and no tool calls. If a tool returned an error, fix the call as the error says and continue. If the task is done, report the result briefly; if you are stuck, say what blocks you.</value></data>
+  <data name="EmptyAnswerStatus" xml:space="preserve"><value>Empty reply — the agent continues</value></data>
+  <data name="TextToolCallPrompt" xml:space="preserve"><value>Your last reply contains a tool call written as text instead of a real call. Call the tool through function calling (the tools you were given), not as text in the answer, and continue.</value></data>
+  <data name="TextToolCallStatus" xml:space="preserve"><value>Tool call written as text — the agent retries it</value></data>
+  <data name="RequirementsAuditPrompt" xml:space="preserve"><value>Before the final answer, audit the result against the user's request. List every requirement from it — rules, API members, examples, the expected behaviour — and for each give where it is implemented (path:line) and what verified it (the build, an existing or requested test). Implement any requirement that has no place in the code. Don't add tests the user didn't ask for: name what stays unverified instead. Then give the final answer.</value></data>
+  <data name="RequirementsAuditStatus" xml:space="preserve"><value>Audit against the request — the agent checks each requirement</value></data>
+  <data name="ExplorationStallNote" xml:space="preserve"><value>(That's {0} reads and searches in a row. Before reading further, sum up in 2–4 lines: what is established (path:line), what is still missing for the answer or the change, and the one next step that gets it. If you already know enough, answer or make the change; a broad survey can go to explore, which returns a short report.)</value></data>
+  <data name="ParamRoles" xml:space="preserve"><value>Roles</value></data>
+  <data name="ParamAdvisorReasoning" xml:space="preserve"><value>Advisor reasoning</value></data>
+  <data name="ParamExplorerReasoning" xml:space="preserve"><value>Explorer reasoning</value></data>
+  <data name="AdvisorModelPrompt" xml:space="preserve"><value>Advisor model (Deep mode): a strong model from another vendor works best</value></data>
+  <data name="AdvisorModel" xml:space="preserve"><value>Advisor model</value></data>
+  <data name="AdvisorModelAction" xml:space="preserve"><value>Advisor model…</value></data>
+  <data name="CommandPickAdvisorModel" xml:space="preserve"><value>Advisor model (Deep mode)</value></data>
+  <data name="ExplorerReadOnlyCommands" xml:space="preserve"><value>Not executed: exploration runs only read-only commands (listing files, git status, log, diff, show, blame).</value></data>
+  <data name="ExplorerNoAnswer" xml:space="preserve"><value>The explorer found nothing to report. Search yourself.</value></data>
+  <data name="ToolExplore" xml:space="preserve"><value>Exploring: {0}</value></data>
+  <data name="ExplorerModelPrompt" xml:space="preserve"><value>Explorer model: researches the code in its own context and reports findings</value></data>
+  <data name="ExplorerModel" xml:space="preserve"><value>Explorer model</value></data>
+  <data name="ExplorerModelAction" xml:space="preserve"><value>Explorer model…</value></data>
+  <data name="CommandPickExplorerModel" xml:space="preserve"><value>Explorer model (code exploration)</value></data>
+  <data name="MemorySaved" xml:space="preserve"><value>Saved to memory: {0}.</value></data>
+  <data name="MemoryUpdated" xml:space="preserve"><value>Memory note {0} updated.</value></data>
+  <data name="MemoryDeleted" xml:space="preserve"><value>Deleted from memory: {0}.</value></data>
+  <data name="MemoryNotFound" xml:space="preserve"><value>There is no memory note {0}.</value></data>
+  <data name="MemoryBadName" xml:space="preserve"><value>A note name is lowercase latin letters, digits and dashes, like build-commands.</value></data>
+  <data name="MemoryBadType" xml:space="preserve"><value>A note type is user, feedback, project or reference.</value></data>
+  <data name="MemoryMissingField" xml:space="preserve"><value>Pass {0} to save a note.</value></data>
+  <data name="MemoryTooLong" xml:space="preserve"><value>A note is limited to {0} characters: keep only the essentials.</value></data>
+  <data name="MemoryFull" xml:space="preserve"><value>Memory holds at most {0} notes: merge or delete old ones first.</value></data>
+  <data name="MemoryNoFolder" xml:space="preserve"><value>Memory is kept per folder: open a folder first.</value></data>
+  <data name="MemoryBadAction" xml:space="preserve"><value>action is read, save or delete.</value></data>
+  <data name="MemoryIndexHeader" xml:space="preserve"><value># Agent memory for this folder
+
+Notes from earlier chats; the agent sees this list at the start of every chat. The list is built from the notes next to it: edit or delete the notes themselves.</value></data>
+  <data name="MemoryAutoSaved" xml:space="preserve"><value>Remembered for this folder: {0} — {1}</value></data>
+  <data name="ToolMemorySave" xml:space="preserve"><value>Remembered: {0}</value></data>
+  <data name="ToolMemoryRead" xml:space="preserve"><value>Memory: {0}</value></data>
+  <data name="ToolMemoryDelete" xml:space="preserve"><value>Forgotten: {0}</value></data>
+  <data name="CommandOpenMemory" xml:space="preserve"><value>Folder memory</value></data>
+  <data name="MenuOpenMemory" xml:space="preserve"><value>Agent memory for this folder</value></data>
+  <data name="OutputSavedToFile" xml:space="preserve"><value>[Output: {0} lines, {1} characters; the middle is omitted above. Full text: {2} — read it with read_file (startLine) or search it with search_text (include: that path).]</value></data>
+  <data name="OutputNotSaved" xml:space="preserve"><value>[Output: {0} lines, {1} characters; the middle is omitted. Narrow the command to see it.]</value></data>
+  <data name="ToolUnavailableInMode" xml:space="preserve"><value>Not executed: {0} is not available in {1} mode. Continue without it, or suggest switching to Agent mode.</value></data>
+  <data name="ChangesUnavailableInMode" xml:space="preserve"><value>Not executed: changes are not available in {0} mode, nothing was changed. Answer without changing files, or suggest switching to Agent mode.</value></data>
+  <data name="QuestionEmpty" xml:space="preserve"><value>The question is empty.</value></data>
+  <data name="UserAnswered" xml:space="preserve"><value>The user answered: {0}</value></data>
+  <data name="NoChangesInChat" xml:space="preserve"><value>You have not changed anything in this chat yet (or the user reverted the files).</value></data>
+  <data name="PlanCleared" xml:space="preserve"><value>Plan cleared.</value></data>
+  <data name="PlanUpdated" xml:space="preserve"><value>Plan updated:</value></data>
+  <data name="PlanDuplicateIds" xml:space="preserve"><value>Plan items have duplicate ids. Give each item its own id.</value></data>
+  <data name="PlanSingleInProgress" xml:space="preserve"><value>Only one item can be in progress. The rest must be pending or completed.</value></data>
+  <data name="PlanItemEmptyTitle" xml:space="preserve"><value>Item "{0}" has an empty title.</value></data>
+  <data name="PlanItemUnknownStatus" xml:space="preserve"><value>Item "{0}" has an unknown status "{1}": use pending, in_progress or completed.</value></data>
+  <data name="PlanTooShort" xml:space="preserve"><value>(Fewer than three items — such a task usually does not need a plan.)</value></data>
+  <data name="PlanTooLong" xml:space="preserve"><value>(More than ten items — merge the small ones: the plan is for the user, not a log of steps.)</value></data>
+  <!-- Approval cards. -->
+  <data name="ApprovalAllowTool" xml:space="preserve"><value>Allow {0}?</value></data>
+  <data name="ApprovalEdit" xml:space="preserve"><value>The agent proposes an edit</value></data>
+  <data name="ApprovalEdits" xml:space="preserve"><value>The agent proposes edits in {0} files</value></data>
+  <data name="ApprovalCreateFile" xml:space="preserve"><value>The agent wants to create a file</value></data>
+  <data name="ApprovalDelete" xml:space="preserve"><value>The agent wants to delete</value></data>
+  <data name="ApprovalMove" xml:space="preserve"><value>The agent wants to move</value></data>
+  <data name="ApprovalRunCommand" xml:space="preserve"><value>The agent wants to run a command</value></data>
+  <data name="ApprovalRunTool" xml:space="preserve"><value>The agent wants to run {0}</value></data>
+  <!-- Modes. -->
+  <data name="ModeAgent" xml:space="preserve"><value>Agent</value></data>
+  <data name="ModeAsk" xml:space="preserve"><value>Ask</value></data>
+  <data name="ModePlan" xml:space="preserve"><value>Plan</value></data>
+  <data name="ModeAgentDescription" xml:space="preserve"><value>does the task itself: reads, edits, builds and verifies</value></data>
+  <data name="ModeAskDescription" xml:space="preserve"><value>answers questions about the code without changing anything</value></data>
+  <data name="ModePlanDescription" xml:space="preserve"><value>studies the code and proposes a plan; run it with the button below the plan</value></data>
+  <data name="ModeDeep" xml:space="preserve"><value>Deep</value></data>
+  <data name="ModeDeepDescription" xml:space="preserve"><value>like Agent, plus an advisor model: reviews the risks before the first edit, helps when the agent is stuck and checks the result independently; build and tests are required. Slower and more expensive — for hard tasks</value></data>
+  <!-- Model request errors. -->
+  <data name="ErrorApiKeyRejected" xml:space="preserve"><value>The API key was not accepted. Check it with the "Agent: Set API key" command.</value></data>
+  <data name="ErrorModelNotFound" xml:space="preserve"><value>Model "{0}" was not found at {1}. Check agent.model in settings.</value></data>
+  <data name="ErrorPaymentRequired" xml:space="preserve"><value>The service balance doesn't cover this request (402). A service may reserve the cost of the input plus the longest possible answer, so a large chat on an expensive model needs a reserve: top up the balance, lower the answer limit (agent.maxOutputTokens) or pick a cheaper model. The work done so far is kept — you can continue.</value></data>
+  <data name="ErrorTooManyRequests" xml:space="preserve"><value>The service is rate limiting requests (429): wait a minute and try again.</value></data>
+  <data name="ErrorService" xml:space="preserve"><value>The service returned error {0}: {1}</value></data>
+  <data name="ErrorStream" xml:space="preserve"><value>The service ended the answer with an error: {0}</value></data>
+  <data name="ErrorNoConnection" xml:space="preserve"><value>Cannot reach {0}. Check your internet connection.</value></data>
+  <!-- Agent tool lines in the feed. -->
+  <data name="FileForms" xml:space="preserve"><value>file|files</value></data>
+  <data name="ToolAskUser" xml:space="preserve"><value>Question for the user</value></data>
+  <data name="ToolReviewChanges" xml:space="preserve"><value>Reviewing own changes</value></data>
+  <data name="ToolPlanItem" xml:space="preserve"><value>Plan · {0}</value></data>
+  <data name="ToolPlanUpdated" xml:space="preserve"><value>Plan updated</value></data>
+  <data name="ToolPlanCleared" xml:space="preserve"><value>cleared</value></data>
+  <data name="ProgressOf" xml:space="preserve"><value>{0} of {1}</value></data>
+  <!-- Context compaction. -->
+  <data name="CompactedToolResults" xml:space="preserve"><value>[Old tool results were compacted; call the tools again for anything you need]</value></data>
+  <data name="CompactedNoResult" xml:space="preserve"><value>(no result)</value></data>
+  <data name="CompactedEmptyResult" xml:space="preserve"><value>(empty)</value></data>
+  <data name="ContextSummarized" xml:space="preserve"><value>Context compacted: the early part of the conversation was replaced with a summary; the agent will reread files before editing</value></data>
+  <data name="ContextTruncated" xml:space="preserve"><value>Context overflow: the oldest messages of the conversation were dropped</value></data>
+  <data name="WrapUpRequest" xml:space="preserve"><value>The step limit of this mode is exhausted: do not call tools anymore. Briefly summarize: what is established by evidence (with path:line), what is only a hypothesis and why, what was done and how it was verified, what remains and where to continue. Do not present an unverified hypothesis as the cause and do not invent a mechanism to make the findings fit.</value></data>
+  <data name="CurrentPlan" xml:space="preserve"><value>Current plan (manage_todo):</value></data>
+  <data name="UserChangedFiles" xml:space="preserve"><value>The user changed these files after you last saw them — read them again before editing: {0}.</value></data>
+  <data name="UserRejectedChanges" xml:space="preserve"><value>rejected your changes</value></data>
+  <data name="UserDeletedFile" xml:space="preserve"><value>deleted</value></data>
+  <!-- Agent, chats, setup. -->
+  <data name="AgentTitle" xml:space="preserve"><value>Agent</value></data>
+  <data name="NewChat" xml:space="preserve"><value>New chat</value></data>
+  <data name="ChatToday" xml:space="preserve"><value>today, {0}</value></data>
+  <data name="ChatYesterday" xml:space="preserve"><value>yesterday, {0}</value></data>
+  <data name="TokensThousands" xml:space="preserve"><value>{0}K</value></data>
+  <data name="TokensMillions" xml:space="preserve"><value>{0}M</value></data>
+  <data name="FileNotFound" xml:space="preserve"><value>File not found: {0}</value></data>
+  <data name="ErrorNoApiKey" xml:space="preserve"><value>No API key is set. Run the "Agent: Set API key" command.</value></data>
+  <data name="ErrorEndpointNotUrl" xml:space="preserve"><value>API address "{0}" is not a URL. Check agent.endpoint in settings.</value></data>
+  <!-- Chat feed. -->
+  <data name="AuthorUser" xml:space="preserve"><value>You</value></data>
+  <data name="AuthorTool" xml:space="preserve"><value>Tool</value></data>
+  <data name="AuthorApproval" xml:space="preserve"><value>Approval</value></data>
+  <data name="AuthorReasoning" xml:space="preserve"><value>Thinking</value></data>
+  <data name="AuthorEditor" xml:space="preserve"><value>Editor</value></data>
+  <data name="AuthorAgentQuestion" xml:space="preserve"><value>Agent question</value></data>
+  <data name="AuthorCheck" xml:space="preserve"><value>Check</value></data>
+  <data name="AuthorReviewer" xml:space="preserve"><value>Reviewer</value></data>
+  <data name="AuthorError" xml:space="preserve"><value>Error</value></data>
+  <data name="Exploring" xml:space="preserve"><value>Exploring…</value></data>
+  <data name="Explored" xml:space="preserve"><value>Explored {0}</value></data>
+  <data name="SearchForms" xml:space="preserve"><value>search|searches</value></data>
+  <data name="FolderForms" xml:space="preserve"><value>folder|folders</value></data>
+  <data name="StepForms" xml:space="preserve"><value>step|steps</value></data>
+  <data name="ContinueRequest" xml:space="preserve"><value>Continue from where you left off.</value></data>
+  <data name="ExecutePlanRequest" xml:space="preserve"><value>Execute this plan.</value></data>
+  <data name="ChatOpenDetail" xml:space="preserve"><value>{0} · open</value></data>
+  <data name="OpenChatPrompt" xml:space="preserve"><value>Open a chat from this folder</value></data>
+  <data name="NoSavedChats" xml:space="preserve"><value>No saved chats yet</value></data>
+  <data name="OpenFolderForChats" xml:space="preserve"><value>Open a folder: chats are stored in it</value></data>
+  <!-- Changed files and diff. -->
+  <data name="ChangedFilesTitle" xml:space="preserve"><value>Changed files: {0}</value></data>
+  <data name="ChangedFilesReadFailed" xml:space="preserve"><value>Could not read the changed files: {0}</value></data>
+  <data name="ChangesNotAccepted" xml:space="preserve"><value>Changes were not accepted: {0}</value></data>
+  <data name="ChangesAccepted" xml:space="preserve"><value>Agent changes accepted: {0}</value></data>
+  <data name="ChangesReverted" xml:space="preserve"><value>Agent changes reverted: {0}</value></data>
+  <data name="FileReverted" xml:space="preserve"><value>Reverted {0}</value></data>
+  <data name="RevertFailed" xml:space="preserve"><value>Could not revert {0}: {1}</value></data>
+  <data name="DiffNewFile" xml:space="preserve"><value>New file {0}</value></data>
+  <data name="DiffDelete" xml:space="preserve"><value>Delete {0} (to the recycle bin)</value></data>
+  <data name="DiffMove" xml:space="preserve"><value>Move {0} → {1}</value></data>
+  <data name="DiffCommandInProject" xml:space="preserve"><value>Command in the project folder</value></data>
+  <data name="DiffCommandInFolder" xml:space="preserve"><value>Command in folder {0}</value></data>
+  <data name="DiffEdit" xml:space="preserve"><value>Edit {0}</value></data>
+  <data name="DiffMoreLines" xml:space="preserve"><value>…{0} more lines</value></data>
+  <!-- Context usage. -->
+  <data name="ContextSummary" xml:space="preserve"><value>Context: {0}{1} of {2} tokens ({3})</value></data>
+  <data name="ContextNoRequests" xml:space="preserve"><value>No requests in this chat yet.</value></data>
+  <data name="ContextSpent" xml:space="preserve"><value>This chat: {0} requests, sent {1}{2}, received {1}{3}</value></data>
+  <data name="ContextSpentCached" xml:space="preserve"><value>; {0} of input came from cache ({1} in the last request).</value></data>
+  <data name="ContextNearlyFull" xml:space="preserve"><value>The context is close to its limit: old tool results will soon be collapsed and the start of the conversation summarized. Start a new chat for a new topic.</value></data>
+  <data name="ContextLimitHint" xml:space="preserve"><value>The chat limit is {0} tokens (the model window is {1}): beyond it old tool results are collapsed and the start of the conversation is summarized. Change it with agent.contextLimit.</value></data>
+  <data name="ContextWindowHint" xml:space="preserve"><value>Set the context window in the model parameters if the catalog does not know it.</value></data>
+  <!-- Agent turn in the feed. -->
+  <data name="DurationSeconds" xml:space="preserve"><value>{0}s</value></data>
+  <data name="DurationMinutes" xml:space="preserve"><value>{0} min</value></data>
+  <data name="DurationMinutesSeconds" xml:space="preserve"><value>{0} min {1}s</value></data>
+  <data name="WorkingFor" xml:space="preserve"><value>Working · {0}</value></data>
+  <data name="WorkLog" xml:space="preserve"><value>Work log · {0}</value></data>
+  <data name="WorkedFor" xml:space="preserve"><value>Worked for {0} · {1}</value></data>
+  <data name="ActionForms" xml:space="preserve"><value>action|actions</value></data>
+  <data name="Thoughts" xml:space="preserve"><value>Thinking</value></data>
+  <data name="ThinkingNow" xml:space="preserve"><value>Thinking…</value></data>
+  <data name="ThinkingFor" xml:space="preserve"><value>Thinking · {0}</value></data>
+  <data name="ThoughtFor" xml:space="preserve"><value>Thought for {0}</value></data>
+  <data name="PlanReady" xml:space="preserve"><value>The plan is ready. Run it in Agent mode; refine it with a message.</value></data>
+  <data name="StepLimitNotice" xml:space="preserve"><value>Reached the limit of {0} model requests per turn: above is the summary so far. Continue with the button or a message.</value></data>
+  <data name="QuestionWithdrawnNote" xml:space="preserve"><value>(question withdrawn)</value></data>
+  <data name="QuestionWithdrawn" xml:space="preserve"><value>Question withdrawn</value></data>
+  <data name="QuestionAnswered" xml:space="preserve"><value>Answer: {0}</value></data>
+  <data name="ApprovalAppliedAutomatically" xml:space="preserve"><value>Applied without asking</value></data>
+  <data name="ApprovalApplied" xml:space="preserve"><value>Applied</value></data>
+  <data name="ApprovalRejected" xml:space="preserve"><value>Rejected</value></data>
+  <data name="UserRejectedAction" xml:space="preserve"><value>The user rejected this action.</value></data>
+  <data name="LengthLimitNotice" xml:space="preserve"><value>The model response was cut off by the length limit: increase "Response length" in the model parameters and continue with a message.</value></data>
+  <data name="ContinueAfterLength" xml:space="preserve"><value>Your answer was cut off by the length limit. Continue exactly from where it stopped, without repetition, recap or apologies.</value></data>
+  <data name="Stopped" xml:space="preserve"><value>(stopped)</value></data>
+  <data name="ActiveFileShared" xml:space="preserve"><value>The agent sees which file is open: {0}. Click to stop sharing it.</value></data>
+  <data name="ActiveFileNotShared" xml:space="preserve"><value>The file is not shared with the agent. Click to share it.</value></data>
+  <data name="TodoTitle" xml:space="preserve"><value>Plan · {0} of {1}</value></data>
+  <data name="FileStatusNew" xml:space="preserve"><value>new</value></data>
+  <data name="FileStatusDeleted" xml:space="preserve"><value>deleted</value></data>
+  <!-- Mode and model. -->
+  <data name="ModeToolTip" xml:space="preserve"><value>Agent mode: {0} — {1}. Click to choose another.</value></data>
+  <data name="ModeChanged" xml:space="preserve"><value>Agent mode: {0}</value></data>
+  <data name="CurrentModeDetail" xml:space="preserve"><value>current · {0}</value></data>
+  <data name="ModePickTitle" xml:space="preserve"><value>Agent mode</value></data>
+  <data name="ParameterDefault" xml:space="preserve"><value>Default</value></data>
+  <data name="ParameterAuto" xml:space="preserve"><value>Auto</value></data>
+  <data name="SameAsAgent" xml:space="preserve"><value>Same as the agent</value></data>
+  <data name="ReasoningNone" xml:space="preserve"><value>No reasoning</value></data>
+  <data name="ReasoningLow" xml:space="preserve"><value>Low</value></data>
+  <data name="ReasoningMedium" xml:space="preserve"><value>Medium</value></data>
+  <data name="ReasoningHigh" xml:space="preserve"><value>High</value></data>
+  <data name="ReasoningExtraHigh" xml:space="preserve"><value>Maximum</value></data>
+  <data name="ParametersSummary" xml:space="preserve"><value>Model parameters — {0}</value></data>
+  <data name="CurrentModel" xml:space="preserve"><value>current</value></data>
+  <data name="PickModelPrompt" xml:space="preserve"><value>Agent model: choose or type "vendor/model"</value></data>
+  <data name="ModelChanged" xml:space="preserve"><value>Agent model: {0}</value></data>
+  <data name="UseCustomModel" xml:space="preserve"><value>Use "{0}"</value></data>
+  <data name="HelperModelPrompt" xml:space="preserve"><value>Helper model: memory notes after a turn and fallback compaction summaries</value></data>
+  <data name="HelperModel" xml:space="preserve"><value>Helper model</value></data>
+  <data name="ParamReasoning" xml:space="preserve"><value>Reasoning</value></data>
+  <data name="ParamTemperature" xml:space="preserve"><value>Temperature</value></data>
+  <data name="ParamMaxOutputTokens" xml:space="preserve"><value>Response length</value></data>
+  <data name="ParamContextWindow" xml:space="preserve"><value>Context window</value></data>
+  <data name="ParamApprovals" xml:space="preserve"><value>Edit approval</value></data>
+  <data name="ApproveEachEdit" xml:space="preserve"><value>Every edit</value></data>
+  <data name="AcceptEditsImmediately" xml:space="preserve"><value>Accept edits immediately</value></data>
+  <data name="PickModelAction" xml:space="preserve"><value>Choose model…</value></data>
+  <data name="HelperModelAction" xml:space="preserve"><value>Helper model…</value></data>
+  <data name="AllSettingsAction" xml:space="preserve"><value>All settings…</value></data>
+  <!-- Commands. -->
+  <data name="CommandSetApiKey" xml:space="preserve"><value>Set API key</value></data>
+  <data name="CommandClearApiKey" xml:space="preserve"><value>Delete API key</value></data>
+  <data name="CommandShowHistory" xml:space="preserve"><value>Folder chat history</value></data>
+  <data name="CommandDeleteChat" xml:space="preserve"><value>Delete current chat</value></data>
+  <data name="CommandPickMode" xml:space="preserve"><value>Choose mode</value></data>
+  <data name="CommandPickModel" xml:space="preserve"><value>Choose model</value></data>
+  <data name="CommandPickHelperModel" xml:space="preserve"><value>Helper model (memory, fallback summaries)</value></data>
+  <data name="CommandModelParameters" xml:space="preserve"><value>Model parameters</value></data>
+  <data name="CommandContextDetails" xml:space="preserve"><value>Context usage</value></data>
+  <data name="CommandToggleActiveFile" xml:space="preserve"><value>Share the active file with the agent</value></data>
+  <data name="CommandCopyLastAnswer" xml:space="preserve"><value>Copy last answer</value></data>
+  <data name="CommandContinue" xml:space="preserve"><value>Continue after the request limit</value></data>
+  <data name="ExecutePlan" xml:space="preserve"><value>Run plan</value></data>
+  <data name="CommandAcceptChanges" xml:space="preserve"><value>Accept agent changes</value></data>
+  <data name="CommandRevertChanges" xml:space="preserve"><value>Revert all agent changes</value></data>
+  <data name="MenuApiKey" xml:space="preserve"><value>Agent API key…</value></data>
+  <data name="ApiKeyDialogTitle" xml:space="preserve"><value>Agent API key</value></data>
+  <data name="ApiKeyDialogPrompt" xml:space="preserve"><value>Paste your {0} API key.</value></data>
+  <data name="ApiKeySaved" xml:space="preserve"><value>API key saved</value></data>
+  <data name="ClearApiKeyQuestion" xml:space="preserve"><value>Delete the agent API key?</value></data>
+  <data name="ClearApiKeyDetails" xml:space="preserve"><value>To use the agent again, you will have to enter the key again.</value></data>
+  <data name="Delete" xml:space="preserve"><value>Delete</value></data>
+  <data name="ApiKeyDeleted" xml:space="preserve"><value>API key deleted</value></data>
+  <!-- Chat panel (CodeEditor.Modules.Agent.Wpf). -->
+  <data name="AgentViewModuleName" xml:space="preserve"><value>Agent: view</value></data>
+  <data name="MoreActions" xml:space="preserve"><value>More actions</value></data>
+  <data name="ChatHistory" xml:space="preserve"><value>Chat history</value></data>
+  <data name="RevertAll" xml:space="preserve"><value>Revert all</value></data>
+  <data name="RevertAllToolTip" xml:space="preserve"><value>Restore the original text of all files (undo with Ctrl+Z in the tab)</value></data>
+  <data name="Accept" xml:space="preserve"><value>Accept</value></data>
+  <data name="AcceptToolTip" xml:space="preserve"><value>Save the files and clear the list</value></data>
+  <data name="RevertFile" xml:space="preserve"><value>Revert file</value></data>
+  <data name="RevertFileName" xml:space="preserve"><value>Revert {0}</value></data>
+  <data name="ShowDiff" xml:space="preserve"><value>Show diff</value></data>
+  <data name="DiffFileName" xml:space="preserve"><value>Diff {0}</value></data>
+  <data name="ApiKeyMissing" xml:space="preserve"><value>To talk to the agent, set the API key of the model service. It is stored encrypted for your Windows account.</value></data>
+  <data name="WelcomeTitle" xml:space="preserve"><value>Ask the agent about the code in this folder</value></data>
+  <data name="WelcomeText" xml:space="preserve"><value>The agent reads and searches the project files, shows edits as diffs and applies them after approval. Links like file:line in an answer open the file.</value></data>
+  <data name="WelcomeOpenFolder" xml:space="preserve"><value>Open a folder to save chats in it.</value></data>
+  <data name="RecentChats" xml:space="preserve"><value>Recent chats</value></data>
+  <data name="AllFolderChats" xml:space="preserve"><value>All folder chats…</value></data>
+  <data name="Send" xml:space="preserve"><value>Send</value></data>
+  <data name="SendToolTip" xml:space="preserve"><value>Send (Enter)</value></data>
+  <data name="Stop" xml:space="preserve"><value>Stop</value></data>
+  <data name="StopToolTip" xml:space="preserve"><value>Stop (Esc)</value></data>
+  <data name="InputPlaceholder" xml:space="preserve"><value>Ask the agent</value></data>
+  <data name="InputName" xml:space="preserve"><value>Message to the agent</value></data>
+  <data name="Apply" xml:space="preserve"><value>Apply</value></data>
+  <data name="Reject" xml:space="preserve"><value>Reject</value></data>
+  <data name="AllowForChat" xml:space="preserve"><value>Allow for this chat</value></data>
+  <data name="AllowForChatToolTip" xml:space="preserve"><value>Use this tool without asking for the rest of this chat</value></data>
+  <data name="AllowAlways" xml:space="preserve"><value>Always allow “{0}”</value></data>
+  <data name="AllowAlwaysToolTip" xml:space="preserve"><value>Run commands starting with these words without asking, in every chat. The rule is saved to terminal.allowedCommands in your settings.</value></data>
+  <data name="AttachmentToolTip" xml:space="preserve"><value>The agent saw which file was open</value></data>
+  <data name="Waiting" xml:space="preserve"><value>Thinking…</value></data>
+  <data name="Continue" xml:space="preserve"><value>Continue</value></data>
+  <data name="Answer" xml:space="preserve"><value>Answer</value></data>
+  <data name="CustomAnswer" xml:space="preserve"><value>Your answer</value></data>
+  <data name="ModelsTitle" xml:space="preserve"><value>Models</value></data>
+  <data name="ModelsHint" xml:space="preserve"><value>Enabled models appear in the model picker of the chat.</value></data>
+  <data name="ModelsSearchPlaceholder" xml:space="preserve"><value>Search models or type vendor/model</value></data>
+  <data name="ModelsLoading" xml:space="preserve"><value>Loading the model list…</value></data>
+  <data name="ModelsLoadFailed" xml:space="preserve"><value>Could not load the model list: {0}</value></data>
+  <data name="ModelsVendorCount" xml:space="preserve"><value>{0} of {1}</value></data>
+  <data name="ModelsSummary" xml:space="preserve"><value>Models: {0}, enabled: {1}</value></data>
+  <data name="ModelsAddCustom" xml:space="preserve"><value>Add</value></data>
+  <data name="ModelsAddCustomHint" xml:space="preserve"><value>Add the typed model: vendor/model</value></data>
+  <data name="ModelsBack" xml:space="preserve"><value>Back to chat</value></data>
+  <data name="ModelsRefresh" xml:space="preserve"><value>Refresh the list</value></data>
+  <data name="ModelsCurrent" xml:space="preserve"><value>current</value></data>
+  <data name="ManageModelsAction" xml:space="preserve"><value>Manage models…</value></data>
+  <data name="CommandManageModels" xml:space="preserve"><value>Manage models</value></data>
+  <data name="UseSupportedModelsAction" xml:space="preserve"><value>Only supported models</value></data>
+  <data name="CommandUseSupportedModels" xml:space="preserve"><value>Keep only supported models</value></data>
+  <data name="ModelTierFast" xml:space="preserve"><value>fast</value></data>
+  <data name="ModelTierOptimal" xml:space="preserve"><value>optimal</value></data>
+  <data name="ModelTierPowerful" xml:space="preserve"><value>powerful</value></data>
+  <data name="RunCommand" xml:space="preserve"><value>Run</value></data>
+  <data name="ApprovalAllowed" xml:space="preserve"><value>Allowed</value></data>
+  <data name="ApprovalAllowedAutomatically" xml:space="preserve"><value>Allowed without asking</value></data>
+  <data name="AttachFilesTitle" xml:space="preserve"><value>Attach files</value></data>
+  <data name="AttachFilesToolTip" xml:space="preserve"><value>Attach files: text and images</value></data>
+  <data name="CommandAttachFiles" xml:space="preserve"><value>Attach files…</value></data>
+  <data name="AttachmentRejected" xml:space="preserve"><value>Not attached: {0}. Text files and images up to 5 MB are supported.</value></data>
+  <data name="RemoveAttachment" xml:space="preserve"><value>Remove</value></data>
+  <data name="AttachedFilesToolTip" xml:space="preserve"><value>Files attached to the question</value></data>
+  <data name="AttachFilesFilter" xml:space="preserve"><value>All files|*.*|Images|*.png;*.jpg;*.jpeg;*.gif;*.webp</value></data>
+  <data name="ParamService" xml:space="preserve"><value>Service</value></data>
+  <data name="ServiceChanged" xml:space="preserve"><value>Service: {0}. Set its API key with the Agent: Set API Key command if it has none yet.</value></data>
+  <!-- Message queue during a turn (ADR 0026). -->
+  <data name="Queued" xml:space="preserve"><value>Queued</value></data>
+  <data name="RemoveQueued" xml:space="preserve"><value>Remove from the queue</value></data>
+  <!-- Web access (ADR 0025). -->
+  <data name="WebOnlyHttp" xml:space="preserve"><value>Only http and https addresses can be read: {0}</value></data>
+  <data name="WebHttpError" xml:space="preserve"><value>{0} answered {1} {2}.</value></data>
+  <data name="WebNotText" xml:space="preserve"><value>{0} is not a text page ({1}): it cannot be read as text.</value></data>
+  <data name="WebUnreachable" xml:space="preserve"><value>{0} is unreachable: {1}</value></data>
+  <data name="WebTimedOut" xml:space="preserve"><value>{0} did not answer in {1} s.</value></data>
+  <data name="WebSearchFailed" xml:space="preserve"><value>Web search failed: {0}</value></data>
+  <data name="WebNothingFound" xml:space="preserve"><value>Nothing relevant was found.</value></data>
+  <data name="WebSources" xml:space="preserve"><value>Sources:</value></data>
+  <data name="ApprovalWebFetch" xml:space="preserve"><value>The agent wants to open a web page</value></data>
+  <data name="ToolWebFetch" xml:space="preserve"><value>Page {0}</value></data>
+  <data name="ToolWebSearch" xml:space="preserve"><value>Web search “{0}”</value></data>
+  <data name="ViewImageResult" xml:space="preserve"><value>The image {0} is in the next message.</value></data>
+  <data name="ViewImageUnsupported" xml:space="preserve"><value>{0} is not an image the model can see: use png, jpg, gif or webp.</value></data>
+  <data name="ViewImageTooLarge" xml:space="preserve"><value>{0} is larger than 5 MB: the model does not accept such images.</value></data>
+  <data name="ImagesNote" xml:space="preserve"><value>Images you opened with view_image.</value></data>
+  <data name="ToolViewImage" xml:space="preserve"><value>Image {0}</value></data>
+  <data name="AskBeforeNewPackage" xml:space="preserve"><value>adding a package</value></data>
+  <data name="AskBeforePublicApi" xml:space="preserve"><value>changing the public API (*.Contracts)</value></data>
+  <data name="AskBeforeDeleteTests" xml:space="preserve"><value>deleting tests</value></data>
+  <data name="AskBeforeMigration" xml:space="preserve"><value>adding a migration</value></data>
+  <data name="RulesProtectedPath" xml:space="preserve"><value>agent.md protects {0}.</value></data>
+  <data name="RulesAskBefore" xml:space="preserve"><value>agent.md asks before {0}.</value></data>
+  <data name="RulesBeforeEdit" xml:space="preserve"><value>Not applied yet: the project has rules for these files. Follow them and repeat the change.</value></data>
+  <data name="RulesUnknownCategory" xml:space="preserve"><value>{0}: unknown ask_before value "{1}"; known values: {2}.</value></data>
+  <data name="RulesUnknownSetting" xml:space="preserve"><value>{0}: unknown setting "{1}"; known settings: {2}.</value></data>
+  <data name="RulesSkipped" xml:space="preserve"><value>{0}: not sent to the agent — together the rules are longer than {1} lines.</value></data>
+  <data name="RulesProblem" xml:space="preserve"><value>Agent rules: {0}</value></data>
+  <data name="RulesProblems" xml:space="preserve"><value>Agent rules: {0} (and {1} more in the log)</value></data>
+  <data name="RulesFileFailed" xml:space="preserve"><value>Could not create agent.md: {0}</value></data>
+  <data name="RulesNoFolder" xml:space="preserve"><value>Open a folder to set rules for the agent.</value></data>
+  <data name="CommandOpenRules" xml:space="preserve"><value>Folder Rules (agent.md)</value></data>
+  <data name="MenuOpenRules" xml:space="preserve"><value>Agent Rules</value></data>
+  <data name="ApprovalReason" xml:space="preserve"><value>Why I ask</value></data>
+  <data name="AgentRulesTemplate" xml:space="preserve"><value>---
+# Settings the editor enforces. Remove "# " at the start of a line to turn it on.
+# Paths the agent changes only with your approval, even when edits are accepted automatically:
+# protected: ["**/*.csproj", ".github/**"]
+# Actions that always ask: new-package, public-api, delete-tests, migration.
+# ask_before: [new-package, delete-tests]
+---
+
+# Rules for the agent
+
+Write instructions, not an overview of the project: the agent reads the code itself.
+Keep it short — this file goes into every request, and long rules are followed worse.
+
+## How to work
+- 
+
+## Conventions
+- 
+
+## Don't
+- 
+
+&lt;!--
+Rules for some files: .breeze/rules/&lt;name&gt;.md with a header, for example
+---
+applies: "src/**/*.xaml"
+description: XAML styles
+---
+The agent gets the text when it reads or edits a matching file.
+--&gt;
+</value></data>
+  <data name="ApiKeyDialogPromptCustom" xml:space="preserve"><value>Paste the API key of {0} (the agent.endpoint setting). The service must support the OpenAI Chat Completions API with tool calls and streaming; the agent is tested with AITUNNEL.</value></data>
+</root>

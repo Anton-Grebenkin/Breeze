@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="ModuleName" xml:space="preserve"><value>Проводник</value></data>
+  <data name="ViewModuleName" xml:space="preserve"><value>Проводник: представление</value></data>
+  <data name="NewFile" xml:space="preserve"><value>Новый файл…</value></data>
+  <data name="NewFolder" xml:space="preserve"><value>Новая папка…</value></data>
+  <data name="Open" xml:space="preserve"><value>Открыть</value></data>
+  <data name="Rename" xml:space="preserve"><value>Переименовать</value></data>
+  <data name="Delete" xml:space="preserve"><value>Удалить</value></data>
+  <data name="CopyPath" xml:space="preserve"><value>Копировать путь</value></data>
+  <data name="CopyRelativePath" xml:space="preserve"><value>Копировать относительный путь</value></data>
+  <data name="RevealInFileManager" xml:space="preserve"><value>Показать в Проводнике Windows</value></data>
+  <data name="Refresh" xml:space="preserve"><value>Обновить</value></data>
+  <data name="CollapseAll" xml:space="preserve"><value>Свернуть все папки</value></data>
+  <data name="MenuNewFile" xml:space="preserve"><value>_Новый файл…</value></data>
+  <data name="MenuNewFolder" xml:space="preserve"><value>Новая _папка…</value></data>
+  <data name="MenuOpen" xml:space="preserve"><value>_Открыть</value></data>
+  <data name="MenuRevealInFileManager" xml:space="preserve"><value>Показать в _Проводнике Windows</value></data>
+  <data name="MenuCopyPath" xml:space="preserve"><value>_Копировать путь</value></data>
+  <data name="MenuCopyRelativePath" xml:space="preserve"><value>Копировать _относительный путь</value></data>
+  <data name="MenuRename" xml:space="preserve"><value>П_ереименовать</value></data>
+  <data name="MenuDelete" xml:space="preserve"><value>_Удалить</value></data>
+  <data name="NewFileToolTip" xml:space="preserve"><value>Новый файл</value></data>
+  <data name="NewFolderToolTip" xml:space="preserve"><value>Новая папка</value></data>
+  <data name="FolderNotOpen" xml:space="preserve"><value>Папка не открыта.</value></data>
+  <data name="OpenFolder" xml:space="preserve"><value>Открыть папку</value></data>
+  <data name="NameField" xml:space="preserve"><value>Имя</value></data>
+  <data name="DeleteFileQuestion" xml:space="preserve"><value>Удалить файл «{0}»?</value></data>
+  <data name="DeleteFolderQuestion" xml:space="preserve"><value>Удалить папку «{0}»?</value></data>
+  <data name="DeleteRestoreHint" xml:space="preserve"><value>Его можно будет восстановить из корзины.</value></data>
+  <data name="NameRequired" xml:space="preserve"><value>Введите имя файла или папки.</value></data>
+  <data name="NameInvalid" xml:space="preserve"><value>Имя «{0}» недопустимо.</value></data>
+  <data name="NameExists" xml:space="preserve"><value>«{0}» уже существует в этой папке.</value></data>
+  <data name="ToolFolderNotFound" xml:space="preserve"><value>Папки «{0}» нет.</value></data>
+  <data name="ToolEmptyFolder" xml:space="preserve"><value>(пусто)</value></data>
+  <data name="ToolTooManyEntries" xml:space="preserve"><value>…(больше {0} записей; уточните путь или уменьшите depth)</value></data>
+  <data name="ToolEmptyFile" xml:space="preserve"><value>(пустой файл)</value></data>
+  <data name="ToolLinesUnchanged" xml:space="preserve"><value>(Строки {0}–{1} файла {2} не изменились с прошлого чтения в этом чате — используйте прежний результат.)</value></data>
+  <data name="ToolLinesPage" xml:space="preserve"><value>…(строки {0}–{1} из {2}; продолжение — startLine={3})</value></data>
+  <data name="ToolWorkspaceNotOpen" xml:space="preserve"><value>Рабочая папка не открыта.</value></data>
+  <data name="ToolNoFilesFound" xml:space="preserve"><value>(ничего не найдено)</value></data>
+  <data name="ToolSimilarPaths" xml:space="preserve"><value> Похожие пути в папке: {0}.</value></data>
+  <data name="ToolPathResolved" xml:space="preserve"><value>(«{0}» — это {1})</value></data>
+  <data name="ToolPathAmbiguous" xml:space="preserve"><value>«{0}» подходит к нескольким файлам: {1}. Укажите путь от корня папки.</value></data>
+  <data name="ToolMoreFiles" xml:space="preserve"><value>…(ещё {0}; уточните маску)</value></data>
+  <data name="ToolPathIsFolder" xml:space="preserve"><value>«{0}» — папка, а не файл: её содержимое покажет list_dir.</value></data>
+  <data name="ToolFolderInsteadOfFile" xml:space="preserve"><value>(«{0}» — папка, а не файл; её содержимое:)</value></data>
+  <data name="ToolFileNotFound" xml:space="preserve"><value>Файла «{0}» нет.</value></data>
+  <data name="ToolBinaryFile" xml:space="preserve"><value>«{0}» — двоичный файл.</value></data>
+  <data name="ToolMovedToRecycleBin" xml:space="preserve"><value>{0} перемещён в корзину.</value></data>
+  <data name="ToolWorkspaceUntouchable" xml:space="preserve"><value>Рабочую папку целиком удалять и переносить нельзя.</value></data>
+  <data name="ToolPathNotFound" xml:space="preserve"><value>«{0}» нет.</value></data>
+  <data name="ToolPathExists" xml:space="preserve"><value>«{0}» уже существует.</value></data>
+  <data name="ReadFileDone" xml:space="preserve"><value>Прочитан {0}</value></data>
+  <data name="ReadFileRunning" xml:space="preserve"><value>Чтение {0}</value></data>
+  <data name="ListDirDone" xml:space="preserve"><value>Просмотрена папка {0}</value></data>
+  <data name="ListDirRunning" xml:space="preserve"><value>Просмотр папки {0}</value></data>
+  <data name="ListRootDone" xml:space="preserve"><value>Просмотрена папка проекта</value></data>
+  <data name="ListRootRunning" xml:space="preserve"><value>Просмотр папки проекта</value></data>
+  <data name="FindFilesDone" xml:space="preserve"><value>Найдены файлы «{0}»</value></data>
+  <data name="FindFilesRunning" xml:space="preserve"><value>Поиск файлов «{0}»</value></data>
+  <data name="DeleteDone" xml:space="preserve"><value>Удалён {0}</value></data>
+  <data name="DeleteRunning" xml:space="preserve"><value>Удаление {0}</value></data>
+  <data name="MoveDone" xml:space="preserve"><value>Перенесён {0} → {1}</value></data>
+  <data name="MoveRunning" xml:space="preserve"><value>Перенос {0} → {1}</value></data>
+  <data name="ItemForms" xml:space="preserve"><value>элемент|элемента|элементов</value></data>
+  <data name="FileForms" xml:space="preserve"><value>файл|файла|файлов</value></data>
+  <data name="LinesEmpty" xml:space="preserve"><value>пустой</value></data>
+  <data name="LinesUnchanged" xml:space="preserve"><value>без изменений</value></data>
+  <data name="LinesRange" xml:space="preserve"><value>строки {0}–{1}</value></data>
+  <data name="AgentChangesMark" xml:space="preserve"><value>Правки агента ждут просмотра</value></data>
+  <data name="CopyName" xml:space="preserve"><value>{0} копия</value></data>
+  <data name="CopyNameNumbered" xml:space="preserve"><value>{0} копия {1}</value></data>
+  <data name="ReplaceQuestion" xml:space="preserve"><value>Файл или папка «{0}» уже есть в «{1}». Заменить?</value></data>
+  <data name="ReplaceHint" xml:space="preserve"><value>Заменяемый элемент уйдёт в корзину.</value></data>
+  <data name="Replace" xml:space="preserve"><value>Заменить</value></data>
+  <data name="CannotReplaceParent" xml:space="preserve"><value>Нельзя заменить «{0}»: перемещаемый элемент лежит внутри.</value></data>
+</root>

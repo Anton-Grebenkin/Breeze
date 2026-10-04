@@ -1,0 +1,28 @@
+<UserControl x:Class="CodeEditor.Shell.Wpf.Views.CaptionButtons"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="clr-namespace:CodeEditor.UI.Themes;assembly=CodeEditor.UI"
+             xmlns:res="clr-namespace:CodeEditor.Shell.Resources;assembly=CodeEditor.Shell"
+             WindowChrome.IsHitTestVisibleInChrome="True">
+  <StackPanel Orientation="Horizontal">
+    <Button Style="{StaticResource Button.Caption}"
+            Content="{x:Static ui:IconGlyphs.ChromeMinimize}"
+            ToolTip="{x:Static res:Strings.Minimize}"
+            Click="OnMinimize"
+            AutomationProperties.AutomationId="Caption.Minimize"
+            AutomationProperties.Name="{x:Static res:Strings.Minimize}" />
+    <Button x:Name="MaximizeButton"
+            Style="{StaticResource Button.Caption}"
+            Content="{x:Static ui:IconGlyphs.ChromeMaximize}"
+            ToolTip="{x:Static res:Strings.Maximize}"
+            Click="OnMaximizeOrRestore"
+            AutomationProperties.AutomationId="Caption.Maximize"
+            AutomationProperties.Name="{x:Static res:Strings.Maximize}" />
+    <Button Style="{StaticResource Button.CaptionClose}"
+            Content="{x:Static ui:IconGlyphs.ChromeClose}"
+            ToolTip="{x:Static res:Strings.Close}"
+            Click="OnClose"
+            AutomationProperties.AutomationId="Caption.Close"
+            AutomationProperties.Name="{x:Static res:Strings.Close}" />
+  </StackPanel>
+</UserControl>

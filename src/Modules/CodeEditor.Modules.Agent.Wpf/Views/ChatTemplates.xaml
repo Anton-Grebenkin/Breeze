@@ -1,0 +1,331 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:approvals="clr-namespace:CodeEditor.Modules.Agent.ViewModels.Approvals;assembly=CodeEditor.Modules.Agent"
+                    xmlns:chat="clr-namespace:CodeEditor.Modules.Agent.ViewModels.Chat;assembly=CodeEditor.Modules.Agent"
+                    xmlns:views="clr-namespace:CodeEditor.Modules.Agent.Wpf.Views"
+                    xmlns:ui="clr-namespace:CodeEditor.UI.Themes;assembly=CodeEditor.UI"
+                    xmlns:controls="clr-namespace:CodeEditor.UI.Controls;assembly=CodeEditor.UI"
+                    xmlns:res="clr-namespace:CodeEditor.Modules.Agent.Resources;assembly=CodeEditor.Modules.Agent"
+                    xmlns:markdown="clr-namespace:CodeEditor.UI.Markdown;assembly=CodeEditor.UI">
+
+  <!-- Chat feed: question chip, Markdown answer, agent work as a chain block (ActivityTemplates), edit cards. -->
+
+  <ResourceDictionary.MergedDictionaries>
+    <ResourceDictionary Source="ActivityTemplates.xaml" />
+  </ResourceDictionary.MergedDictionaries>
+
+  <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+
+  <Style x:Key="Button.Toolbar" TargetType="ButtonBase" BasedOn="{StaticResource Button.Subtle}">
+    <Setter Property="Padding" Value="4" />
+    <Setter Property="FontFamily" Value="{DynamicResource Font.Icons}" />
+    <Setter Property="FontSize" Value="{DynamicResource FontSize.Icon}" />
+  </Style>
+
+  <Style x:Key="TextBlock.Note" TargetType="TextBlock">
+    <Setter Property="FontSize" Value="{DynamicResource FontSize.Small}" />
+    <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Secondary}" />
+    <Setter Property="TextWrapping" Value="Wrap" />
+  </Style>
+
+  <!-- Message text is selectable and copyable, not editable. -->
+  <Style x:Key="TextBox.Message" TargetType="TextBox">
+    <Setter Property="IsReadOnly" Value="True" />
+    <Setter Property="TextWrapping" Value="Wrap" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Primary}" />
+    <Setter Property="SelectionBrush" Value="{DynamicResource Brush.Accent}" />
+    <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="TextBox">
+          <ScrollViewer x:Name="PART_ContentHost" Focusable="False" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Disabled" />
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!-- Diff line: number, marker, monospace text; added and removed backgrounds come from theme tokens. -->
+  <DataTemplate x:Key="DiffLineTemplate" DataType="{x:Type approvals:DiffLineViewModel}">
+    <Grid x:Name="Row">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="36" />
+        <ColumnDefinition Width="14" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
+      <TextBlock Padding="0,0,6,0" TextAlignment="Right" Foreground="{DynamicResource Brush.Editor.LineNumber}" Text="{Binding LineText}" />
+      <TextBlock Grid.Column="1" Text="{Binding Marker}" />
+      <TextBlock Grid.Column="2" Text="{Binding Text}" TextTrimming="CharacterEllipsis" />
+    </Grid>
+    <DataTemplate.Triggers>
+      <DataTrigger Binding="{Binding Kind}" Value="Added">
+        <Setter TargetName="Row" Property="Background" Value="{DynamicResource Brush.Diff.InsertedBackground}" />
+      </DataTrigger>
+      <DataTrigger Binding="{Binding Kind}" Value="Removed">
+        <Setter TargetName="Row" Property="Background" Value="{DynamicResource Brush.Diff.RemovedBackground}" />
+      </DataTrigger>
+    </DataTemplate.Triggers>
+  </DataTemplate>
+
+  <!-- Approval card: header, per-file diff, decision. -->
+  <DataTemplate x:Key="ApprovalTemplate" DataType="{x:Type approvals:ApprovalCardViewModel}">
+    <Border Padding="8" BorderThickness="1" CornerRadius="6"
+            BorderBrush="{DynamicResource Brush.Widget.Border}"
+            Background="{DynamicResource Brush.Widget.Background}"
+            AutomationProperties.AutomationId="Agent.Approval">
+      <StackPanel>
+        <TextBlock FontWeight="SemiBold" Text="{Binding Title}" />
+        <!-- Why agent.md requires this decision, so the user knows why it asks even after "Allow for this chat". -->
+        <DockPanel Margin="0,4,0,0" Visibility="{Binding HasReason, Converter={StaticResource BoolToVisibility}}"
+                   ToolTip="{x:Static res:Strings.ApprovalReason}">
+          <TextBlock DockPanel.Dock="Left" Margin="0,1,6,0" VerticalAlignment="Top"
+                     FontFamily="{DynamicResource Font.Icons}" FontSize="{DynamicResource FontSize.Small}"
+                     Foreground="{DynamicResource Brush.Warning.Foreground}" Text="{x:Static ui:IconGlyphs.Shield}" />
+          <TextBlock TextWrapping="Wrap" FontSize="{DynamicResource FontSize.Small}" Foreground="{DynamicResource Brush.Text.Secondary}"
+                     Text="{Binding Reason}" AutomationProperties.AutomationId="Agent.Approval.Reason" />
+        </DockPanel>
+        <ItemsControl Margin="0,6,0,0" ItemsSource="{Binding Files}" Focusable="False">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate DataType="{x:Type approvals:FileDiffViewModel}">
+              <StackPanel Margin="0,4,0,0">
+                <DockPanel>
+                  <TextBlock DockPanel.Dock="Right" FontSize="{DynamicResource FontSize.Small}" Foreground="{DynamicResource Brush.Text.Secondary}" Text="{Binding Counts}" />
+                  <TextBlock TextTrimming="CharacterEllipsis" FontSize="{DynamicResource FontSize.Small}" Text="{Binding Header}" />
+                </DockPanel>
+                <ItemsControl x:Name="Diff" Margin="0,2,0,0" ItemsSource="{Binding Lines}" ItemTemplate="{StaticResource DiffLineTemplate}" Focusable="False"
+                              FontFamily="{DynamicResource Font.Code}" FontSize="{DynamicResource FontSize.Small}" />
+                <!-- A command is shown as is, monospace and wrapped: it is read before being allowed. -->
+                <Border x:Name="CommandBox" Margin="0,4,0,0" Padding="8,6" CornerRadius="4" BorderThickness="1" Visibility="Collapsed"
+                        BorderBrush="{DynamicResource Brush.Border}" Background="{DynamicResource Brush.Markdown.CodeBlockBackground}">
+                  <TextBox Style="{StaticResource TextBox.Message}" FontFamily="{DynamicResource Font.Code}" FontSize="{DynamicResource FontSize.Code}"
+                           Text="{Binding Command, Mode=OneWay}" AutomationProperties.AutomationId="Agent.Approval.Command" />
+                </Border>
+              </StackPanel>
+              <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding IsCommand}" Value="True">
+                  <Setter TargetName="Diff" Property="Visibility" Value="Collapsed" />
+                  <Setter TargetName="CommandBox" Property="Visibility" Value="Visible" />
+                </DataTrigger>
+              </DataTemplate.Triggers>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <WrapPanel Margin="0,8,0,0" Visibility="{Binding IsPending, Converter={StaticResource BoolToVisibility}}">
+          <Button Margin="0,0,0,4" Style="{StaticResource Button.Primary}" Content="{Binding ApproveText}" Command="{Binding ApproveCommand}"
+                  AutomationProperties.AutomationId="Agent.Approval.Approve" />
+          <Button Margin="8,0,0,4" Style="{StaticResource Button.Secondary}" Content="{x:Static res:Strings.Reject}" Command="{Binding RejectCommand}"
+                  AutomationProperties.AutomationId="Agent.Approval.Reject" />
+          <Button Margin="0,0,0,4" Style="{StaticResource Button.Subtle}" Padding="8,4" Content="{x:Static res:Strings.AllowForChat}"
+                  Command="{Binding ApproveForChatCommand}" ToolTip="{x:Static res:Strings.AllowForChatToolTip}"
+                  AutomationProperties.AutomationId="Agent.Approval.ApproveForChat" />
+          <!-- Module rule (e.g. "dotnet test"): later such commands run without asking; saved to user settings. -->
+          <Button Margin="0,0,0,4" Style="{StaticResource Button.Subtle}" Padding="8,4" Content="{Binding AllowAlwaysText}"
+                  Command="{Binding AllowAlwaysCommand}" ToolTip="{x:Static res:Strings.AllowAlwaysToolTip}"
+                  Visibility="{Binding HasRule, Converter={StaticResource BoolToVisibility}}"
+                  AutomationProperties.AutomationId="Agent.Approval.AllowAlways" />
+        </WrapPanel>
+        <TextBlock Margin="0,4,0,0" Style="{StaticResource TextBlock.Note}"
+                   Text="{Binding StateText}" AutomationProperties.AutomationId="Agent.Approval.State"
+                   Visibility="{Binding IsPending, Converter={x:Static controls:InverseBoolToVisibilityConverter.Instance}}" />
+      </StackPanel>
+    </Border>
+  </DataTemplate>
+
+  <!-- Question: a chip with the text; below it, the file the agent saw. -->
+  <DataTemplate x:Key="Message.User" DataType="{x:Type chat:ChatMessageViewModel}">
+    <StackPanel Margin="12,12,8,4">
+      <Border Padding="8,6" CornerRadius="6" BorderThickness="1"
+              BorderBrush="{DynamicResource Brush.Widget.Border}"
+              Background="{DynamicResource Brush.Widget.Background}">
+        <TextBox Style="{StaticResource TextBox.Message}" Text="{Binding Text, Mode=OneWay}"
+                 AutomationProperties.AutomationId="Agent.Message" AutomationProperties.Name="{Binding Author}" />
+      </Border>
+      <TextBlock Margin="0,4,0,0" Style="{StaticResource TextBlock.Note}" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"
+                 Visibility="{Binding Attachment, Converter={x:Static controls:NullToCollapsedConverter.Instance}}"
+                 ToolTip="{x:Static res:Strings.AttachmentToolTip}">
+        <Run FontFamily="{DynamicResource Font.Icons}" Text="{x:Static ui:IconGlyphs.File}" />
+        <Run Text="{Binding Attachment, Mode=OneWay}" />
+      </TextBlock>
+      <TextBlock Margin="0,2,0,0" Style="{StaticResource TextBlock.Note}" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"
+                 Visibility="{Binding FilesText, Converter={x:Static controls:NullToCollapsedConverter.Instance}}"
+                 ToolTip="{x:Static res:Strings.AttachedFilesToolTip}"
+                 AutomationProperties.AutomationId="Agent.Message.Files">
+        <Run FontFamily="{DynamicResource Font.Icons}" Text="{x:Static ui:IconGlyphs.Attach}" />
+        <Run Text="{Binding FilesText, Mode=OneWay}" />
+      </TextBlock>
+    </StackPanel>
+  </DataTemplate>
+
+  <!-- Answer: Markdown with code highlighting, links and text selection; a pulsing "Thinking…" until text arrives. -->
+  <!-- After a work block in a running turn (IsChainTail) the answer is the next chain step: rail, dot, same indent as
+       progress lines. When the model moves on to tools the text becomes a progress line in place, so nothing jumps;
+       when the turn ends the answer becomes a regular message as the block collapses. -->
+  <DataTemplate x:Key="Message.Assistant" DataType="{x:Type chat:ChatMessageViewModel}">
+    <Grid x:Name="Root" Margin="12,4,8,4">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
+      <Grid x:Name="Rail" Width="20" Visibility="Collapsed">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="3" MaxHeight="3" />
+          <RowDefinition Height="16" MaxHeight="16" />
+          <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Rectangle Style="{StaticResource Activity.Rail}" />
+        <TextBlock x:Name="RailIcon" Grid.Row="1" Style="{StaticResource Activity.Icon}" Text="{x:Static ui:IconGlyphs.CircleSmallFilled}" />
+      </Grid>
+      <StackPanel Grid.Column="1">
+        <StackPanel x:Name="Waiting" Orientation="Horizontal" Visibility="Collapsed" AutomationProperties.AutomationId="Agent.Waiting">
+          <TextBlock x:Name="WaitingIcon" Width="16" Margin="0,0,8,0" VerticalAlignment="Center" TextAlignment="Center" FontFamily="{DynamicResource Font.Icons}"
+                     FontSize="{DynamicResource FontSize.Icon}" Foreground="{DynamicResource Brush.Accent}" Text="{x:Static ui:IconGlyphs.Sparkle}" />
+          <TextBlock x:Name="WaitingText" VerticalAlignment="Center" Foreground="{DynamicResource Brush.Text.Secondary}" Text="{x:Static res:Strings.Waiting}" />
+        </StackPanel>
+        <markdown:MarkdownViewer x:Name="Answer" Markdown="{Binding Text}" LineHeight="{DynamicResource LineHeight.Chat}"
+                                 AutomationProperties.AutomationId="Agent.Message" AutomationProperties.Name="{Binding Author}" />
+      </StackPanel>
+    </Grid>
+    <DataTemplate.Triggers>
+      <!-- Chain tail: flush against the block (its bottom margin is -6), text aligned with progress lines. -->
+      <DataTrigger Binding="{Binding IsChainTail}" Value="True">
+        <Setter TargetName="Root" Property="Margin" Value="12,-6,8,4" />
+        <Setter TargetName="Rail" Property="Visibility" Value="Visible" />
+        <Setter TargetName="Answer" Property="Margin" Value="-1,0,0,0" />
+        <Setter TargetName="WaitingIcon" Property="Visibility" Value="Collapsed" />
+        <Setter TargetName="Waiting" Property="Margin" Value="4,0,0,0" />
+      </DataTrigger>
+      <!-- "Thinking…" only while the model prepares the answer and nothing above is running: a running tool or
+           streaming reasoning shows the work itself. -->
+      <MultiDataTrigger>
+        <MultiDataTrigger.Conditions>
+          <Condition Binding="{Binding IsInProgress}" Value="True" />
+          <Condition Binding="{Binding Text}" Value="" />
+          <Condition Binding="{Binding IsChainBusy}" Value="False" />
+        </MultiDataTrigger.Conditions>
+        <Setter TargetName="Waiting" Property="Visibility" Value="Visible" />
+        <MultiDataTrigger.EnterActions>
+          <BeginStoryboard x:Name="Pulse">
+            <Storyboard RepeatBehavior="Forever" AutoReverse="True">
+              <DoubleAnimation Storyboard.TargetName="WaitingText" Storyboard.TargetProperty="Opacity" From="1" To="0.45" Duration="0:0:0.9" />
+            </Storyboard>
+          </BeginStoryboard>
+        </MultiDataTrigger.EnterActions>
+        <MultiDataTrigger.ExitActions>
+          <StopStoryboard BeginStoryboardName="Pulse" />
+        </MultiDataTrigger.ExitActions>
+      </MultiDataTrigger>
+      <!-- "Thinking…" in the chain: a sparkle icon replaces the dot on the rail. -->
+      <MultiDataTrigger>
+        <MultiDataTrigger.Conditions>
+          <Condition Binding="{Binding IsChainTail}" Value="True" />
+          <Condition Binding="{Binding IsInProgress}" Value="True" />
+          <Condition Binding="{Binding Text}" Value="" />
+        </MultiDataTrigger.Conditions>
+        <Setter TargetName="RailIcon" Property="Text" Value="{x:Static ui:IconGlyphs.Sparkle}" />
+        <Setter TargetName="RailIcon" Property="Foreground" Value="{DynamicResource Brush.Accent}" />
+      </MultiDataTrigger>
+      <!-- A step above is still running and there is no text yet: hide the empty tail. -->
+      <MultiDataTrigger>
+        <MultiDataTrigger.Conditions>
+          <Condition Binding="{Binding IsChainTail}" Value="True" />
+          <Condition Binding="{Binding IsChainBusy}" Value="True" />
+          <Condition Binding="{Binding Text}" Value="" />
+        </MultiDataTrigger.Conditions>
+        <Setter TargetName="Root" Property="Visibility" Value="Collapsed" />
+      </MultiDataTrigger>
+    </DataTemplate.Triggers>
+  </DataTemplate>
+
+  <DataTemplate x:Key="Message.Approval" DataType="{x:Type chat:ChatMessageViewModel}">
+    <ContentControl Margin="12,4,8,4" Content="{Binding Approval}" ContentTemplate="{StaticResource ApprovalTemplate}" Focusable="False" />
+  </DataTemplate>
+
+  <DataTemplate x:Key="Message.Error" DataType="{x:Type chat:ChatMessageViewModel}">
+    <TextBox Margin="12,4,8,4" Style="{StaticResource TextBox.Message}" Text="{Binding Text, Mode=OneWay}"
+             Foreground="{DynamicResource Brush.Error.Foreground}"
+             AutomationProperties.AutomationId="Agent.Message" AutomationProperties.Name="{Binding Author}" />
+  </DataTemplate>
+
+  <!-- Harness notice: the turn hit the request limit; continue. -->
+  <DataTemplate x:Key="Message.Notice" DataType="{x:Type chat:ChatMessageViewModel}">
+    <controls:AutomationBorder Margin="12,4,8,4" Padding="8,6" CornerRadius="6" BorderThickness="1"
+                               BorderBrush="{DynamicResource Brush.Widget.Border}"
+                               AutomationProperties.AutomationId="Agent.Notice">
+      <StackPanel>
+        <TextBox Style="{StaticResource TextBox.Message}" Foreground="{DynamicResource Brush.Text.Secondary}" Text="{Binding Text, Mode=OneWay}" />
+        <Button Margin="0,6,0,0" HorizontalAlignment="Left" Style="{StaticResource Button.Secondary}" Content="{x:Static res:Strings.Continue}"
+                Command="{Binding DataContext.ContinueCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                AutomationProperties.AutomationId="Agent.Continue" />
+      </StackPanel>
+    </controls:AutomationBorder>
+  </DataTemplate>
+
+  <!-- Plan ready (Plan mode): execute it in Agent mode via the button, the palette or a message. -->
+  <DataTemplate x:Key="Message.Handoff" DataType="{x:Type chat:ChatMessageViewModel}">
+    <controls:AutomationBorder Margin="12,4,8,4" Padding="8,6" CornerRadius="6" BorderThickness="1"
+                               BorderBrush="{DynamicResource Brush.Widget.Border}"
+                               AutomationProperties.AutomationId="Agent.Handoff">
+      <StackPanel>
+        <TextBox Style="{StaticResource TextBox.Message}" Foreground="{DynamicResource Brush.Text.Secondary}" Text="{Binding Text, Mode=OneWay}" />
+        <Button Margin="0,6,0,0" HorizontalAlignment="Left" Style="{StaticResource Button.Primary}" Content="{x:Static res:Strings.ExecutePlan}"
+                Command="{Binding DataContext.ExecutePlanCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                AutomationProperties.AutomationId="Agent.ExecutePlan" />
+      </StackPanel>
+    </controls:AutomationBorder>
+  </DataTemplate>
+
+  <!-- Agent question: option buttons and a free-form answer; the turn waits. A restored feed shows only the text. -->
+  <DataTemplate x:Key="Message.Question" DataType="{x:Type chat:ChatMessageViewModel}">
+    <controls:AutomationBorder Margin="12,4,8,4" Padding="8" CornerRadius="6" BorderThickness="1"
+                               BorderBrush="{DynamicResource Brush.Accent}"
+                               Background="{DynamicResource Brush.Widget.Background}"
+                               AutomationProperties.AutomationId="Agent.Question">
+      <StackPanel>
+        <TextBlock Style="{StaticResource TextBlock.Note}" FontWeight="SemiBold" Text="{x:Static res:Strings.AuthorAgentQuestion}" />
+        <TextBox Margin="0,4,0,0" Style="{StaticResource TextBox.Message}" Text="{Binding Text, Mode=OneWay}" />
+        <StackPanel Margin="0,8,0,0" Visibility="{Binding Question.IsPending, Converter={StaticResource BoolToVisibility}, FallbackValue=Collapsed}">
+          <ItemsControl ItemsSource="{Binding Question.Options}" Focusable="False">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <WrapPanel />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Button Margin="0,0,8,4" Style="{StaticResource Button.Secondary}" Content="{Binding}"
+                        Command="{Binding DataContext.Question.ChooseCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                        CommandParameter="{Binding}"
+                        AutomationProperties.AutomationId="Agent.Question.Option" />
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+          <DockPanel Margin="0,4,0,0">
+            <Button DockPanel.Dock="Right" Margin="8,0,0,0" Style="{StaticResource Button.Primary}" Content="{x:Static res:Strings.Answer}"
+                    Command="{Binding Question.SubmitCommand}" AutomationProperties.AutomationId="Agent.Question.Submit" />
+            <TextBox Style="{StaticResource TextBox.Field}" Tag="{x:Static res:Strings.CustomAnswer}"
+                     Text="{Binding Question.CustomAnswer, UpdateSourceTrigger=PropertyChanged}"
+                     AutomationProperties.AutomationId="Agent.Question.Input" AutomationProperties.Name="{x:Static res:Strings.CustomAnswer}">
+              <TextBox.InputBindings>
+                <KeyBinding Key="Enter" Command="{Binding Question.SubmitCommand}" />
+              </TextBox.InputBindings>
+            </TextBox>
+          </DockPanel>
+        </StackPanel>
+      </StackPanel>
+    </controls:AutomationBorder>
+  </DataTemplate>
+
+  <views:ChatMessageTemplateSelector x:Key="MessageTemplateSelector"
+                                     User="{StaticResource Message.User}"
+                                     Assistant="{StaticResource Message.Assistant}"
+                                     Approval="{StaticResource Message.Approval}"
+                                     Error="{StaticResource Message.Error}"
+                                     Notice="{StaticResource Message.Notice}"
+                                     Question="{StaticResource Message.Question}"
+                                     Handoff="{StaticResource Message.Handoff}" />
+
+  <views:FeedTemplateSelector x:Key="FeedTemplateSelector" Block="{StaticResource Feed.Block}" Messages="{StaticResource MessageTemplateSelector}" />
+
+</ResourceDictionary>

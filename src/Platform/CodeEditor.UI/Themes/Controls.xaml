@@ -1,0 +1,350 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:CodeEditor.UI.Controls">
+
+  <!-- Shared control styles. Colors only via DynamicResource so theme switching works. -->
+
+  <Style x:Key="FocusVisual">
+    <Setter Property="Control.Template">
+      <Setter.Value>
+        <ControlTemplate>
+          <Rectangle Margin="1"
+                     RadiusX="4" RadiusY="4"
+                     Stroke="{DynamicResource Brush.Focus.Border}"
+                     StrokeThickness="1"
+                     SnapsToDevicePixels="True" />
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!-- Flat borderless button; the background appears on hover. -->
+  <Style x:Key="Button.Subtle" TargetType="ButtonBase">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Primary}" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="8,4" />
+    <Setter Property="Cursor" Value="Arrow" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="ButtonBase">
+          <Border Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}"
+                  CornerRadius="4"
+                  Padding="{TemplateBinding Padding}"
+                  SnapsToDevicePixels="True">
+            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                              RecognizesAccessKey="True" />
+          </Border>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+    <Style.Triggers>
+      <Trigger Property="IsMouseOver" Value="True">
+        <Setter Property="Background" Value="{DynamicResource Brush.Control.HoverBackground}" />
+      </Trigger>
+      <Trigger Property="IsPressed" Value="True">
+        <Setter Property="Background" Value="{DynamicResource Brush.Control.PressedBackground}" />
+      </Trigger>
+      <Trigger Property="IsEnabled" Value="False">
+        <Setter Property="Opacity" Value="0.5" />
+      </Trigger>
+    </Style.Triggers>
+  </Style>
+
+  <!-- Caption buttons: rectangular, full title bar height. -->
+  <Style x:Key="Button.Caption" TargetType="Button">
+    <Setter Property="Width" Value="46" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource Brush.TitleBar.Foreground}" />
+    <Setter Property="FontFamily" Value="{DynamicResource Font.Icons}" />
+    <Setter Property="FontSize" Value="{DynamicResource FontSize.CaptionIcon}" />
+    <Setter Property="IsTabStop" Value="False" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Button">
+          <Border Background="{TemplateBinding Background}">
+            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </Border>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+    <Style.Triggers>
+      <Trigger Property="IsMouseOver" Value="True">
+        <Setter Property="Background" Value="{DynamicResource Brush.Control.HoverBackground}" />
+      </Trigger>
+      <Trigger Property="IsPressed" Value="True">
+        <Setter Property="Background" Value="{DynamicResource Brush.Control.PressedBackground}" />
+      </Trigger>
+    </Style.Triggers>
+  </Style>
+
+  <Style x:Key="Button.CaptionClose" TargetType="Button" BasedOn="{StaticResource Button.Caption}">
+    <Style.Triggers>
+      <Trigger Property="IsMouseOver" Value="True">
+        <Setter Property="Background" Value="{DynamicResource Brush.Caption.CloseHoverBackground}" />
+        <Setter Property="Foreground" Value="{DynamicResource Brush.Caption.CloseHoverForeground}" />
+      </Trigger>
+    </Style.Triggers>
+  </Style>
+
+  <!-- Title bar search box: looks like an input, works as a button. -->
+  <Style x:Key="Button.CommandCenter" TargetType="Button" BasedOn="{StaticResource Button.Subtle}">
+    <Setter Property="Background" Value="{DynamicResource Brush.Input.Background}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Brush.Input.Border}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Secondary}" />
+    <Setter Property="Padding" Value="8,2" />
+    <Setter Property="Height" Value="24" />
+  </Style>
+
+  <!-- Primary dialog button in the accent color. -->
+  <Style x:Key="Button.Primary" TargetType="Button" BasedOn="{StaticResource Button.Subtle}">
+    <Setter Property="Background" Value="{DynamicResource Brush.Accent}" />
+    <Setter Property="Foreground" Value="{DynamicResource Brush.Accent.Foreground}" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Padding" Value="12,4" />
+    <Setter Property="MinWidth" Value="80" />
+    <Style.Triggers>
+      <Trigger Property="IsMouseOver" Value="True">
+        <Setter Property="Opacity" Value="0.9" />
+        <Setter Property="Background" Value="{DynamicResource Brush.Accent}" />
+      </Trigger>
+    </Style.Triggers>
+  </Style>
+
+  <!-- Secondary dialog button, e.g. Cancel. -->
+  <Style x:Key="Button.Secondary" TargetType="Button" BasedOn="{StaticResource Button.CommandCenter}">
+    <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Primary}" />
+    <Setter Property="Padding" Value="12,4" />
+    <Setter Property="Height" Value="Auto" />
+    <Setter Property="MinWidth" Value="80" />
+  </Style>
+
+  <!-- Title bar layout toggle: 16 px icon, as in VS Code. -->
+  <Style x:Key="Button.LayoutToggle" TargetType="Button" BasedOn="{StaticResource Button.Subtle}">
+    <Setter Property="Width" Value="28" />
+    <Setter Property="Height" Value="24" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="Margin" Value="1,0" />
+    <Setter Property="FontFamily" Value="{DynamicResource Font.Icons}" />
+    <Setter Property="FontSize" Value="{DynamicResource FontSize.Icon}" />
+    <Setter Property="Foreground" Value="{DynamicResource Brush.TitleBar.Foreground}" />
+  </Style>
+
+  <!--
+    Activity bar button: icon on a rounded 40×40 plate, muted until hover (ADR 0038). The icon is geometry with a thin
+    outline (GlyphIcon): as text, Codicons at this size get jagged 1.25 px lines.
+  -->
+  <Style x:Key="Button.ActivityBar" TargetType="Button">
+    <Setter Property="Width" Value="48" />
+    <Setter Property="Height" Value="46" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource Brush.ActivityBar.InactiveForeground}" />
+    <Setter Property="FontFamily" Value="{DynamicResource Font.Icons}" />
+    <Setter Property="FontSize" Value="{DynamicResource FontSize.ActivityIcon}" />
+    <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Button">
+          <Grid Background="Transparent">
+            <Border x:Name="Plate" Margin="4,3" CornerRadius="6" Background="{TemplateBinding Background}" />
+            <controls:GlyphIcon HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Glyph="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}"
+                                Size="{TemplateBinding FontSize}"
+                                Weight="{DynamicResource IconWeight.Activity}" />
+          </Grid>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+              <Setter TargetName="Plate" Property="Background" Value="{DynamicResource Brush.List.HoverBackground}" />
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+    <Style.Triggers>
+      <Trigger Property="IsMouseOver" Value="True">
+        <Setter Property="Foreground" Value="{DynamicResource Brush.ActivityBar.Foreground}" />
+      </Trigger>
+      <Trigger Property="IsKeyboardFocused" Value="True">
+        <Setter Property="Foreground" Value="{DynamicResource Brush.ActivityBar.Foreground}" />
+      </Trigger>
+    </Style.Triggers>
+  </Style>
+
+  <!-- Tool window icon in the activity bar: the active one has a plate and a short accent bar on the left (ADR 0038). -->
+  <Style x:Key="Button.ActivityItem" TargetType="Button" BasedOn="{StaticResource Button.ActivityBar}">
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Button">
+          <Grid Background="Transparent">
+            <Border x:Name="Plate" Margin="4,3" CornerRadius="6" Background="{TemplateBinding Background}" />
+            <Border x:Name="Indicator"
+                    Width="3"
+                    Height="16"
+                    Margin="4,0,0,0"
+                    CornerRadius="1.5"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    Background="{DynamicResource Brush.Accent}"
+                    Visibility="Collapsed" />
+            <controls:GlyphIcon HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Glyph="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}"
+                                Size="{TemplateBinding FontSize}"
+                                Weight="{DynamicResource IconWeight.Activity}" />
+          </Grid>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+              <Setter TargetName="Plate" Property="Background" Value="{DynamicResource Brush.List.HoverBackground}" />
+            </Trigger>
+            <DataTrigger Binding="{Binding IsActive}" Value="True">
+              <Setter TargetName="Indicator" Property="Visibility" Value="Visible" />
+              <Setter TargetName="Plate" Property="Background" Value="{DynamicResource Brush.List.SelectionBackground}" />
+              <Setter Property="Foreground" Value="{DynamicResource Brush.ActivityBar.Foreground}" />
+            </DataTrigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!-- Bottom panel tab: the active one has a rounded accent underline. -->
+  <Style x:Key="Button.PanelTab" TargetType="Button">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Secondary}" />
+    <Setter Property="Padding" Value="8,0" />
+    <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Button">
+          <Grid Background="{TemplateBinding Background}">
+            <ContentPresenter Margin="{TemplateBinding Padding}" VerticalAlignment="Center" />
+            <Border x:Name="Underline"
+                    Height="2"
+                    CornerRadius="1"
+                    VerticalAlignment="Bottom"
+                    Margin="{TemplateBinding Padding}"
+                    Background="{DynamicResource Brush.Accent}"
+                    Visibility="Collapsed" />
+          </Grid>
+          <ControlTemplate.Triggers>
+            <DataTrigger Binding="{Binding IsActive}" Value="True">
+              <Setter TargetName="Underline" Property="Visibility" Value="Visible" />
+              <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Primary}" />
+            </DataTrigger>
+            <Trigger Property="IsMouseOver" Value="True">
+              <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Primary}" />
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!--
+    Area splitter: a transparent gap between cards (ADR 0038); on hover and drag an accent line shows in the middle,
+    1 px narrower than the gap on each side.
+  -->
+  <Style x:Key="GridSplitter.Thin" TargetType="GridSplitter">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Focusable" Value="False" />
+    <Setter Property="ResizeBehavior" Value="PreviousAndNext" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="GridSplitter">
+          <Grid Background="Transparent">
+            <Border Margin="1" CornerRadius="1" Background="{TemplateBinding Background}" />
+          </Grid>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+    <Style.Triggers>
+      <Trigger Property="IsMouseOver" Value="True">
+        <Setter Property="Background" Value="{DynamicResource Brush.Accent}" />
+      </Trigger>
+      <Trigger Property="IsDragging" Value="True">
+        <Setter Property="Background" Value="{DynamicResource Brush.Accent}" />
+      </Trigger>
+    </Style.Triggers>
+  </Style>
+
+  <!-- Area header: small semibold, no small caps (they make letters even smaller). -->
+  <Style x:Key="TextBlock.AreaHeader" TargetType="TextBlock">
+    <Setter Property="Margin" Value="12,0" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="FontSize" Value="{DynamicResource FontSize.Small}" />
+    <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Secondary}" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
+
+  <!-- Option toggle ("Aa", ".*"): accent border when on, as in VS Code search. -->
+  <Style x:Key="ToggleButton.Option" TargetType="ToggleButton">
+    <Setter Property="Width" Value="22" />
+    <Setter Property="Height" Value="20" />
+    <Setter Property="Margin" Value="1,0" />
+    <Setter Property="Focusable" Value="False" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Primary}" />
+    <Setter Property="FontSize" Value="{DynamicResource FontSize.Small}" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="ToggleButton">
+          <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" CornerRadius="3">
+            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </Border>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+    <Style.Triggers>
+      <Trigger Property="IsMouseOver" Value="True">
+        <Setter Property="Background" Value="{DynamicResource Brush.Control.HoverBackground}" />
+      </Trigger>
+      <Trigger Property="IsChecked" Value="True">
+        <Setter Property="BorderBrush" Value="{DynamicResource Brush.Accent}" />
+        <Setter Property="Background" Value="{DynamicResource Brush.List.SelectionBackground}" />
+      </Trigger>
+    </Style.Triggers>
+  </Style>
+<!-- Icon option toggle: match case, whole word, regex. -->  <Style x:Key="ToggleButton.OptionIcon" TargetType="ToggleButton" BasedOn="{StaticResource ToggleButton.Option}">    <Setter Property="FontFamily" Value="{DynamicResource Font.Icons}" />    <Setter Property="FontSize" Value="{DynamicResource FontSize.Icon}" />  </Style>
+
+  <!-- A key in a keybinding hint. -->
+  <Style x:Key="Border.Keycap" TargetType="Border">
+    <Setter Property="Background" Value="{DynamicResource Brush.Keycap.Background}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Brush.Keycap.Border}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="4" />
+    <Setter Property="Padding" Value="4,0" />
+  </Style>
+
+  <!-- Count badge in a list row, e.g. matches in a file. -->
+  <Style x:Key="Border.Badge" TargetType="Border">
+    <Setter Property="Background" Value="{DynamicResource Brush.Badge.Background}" />
+    <Setter Property="CornerRadius" Value="8" />
+    <Setter Property="MinWidth" Value="18" />
+    <Setter Property="Padding" Value="5,0" />
+    <Setter Property="TextElement.Foreground" Value="{DynamicResource Brush.Badge.Foreground}" />
+    <Setter Property="TextElement.FontFamily" Value="{DynamicResource Font.Ui.Small}" />
+    <Setter Property="TextElement.FontSize" Value="{DynamicResource FontSize.Small}" />
+  </Style>
+
+  <Style TargetType="ToolTip">
+    <Setter Property="Background" Value="{DynamicResource Brush.Input.Background}" />
+    <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Primary}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Brush.Input.Border}" />
+    <Setter Property="FontFamily" Value="{DynamicResource Font.Ui}" />
+    <Setter Property="FontSize" Value="{DynamicResource FontSize.Normal}" />
+    <!-- Tooltips live in their own window and don't inherit the main window's text settings (ADR 0038). -->
+    <Setter Property="TextOptions.TextFormattingMode" Value="Ideal" />
+    <Setter Property="TextOptions.TextRenderingMode" Value="Grayscale" />
+  </Style>
+
+</ResourceDictionary>

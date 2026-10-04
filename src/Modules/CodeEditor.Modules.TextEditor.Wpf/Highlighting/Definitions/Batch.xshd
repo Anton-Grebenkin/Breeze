@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<!--
+  Windows batch files (.bat, .cmd): REM and :: comments, :name labels, strings, variables %VAR%, %~dp0, %%i, !VAR!,
+  case-insensitive commands and control words. Color names are theme tokens (ADR 0036).
+-->
+<SyntaxDefinition name="Batch" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+  <Color name="Comment" />
+  <Color name="String" />
+  <Color name="Number" />
+  <Color name="Keyword" />
+  <Color name="ControlKeyword" />
+  <Color name="Function" />
+  <Color name="Variable" />
+
+  <RuleSet ignoreCase="true">
+    <Span color="Comment" begin="(?&lt;=^|[&amp;(])\s*@?rem(?=$|[\s.:,;=/\\])" />
+    <Span color="Comment" begin="^\s*::" />
+    <Span color="String" begin="&quot;" end="&quot;" ruleSet="Variables" />
+    <Import ruleSet="Variables" />
+    <!-- Label: :name at the line start and after goto or call. -->
+    <Rule color="Function">^\s*:[^\s:]\S*</Rule>
+    <Rule color="Function">(?&lt;=\b(?:goto|call)\s+):[\w.-]+</Rule>
+
+    <Keywords color="ControlKeyword">
+      <Word>if</Word>
+      <Word>else</Word>
+      <Word>for</Word>
+      <Word>in</Word>
+      <Word>do</Word>
+      <Word>goto</Word>
+      <Word>call</Word>
+      <Word>exit</Word>
+    </Keywords>
+    <Keywords color="Keyword">
+      <Word>echo</Word>
+      <Word>set</Word>
+      <Word>setlocal</Word>
+      <Word>endlocal</Word>
+      <Word>enabledelayedexpansion</Word>
+      <Word>enableextensions</Word>
+      <Word>off</Word>
+      <Word>on</Word>
+      <Word>not</Word>
+      <Word>exist</Word>
+      <Word>defined</Word>
+      <Word>errorlevel</Word>
+      <Word>equ</Word>
+      <Word>neq</Word>
+      <Word>lss</Word>
+      <Word>leq</Word>
+      <Word>gtr</Word>
+      <Word>geq</Word>
+      <Word>nul</Word>
+      <Word>cd</Word>
+      <Word>chdir</Word>
+      <Word>pushd</Word>
+      <Word>popd</Word>
+      <Word>cls</Word>
+      <Word>copy</Word>
+      <Word>xcopy</Word>
+      <Word>del</Word>
+      <Word>erase</Word>
+      <Word>dir</Word>
+      <Word>md</Word>
+      <Word>mkdir</Word>
+      <Word>rd</Word>
+      <Word>rmdir</Word>
+      <Word>move</Word>
+      <Word>ren</Word>
+      <Word>rename</Word>
+      <Word>type</Word>
+      <Word>title</Word>
+      <Word>color</Word>
+      <Word>pause</Word>
+      <Word>start</Word>
+      <Word>shift</Word>
+      <Word>timeout</Word>
+      <Word>choice</Word>
+    </Keywords>
+    <Rule color="Number">(?&lt;![\w%!.])\d+(?![\w.])</Rule>
+  </RuleSet>
+
+  <!-- %VAR%, %VAR:~0,5%, %~dp0, %1, %*, %%i, %%~fi, !VAR! -->
+  <RuleSet name="Variables" ignoreCase="true">
+    <Rule color="Variable">%%~?[a-z]|%~[a-z$:]*[0-9]|%[0-9*]|%[a-z_][\w.$\#@-]*(?::[^%\r\n]*)?%|![a-z_][\w.$\#@-]*(?::[^!\r\n]*)?!</Rule>
+  </RuleSet>
+</SyntaxDefinition>

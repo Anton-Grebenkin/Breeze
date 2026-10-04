@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Explorer view. -->
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CodeEditor.Modules.Explorer\CodeEditor.Modules.Explorer.csproj" />
+    <ProjectReference Include="..\..\Platform\CodeEditor.UI\CodeEditor.UI.csproj" />
+    <ProjectReference Include="..\..\Platform\CodeEditor.Shell.Wpf\CodeEditor.Shell.Wpf.csproj" />
+  </ItemGroup>
+
+</Project>

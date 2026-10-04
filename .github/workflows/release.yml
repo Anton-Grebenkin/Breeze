@@ -1,0 +1,87 @@
+# Publishes a release when a version tag is pushed: v0.1.0-alpha.1, v0.1.0, v1.2.3-beta.2.
+# Builds and tests, then Velopack packs Setup.exe, a portable zip and update packages (deltas against the previous
+# release) and uploads them to a GitHub release with notes from CHANGELOG.md. A tag with "-" is a pre-release.
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  release:
+    name: Build, pack and publish
+    runs-on: windows-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - name: Version from tag
+        id: version
+        shell: pwsh
+        run: |
+          $version = '${{ github.ref_name }}'.Substring(1)
+          if ($version -notmatch '^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?$') {
+            throw "Tag ${{ github.ref_name }} is not v<SemVer>, e.g. v0.1.0-alpha.1"
+          }
+          "version=$version" >> $env:GITHUB_OUTPUT
+          "prerelease=$($version.Contains('-'))" >> $env:GITHUB_OUTPUT
+          "repo=${{ github.server_url }}/${{ github.repository }}" >> $env:GITHUB_OUTPUT
+
+      - name: Release notes exist
+        shell: pwsh
+        run: ./build/release-notes.ps1 -Version ${{ steps.version.outputs.version }}
+
+      - name: Build and test
+        shell: pwsh
+        run: ./build/test.ps1 -Configuration Release
+
+      - name: Restore tools
+        run: dotnet tool restore
+
+      # Deltas are built against the latest published release of the same kind; the first release has none.
+      - name: Download previous release
+        continue-on-error: true
+        shell: pwsh
+        run: |
+          $pre = if ('${{ steps.version.outputs.prerelease }}' -eq 'True') { '--pre' } else { $null }
+          dotnet vpk download github --repoUrl ${{ steps.version.outputs.repo }} --token ${{ secrets.GITHUB_TOKEN }} --outputDir releases $pre
+
+      - name: Publish and pack
+        shell: pwsh
+        run: ./build/publish.ps1 -Version ${{ steps.version.outputs.version }} -RepositoryUrl ${{ steps.version.outputs.repo }} -Pack
+
+      - name: Upload to GitHub release
+        shell: pwsh
+        run: |
+          $pre = if ('${{ steps.version.outputs.prerelease }}' -eq 'True') { '--pre' } else { $null }
+          dotnet vpk upload github --repoUrl ${{ steps.version.outputs.repo }} --token ${{ secrets.GITHUB_TOKEN }} `
+            --publish --releaseName "Breeze ${{ steps.version.outputs.version }}" --tag ${{ github.ref_name }} `
+            --outputDir releases $pre
+
+      # Provenance: anyone can check that the files were built here from this commit (gh attestation verify).
+      # GitHub offers it for public repositories.
+      - name: Attest build provenance
+        if: ${{ !github.event.repository.private }}
+        uses: actions/attest-build-provenance@v4
+        with:
+          subject-path: |
+            releases/*.exe
+            releases/*.zip
+            releases/*.nupkg

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="ModuleName" xml:space="preserve"><value>Браузер</value></data>
+  <data name="ViewModuleName" xml:space="preserve"><value>Представление браузера</value></data>
+  <!-- Panel. -->
+  <data name="Address" xml:space="preserve"><value>Адрес</value></data>
+  <data name="AddressPlaceholder" xml:space="preserve"><value>Адрес: localhost:5000 или сайт</value></data>
+  <data name="Back" xml:space="preserve"><value>Назад</value></data>
+  <data name="Forward" xml:space="preserve"><value>Вперёд</value></data>
+  <data name="Reload" xml:space="preserve"><value>Обновить</value></data>
+  <data name="Go" xml:space="preserve"><value>Перейти</value></data>
+  <!-- Browser. -->
+  <data name="BrowserUnavailable" xml:space="preserve"><value>Браузер недоступен: {0}</value></data>
+  <data name="NavigationFailed" xml:space="preserve"><value>Страница не открылась: {0}</value></data>
+  <data name="LoadTimedOut" xml:space="preserve"><value>Страница не загрузилась за {0} с.</value></data>
+  <data name="NoPage" xml:space="preserve"><value>Страница не открыта: открой её действием navigate.</value></data>
+  <!-- Agent tool. -->
+  <data name="UnknownAction" xml:space="preserve"><value>Неизвестное действие «{0}». Допустимы: {1}.</value></data>
+  <data name="ArgumentRequired" xml:space="preserve"><value>Для этого действия нужен аргумент {0}.</value></data>
+  <data name="OnlyHttp" xml:space="preserve"><value>Открываются только адреса http и https: {0}</value></data>
+  <data name="ElementNotFound" xml:space="preserve"><value>На странице нет элемента с такой меткой: сделай новый снимок.</value></data>
+  <data name="NoSuchOption" xml:space="preserve"><value>В списке нет такого варианта.</value></data>
+  <data name="EmptyPage" xml:space="preserve"><value>(страница пуста)</value></data>
+  <data name="SnapshotTruncated" xml:space="preserve"><value>…(страница длиннее: остальное обрезано)</value></data>
+  <data name="ConsoleEmpty" xml:space="preserve"><value>Сообщений консоли и ошибок страницы с прошлого вызова нет.</value></data>
+  <data name="ApprovalTitle" xml:space="preserve"><value>Агент хочет открыть страницу в браузере</value></data>
+  <!-- Agent feed rows. -->
+  <data name="FeedTitle" xml:space="preserve"><value>Браузер: {0}</value></data>
+  <data name="FeedClick" xml:space="preserve"><value>щелчок {0}</value></data>
+  <data name="FeedType" xml:space="preserve"><value>ввод в {0}</value></data>
+  <data name="FeedBack" xml:space="preserve"><value>назад</value></data>
+  <data name="FeedReload" xml:space="preserve"><value>обновление</value></data>
+  <data name="FeedConsole" xml:space="preserve"><value>консоль</value></data>
+  <data name="FeedSnapshot" xml:space="preserve"><value>страница</value></data>
+  <data name="ScreenshotResult" xml:space="preserve"><value>Снимок экрана {0} — в следующем сообщении.</value></data>
+  <data name="ScreenshotNotSeen" xml:space="preserve"><value>Эта модель не видит картинок: читай страницу действием snapshot.</value></data>
+  <data name="ScreenshotTooLarge" xml:space="preserve"><value>Снимок экрана больше 5 МБ даже в JPEG: читай страницу действием snapshot.</value></data>
+  <data name="ScreenshotFailed" xml:space="preserve"><value>Браузер не вернул снимок экрана.</value></data>
+  <data name="FeedScreenshot" xml:space="preserve"><value>снимок экрана</value></data>
+</root>

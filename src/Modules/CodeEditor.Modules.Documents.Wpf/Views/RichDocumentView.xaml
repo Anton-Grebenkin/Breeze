@@ -1,0 +1,26 @@
+<UserControl x:Class="CodeEditor.Modules.Documents.Wpf.Views.RichDocumentView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:CodeEditor.Modules.Documents.ViewModels;assembly=CodeEditor.Modules.Documents"
+             xmlns:res="clr-namespace:CodeEditor.Modules.Documents.Resources;assembly=CodeEditor.Modules.Documents"
+             xmlns:views="clr-namespace:CodeEditor.Modules.Documents.Wpf.Views"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:RichDocumentViewerViewModel}"
+             Background="{DynamicResource Brush.Editor.Background}"
+             AutomationProperties.AutomationId="RichDocumentViewer">
+  <!-- Word document or presentation as read-only formatted text; selection and copy work. -->
+  <DockPanel>
+    <views:ViewerToolbar DockPanel.Dock="Top" />
+    <FlowDocumentScrollViewer x:Name="Viewer"
+                              IsToolBarVisible="False"
+                              HorizontalScrollBarVisibility="Disabled"
+                              VerticalScrollBarVisibility="Auto"
+                              Foreground="{DynamicResource Brush.Editor.Foreground}"
+                              Background="{DynamicResource Brush.Editor.Background}"
+                              SelectionBrush="{DynamicResource Brush.Editor.Selection}"
+                              AutomationProperties.AutomationId="RichDocumentViewer.Text"
+                              AutomationProperties.Name="{x:Static res:Strings.Document}" />
+  </DockPanel>
+</UserControl>

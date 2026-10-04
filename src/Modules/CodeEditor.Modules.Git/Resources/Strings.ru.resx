@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="ModuleName" xml:space="preserve"><value>Git</value></data>
+  <!-- Tool replies to the model. -->
+  <data name="UnknownAction" xml:space="preserve"><value>Неизвестное действие «{0}». Допустимы: {1}.</value></data>
+  <data name="ArgumentRequired" xml:space="preserve"><value>Для действия {0} нужен аргумент {1}.</value></data>
+  <data name="InvalidName" xml:space="preserve"><value>«{0}» не годится как {1}: не пусто, без «-» в начале и без пробелов.</value></data>
+  <data name="GitFailed" xml:space="preserve"><value>git {0} завершился с кодом {1}:
+{2}</value></data>
+  <data name="GitTimedOut" xml:space="preserve"><value>git {0} не завершился за {1} с.</value></data>
+  <data name="NoChanges" xml:space="preserve"><value>Изменений нет.</value></data>
+  <data name="EmptyOutput" xml:space="preserve"><value>(вывода нет)</value></data>
+  <data name="Done" xml:space="preserve"><value>Готово.</value></data>
+  <!-- Approval card. -->
+  <data name="ApprovalTitle" xml:space="preserve"><value>Агент хочет изменить репозиторий git</value></data>
+  <data name="ApprovalHeader" xml:space="preserve"><value>Команды git</value></data>
+  <!-- Agent feed rows. -->
+  <data name="StatusTitle" xml:space="preserve"><value>Состояние git</value></data>
+  <data name="DiffTitle" xml:space="preserve"><value>Изменения git</value></data>
+  <data name="DiffOfTitle" xml:space="preserve"><value>Изменения git в {0}</value></data>
+  <data name="LogTitle" xml:space="preserve"><value>История git</value></data>
+  <data name="LogOfTitle" xml:space="preserve"><value>История git: {0}</value></data>
+  <data name="ShowTitle" xml:space="preserve"><value>Коммит {0}</value></data>
+  <data name="BlameTitle" xml:space="preserve"><value>Авторы строк {0}</value></data>
+  <data name="CommitTitle" xml:space="preserve"><value>Коммит: {0}</value></data>
+  <data name="CreateBranchTitle" xml:space="preserve"><value>Новая ветка {0}</value></data>
+  <data name="SwitchTitle" xml:space="preserve"><value>Переход на ветку {0}</value></data>
+  <data name="StashTitle" xml:space="preserve"><value>Изменения отложены (stash)</value></data>
+  <data name="StashPopTitle" xml:space="preserve"><value>Изменения возвращены из stash</value></data>
+  <data name="RestoreTitle" xml:space="preserve"><value>Откат изменений в {0}</value></data>
+  <data name="PushTitle" xml:space="preserve"><value>Отправка в удалённый репозиторий</value></data>
+  <data name="PanelTitle" xml:space="preserve"><value>Система управления версиями</value></data>
+  <data name="ViewModuleName" xml:space="preserve"><value>Представления Git</value></data>
+  <data name="NoFolderText" xml:space="preserve"><value>Откройте папку с репозиторием git, чтобы смотреть изменения, делать коммиты и переключать ветки.</value></data>
+  <data name="NotRepositoryText" xml:space="preserve"><value>Папка не входит в репозиторий git. Создайте его, чтобы следить за изменениями.</value></data>
+  <data name="NoGitText" xml:space="preserve"><value>git не найден. Установите Git для Windows (git-scm.com) и перезапустите редактор.</value></data>
+  <data name="LoadingText" xml:space="preserve"><value>Чтение репозитория…</value></data>
+  <data name="ChangesList" xml:space="preserve"><value>Изменённые файлы</value></data>
+  <data name="RefreshToolTip" xml:space="preserve"><value>Обновить</value></data>
+  <data name="PullToolTip" xml:space="preserve"><value>Pull — получить изменения из удалённого репозитория</value></data>
+  <data name="PushToolTip" xml:space="preserve"><value>Push — отправить коммиты в удалённый репозиторий</value></data>
+  <data name="MoreActions" xml:space="preserve"><value>Другие действия…</value></data>
+  <data name="DismissError" xml:space="preserve"><value>Закрыть</value></data>
+  <data name="CommitButton" xml:space="preserve"><value>Коммит</value></data>
+  <data name="CommitMessageName" xml:space="preserve"><value>Сообщение коммита</value></data>
+  <data name="CommitPlaceholder" xml:space="preserve"><value>Сообщение (Ctrl+Enter — коммит в «{0}»)</value></data>
+  <data name="CommitPlaceholderNoBranch" xml:space="preserve"><value>Сообщение (Ctrl+Enter — коммит)</value></data>
+  <data name="CommitMessageRequired" xml:space="preserve"><value>Введите сообщение коммита.</value></data>
+  <data name="NothingToCommit" xml:space="preserve"><value>Нет изменений для коммита.</value></data>
+  <data name="CommitAllQuestion" xml:space="preserve"><value>В индексе нет изменений. Добавить в индекс все изменения и закоммитить их?</value></data>
+  <data name="CommitAllDetail" xml:space="preserve"><value>В индекс попадут все изменения, включая новые файлы.</value></data>
+  <data name="CommitAllConfirm" xml:space="preserve"><value>Добавить всё и закоммитить</value></data>
+  <data name="GroupMerge" xml:space="preserve"><value>Конфликты слияния</value></data>
+  <data name="GroupStaged" xml:space="preserve"><value>Изменения в индексе</value></data>
+  <data name="GroupChanges" xml:space="preserve"><value>Изменения</value></data>
+  <data name="GroupLimited" xml:space="preserve"><value>Показаны первые {0} из {1} файлов</value></data>
+  <data name="StatusModified" xml:space="preserve"><value>Изменён</value></data>
+  <data name="StatusAdded" xml:space="preserve"><value>Добавлен</value></data>
+  <data name="StatusDeleted" xml:space="preserve"><value>Удалён</value></data>
+  <data name="StatusRenamed" xml:space="preserve"><value>Переименован</value></data>
+  <data name="StatusCopied" xml:space="preserve"><value>Скопирован</value></data>
+  <data name="StatusTypeChanged" xml:space="preserve"><value>Изменён тип</value></data>
+  <data name="StatusUntracked" xml:space="preserve"><value>Новый, не отслеживается</value></data>
+  <data name="StatusConflict" xml:space="preserve"><value>Конфликт</value></data>
+  <data name="ChangeToolTip" xml:space="preserve"><value>{0} • {1}</value></data>
+  <data name="RenamedChangeToolTip" xml:space="preserve"><value>{0} • {1} из {2}</value></data>
+  <data name="StageToolTip" xml:space="preserve"><value>Добавить в индекс</value></data>
+  <data name="UnstageToolTip" xml:space="preserve"><value>Убрать из индекса</value></data>
+  <data name="DiscardToolTip" xml:space="preserve"><value>Отменить изменения</value></data>
+  <data name="OpenFileToolTip" xml:space="preserve"><value>Открыть файл</value></data>
+  <data name="StageAllToolTip" xml:space="preserve"><value>Добавить всё в индекс</value></data>
+  <data name="UnstageAllToolTip" xml:space="preserve"><value>Убрать всё из индекса</value></data>
+  <data name="GitMenu" xml:space="preserve"><value>_Git</value></data>
+  <data name="CommandCommit" xml:space="preserve"><value>Коммит</value></data>
+  <data name="CommandStage" xml:space="preserve"><value>Добавить в индекс</value></data>
+  <data name="CommandUnstage" xml:space="preserve"><value>Убрать из индекса</value></data>
+  <data name="CommandStageAll" xml:space="preserve"><value>Добавить все изменения в индекс</value></data>
+  <data name="CommandUnstageAll" xml:space="preserve"><value>Убрать все изменения из индекса</value></data>
+  <data name="CommandDiscard" xml:space="preserve"><value>Отменить изменения…</value></data>
+  <data name="CommandRefresh" xml:space="preserve"><value>Обновить</value></data>
+  <data name="CommandCheckout" xml:space="preserve"><value>Перейти на ветку…</value></data>
+  <data name="CommandCreateBranch" xml:space="preserve"><value>Создать ветку…</value></data>
+  <data name="CommandPull" xml:space="preserve"><value>Pull — получить изменения</value></data>
+  <data name="CommandPush" xml:space="preserve"><value>Push — отправить коммиты</value></data>
+  <data name="CommandFetch" xml:space="preserve"><value>Fetch — проверить удалённый репозиторий</value></data>
+  <data name="CommandShowHistory" xml:space="preserve"><value>История</value></data>
+  <data name="CommandOpenChanges" xml:space="preserve"><value>Открыть изменения</value></data>
+  <data name="CommandOpenFile" xml:space="preserve"><value>Открыть файл</value></data>
+  <data name="CommandInit" xml:space="preserve"><value>Инициализировать репозиторий</value></data>
+  <data name="ActionStage" xml:space="preserve"><value>Добавление в индекс</value></data>
+  <data name="ActionUnstage" xml:space="preserve"><value>Удаление из индекса</value></data>
+  <data name="ActionDiscard" xml:space="preserve"><value>Отмена изменений</value></data>
+  <data name="ActionCommit" xml:space="preserve"><value>Коммит</value></data>
+  <data name="ActionPull" xml:space="preserve"><value>Pull</value></data>
+  <data name="ActionPush" xml:space="preserve"><value>Push</value></data>
+  <data name="ActionFetch" xml:space="preserve"><value>Fetch</value></data>
+  <data name="ActionSwitch" xml:space="preserve"><value>Переход на {0}</value></data>
+  <data name="ActionCreateBranch" xml:space="preserve"><value>Создание ветки {0}</value></data>
+  <data name="ActionInit" xml:space="preserve"><value>Создание репозитория</value></data>
+  <data name="GitActivity" xml:space="preserve"><value>Git: {0}…</value></data>
+  <data name="GitActivityDone" xml:space="preserve"><value>Git: {0} — готово</value></data>
+  <data name="GitBusy" xml:space="preserve"><value>Git: дождитесь окончания «{0}»</value></data>
+  <data name="GitErrorStatus" xml:space="preserve"><value>Ошибка git: {0}</value></data>
+  <data name="GitTimeout" xml:space="preserve"><value>git не завершился за {0} с.</value></data>
+  <data name="GitExitCode" xml:space="preserve"><value>git завершился с кодом {0}.</value></data>
+  <data name="NoRepository" xml:space="preserve"><value>Папка не входит в репозиторий git.</value></data>
+  <data name="NothingToStage" xml:space="preserve"><value>Нет изменений для добавления в индекс.</value></data>
+  <data name="NothingToUnstage" xml:space="preserve"><value>В индексе нет изменений.</value></data>
+  <data name="NothingToDiscard" xml:space="preserve"><value>Нет изменений для отмены.</value></data>
+  <data name="NoChangesInFile" xml:space="preserve"><value>В файле нет изменений.</value></data>
+  <data name="FileIsDeleted" xml:space="preserve"><value>Файл удалён — можно открыть только изменения.</value></data>
+  <data name="DiscardQuestion" xml:space="preserve"><value>Отменить изменения в «{0}»?</value></data>
+  <data name="DiscardManyQuestion" xml:space="preserve"><value>Отменить изменения в {0}?</value></data>
+  <data name="DiscardFileForms" xml:space="preserve"><value>файле|файлах|файлах</value></data>
+  <data name="DiscardDetail" xml:space="preserve"><value>Изменения будут потеряны, новые файлы уйдут в корзину.</value></data>
+  <data name="DiscardConfirm" xml:space="preserve"><value>Отменить изменения</value></data>
+  <data name="DeleteUntrackedQuestion" xml:space="preserve"><value>Удалить новый файл «{0}»?</value></data>
+  <data name="DeleteUntrackedDetail" xml:space="preserve"><value>Файла нет в git: он будет перемещён в корзину.</value></data>
+  <data name="DeleteUntrackedConfirm" xml:space="preserve"><value>Удалить</value></data>
+  <data name="CheckoutPlaceholder" xml:space="preserve"><value>Выберите ветку для перехода</value></data>
+  <data name="CreateBranchItem" xml:space="preserve"><value>+ Создать ветку…</value></data>
+  <data name="CurrentBranchDetail" xml:space="preserve"><value>текущая • {0}</value></data>
+  <data name="RemoteBranchDetail" xml:space="preserve"><value>удалённая • {0}</value></data>
+  <data name="NewBranchPlaceholder" xml:space="preserve"><value>Имя новой ветки</value></data>
+  <data name="CreateBranchNamed" xml:space="preserve"><value>Создать ветку «{0}»</value></data>
+  <data name="BranchNameHint" xml:space="preserve"><value>Введите имя ветки: без пробелов, не с «-» или «.».</value></data>
+  <data name="DetachedHead" xml:space="preserve"><value>{0} (отсоединён)</value></data>
+  <data name="BranchToolTip" xml:space="preserve"><value>Ветка {0} — перейти на другую ветку</value></data>
+  <data name="SyncToolTip" xml:space="preserve"><value>{0}: отправить {1}, получить {2}</value></data>
+  <data name="NoUpstreamToolTip" xml:space="preserve"><value>Нет вышестоящей ветки: Push опубликует ветку в origin</value></data>
+  <data name="DiffTitleChanges" xml:space="preserve"><value>{0} (изменения)</value></data>
+  <data name="DiffTitleStaged" xml:space="preserve"><value>{0} (индекс)</value></data>
+  <data name="DiffToolTipChanges" xml:space="preserve"><value>{0} — изменения в рабочей папке</value></data>
+  <data name="DiffToolTipStaged" xml:space="preserve"><value>{0} — изменения в индексе</value></data>
+  <data name="DiffLines" xml:space="preserve"><value>Строки изменений</value></data>
+  <data name="Loading" xml:space="preserve"><value>Загрузка…</value></data>
+  <data name="CopyLines" xml:space="preserve"><value>Копировать</value></data>
+  <data name="DiffNoNewline" xml:space="preserve"><value>Нет перевода строки в конце файла</value></data>
+  <data name="DiffNewFile" xml:space="preserve"><value>Новый файл</value></data>
+  <data name="DiffDeletedFile" xml:space="preserve"><value>Файл удалён</value></data>
+  <data name="DiffModeChanged" xml:space="preserve"><value>Режим файла: {0} → {1}</value></data>
+  <data name="DiffRenamed" xml:space="preserve"><value>Переименован: {0} → {1}</value></data>
+  <data name="DiffCopied" xml:space="preserve"><value>Скопирован: {0} → {1}</value></data>
+  <data name="DiffBinary" xml:space="preserve"><value>Двоичный файл: изменения не показываются</value></data>
+  <data name="DiffTruncated" xml:space="preserve"><value>Диф слишком длинный: показаны первые {0} строк.</value></data>
+  <data name="HistoryEmpty" xml:space="preserve"><value>Коммитов пока нет.</value></data>
+  <data name="LoadMore" xml:space="preserve"><value>Показать ещё</value></data>
+  <data name="CopyHash" xml:space="preserve"><value>Копировать хеш</value></data>
+  <data name="CommitsList" xml:space="preserve"><value>Коммиты</value></data>
+  <data name="CommitFiles" xml:space="preserve"><value>Файлы коммита</value></data>
+  <data name="SelectCommitHint" xml:space="preserve"><value>Выберите коммит, чтобы увидеть его файлы и изменения.</value></data>
+</root>

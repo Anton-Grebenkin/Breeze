@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Browser module: a browser panel shared by the user and the agent, plus the agent's browser tool. No WPF. -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Platform\CodeEditor.Core\CodeEditor.Core.csproj" />
+    <ProjectReference Include="..\..\Platform\CodeEditor.Shell\CodeEditor.Shell.csproj" />
+    <ProjectReference Include="..\CodeEditor.Modules.Agent.Contracts\CodeEditor.Modules.Agent.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>

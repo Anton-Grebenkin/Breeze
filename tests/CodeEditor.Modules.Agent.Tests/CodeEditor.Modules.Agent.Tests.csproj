@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Agent Framework compaction is experimental (MAAI001); compaction strategy tests build the index themselves. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <IsTestProject>true</IsTestProject>
+    <NoWarn>$(NoWarn);MAAI001</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Modules\CodeEditor.Modules.Agent\CodeEditor.Modules.Agent.csproj" />
+    <ProjectReference Include="..\CodeEditor.Testing\CodeEditor.Testing.csproj" />
+  </ItemGroup>
+
+</Project>

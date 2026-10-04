@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="ModuleName" xml:space="preserve"><value>Explorer</value></data>
+  <data name="ViewModuleName" xml:space="preserve"><value>Explorer: view</value></data>
+  <data name="NewFile" xml:space="preserve"><value>New File…</value></data>
+  <data name="NewFolder" xml:space="preserve"><value>New Folder…</value></data>
+  <data name="Open" xml:space="preserve"><value>Open</value></data>
+  <data name="Rename" xml:space="preserve"><value>Rename</value></data>
+  <data name="Delete" xml:space="preserve"><value>Delete</value></data>
+  <data name="CopyPath" xml:space="preserve"><value>Copy Path</value></data>
+  <data name="CopyRelativePath" xml:space="preserve"><value>Copy Relative Path</value></data>
+  <data name="RevealInFileManager" xml:space="preserve"><value>Reveal in File Explorer</value></data>
+  <data name="Refresh" xml:space="preserve"><value>Refresh</value></data>
+  <data name="CollapseAll" xml:space="preserve"><value>Collapse All Folders</value></data>
+  <data name="MenuNewFile" xml:space="preserve"><value>New _File…</value></data>
+  <data name="MenuNewFolder" xml:space="preserve"><value>New F_older…</value></data>
+  <data name="MenuOpen" xml:space="preserve"><value>_Open</value></data>
+  <data name="MenuRevealInFileManager" xml:space="preserve"><value>Reveal in File _Explorer</value></data>
+  <data name="MenuCopyPath" xml:space="preserve"><value>Copy _Path</value></data>
+  <data name="MenuCopyRelativePath" xml:space="preserve"><value>Copy Relati_ve Path</value></data>
+  <data name="MenuRename" xml:space="preserve"><value>_Rename</value></data>
+  <data name="MenuDelete" xml:space="preserve"><value>_Delete</value></data>
+  <data name="NewFileToolTip" xml:space="preserve"><value>New File</value></data>
+  <data name="NewFolderToolTip" xml:space="preserve"><value>New Folder</value></data>
+  <data name="FolderNotOpen" xml:space="preserve"><value>You have not yet opened a folder.</value></data>
+  <data name="OpenFolder" xml:space="preserve"><value>Open Folder</value></data>
+  <data name="NameField" xml:space="preserve"><value>Name</value></data>
+  <data name="DeleteFileQuestion" xml:space="preserve"><value>Delete file '{0}'?</value></data>
+  <data name="DeleteFolderQuestion" xml:space="preserve"><value>Delete folder '{0}'?</value></data>
+  <data name="DeleteRestoreHint" xml:space="preserve"><value>You can restore it from the Recycle Bin.</value></data>
+  <data name="NameRequired" xml:space="preserve"><value>A file or folder name must be provided.</value></data>
+  <data name="NameInvalid" xml:space="preserve"><value>The name '{0}' is not valid.</value></data>
+  <data name="NameExists" xml:space="preserve"><value>'{0}' already exists in this folder.</value></data>
+  <data name="ToolFolderNotFound" xml:space="preserve"><value>Folder '{0}' does not exist.</value></data>
+  <data name="ToolEmptyFolder" xml:space="preserve"><value>(empty)</value></data>
+  <data name="ToolTooManyEntries" xml:space="preserve"><value>…(more than {0} entries; narrow the path or reduce depth)</value></data>
+  <data name="ToolEmptyFile" xml:space="preserve"><value>(empty file)</value></data>
+  <data name="ToolLinesUnchanged" xml:space="preserve"><value>(Lines {0}–{1} of {2} are unchanged since the previous read in this chat — use the earlier result.)</value></data>
+  <data name="ToolLinesPage" xml:space="preserve"><value>…(lines {0}–{1} of {2}; continue with startLine={3})</value></data>
+  <data name="ToolWorkspaceNotOpen" xml:space="preserve"><value>No workspace folder is open.</value></data>
+  <data name="ToolNoFilesFound" xml:space="preserve"><value>(nothing found)</value></data>
+  <data name="ToolSimilarPaths" xml:space="preserve"><value> Similar paths in the workspace: {0}.</value></data>
+  <data name="ToolPathResolved" xml:space="preserve"><value>('{0}' resolved to {1})</value></data>
+  <data name="ToolPathAmbiguous" xml:space="preserve"><value>'{0}' matches several files: {1}. Pass the path from the workspace root.</value></data>
+  <data name="ToolMoreFiles" xml:space="preserve"><value>…({0} more; refine the pattern)</value></data>
+  <data name="ToolPathIsFolder" xml:space="preserve"><value>'{0}' is a folder, not a file: list_dir shows its contents.</value></data>
+  <data name="ToolFolderInsteadOfFile" xml:space="preserve"><value>('{0}' is a folder, not a file; its contents:)</value></data>
+  <data name="ToolFileNotFound" xml:space="preserve"><value>File '{0}' does not exist.</value></data>
+  <data name="ToolBinaryFile" xml:space="preserve"><value>'{0}' is a binary file.</value></data>
+  <data name="ToolMovedToRecycleBin" xml:space="preserve"><value>{0} moved to the Recycle Bin.</value></data>
+  <data name="ToolWorkspaceUntouchable" xml:space="preserve"><value>The workspace folder itself cannot be deleted or moved.</value></data>
+  <data name="ToolPathNotFound" xml:space="preserve"><value>'{0}' does not exist.</value></data>
+  <data name="ToolPathExists" xml:space="preserve"><value>'{0}' already exists.</value></data>
+  <data name="ReadFileDone" xml:space="preserve"><value>Read {0}</value></data>
+  <data name="ReadFileRunning" xml:space="preserve"><value>Reading {0}</value></data>
+  <data name="ListDirDone" xml:space="preserve"><value>Listed folder {0}</value></data>
+  <data name="ListDirRunning" xml:space="preserve"><value>Listing folder {0}</value></data>
+  <data name="ListRootDone" xml:space="preserve"><value>Listed project folder</value></data>
+  <data name="ListRootRunning" xml:space="preserve"><value>Listing project folder</value></data>
+  <data name="FindFilesDone" xml:space="preserve"><value>Found files '{0}'</value></data>
+  <data name="FindFilesRunning" xml:space="preserve"><value>Finding files '{0}'</value></data>
+  <data name="DeleteDone" xml:space="preserve"><value>Deleted {0}</value></data>
+  <data name="DeleteRunning" xml:space="preserve"><value>Deleting {0}</value></data>
+  <data name="MoveDone" xml:space="preserve"><value>Moved {0} → {1}</value></data>
+  <data name="MoveRunning" xml:space="preserve"><value>Moving {0} → {1}</value></data>
+  <data name="ItemForms" xml:space="preserve"><value>item|items</value></data>
+  <data name="FileForms" xml:space="preserve"><value>file|files</value></data>
+  <data name="LinesEmpty" xml:space="preserve"><value>empty</value></data>
+  <data name="LinesUnchanged" xml:space="preserve"><value>unchanged</value></data>
+  <data name="LinesRange" xml:space="preserve"><value>lines {0}–{1}</value></data>
+  <data name="AgentChangesMark" xml:space="preserve"><value>Agent edits awaiting review</value></data>
+  <data name="CopyName" xml:space="preserve"><value>{0} copy</value></data>
+  <data name="CopyNameNumbered" xml:space="preserve"><value>{0} copy {1}</value></data>
+  <data name="ReplaceQuestion" xml:space="preserve"><value>A file or folder named '{0}' already exists in '{1}'. Replace it?</value></data>
+  <data name="ReplaceHint" xml:space="preserve"><value>The replaced item goes to the Recycle Bin.</value></data>
+  <data name="Replace" xml:space="preserve"><value>Replace</value></data>
+  <data name="CannotReplaceParent" xml:space="preserve"><value>'{0}' can't be replaced: the item being moved is inside it.</value></data>
+</root>

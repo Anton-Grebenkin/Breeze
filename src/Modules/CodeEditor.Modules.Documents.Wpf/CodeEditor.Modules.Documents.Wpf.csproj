@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Document viewer views (ADR 0034): PDF uses the built-in WebView2 viewer (same package as the browser, no extra
+    assemblies), Word and PowerPoint use FlowDocument, Excel and CSV use DataGrid. WebView2 assemblies load when the
+    first PDF is shown.
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Web.WebView2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CodeEditor.Modules.Documents\CodeEditor.Modules.Documents.csproj" />
+    <ProjectReference Include="..\..\Platform\CodeEditor.UI\CodeEditor.UI.csproj" />
+    <ProjectReference Include="..\..\Platform\CodeEditor.Shell.Wpf\CodeEditor.Shell.Wpf.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,54 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Agent module: chat with a model via Microsoft Agent Framework and an OpenAI-compatible API. No WPF. -->
+
+  <!--
+    Experimental APIs: Agent Framework context compaction (MAAI001, ADR 0009) and the OpenAI Responses API (OPENAI001),
+    the only way OpenAI reasoning models call tools.
+  -->
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);MAAI001;OPENAI001</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Agents.AI" />
+    <PackageReference Include="Microsoft.Agents.AI.Workflows" />
+    <PackageReference Include="Microsoft.Extensions.AI.OpenAI" />
+  </ItemGroup>
+
+  <!--
+    Services and ViewModels subfolders have their own namespaces, imported module-wide: the central classes
+    (AgentConversation, ChatViewModel) use types from many subfolders and would otherwise exceed 300 lines.
+  -->
+  <ItemGroup>
+    <Using Include="CodeEditor.Modules.Agent.Services.Anthropic" />
+    <Using Include="CodeEditor.Modules.Agent.Services.Api" />
+    <Using Include="CodeEditor.Modules.Agent.Services.Attachments" />
+    <Using Include="CodeEditor.Modules.Agent.Services.Cache" />
+    <Using Include="CodeEditor.Modules.Agent.Services.Chat" />
+    <Using Include="CodeEditor.Modules.Agent.Services.Context" />
+    <Using Include="CodeEditor.Modules.Agent.Services.Conversation" />
+    <Using Include="CodeEditor.Modules.Agent.Services.Deep" />
+    <Using Include="CodeEditor.Modules.Agent.Services.History" />
+    <Using Include="CodeEditor.Modules.Agent.Services.Http" />
+    <Using Include="CodeEditor.Modules.Agent.Services.Memory" />
+    <Using Include="CodeEditor.Modules.Agent.Services.Models" />
+    <Using Include="CodeEditor.Modules.Agent.Services.Prompts" />
+    <Using Include="CodeEditor.Modules.Agent.Services.Settings" />
+    <Using Include="CodeEditor.Modules.Agent.Services.Tools" />
+    <Using Include="CodeEditor.Modules.Agent.Services.Turn" />
+    <Using Include="CodeEditor.Modules.Agent.Services.Web" />
+    <Using Include="CodeEditor.Modules.Agent.ViewModels.Activity" />
+    <Using Include="CodeEditor.Modules.Agent.ViewModels.Approvals" />
+    <Using Include="CodeEditor.Modules.Agent.ViewModels.Chat" />
+    <Using Include="CodeEditor.Modules.Agent.ViewModels.Composer" />
+    <Using Include="CodeEditor.Modules.Agent.ViewModels.Models" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Platform\CodeEditor.Core\CodeEditor.Core.csproj" />
+    <ProjectReference Include="..\..\Platform\CodeEditor.Shell\CodeEditor.Shell.csproj" />
+    <ProjectReference Include="..\CodeEditor.Modules.Agent.Contracts\CodeEditor.Modules.Agent.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>

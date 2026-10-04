@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Docker module: panel and agent tools (reads run freely, changes go through an approval card). No WPF. -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Platform\CodeEditor.Core\CodeEditor.Core.csproj" />
+    <ProjectReference Include="..\..\Platform\CodeEditor.Shell\CodeEditor.Shell.csproj" />
+    <ProjectReference Include="..\CodeEditor.Modules.Agent.Contracts\CodeEditor.Modules.Agent.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>

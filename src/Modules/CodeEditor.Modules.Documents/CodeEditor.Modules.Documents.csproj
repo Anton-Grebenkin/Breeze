@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Documents module (ADR 0034): PDF, Word, Excel, PowerPoint and CSV reading and writing, agent tools, viewer
+    ViewModels. No WPF. Format libraries load on the first document open or tool call.
+  -->
+
+  <ItemGroup>
+    <PackageReference Include="DocumentFormat.OpenXml" />
+    <PackageReference Include="PdfPig" />
+    <PackageReference Include="PDFsharp-MigraDoc" />
+    <PackageReference Include="Markdig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Platform\CodeEditor.Core\CodeEditor.Core.csproj" />
+    <ProjectReference Include="..\..\Platform\CodeEditor.Shell\CodeEditor.Shell.csproj" />
+    <ProjectReference Include="..\CodeEditor.Modules.Agent.Contracts\CodeEditor.Modules.Agent.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>

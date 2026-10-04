@@ -1,0 +1,178 @@
+<UserControl x:Class="CodeEditor.Modules.Explorer.Wpf.Views.ExplorerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:CodeEditor.Modules.Explorer.ViewModels;assembly=CodeEditor.Modules.Explorer"
+             xmlns:ui="clr-namespace:CodeEditor.UI.Themes;assembly=CodeEditor.UI"
+             xmlns:controls="clr-namespace:CodeEditor.UI.Controls;assembly=CodeEditor.UI"
+             xmlns:res="clr-namespace:CodeEditor.Modules.Explorer.Resources;assembly=CodeEditor.Modules.Explorer"
+             xmlns:shell="clr-namespace:CodeEditor.Shell;assembly=CodeEditor.Shell"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:ExplorerPanelViewModel}"
+             AutomationProperties.AutomationId="Explorer">
+  <UserControl.Resources>
+    <Style x:Key="Button.Toolbar" TargetType="Button" BasedOn="{StaticResource Button.Subtle}">
+      <Setter Property="Padding" Value="4" />
+      <Setter Property="FontFamily" Value="{DynamicResource Font.Icons}" />
+      <Setter Property="FontSize" Value="{DynamicResource FontSize.Icon}" />
+    </Style>
+
+    <!-- File icon colored by kind, like VS Code icon themes: warm folders, brand-colored code (ADR 0038). -->
+    <Style x:Key="TextBlock.FileIcon" TargetType="TextBlock">
+      <Setter Property="Width" Value="16" />
+      <Setter Property="Margin" Value="0,0,6,0" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="FontFamily" Value="{DynamicResource Font.Icons}" />
+      <Setter Property="FontSize" Value="{DynamicResource FontSize.Icon}" />
+      <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Secondary}" />
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding Icon}" Value="{x:Static shell:IconNames.Folder}">
+          <Setter Property="Foreground" Value="{DynamicResource Brush.FileIcon.Folder}" />
+        </DataTrigger>
+        <DataTrigger Binding="{Binding Icon}" Value="{x:Static shell:IconNames.FolderOpened}">
+          <Setter Property="Foreground" Value="{DynamicResource Brush.FileIcon.Folder}" />
+        </DataTrigger>
+        <DataTrigger Binding="{Binding Icon}" Value="{x:Static shell:IconNames.FileCode}">
+          <Setter Property="Foreground" Value="{DynamicResource Brush.FileIcon.Code}" />
+        </DataTrigger>
+        <DataTrigger Binding="{Binding Icon}" Value="{x:Static shell:IconNames.Json}">
+          <Setter Property="Foreground" Value="{DynamicResource Brush.FileIcon.Data}" />
+        </DataTrigger>
+        <DataTrigger Binding="{Binding Icon}" Value="{x:Static shell:IconNames.Diagram}">
+          <Setter Property="Foreground" Value="{DynamicResource Brush.FileIcon.Data}" />
+        </DataTrigger>
+        <DataTrigger Binding="{Binding Icon}" Value="{x:Static shell:IconNames.Markdown}">
+          <Setter Property="Foreground" Value="{DynamicResource Brush.FileIcon.Document}" />
+        </DataTrigger>
+        <DataTrigger Binding="{Binding Icon}" Value="{x:Static shell:IconNames.FileText}">
+          <Setter Property="Foreground" Value="{DynamicResource Brush.FileIcon.Document}" />
+        </DataTrigger>
+        <DataTrigger Binding="{Binding Icon}" Value="{x:Static shell:IconNames.FileMedia}">
+          <Setter Property="Foreground" Value="{DynamicResource Brush.FileIcon.Media}" />
+        </DataTrigger>
+        <DataTrigger Binding="{Binding Icon}" Value="{x:Static shell:IconNames.Audio}">
+          <Setter Property="Foreground" Value="{DynamicResource Brush.FileIcon.Media}" />
+        </DataTrigger>
+        <DataTrigger Binding="{Binding Icon}" Value="{x:Static shell:IconNames.Video}">
+          <Setter Property="Foreground" Value="{DynamicResource Brush.FileIcon.Media}" />
+        </DataTrigger>
+        <DataTrigger Binding="{Binding Icon}" Value="{x:Static shell:IconNames.Table}">
+          <Setter Property="Foreground" Value="{DynamicResource Brush.FileIcon.Table}" />
+        </DataTrigger>
+        <DataTrigger Binding="{Binding Icon}" Value="{x:Static shell:IconNames.FilePdf}">
+          <Setter Property="Foreground" Value="{DynamicResource Brush.FileIcon.Pdf}" />
+        </DataTrigger>
+        <DataTrigger Binding="{Binding Icon}" Value="{x:Static shell:IconNames.Presentation}">
+          <Setter Property="Foreground" Value="{DynamicResource Brush.FileIcon.Slides}" />
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+  </UserControl.Resources>
+
+  <Grid>
+    <!-- No folder open: hint and button, as in VS Code. -->
+    <StackPanel Margin="16"
+                Visibility="{Binding Explorer.HasWorkspace, Converter={x:Static controls:InverseBoolToVisibilityConverter.Instance}}">
+      <TextBlock TextWrapping="Wrap"
+                 Foreground="{DynamicResource Brush.Text.Secondary}"
+                 Text="{x:Static res:Strings.FolderNotOpen}" />
+      <Button Margin="0,12,0,0"
+              HorizontalAlignment="Stretch"
+              Style="{StaticResource Button.CommandCenter}"
+              Command="{Binding Explorer.OpenFolderCommand}"
+              Content="{x:Static res:Strings.OpenFolder}"
+              AutomationProperties.AutomationId="Explorer.OpenFolder" />
+    </StackPanel>
+
+    <DockPanel Visibility="{Binding Explorer.HasWorkspace, Converter={StaticResource BoolToVisibility}}">
+      <!-- Header: folder name and actions. -->
+      <DockPanel DockPanel.Dock="Top" Height="24" Margin="8,0,4,0">
+        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+          <Button Style="{StaticResource Button.Toolbar}" Content="{x:Static ui:IconGlyphs.NewFile}" ToolTip="{x:Static res:Strings.NewFileToolTip}"
+                  Command="{Binding NewFileCommand}" AutomationProperties.AutomationId="Explorer.NewFile" AutomationProperties.Name="{x:Static res:Strings.NewFileToolTip}" />
+          <Button Style="{StaticResource Button.Toolbar}" Content="{x:Static ui:IconGlyphs.NewFolder}" ToolTip="{x:Static res:Strings.NewFolderToolTip}"
+                  Command="{Binding NewFolderCommand}" AutomationProperties.AutomationId="Explorer.NewFolder" AutomationProperties.Name="{x:Static res:Strings.NewFolderToolTip}" />
+          <Button Style="{StaticResource Button.Toolbar}" Content="{x:Static ui:IconGlyphs.Refresh}" ToolTip="{x:Static res:Strings.Refresh}"
+                  Command="{Binding Explorer.RefreshCommand}" AutomationProperties.AutomationId="Explorer.Refresh" AutomationProperties.Name="{x:Static res:Strings.Refresh}" />
+          <Button Style="{StaticResource Button.Toolbar}" Content="{x:Static ui:IconGlyphs.CollapseAll}" ToolTip="{x:Static res:Strings.CollapseAll}"
+                  Command="{Binding Explorer.CollapseAllCommand}" AutomationProperties.AutomationId="Explorer.CollapseAll" AutomationProperties.Name="{x:Static res:Strings.CollapseAll}" />
+        </StackPanel>
+        <TextBlock Style="{StaticResource TextBlock.AreaHeader}" Margin="0" Text="{Binding Explorer.FolderName}" />
+      </DockPanel>
+
+      <TreeView x:Name="Tree"
+                Style="{StaticResource TreeView.Files}"
+                ItemsSource="{Binding Explorer.Tree.Root.Children}"
+                IsKeyboardFocusWithinChanged="OnTreeFocusChanged"
+                AutomationProperties.AutomationId="Explorer.Tree">
+        <TreeView.ItemContainerStyle>
+          <Style TargetType="TreeViewItem" BasedOn="{StaticResource TreeViewItem.Row}">
+            <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+            <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+            <Setter Property="AutomationProperties.AutomationId" Value="{Binding AutomationId}" />
+            <Setter Property="AutomationProperties.Name" Value="{Binding Name}" />
+            <EventSetter Event="MouseDoubleClick" Handler="OnItemDoubleClick" />
+            <EventSetter Event="PreviewMouseLeftButtonUp" Handler="OnItemClick" />
+            <EventSetter Event="PreviewMouseRightButtonDown" Handler="OnItemRightButtonDown" />
+          </Style>
+        </TreeView.ItemContainerStyle>
+        <TreeView.ItemTemplate>
+          <HierarchicalDataTemplate DataType="{x:Type vm:FileNodeViewModel}" ItemsSource="{Binding Children}">
+            <StackPanel Orientation="Horizontal">
+              <TextBlock Style="{StaticResource TextBlock.FileIcon}"
+                         Text="{Binding Icon, Converter={x:Static controls:IconGlyphConverter.Instance}}" />
+              <TextBlock VerticalAlignment="Center"
+                         Text="{Binding Name}"
+                         Visibility="{Binding IsEditing, Converter={x:Static controls:InverseBoolToVisibilityConverter.Instance}}">
+                <TextBlock.Style>
+                  <Style TargetType="TextBlock">
+                    <Style.Triggers>
+                      <!-- Agent edits awaiting review (ADR 0040). -->
+                      <DataTrigger Binding="{Binding IsAgentChanged}" Value="True">
+                        <Setter Property="Foreground" Value="{DynamicResource Brush.AgentChange.Foreground}" />
+                      </DataTrigger>
+                    </Style.Triggers>
+                  </Style>
+                </TextBlock.Style>
+              </TextBlock>
+              <!-- A dot after the name: the file has agent edits, or the folder contains such files. -->
+              <TextBlock x:Name="AgentMark"
+                         Margin="6,0,0,0"
+                         VerticalAlignment="Center"
+                         FontSize="{DynamicResource FontSize.Small}"
+                         Foreground="{DynamicResource Brush.AgentChange.Foreground}"
+                         Text="●"
+                         ToolTip="{x:Static res:Strings.AgentChangesMark}"
+                         Visibility="Collapsed" />
+              <TextBox MinWidth="140"
+                       Padding="2,0"
+                       Style="{StaticResource TextBox.Input}"
+                       Text="{Binding EditName, UpdateSourceTrigger=PropertyChanged}"
+                       Visibility="{Binding IsEditing, Converter={StaticResource BoolToVisibility}}"
+                       IsVisibleChanged="OnEditBoxVisibleChanged"
+                       PreviewKeyDown="OnEditBoxKeyDown"
+                       LostKeyboardFocus="OnEditBoxLostFocus"
+                       AutomationProperties.AutomationId="Explorer.EditName"
+                       AutomationProperties.Name="{x:Static res:Strings.NameField}" />
+            </StackPanel>
+            <HierarchicalDataTemplate.Triggers>
+              <DataTrigger Binding="{Binding IsAgentChanged}" Value="True">
+                <Setter TargetName="AgentMark" Property="Visibility" Value="Visible" />
+              </DataTrigger>
+              <DataTrigger Binding="{Binding ContainsAgentChanges}" Value="True">
+                <Setter TargetName="AgentMark" Property="Visibility" Value="Visible" />
+              </DataTrigger>
+            </HierarchicalDataTemplate.Triggers>
+          </HierarchicalDataTemplate>
+        </TreeView.ItemTemplate>
+        <TreeView.ContextMenu>
+          <ContextMenu ItemsSource="{Binding ContextMenu.Items}"
+                       ItemContainerStyle="{StaticResource MenuItem.Bound}"
+                       Opened="OnContextMenuOpened"
+                       AutomationProperties.AutomationId="Explorer.ContextMenu" />
+        </TreeView.ContextMenu>
+      </TreeView>
+    </DockPanel>
+  </Grid>
+</UserControl>

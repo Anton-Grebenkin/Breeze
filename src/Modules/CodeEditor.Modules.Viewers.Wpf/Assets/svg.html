@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!--
+  SVG drawing page (ADR 0037). The drawing is shown with an img element, so scripts, links and external files inside
+  the SVG don't work. The policy forbids inline scripts and handlers; the drawing loads only from the file's folder
+  address; no network.
+-->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src https://*.codeeditor.example">
+<title>SVG</title>
+<link rel="stylesheet" href="viewer.css">
+<script src="svg.js" defer></script>
+</head>
+<body>
+<main id="viewport" tabindex="0"><div id="content"><img id="picture" class="waiting" alt="" draggable="false"></div></main>
+</body>
+</html>

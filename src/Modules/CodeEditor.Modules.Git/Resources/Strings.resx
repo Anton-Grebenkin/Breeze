@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="ModuleName" xml:space="preserve"><value>Git</value></data>
+  <!-- Tool replies to the model. -->
+  <data name="UnknownAction" xml:space="preserve"><value>Unknown action '{0}'. Use one of: {1}.</value></data>
+  <data name="ArgumentRequired" xml:space="preserve"><value>The {0} action needs the {1} argument.</value></data>
+  <data name="InvalidName" xml:space="preserve"><value>'{0}' is not a valid {1}: it must not be empty, start with '-' or contain spaces.</value></data>
+  <data name="GitFailed" xml:space="preserve"><value>git {0} failed with exit code {1}:
+{2}</value></data>
+  <data name="GitTimedOut" xml:space="preserve"><value>git {0} did not finish in {1} s.</value></data>
+  <data name="NoChanges" xml:space="preserve"><value>No changes.</value></data>
+  <data name="EmptyOutput" xml:space="preserve"><value>(no output)</value></data>
+  <data name="Done" xml:space="preserve"><value>Done.</value></data>
+  <!-- Approval card. -->
+  <data name="ApprovalTitle" xml:space="preserve"><value>The agent wants to change the git repository</value></data>
+  <data name="ApprovalHeader" xml:space="preserve"><value>git commands</value></data>
+  <!-- Agent feed rows. -->
+  <data name="StatusTitle" xml:space="preserve"><value>Git status</value></data>
+  <data name="DiffTitle" xml:space="preserve"><value>Git changes</value></data>
+  <data name="DiffOfTitle" xml:space="preserve"><value>Git changes in {0}</value></data>
+  <data name="LogTitle" xml:space="preserve"><value>Git history</value></data>
+  <data name="LogOfTitle" xml:space="preserve"><value>Git history of {0}</value></data>
+  <data name="ShowTitle" xml:space="preserve"><value>Commit {0}</value></data>
+  <data name="BlameTitle" xml:space="preserve"><value>Line authors in {0}</value></data>
+  <data name="CommitTitle" xml:space="preserve"><value>Commit: {0}</value></data>
+  <data name="CreateBranchTitle" xml:space="preserve"><value>New branch {0}</value></data>
+  <data name="SwitchTitle" xml:space="preserve"><value>Switch to branch {0}</value></data>
+  <data name="StashTitle" xml:space="preserve"><value>Changes stashed</value></data>
+  <data name="StashPopTitle" xml:space="preserve"><value>Changes restored from stash</value></data>
+  <data name="RestoreTitle" xml:space="preserve"><value>Changes discarded in {0}</value></data>
+  <data name="PushTitle" xml:space="preserve"><value>Push to the remote repository</value></data>
+  <!-- Source Control panel. -->
+  <data name="PanelTitle" xml:space="preserve"><value>Source Control</value></data>
+  <data name="ViewModuleName" xml:space="preserve"><value>Git views</value></data>
+  <data name="NoFolderText" xml:space="preserve"><value>Open a folder with a git repository to see changes, commit and switch branches.</value></data>
+  <data name="NotRepositoryText" xml:space="preserve"><value>The folder is not in a git repository. Initialize one to track changes.</value></data>
+  <data name="NoGitText" xml:space="preserve"><value>git is not found. Install Git for Windows (git-scm.com) and restart the editor.</value></data>
+  <data name="LoadingText" xml:space="preserve"><value>Reading the repository…</value></data>
+  <data name="ChangesList" xml:space="preserve"><value>Changed files</value></data>
+  <data name="RefreshToolTip" xml:space="preserve"><value>Refresh</value></data>
+  <data name="PullToolTip" xml:space="preserve"><value>Pull: get changes from the remote repository</value></data>
+  <data name="PushToolTip" xml:space="preserve"><value>Push: send commits to the remote repository</value></data>
+  <data name="MoreActions" xml:space="preserve"><value>More Actions…</value></data>
+  <data name="DismissError" xml:space="preserve"><value>Close</value></data>
+  <data name="CommitButton" xml:space="preserve"><value>Commit</value></data>
+  <data name="CommitMessageName" xml:space="preserve"><value>Commit message</value></data>
+  <data name="CommitPlaceholder" xml:space="preserve"><value>Message (Ctrl+Enter to commit on '{0}')</value></data>
+  <data name="CommitPlaceholderNoBranch" xml:space="preserve"><value>Message (Ctrl+Enter to commit)</value></data>
+  <data name="CommitMessageRequired" xml:space="preserve"><value>Enter a commit message.</value></data>
+  <data name="NothingToCommit" xml:space="preserve"><value>There are no changes to commit.</value></data>
+  <data name="CommitAllQuestion" xml:space="preserve"><value>There are no staged changes. Stage all changes and commit them?</value></data>
+  <data name="CommitAllDetail" xml:space="preserve"><value>All changes, including new files, will be added to the index.</value></data>
+  <data name="CommitAllConfirm" xml:space="preserve"><value>Stage All and Commit</value></data>
+  <data name="GroupMerge" xml:space="preserve"><value>Merge Changes</value></data>
+  <data name="GroupStaged" xml:space="preserve"><value>Staged Changes</value></data>
+  <data name="GroupChanges" xml:space="preserve"><value>Changes</value></data>
+  <data name="GroupLimited" xml:space="preserve"><value>Showing the first {0} of {1} files</value></data>
+  <data name="StatusModified" xml:space="preserve"><value>Modified</value></data>
+  <data name="StatusAdded" xml:space="preserve"><value>Added</value></data>
+  <data name="StatusDeleted" xml:space="preserve"><value>Deleted</value></data>
+  <data name="StatusRenamed" xml:space="preserve"><value>Renamed</value></data>
+  <data name="StatusCopied" xml:space="preserve"><value>Copied</value></data>
+  <data name="StatusTypeChanged" xml:space="preserve"><value>Type changed</value></data>
+  <data name="StatusUntracked" xml:space="preserve"><value>Untracked</value></data>
+  <data name="StatusConflict" xml:space="preserve"><value>Conflict</value></data>
+  <data name="ChangeToolTip" xml:space="preserve"><value>{0} • {1}</value></data>
+  <data name="RenamedChangeToolTip" xml:space="preserve"><value>{0} • {1} from {2}</value></data>
+  <data name="StageToolTip" xml:space="preserve"><value>Stage Changes</value></data>
+  <data name="UnstageToolTip" xml:space="preserve"><value>Unstage Changes</value></data>
+  <data name="DiscardToolTip" xml:space="preserve"><value>Discard Changes</value></data>
+  <data name="OpenFileToolTip" xml:space="preserve"><value>Open File</value></data>
+  <data name="StageAllToolTip" xml:space="preserve"><value>Stage All Changes</value></data>
+  <data name="UnstageAllToolTip" xml:space="preserve"><value>Unstage All Changes</value></data>
+  <!-- Commands and menus. -->
+  <data name="GitMenu" xml:space="preserve"><value>G_it</value></data>
+  <data name="CommandCommit" xml:space="preserve"><value>Commit</value></data>
+  <data name="CommandStage" xml:space="preserve"><value>Stage Changes</value></data>
+  <data name="CommandUnstage" xml:space="preserve"><value>Unstage Changes</value></data>
+  <data name="CommandStageAll" xml:space="preserve"><value>Stage All Changes</value></data>
+  <data name="CommandUnstageAll" xml:space="preserve"><value>Unstage All Changes</value></data>
+  <data name="CommandDiscard" xml:space="preserve"><value>Discard Changes…</value></data>
+  <data name="CommandRefresh" xml:space="preserve"><value>Refresh</value></data>
+  <data name="CommandCheckout" xml:space="preserve"><value>Checkout to…</value></data>
+  <data name="CommandCreateBranch" xml:space="preserve"><value>Create Branch…</value></data>
+  <data name="CommandPull" xml:space="preserve"><value>Pull</value></data>
+  <data name="CommandPush" xml:space="preserve"><value>Push</value></data>
+  <data name="CommandFetch" xml:space="preserve"><value>Fetch</value></data>
+  <data name="CommandShowHistory" xml:space="preserve"><value>Show History</value></data>
+  <data name="CommandOpenChanges" xml:space="preserve"><value>Open Changes</value></data>
+  <data name="CommandOpenFile" xml:space="preserve"><value>Open File</value></data>
+  <data name="CommandInit" xml:space="preserve"><value>Initialize Repository</value></data>
+  <!-- Action progress and errors (panel and status bar). -->
+  <data name="ActionStage" xml:space="preserve"><value>Stage</value></data>
+  <data name="ActionUnstage" xml:space="preserve"><value>Unstage</value></data>
+  <data name="ActionDiscard" xml:space="preserve"><value>Discard changes</value></data>
+  <data name="ActionCommit" xml:space="preserve"><value>Commit</value></data>
+  <data name="ActionPull" xml:space="preserve"><value>Pull</value></data>
+  <data name="ActionPush" xml:space="preserve"><value>Push</value></data>
+  <data name="ActionFetch" xml:space="preserve"><value>Fetch</value></data>
+  <data name="ActionSwitch" xml:space="preserve"><value>Switch to {0}</value></data>
+  <data name="ActionCreateBranch" xml:space="preserve"><value>Create branch {0}</value></data>
+  <data name="ActionInit" xml:space="preserve"><value>Initialize repository</value></data>
+  <data name="GitActivity" xml:space="preserve"><value>Git: {0}…</value></data>
+  <data name="GitActivityDone" xml:space="preserve"><value>Git: {0} — done</value></data>
+  <data name="GitBusy" xml:space="preserve"><value>Git: wait for '{0}' to finish</value></data>
+  <data name="GitErrorStatus" xml:space="preserve"><value>Git error: {0}</value></data>
+  <data name="GitTimeout" xml:space="preserve"><value>git did not finish in {0} s.</value></data>
+  <data name="GitExitCode" xml:space="preserve"><value>git failed with exit code {0}.</value></data>
+  <data name="NoRepository" xml:space="preserve"><value>The folder is not in a git repository.</value></data>
+  <data name="NothingToStage" xml:space="preserve"><value>No changes to stage.</value></data>
+  <data name="NothingToUnstage" xml:space="preserve"><value>No staged changes.</value></data>
+  <data name="NothingToDiscard" xml:space="preserve"><value>No changes to discard.</value></data>
+  <data name="NoChangesInFile" xml:space="preserve"><value>The file has no changes.</value></data>
+  <data name="FileIsDeleted" xml:space="preserve"><value>The file is deleted: only its changes can be opened.</value></data>
+  <data name="DiscardQuestion" xml:space="preserve"><value>Discard changes in '{0}'?</value></data>
+  <data name="DiscardManyQuestion" xml:space="preserve"><value>Discard changes in {0}?</value></data>
+  <data name="DiscardFileForms" xml:space="preserve"><value>file|files</value></data>
+  <data name="DiscardDetail" xml:space="preserve"><value>The changes will be lost; new files are moved to the Recycle Bin.</value></data>
+  <data name="DiscardConfirm" xml:space="preserve"><value>Discard Changes</value></data>
+  <data name="DeleteUntrackedQuestion" xml:space="preserve"><value>Delete the new file '{0}'?</value></data>
+  <data name="DeleteUntrackedDetail" xml:space="preserve"><value>The file is not in git: it will be moved to the Recycle Bin.</value></data>
+  <data name="DeleteUntrackedConfirm" xml:space="preserve"><value>Delete</value></data>
+  <!-- Branches: palette picker and status bar. -->
+  <data name="CheckoutPlaceholder" xml:space="preserve"><value>Select a branch to switch to</value></data>
+  <data name="CreateBranchItem" xml:space="preserve"><value>+ Create new branch…</value></data>
+  <data name="CurrentBranchDetail" xml:space="preserve"><value>current • {0}</value></data>
+  <data name="RemoteBranchDetail" xml:space="preserve"><value>remote • {0}</value></data>
+  <data name="NewBranchPlaceholder" xml:space="preserve"><value>Name of the new branch</value></data>
+  <data name="CreateBranchNamed" xml:space="preserve"><value>Create branch '{0}'</value></data>
+  <data name="BranchNameHint" xml:space="preserve"><value>Type a branch name: no spaces, not starting with '-' or '.'.</value></data>
+  <data name="DetachedHead" xml:space="preserve"><value>{0} (detached)</value></data>
+  <data name="BranchToolTip" xml:space="preserve"><value>Branch {0} — switch to another branch</value></data>
+  <data name="SyncToolTip" xml:space="preserve"><value>{0}: {1} to push, {2} to pull</value></data>
+  <data name="NoUpstreamToolTip" xml:space="preserve"><value>No upstream branch: Push publishes the branch to origin</value></data>
+  <!-- Diff and history tabs. -->
+  <data name="DiffTitleChanges" xml:space="preserve"><value>{0} (changes)</value></data>
+  <data name="DiffTitleStaged" xml:space="preserve"><value>{0} (index)</value></data>
+  <data name="DiffToolTipChanges" xml:space="preserve"><value>{0} — changes in the working tree</value></data>
+  <data name="DiffToolTipStaged" xml:space="preserve"><value>{0} — staged changes</value></data>
+  <data name="DiffLines" xml:space="preserve"><value>Changed lines</value></data>
+  <data name="Loading" xml:space="preserve"><value>Loading…</value></data>
+  <data name="CopyLines" xml:space="preserve"><value>Copy</value></data>
+  <data name="DiffNoNewline" xml:space="preserve"><value>No newline at end of file</value></data>
+  <data name="DiffNewFile" xml:space="preserve"><value>New file</value></data>
+  <data name="DiffDeletedFile" xml:space="preserve"><value>Deleted file</value></data>
+  <data name="DiffModeChanged" xml:space="preserve"><value>File mode: {0} → {1}</value></data>
+  <data name="DiffRenamed" xml:space="preserve"><value>Renamed: {0} → {1}</value></data>
+  <data name="DiffCopied" xml:space="preserve"><value>Copied: {0} → {1}</value></data>
+  <data name="DiffBinary" xml:space="preserve"><value>Binary file: changes are not shown</value></data>
+  <data name="DiffTruncated" xml:space="preserve"><value>The diff is too long: showing the first {0} lines.</value></data>
+  <data name="HistoryEmpty" xml:space="preserve"><value>No commits yet.</value></data>
+  <data name="LoadMore" xml:space="preserve"><value>Show More</value></data>
+  <data name="CopyHash" xml:space="preserve"><value>Copy Hash</value></data>
+  <data name="CommitsList" xml:space="preserve"><value>Commits</value></data>
+  <data name="CommitFiles" xml:space="preserve"><value>Files of the commit</value></data>
+  <data name="SelectCommitHint" xml:space="preserve"><value>Select a commit to see its files and changes.</value></data>
+</root>

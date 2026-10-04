@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!--
+  HTTP requests (.http, .rest), as in Visual Studio and REST Client: ### separates requests, # and // comments,
+  method and protocol version, "Name: value" headers, {{name}} and @name = value variables, JSON body strings,
+  numbers, true/false/null. Color names are theme tokens (ADR 0036).
+-->
+<SyntaxDefinition name="Http" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+  <Color name="Comment" />
+  <Color name="String" />
+  <Color name="Number" />
+  <Color name="Keyword" />
+  <Color name="Type" />
+  <Color name="Variable" />
+
+  <RuleSet>
+    <Span color="Comment" begin="^###" />
+    <Span color="Comment" begin="^\s*(?:#|//)" />
+    <Span color="String" begin="&quot;" end="&quot;" ruleSet="Quoted" />
+
+    <Rule color="Variable">\{\{[^{}\r\n]*\}\}</Rule>
+    <Rule color="Variable">^@[\w.\-]+</Rule>
+    <Rule color="Keyword">^(?:GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS|TRACE|CONNECT)(?=\s)</Rule>
+    <Rule color="Keyword">\bHTTP/\d(?:\.\d)?\b</Rule>
+    <Rule color="Type">^[A-Za-z][\w\-]*(?=[\ \t]*:[\ \t])</Rule>
+    <Keywords color="Keyword">
+      <Word>true</Word>
+      <Word>false</Word>
+      <Word>null</Word>
+    </Keywords>
+    <!-- A number in the body or a header ("Content-Length: 42"), but not a port in a URL (localhost:5001). -->
+    <Rule color="Number">(?&lt;=:[\ \t]+|[\[,][\ \t]*)-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?(?![\w.])</Rule>
+  </RuleSet>
+
+  <RuleSet name="Quoted">
+    <Span begin="\\" end="." />
+    <Rule color="Variable">\{\{[^{}\r\n]*\}\}</Rule>
+  </RuleSet>
+</SyntaxDefinition>

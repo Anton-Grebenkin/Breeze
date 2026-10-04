@@ -1,0 +1,20 @@
+<UserControl x:Class="CodeEditor.Modules.Viewers.Wpf.Views.MediaViewerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:CodeEditor.Modules.Viewers.ViewModels;assembly=CodeEditor.Modules.Viewers"
+             xmlns:views="clr-namespace:CodeEditor.Modules.Viewers.Wpf.Views"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:MediaViewerViewModel}"
+             Background="{DynamicResource Brush.Editor.Background}"
+             AutomationProperties.AutomationId="MediaViewer">
+  <!-- Audio and video: the browser player (WebView2) with controls; the recording stays paused until started. -->
+  <DockPanel>
+    <views:ViewerToolbar DockPanel.Dock="Top" />
+    <TextBlock x:Name="Unavailable" DockPanel.Dock="Top" Margin="8" TextWrapping="Wrap" Visibility="Collapsed"
+               Foreground="{DynamicResource Brush.Error.Foreground}"
+               AutomationProperties.AutomationId="MediaViewer.Unavailable" />
+    <ContentControl x:Name="Host" Focusable="False" AutomationProperties.AutomationId="MediaViewer.Host" />
+  </DockPanel>
+</UserControl>

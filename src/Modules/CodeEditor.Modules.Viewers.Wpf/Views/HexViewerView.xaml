@@ -1,0 +1,101 @@
+<UserControl x:Class="CodeEditor.Modules.Viewers.Wpf.Views.HexViewerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:CodeEditor.Modules.Viewers.ViewModels;assembly=CodeEditor.Modules.Viewers"
+             xmlns:hex="clr-namespace:CodeEditor.Modules.Viewers.Hex;assembly=CodeEditor.Modules.Viewers"
+             xmlns:res="clr-namespace:CodeEditor.Modules.Viewers.Resources;assembly=CodeEditor.Modules.Viewers"
+             xmlns:views="clr-namespace:CodeEditor.Modules.Viewers.Wpf.Views"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:HexViewerViewModel}"
+             Background="{DynamicResource Brush.Editor.Background}"
+             AutomationProperties.AutomationId="HexViewer">
+  <UserControl.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="ToolbarStyles.xaml" />
+      </ResourceDictionary.MergedDictionaries>
+
+      <Style x:Key="Hex.Column" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{DynamicResource Font.Code}" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSize.Code}" />
+      </Style>
+
+      <!-- Dump row: hover highlight and selected row, as in the editor lists. -->
+      <Style x:Key="Hex.Row" TargetType="ListBoxItem">
+        <Setter Property="Padding" Value="8,0" />
+        <Setter Property="Foreground" Value="{DynamicResource Brush.Editor.Foreground}" />
+        <Setter Property="AutomationProperties.AutomationId" Value="{Binding OffsetText, StringFormat=HexViewer.Row.{0}}" />
+        <Setter Property="Template">
+          <Setter.Value>
+            <ControlTemplate TargetType="ListBoxItem">
+              <Border x:Name="Bd" Background="Transparent" Padding="{TemplateBinding Padding}">
+                <ContentPresenter />
+              </Border>
+              <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                  <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Brush.List.HoverBackground}" />
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                  <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Brush.List.SelectionBackground}" />
+                  <Setter Property="Foreground" Value="{DynamicResource Brush.List.SelectionForeground}" />
+                </Trigger>
+              </ControlTemplate.Triggers>
+            </ControlTemplate>
+          </Setter.Value>
+        </Setter>
+      </Style>
+    </ResourceDictionary>
+  </UserControl.Resources>
+
+  <!--
+    16-byte rows: offset, bytes, characters. The list is virtualized: only visible rows are created. Type-ahead search
+    is off: it would enumerate the hundreds of millions of rows of a multi-gigabyte file.
+  -->
+  <DockPanel>
+    <views:ViewerToolbar DockPanel.Dock="Top">
+      <views:ViewerToolbar.Tools>
+        <Button Style="{StaticResource Button.ToolbarIcon}" Content="{x:Static views:ViewerGlyphs.GoToOffset}"
+                Command="{Binding GoToOffsetCommand}" ToolTip="{x:Static res:Strings.GoToOffset}"
+                AutomationProperties.AutomationId="HexViewer.GoToOffset" AutomationProperties.Name="{x:Static res:Strings.GoToOffset}" />
+      </views:ViewerToolbar.Tools>
+    </views:ViewerToolbar>
+    <!-- Left padding is one pixel more than the rows': the list template draws a one-pixel border around them. -->
+    <Border DockPanel.Dock="Top" Padding="9,2,8,2" ClipToBounds="True" BorderThickness="0,0,0,1" BorderBrush="{DynamicResource Brush.Border}">
+      <StackPanel x:Name="Header" Orientation="Horizontal" AutomationProperties.AutomationId="HexViewer.Header">
+        <StackPanel.RenderTransform>
+          <TranslateTransform x:Name="HeaderShift" />
+        </StackPanel.RenderTransform>
+        <TextBlock Style="{StaticResource Hex.Column}" Text="{Binding Rows.OffsetHeader}" Foreground="{DynamicResource Brush.Text.Secondary}" />
+        <TextBlock Style="{StaticResource Hex.Column}" Margin="16,0" Text="{Binding BytesHeader}" Foreground="{DynamicResource Brush.Text.Secondary}" />
+        <TextBlock Style="{StaticResource Hex.Column}" Text="{Binding TextHeader}" Foreground="{DynamicResource Brush.Text.Secondary}" />
+      </StackPanel>
+    </Border>
+    <ListBox x:Name="Rows"
+             ItemsSource="{Binding Rows}"
+             SelectedIndex="{Binding SelectedIndex}"
+             ItemContainerStyle="{StaticResource Hex.Row}"
+             IsTextSearchEnabled="False"
+             Background="{DynamicResource Brush.Editor.Background}"
+             BorderThickness="0"
+             Padding="0"
+             ScrollViewer.CanContentScroll="True"
+             ScrollViewer.HorizontalScrollBarVisibility="Auto"
+             VirtualizingPanel.IsVirtualizing="True"
+             VirtualizingPanel.VirtualizationMode="Recycling"
+             VirtualizingPanel.ScrollUnit="Item"
+             AutomationProperties.AutomationId="HexViewer.Rows"
+             AutomationProperties.Name="{x:Static res:Strings.Bytes}">
+      <ListBox.ItemTemplate>
+        <DataTemplate DataType="{x:Type hex:HexRow}">
+          <StackPanel Orientation="Horizontal">
+            <TextBlock Style="{StaticResource Hex.Column}" Text="{Binding OffsetText}" Foreground="{DynamicResource Brush.Editor.LineNumber}" />
+            <TextBlock Style="{StaticResource Hex.Column}" Margin="16,0" views:HexMarking.Text="{Binding Hex}" views:HexMarking.Marked="{Binding Marked}" />
+            <TextBlock Style="{StaticResource Hex.Column}" views:HexMarking.Text="{Binding Text}" views:HexMarking.Marked="{Binding Marked}" views:HexMarking.IsBytes="False" />
+          </StackPanel>
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+  </DockPanel>
+</UserControl>

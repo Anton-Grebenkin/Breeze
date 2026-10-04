@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="ModuleName" xml:space="preserve"><value>Terminal</value></data>
+  <data name="Build" xml:space="preserve"><value>Build</value></data>
+  <data name="Tests" xml:space="preserve"><value>Tests</value></data>
+  <data name="Commands" xml:space="preserve"><value>Commands</value></data>
+  <data name="BuildCommand" xml:space="preserve"><value>Build</value></data>
+  <data name="RunTestsCommand" xml:space="preserve"><value>Run Tests</value></data>
+  <data name="Building" xml:space="preserve"><value>Building…</value></data>
+  <data name="RunningTests" xml:space="preserve"><value>Running tests…</value></data>
+  <data name="LastBuild" xml:space="preserve"><value>Last build ({0:HH:mm}): {1}</value></data>
+  <data name="LastTestRun" xml:space="preserve"><value>Last test run: {0}</value></data>
+  <data name="NoBuildYet" xml:space="preserve"><value>There has been no build in this session yet — call build.</value></data>
+  <data name="ErrorsHeader" xml:space="preserve"><value>Build of {0} at {1:HH:mm:ss} (edits after it are not included):</value></data>
+  <data name="NoDiagnostics" xml:space="preserve"><value> No errors or warnings.</value></data>
+  <data name="BuildTimedOut" xml:space="preserve"><value>Build of {0} timed out after {1} s.</value></data>
+  <data name="BuildSucceeded" xml:space="preserve"><value>Build of {0} succeeded in {1} s.</value></data>
+  <data name="BuildSucceededWithWarnings" xml:space="preserve"><value>Build of {0} succeeded in {1} s, warnings: {2}.</value></data>
+  <data name="BuildFailed" xml:space="preserve"><value>Build of {0} failed in {1} s: errors {2}, warnings {3}.</value></data>
+  <data name="MoreDiagnostics" xml:space="preserve"><value>…({0} more; fix these and build again)</value></data>
+  <data name="BuildOutputTail" xml:space="preserve"><value>Build output (end):</value></data>
+  <data name="TestsTimedOut" xml:space="preserve"><value>Tests ({0}) timed out after {1} s.</value></data>
+  <data name="TestsNotStarted" xml:space="preserve"><value>Tests ({0}) did not start: build errors {1}.</value></data>
+  <data name="TestsSummary" xml:space="preserve"><value>Tests ({0}): passed {1} of {2}, failed {3}, skipped {4} in {5} s.</value></data>
+  <data name="TestsNoTotals" xml:space="preserve"><value>Tests ({0}): no totals found in the output after {1} s.</value></data>
+  <data name="TestFailed" xml:space="preserve"><value>Failed {0}</value></data>
+  <data name="MoreFailures" xml:space="preserve"><value>…(more failed tests: {0})</value></data>
+  <data name="OutputTail" xml:space="preserve"><value>Output (end):</value></data>
+  <data name="TestFilter" xml:space="preserve"><value> (filter '{0}')</value></data>
+  <data name="CommandTimedOut" xml:space="preserve"><value>The command timed out after {0} s.</value></data>
+  <data name="CommandExitCode" xml:space="preserve"><value>Exit code {0} in {1} s.</value></data>
+  <data name="NoOutput" xml:space="preserve"><value> No output.</value></data>
+  <data name="FolderNotFound" xml:space="preserve"><value>Folder '{0}' does not exist.</value></data>
+  <data name="CommandForbidden" xml:space="preserve"><value>The command is blocked by the editor policy: {0}. If it is really needed, the user will run it themselves.</value></data>
+  <data name="BackgroundRunning" xml:space="preserve"><value>Background command #{0} is running ({1} s).</value></data>
+  <data name="BackgroundExited" xml:space="preserve"><value>Background command #{0} exited with code {1} after {2} s.</value></data>
+  <data name="BackgroundStopped" xml:space="preserve"><value>Background command #{0} was stopped after {1} s.</value></data>
+  <data name="BackgroundHowTo" xml:space="preserve"><value>New output: command_output(id: {0}); stop: stop_command(id: {0}).</value></data>
+  <data name="BackgroundNoNewOutput" xml:space="preserve"><value>(no new output)</value></data>
+  <data name="BackgroundDropped" xml:space="preserve"><value>({0} early lines are no longer kept; the full output is in the Commands channel)</value></data>
+  <data name="BackgroundLimit" xml:space="preserve"><value>Not started: {0} background commands are already running. Stop one with stop_command first.</value></data>
+  <data name="BackgroundNotFound" xml:space="preserve"><value>There is no background command #{0}.</value></data>
+  <data name="BackgroundBadPattern" xml:space="preserve"><value>Invalid regular expression in waitFor: {0}</value></data>
+  <data name="BackgroundOutputTitle" xml:space="preserve"><value>Output of background command #{0}</value></data>
+  <data name="BackgroundStopTitle" xml:space="preserve"><value>Stop background command #{0}</value></data>
+  <data name="DetailRunning" xml:space="preserve"><value>running</value></data>
+  <data name="DetailStopped" xml:space="preserve"><value>stopped</value></data>
+  <data name="DetailBackground" xml:space="preserve"><value>in background #{0}</value></data>
+  <data name="ExitNoMatches" xml:space="preserve"><value>Exit code 1 from a search command means no matches, not an error.</value></data>
+  <data name="ExitDifferences" xml:space="preserve"><value>Exit code 1 from git diff --exit-code means the files differ.</value></data>
+  <data name="ExitRobocopySuccess" xml:space="preserve"><value>Exit codes 1–7 from robocopy mean success: files were copied or skipped.</value></data>
+  <data name="PolicyFormatDisk" xml:space="preserve"><value>formatting a disk</value></data>
+  <data name="PolicyPowerOff" xml:space="preserve"><value>shutting down or restarting the computer</value></data>
+  <data name="PolicyForcePush" xml:space="preserve"><value>force-pushing to git (--force)</value></data>
+  <data name="PolicyWipeRoot" xml:space="preserve"><value>deleting a drive root or the user profile</value></data>
+  <data name="PolicyRemoteScript" xml:space="preserve"><value>running a script downloaded from the internet</value></data>
+  <data name="PolicyRegistry" xml:space="preserve"><value>changing the Windows registry</value></data>
+  <data name="PolicyExecutionPolicy" xml:space="preserve"><value>changing the PowerShell execution policy</value></data>
+  <data name="NoWorkspace" xml:space="preserve"><value>No folder is open.</value></data>
+  <data name="NotBuildable" xml:space="preserve"><value>'{0}' is not a solution or project (.slnx, .sln, .csproj), or it does not exist.</value></data>
+  <data name="NothingToBuild" xml:space="preserve"><value>The folder root has no solution or single project. Specify project — a path to a .slnx, .sln or .csproj.</value></data>
+  <data name="LastBuildErrors" xml:space="preserve"><value>Last build errors</value></data>
+  <data name="DetailSucceeded" xml:space="preserve"><value>succeeded</value></data>
+  <data name="DetailSucceededWithWarnings" xml:space="preserve"><value>succeeded, warnings: {0}</value></data>
+  <data name="DetailErrors" xml:space="preserve"><value>errors: {0}</value></data>
+  <data name="DetailTimedOut" xml:space="preserve"><value>timed out</value></data>
+  <data name="DetailNotBuilt" xml:space="preserve"><value>build failed</value></data>
+  <data name="DetailNoTotals" xml:space="preserve"><value>no totals</value></data>
+  <data name="DetailPassed" xml:space="preserve"><value>{0} of {1} passed</value></data>
+  <data name="DetailFailed" xml:space="preserve"><value>{0} of {1} failed</value></data>
+  <data name="DetailExitCode" xml:space="preserve"><value>exit code {0}</value></data>
+  <data name="TestsWithFilter" xml:space="preserve"><value>Tests '{0}'</value></data>
+  <data name="CommandTitle" xml:space="preserve"><value>Command {0}</value></data>
+</root>

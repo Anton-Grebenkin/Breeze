@@ -1,0 +1,131 @@
+<?xml version="1.0"?>
+<!--
+  Ruby: # and =begin … =end comments, "…" and `…` strings with #{expression}, '…', %w[…] and relatives, heredocs
+  with common delimiters (EOS, SQL, HEREDOC…), regexes, :name symbols and name: keys, @x, @@x, $x variables,
+  keywords, constants and classes, method names after def, calls, numbers. Color names are theme tokens (ADR 0036).
+-->
+<SyntaxDefinition name="Ruby" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+  <Color name="Comment" />
+  <Color name="String" />
+  <Color name="Number" />
+  <Color name="Keyword" />
+  <Color name="ControlKeyword" />
+  <Color name="Function" />
+  <Color name="Type" />
+  <Color name="Variable" />
+  <Color name="Text" />
+
+  <RuleSet>
+    <Span color="Comment" multiline="true" begin="^=begin\b" end="^=end\b" />
+    <Span color="Comment" begin="#" />
+    <Span color="String" multiline="true" ruleSet="Interpolated"
+          begin="&lt;&lt;[~-]?[&quot;']?(?:EOS|EOF|EOT|EOM|END|SQL|HEREDOC|TEXT|RUBY|HTML|JSON|YAML|MD|GRAPHQL)\b[&quot;']?"
+          end="^\s*(?:EOS|EOF|EOT|EOM|END|SQL|HEREDOC|TEXT|RUBY|HTML|JSON|YAML|MD|GRAPHQL)$" />
+    <Span color="String" multiline="true" begin="&quot;" end="&quot;" ruleSet="Interpolated" />
+    <Span color="String" multiline="true" begin="`" end="`" ruleSet="Interpolated" />
+    <Span color="String" multiline="true" begin="'" end="'" ruleSet="Escapes" />
+    <Span color="String" multiline="true" begin="%[qQwWiIsx]?\(" end="\)" ruleSet="Interpolated" />
+    <Span color="String" multiline="true" begin="%[qQwWiIsx]?\[" end="\]" ruleSet="Interpolated" />
+    <Span color="String" multiline="true" begin="%[qQwWiIsx]?\{" end="\}" ruleSet="Interpolated" />
+    <Span color="String" multiline="true" begin="%r\{" end="\}[imxounse]*" ruleSet="Interpolated" />
+    <Span color="String" ruleSet="Interpolated" end="/[imxounse]*"
+          begin="(?&lt;=(?:^|[(,=~!|&amp;{;\[]|\b(?:when|if|unless|and|or|not|return))\s*)/(?![\s=])" />
+
+    <Rule color="Variable">@@?[A-Za-z_]\w*|\$[A-Za-z_]\w*</Rule>
+    <Rule color="Variable">(?&lt;![:\w]):(?&gt;[A-Za-z_]\w*[?!=]?)</Rule>
+    <Rule color="Variable">\b(?&gt;[A-Za-z_]\w*[?!]?):(?=[\s,)]|$)</Rule>
+
+    <Keywords color="Keyword">
+      <Word>defined?</Word>
+    </Keywords>
+    <Keywords color="ControlKeyword">
+      <Word>if</Word>
+      <Word>elsif</Word>
+      <Word>else</Word>
+      <Word>unless</Word>
+      <Word>case</Word>
+      <Word>when</Word>
+      <Word>while</Word>
+      <Word>until</Word>
+      <Word>for</Word>
+      <Word>in</Word>
+      <Word>break</Word>
+      <Word>next</Word>
+      <Word>redo</Word>
+      <Word>retry</Word>
+      <Word>return</Word>
+      <Word>yield</Word>
+      <Word>begin</Word>
+      <Word>rescue</Word>
+      <Word>ensure</Word>
+      <Word>then</Word>
+      <Word>raise</Word>
+    </Keywords>
+    <Keywords color="Keyword">
+      <Word>alias</Word>
+      <Word>and</Word>
+      <Word>class</Word>
+      <Word>def</Word>
+      <Word>do</Word>
+      <Word>end</Word>
+      <Word>module</Word>
+      <Word>nil</Word>
+      <Word>not</Word>
+      <Word>or</Word>
+      <Word>self</Word>
+      <Word>super</Word>
+      <Word>true</Word>
+      <Word>false</Word>
+      <Word>undef</Word>
+      <Word>BEGIN</Word>
+      <Word>END</Word>
+      <Word>__FILE__</Word>
+      <Word>__LINE__</Word>
+      <Word>__method__</Word>
+      <Word>__dir__</Word>
+    </Keywords>
+    <Keywords color="Function">
+      <Word>require</Word>
+      <Word>require_relative</Word>
+      <Word>include</Word>
+      <Word>extend</Word>
+      <Word>prepend</Word>
+      <Word>attr_accessor</Word>
+      <Word>attr_reader</Word>
+      <Word>attr_writer</Word>
+      <Word>private</Word>
+      <Word>protected</Word>
+      <Word>public</Word>
+      <Word>module_function</Word>
+      <Word>puts</Word>
+      <Word>print</Word>
+      <Word>lambda</Word>
+      <Word>proc</Word>
+      <Word>loop</Word>
+    </Keywords>
+    <Rule color="Function">(?&lt;=\bdef\s+(?:self\.)?)[A-Za-z_]\w*[?!=]?</Rule>
+    <Rule color="Type">\b[A-Z]\w*</Rule>
+    <Rule color="Function">\b[a-z_]\w*[?!]?(?=\()</Rule>
+    <Rule color="Number">
+      \b(?:0[xX][\da-fA-F_]+|0[bB][01_]+|0[oO]?[0-7_]+|\d[\d_]*(?:\.\d[\d_]*)?(?:[eE][+-]?\d+)?)r?i?\b
+    </Rule>
+  </RuleSet>
+
+  <RuleSet name="Escapes">
+    <Span begin="\\" end="." />
+  </RuleSet>
+
+  <!-- "…#{expression}…": the code inside uses the text color. -->
+  <RuleSet name="Interpolated">
+    <Span begin="\\" end="." />
+    <Span color="Text" multiline="true" ruleSet="Code">
+      <Begin color="Keyword">\#\{</Begin>
+      <End color="Keyword">\}</End>
+    </Span>
+  </RuleSet>
+
+  <RuleSet name="Code">
+    <Span multiline="true" begin="\{" end="\}" ruleSet="Code" />
+    <Import ruleSet="" />
+  </RuleSet>
+</SyntaxDefinition>

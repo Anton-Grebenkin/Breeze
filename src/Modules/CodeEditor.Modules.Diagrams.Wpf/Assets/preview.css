@@ -1,0 +1,78 @@
+/*
+  Diagram preview. Page colors are editor theme tokens sent by the tab (--background and others); this file only does
+  layout. Spacing 8/16, transitions up to 150 ms, as in the rest of the UI.
+*/
+:root {
+  color-scheme: light dark;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--background, Canvas);
+  color: var(--foreground, CanvasText);
+  font: 13px/1.4 "Segoe UI Variable Text", "Segoe UI", sans-serif;
+}
+
+#viewport {
+  position: absolute;
+  inset: 0;
+  overflow: auto;
+  outline: none;
+  cursor: grab;
+}
+
+#viewport:focus-visible {
+  outline: 1px solid var(--focus, Highlight);
+  outline-offset: -1px;
+}
+
+#viewport.dragging {
+  cursor: grabbing;
+}
+
+/* A diagram smaller than the window is centered; a larger one starts at the left edge so scrolling reaches all of it. */
+#content {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: max-content;
+  min-width: 100%;
+  min-height: 100%;
+  padding: 16px;
+  user-select: none;
+}
+
+#content.single {
+  justify-content: center;
+}
+
+figure {
+  margin: 0 auto;
+}
+
+figcaption {
+  margin-bottom: 8px;
+  color: var(--secondary, GrayText);
+}
+
+/* No diagrams: rendering in progress, the file is empty or the diagram has an error. */
+.placeholder {
+  margin: auto;
+  max-width: 480px;
+  color: var(--secondary, GrayText);
+  text-align: center;
+}
+
+.diagram svg {
+  display: block;
+}
+
+/* The text has an error: the last good image stays visible, dimmed. */
+.stale {
+  opacity: 0.45;
+  transition: opacity 150ms;
+}

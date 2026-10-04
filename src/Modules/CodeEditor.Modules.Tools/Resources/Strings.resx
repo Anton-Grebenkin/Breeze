@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="ModuleName" xml:space="preserve"><value>Tools</value></data>
+  <data name="Category" xml:space="preserve"><value>Tools</value></data>
+  <data name="Menu" xml:space="preserve"><value>_Tools</value></data>
+  <data name="CommandRunTool" xml:space="preserve"><value>Run Tool…</value></data>
+  <data name="CommandNewTool" xml:space="preserve"><value>New Tool…</value></data>
+  <data name="CommandRefresh" xml:space="preserve"><value>Refresh Tool List</value></data>
+  <data name="OutputChannel" xml:space="preserve"><value>Tools</value></data>
+  <data name="ToolInvalidName" xml:space="preserve"><value>"{0}": a tool folder name may contain only letters, digits, ".", "-" and "_".</value></data>
+  <data name="ToolUnknownSetting" xml:space="preserve"><value>unknown setting "{0}"; known: description, parameters, run, timeout.</value></data>
+  <data name="ToolNoScript" xml:space="preserve"><value>{0}: no script — put run.ps1, run.mjs, run.js or run.cs next to tool.md or name it in "run".</value></data>
+  <data name="ToolInvalidParameter" xml:space="preserve"><value>"{0}" is not a valid parameter name or is repeated: use letters, digits, "-" and "_".</value></data>
+  <data name="ToolInvalidTimeout" xml:space="preserve"><value>timeout "{0}" must be a number of seconds from 1 to {1}.</value></data>
+  <data name="ToolUnknownParameter" xml:space="preserve"><value>Unknown parameter "{0}" of tool {1}. Its parameters: {2}.</value></data>
+  <data name="PowerShellMissing" xml:space="preserve"><value>PowerShell is not found: install PowerShell 7 or check PATH.</value></data>
+  <data name="NodeMissing" xml:space="preserve"><value>Node.js is not found: install it from nodejs.org (or add it to PATH) and restart Breeze.</value></data>
+  <data name="DotnetMissing" xml:space="preserve"><value>The .NET SDK is not found: install .NET 10 SDK to run C# tools.</value></data>
+  <data name="ToolTimedOut" xml:space="preserve"><value>Tool {0} did not finish in {1} s and was stopped. Output so far:
+{2}</value></data>
+  <data name="ToolFailed" xml:space="preserve"><value>Tool {0} failed with exit code {1}:
+{2}</value></data>
+  <data name="ToolDoneEmpty" xml:space="preserve"><value>The tool finished and printed nothing.</value></data>
+  <data name="ToolNotFound" xml:space="preserve"><value>No tool "{0}" on the shelf. Tools: {1}.</value></data>
+  <data name="ToolStarted" xml:space="preserve"><value>Tool {0} is running…</value></data>
+  <data name="ToolFinished" xml:space="preserve"><value>Tool {0} finished — the output is in the Output panel.</value></data>
+  <data name="ToolFailedStatus" xml:space="preserve"><value>Tool {0} failed (exit code {1}) — see the Output panel.</value></data>
+  <data name="ToolTimedOutStatus" xml:space="preserve"><value>Tool {0} did not finish in time and was stopped.</value></data>
+  <data name="ToolNotStarted" xml:space="preserve"><value>Tool {0} did not start: {1}</value></data>
+  <data name="ToolMissing" xml:space="preserve"><value>No tool "{0}" on the shelf.</value></data>
+  <data name="ApprovalTitle" xml:space="preserve"><value>The agent wants to run tool "{0}" — its code is new or changed</value></data>
+  <data name="ApprovalHeader" xml:space="preserve"><value>Command and code of {0}</value></data>
+  <data name="MoreLines" xml:space="preserve"><value>… {0} more lines</value></data>
+  <data name="ConfirmRun" xml:space="preserve"><value>Run tool "{0}"?</value></data>
+  <data name="ConfirmRunDetail" xml:space="preserve"><value>Its code is new or has changed since you last allowed it: {0}. Run it only if you trust this folder.</value></data>
+  <data name="Run" xml:space="preserve"><value>Run</value></data>
+  <data name="PickToolPlaceholder" xml:space="preserve"><value>Pick a tool to run</value></data>
+  <data name="NoTools" xml:space="preserve"><value>No tools yet: create one with "Tools: New Tool…"</value></data>
+  <data name="NewToolPlaceholder" xml:space="preserve"><value>Name of the new tool, for example count-lines</value></data>
+  <data name="NewToolNamed" xml:space="preserve"><value>Create tool "{0}" in .breeze/tools</value></data>
+  <data name="NewToolNameRules" xml:space="preserve"><value>Use letters, digits, ".", "-" and "_" without spaces</value></data>
+  <data name="ToolExists" xml:space="preserve"><value>Tool "{0}" already exists.</value></data>
+  <data name="NoFolder" xml:space="preserve"><value>Open a folder to add tools to it.</value></data>
+  <data name="ParameterPlaceholder" xml:space="preserve"><value>{0} › {1}: {2}</value></data>
+  <data name="ParameterEmpty" xml:space="preserve"><value>Leave empty</value></data>
+  <data name="ParameterValue" xml:space="preserve"><value>Use "{0}"</value></data>
+  <data name="ToolTemplateDefinition" xml:space="preserve"><value>---
+description: Counts lines in the files of a folder
+parameters:
+  path: Folder relative to the workspace root
+  pattern: File mask, for example *.cs
+---
+
+The agent sees the description and the parameters and calls the tool with run_tool;
+you run it from the Tools menu or the palette.
+
+The script next to this file (run.ps1, run.mjs or run.cs) runs in the workspace root and gets
+the parameters as -path value (PowerShell) or --path value (Node.js, C#) and in BREEZE_ARG_PATH.
+What it prints goes to the agent or to the Output panel. A non-zero exit code means failure.
+Optional settings: run: script file name; timeout: seconds (default 120).
+</value></data>
+  <data name="ToolTemplateScript" xml:space="preserve"><value>param(
+    [string]$path = ".",
+    [string]$pattern = "*"
+)
+
+$files = Get-ChildItem -Path $path -Filter $pattern -Recurse -File
+$lines = ($files | Get-Content | Measure-Object -Line).Lines
+"$($files.Count) files, $lines lines"
+</value></data>
+</root>

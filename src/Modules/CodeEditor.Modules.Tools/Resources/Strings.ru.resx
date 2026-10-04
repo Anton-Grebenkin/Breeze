@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="ModuleName" xml:space="preserve"><value>Инструменты</value></data>
+  <data name="Category" xml:space="preserve"><value>Инструменты</value></data>
+  <data name="Menu" xml:space="preserve"><value>_Инструменты</value></data>
+  <data name="CommandRunTool" xml:space="preserve"><value>Запустить инструмент…</value></data>
+  <data name="CommandNewTool" xml:space="preserve"><value>Новый инструмент…</value></data>
+  <data name="CommandRefresh" xml:space="preserve"><value>Обновить список инструментов</value></data>
+  <data name="OutputChannel" xml:space="preserve"><value>Инструменты</value></data>
+  <data name="ToolInvalidName" xml:space="preserve"><value>«{0}»: в имени папки инструмента допустимы только буквы, цифры, «.», «-» и «_».</value></data>
+  <data name="ToolUnknownSetting" xml:space="preserve"><value>неизвестная настройка «{0}»; допустимые: description, parameters, run, timeout.</value></data>
+  <data name="ToolNoScript" xml:space="preserve"><value>{0}: нет скрипта — положите run.ps1, run.mjs, run.js или run.cs рядом с tool.md или укажите его в «run».</value></data>
+  <data name="ToolInvalidParameter" xml:space="preserve"><value>«{0}» — недопустимое или повторное имя параметра: используйте буквы, цифры, «-» и «_».</value></data>
+  <data name="ToolInvalidTimeout" xml:space="preserve"><value>timeout «{0}» должен быть числом секунд от 1 до {1}.</value></data>
+  <data name="ToolUnknownParameter" xml:space="preserve"><value>У инструмента {1} нет параметра «{0}». Его параметры: {2}.</value></data>
+  <data name="PowerShellMissing" xml:space="preserve"><value>PowerShell не найден: установите PowerShell 7 или проверьте PATH.</value></data>
+  <data name="NodeMissing" xml:space="preserve"><value>Node.js не найден: установите его с nodejs.org (или добавьте в PATH) и перезапустите Breeze.</value></data>
+  <data name="DotnetMissing" xml:space="preserve"><value>.NET SDK не найден: для инструментов на C# установите .NET 10 SDK.</value></data>
+  <data name="ToolTimedOut" xml:space="preserve"><value>Инструмент {0} не завершился за {1} с и остановлен. Вывод к этому моменту:
+{2}</value></data>
+  <data name="ToolFailed" xml:space="preserve"><value>Инструмент {0} завершился с кодом {1}:
+{2}</value></data>
+  <data name="ToolDoneEmpty" xml:space="preserve"><value>Инструмент завершился и ничего не вывел.</value></data>
+  <data name="ToolNotFound" xml:space="preserve"><value>На полке нет инструмента «{0}». Инструменты: {1}.</value></data>
+  <data name="ToolStarted" xml:space="preserve"><value>Инструмент {0} работает…</value></data>
+  <data name="ToolFinished" xml:space="preserve"><value>Инструмент {0} завершён — вывод в панели «Вывод».</value></data>
+  <data name="ToolFailedStatus" xml:space="preserve"><value>Инструмент {0} завершился с ошибкой (код {1}) — см. панель «Вывод».</value></data>
+  <data name="ToolTimedOutStatus" xml:space="preserve"><value>Инструмент {0} не уложился во время и остановлен.</value></data>
+  <data name="ToolNotStarted" xml:space="preserve"><value>Инструмент {0} не запустился: {1}</value></data>
+  <data name="ToolMissing" xml:space="preserve"><value>На полке нет инструмента «{0}».</value></data>
+  <data name="ApprovalTitle" xml:space="preserve"><value>Агент хочет запустить инструмент «{0}» — его код новый или изменён</value></data>
+  <data name="ApprovalHeader" xml:space="preserve"><value>Команда и код {0}</value></data>
+  <data name="MoreLines" xml:space="preserve"><value>… ещё строк: {0}</value></data>
+  <data name="ConfirmRun" xml:space="preserve"><value>Запустить инструмент «{0}»?</value></data>
+  <data name="ConfirmRunDetail" xml:space="preserve"><value>Его код новый или изменился с тех пор, как вы его разрешили: {0}. Запускайте, только если доверяете этой папке.</value></data>
+  <data name="Run" xml:space="preserve"><value>Запустить</value></data>
+  <data name="PickToolPlaceholder" xml:space="preserve"><value>Выберите инструмент</value></data>
+  <data name="NoTools" xml:space="preserve"><value>Инструментов пока нет: создайте командой «Инструменты: Новый инструмент…»</value></data>
+  <data name="NewToolPlaceholder" xml:space="preserve"><value>Имя нового инструмента, например count-lines</value></data>
+  <data name="NewToolNamed" xml:space="preserve"><value>Создать инструмент «{0}» в .breeze/tools</value></data>
+  <data name="NewToolNameRules" xml:space="preserve"><value>Буквы, цифры, «.», «-» и «_» без пробелов</value></data>
+  <data name="ToolExists" xml:space="preserve"><value>Инструмент «{0}» уже есть.</value></data>
+  <data name="NoFolder" xml:space="preserve"><value>Откройте папку, чтобы добавить в неё инструменты.</value></data>
+  <data name="ParameterPlaceholder" xml:space="preserve"><value>{0} › {1}: {2}</value></data>
+  <data name="ParameterEmpty" xml:space="preserve"><value>Оставить пустым</value></data>
+  <data name="ParameterValue" xml:space="preserve"><value>Использовать «{0}»</value></data>
+  <data name="ToolTemplateDefinition" xml:space="preserve"><value>---
+description: Считает строки в файлах папки
+parameters:
+  path: Папка относительно корня
+  pattern: Маска файлов, например *.cs
+---
+
+Агент видит описание и параметры и вызывает инструмент через run_tool;
+вы запускаете его из меню «Инструменты» или палитры.
+
+Скрипт рядом с этим файлом (run.ps1, run.mjs или run.cs) работает в корне папки и получает
+параметры как -path значение (PowerShell) или --path значение (Node.js, C#) и в BREEZE_ARG_PATH.
+То, что он выводит, получает агент или панель «Вывод». Ненулевой код выхода — ошибка.
+Необязательные настройки: run — имя файла скрипта; timeout — секунды (по умолчанию 120).
+</value></data>
+  <data name="ToolTemplateScript" xml:space="preserve"><value>param(
+    [string]$path = ".",
+    [string]$pattern = "*"
+)
+
+$files = Get-ChildItem -Path $path -Filter $pattern -Recurse -File
+$lines = ($files | Get-Content | Measure-Object -Line).Lines
+"$($files.Count) files, $lines lines"
+</value></data>
+</root>

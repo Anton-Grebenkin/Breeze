@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    File viewers module (ADR 0037): images, SVG, audio and video, hex view of binary files.
+    Logic and view models without WPF; the WIC image decoder and WebView2 pages live in CodeEditor.Modules.Viewers.Wpf.
+  -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Platform\CodeEditor.Core\CodeEditor.Core.csproj" />
+    <ProjectReference Include="..\..\Platform\CodeEditor.Shell\CodeEditor.Shell.csproj" />
+  </ItemGroup>
+
+</Project>

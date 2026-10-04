@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- git views: Source Control panel, diff and history in editor tabs (ADR 0032). -->
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CodeEditor.Modules.Git\CodeEditor.Modules.Git.csproj" />
+    <ProjectReference Include="..\..\Platform\CodeEditor.UI\CodeEditor.UI.csproj" />
+    <ProjectReference Include="..\..\Platform\CodeEditor.Shell.Wpf\CodeEditor.Shell.Wpf.csproj" />
+  </ItemGroup>
+
+</Project>

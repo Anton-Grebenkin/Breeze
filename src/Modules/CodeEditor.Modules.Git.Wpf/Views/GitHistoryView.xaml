@@ -1,0 +1,136 @@
+<UserControl x:Class="CodeEditor.Modules.Git.Wpf.Views.GitHistoryView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:tabs="clr-namespace:CodeEditor.Modules.Git.ViewModels.Tabs;assembly=CodeEditor.Modules.Git"
+             xmlns:res="clr-namespace:CodeEditor.Modules.Git.Resources;assembly=CodeEditor.Modules.Git"
+             xmlns:ui="clr-namespace:CodeEditor.UI.Themes;assembly=CodeEditor.UI"
+             xmlns:controls="clr-namespace:CodeEditor.UI.Controls;assembly=CodeEditor.UI"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=tabs:GitHistoryViewModel}"
+             Background="{DynamicResource Brush.Editor.Background}"
+             AutomationProperties.AutomationId="GitHistory">
+  <UserControl.Resources>
+    <ResourceDictionary Source="GitStyles.xaml" />
+  </UserControl.Resources>
+
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="2*" MinWidth="220" />
+      <ColumnDefinition Width="Auto" />
+      <ColumnDefinition Width="3*" MinWidth="260" />
+    </Grid.ColumnDefinitions>
+
+    <!-- Commits of the current branch: subject and refs, then hash, author, date. -->
+    <DockPanel>
+      <DockPanel DockPanel.Dock="Top" Height="30" Margin="12,0,4,0">
+        <Button DockPanel.Dock="Right" Style="{StaticResource Button.Toolbar}" Content="{x:Static ui:IconGlyphs.Refresh}" ToolTip="{x:Static res:Strings.RefreshToolTip}"
+                Command="{Binding RefreshCommand}"
+                AutomationProperties.AutomationId="GitHistory.Refresh" AutomationProperties.Name="{x:Static res:Strings.RefreshToolTip}" />
+        <TextBlock VerticalAlignment="Center" FontWeight="SemiBold" Foreground="{DynamicResource Brush.Text.Secondary}" Text="{x:Static res:Strings.CommitsList}" />
+      </DockPanel>
+      <TextBox DockPanel.Dock="Top" Margin="12,4" MaxHeight="160" Style="{StaticResource TextBox.Message}" Text="{Binding ListMessage, Mode=OneWay}"
+               Visibility="{Binding ListMessage, Converter={x:Static controls:NullToCollapsedConverter.Instance}}"
+               AutomationProperties.AutomationId="GitHistory.Message" />
+      <Button DockPanel.Dock="Bottom" Margin="12,4" HorizontalAlignment="Stretch" Style="{StaticResource Button.Secondary}"
+              Content="{x:Static res:Strings.LoadMore}" Command="{Binding LoadMoreCommand}"
+              Visibility="{Binding HasMore, Converter={StaticResource BoolToVisibility}}"
+              AutomationProperties.AutomationId="GitHistory.LoadMore" />
+      <ListBox Style="{StaticResource ListBox.Rows}"
+               ItemsSource="{Binding Commits}"
+               SelectedItem="{Binding SelectedCommit}"
+               AutomationProperties.AutomationId="GitHistory.Commits"
+               AutomationProperties.Name="{x:Static res:Strings.CommitsList}">
+        <ListBox.ItemContainerStyle>
+          <Style TargetType="ListBoxItem" BasedOn="{StaticResource ListBoxItem.Row}">
+            <Setter Property="ToolTip" Value="{Binding Message}" />
+            <Setter Property="AutomationProperties.AutomationId" Value="{Binding AutomationId}" />
+            <Setter Property="AutomationProperties.Name" Value="{Binding Subject}" />
+          </Style>
+        </ListBox.ItemContainerStyle>
+        <ListBox.ItemTemplate>
+          <DataTemplate DataType="{x:Type tabs:GitLogEntryViewModel}">
+            <StackPanel>
+              <DockPanel>
+                <Border DockPanel.Dock="Right" Margin="4,0,0,0" Style="{StaticResource Border.Badge}"
+                        Visibility="{Binding HasRefs, Converter={StaticResource BoolToVisibility}}">
+                  <TextBlock MaxWidth="160" TextTrimming="CharacterEllipsis" Text="{Binding Refs}" />
+                </Border>
+                <TextBlock TextTrimming="CharacterEllipsis" Text="{Binding Subject}" />
+              </DockPanel>
+              <TextBlock TextTrimming="CharacterEllipsis" FontSize="{DynamicResource FontSize.Small}" Foreground="{DynamicResource Brush.Text.Secondary}">
+                <Run FontFamily="{DynamicResource Font.Code}" Text="{Binding ShortHash, Mode=OneWay}" /> • <Run Text="{Binding Author, Mode=OneWay}" /> • <Run Text="{Binding DateText, Mode=OneWay}" />
+              </TextBlock>
+            </StackPanel>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+    </DockPanel>
+
+    <GridSplitter Grid.Column="1" Width="4" HorizontalAlignment="Stretch" Style="{StaticResource GridSplitter.Thin}" />
+
+    <!-- Selected commit: message, files, diff of the selected file. -->
+    <Grid Grid.Column="2">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="*" MinHeight="60" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="3*" MinHeight="100" />
+      </Grid.RowDefinitions>
+
+      <DockPanel Margin="12,6,4,6" Visibility="{Binding SelectedCommit, Converter={x:Static controls:NullToCollapsedConverter.Instance}}">
+        <Button DockPanel.Dock="Right" VerticalAlignment="Top" Style="{StaticResource Button.Toolbar}" Content="{x:Static ui:IconGlyphs.Copy}"
+                ToolTip="{x:Static res:Strings.CopyHash}" Command="{Binding CopyHashCommand}"
+                AutomationProperties.AutomationId="GitHistory.CopyHash" AutomationProperties.Name="{x:Static res:Strings.CopyHash}" />
+        <StackPanel>
+          <TextBox MaxHeight="140" Style="{StaticResource TextBox.Message}" Foreground="{DynamicResource Brush.Text.Primary}"
+                   Text="{Binding SelectedCommit.Message, Mode=OneWay}" AutomationProperties.AutomationId="GitHistory.CommitMessage" />
+          <TextBlock Margin="0,4,0,0" TextTrimming="CharacterEllipsis" FontSize="{DynamicResource FontSize.Small}" Foreground="{DynamicResource Brush.Text.Secondary}">
+            <Run FontFamily="{DynamicResource Font.Code}" Text="{Binding SelectedCommit.Hash, Mode=OneWay}" /> • <Run Text="{Binding SelectedCommit.Author, Mode=OneWay}" /> • <Run Text="{Binding SelectedCommit.DateText, Mode=OneWay}" />
+          </TextBlock>
+        </StackPanel>
+      </DockPanel>
+
+      <DockPanel Grid.Row="1">
+        <TextBox DockPanel.Dock="Top" Margin="12,4" MaxHeight="160" Style="{StaticResource TextBox.Message}" Text="{Binding DetailsMessage, Mode=OneWay}"
+                 Visibility="{Binding DetailsMessage, Converter={x:Static controls:NullToCollapsedConverter.Instance}}"
+                 AutomationProperties.AutomationId="GitHistory.DetailsMessage" />
+        <ListBox Style="{StaticResource ListBox.Rows}"
+                 ItemsSource="{Binding Files}"
+                 SelectedItem="{Binding SelectedFile}"
+                 AutomationProperties.AutomationId="GitHistory.Files"
+                 AutomationProperties.Name="{x:Static res:Strings.CommitFiles}">
+          <ListBox.ItemContainerStyle>
+            <Style TargetType="ListBoxItem" BasedOn="{StaticResource ListBoxItem.Row}">
+              <Setter Property="ToolTip" Value="{Binding ToolTip}" />
+              <Setter Property="AutomationProperties.AutomationId" Value="{Binding AutomationId}" />
+              <Setter Property="AutomationProperties.Name" Value="{Binding Path}" />
+            </Style>
+          </ListBox.ItemContainerStyle>
+          <ListBox.ItemTemplate>
+            <DataTemplate DataType="{x:Type tabs:GitCommitFileViewModel}">
+              <DockPanel>
+                <TextBlock x:Name="Letter" DockPanel.Dock="Right" Style="{StaticResource TextBlock.StatusLetter}" Text="{Binding Letter}" />
+                <TextBlock x:Name="Name" TextTrimming="CharacterEllipsis">
+                  <Run Text="{Binding Name, Mode=OneWay}" />
+                  <Run FontSize="{DynamicResource FontSize.Small}" Foreground="{DynamicResource Brush.Text.Secondary}" Text="{Binding Directory, Mode=OneWay}" />
+                </TextBlock>
+              </DockPanel>
+              <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding IsDeleted}" Value="True">
+                  <Setter TargetName="Name" Property="TextDecorations" Value="Strikethrough" />
+                </DataTrigger>
+              </DataTemplate.Triggers>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+      </DockPanel>
+
+      <GridSplitter Grid.Row="2" Height="4" HorizontalAlignment="Stretch" Style="{StaticResource GridSplitter.Thin}" />
+
+      <!-- Commit file diff: the same view as the changes tab. -->
+      <ContentControl Grid.Row="3" Content="{Binding Diff}" Focusable="False" />
+    </Grid>
+  </Grid>
+</UserControl>

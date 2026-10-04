@@ -1,0 +1,129 @@
+<?xml version="1.0"?>
+<!--
+  Swift: comments (block comments nest), "…" and """…""" strings with \(expression) interpolation, raw #"…"#,
+  #if and #available directives, @… attributes, keywords, capitalized types, calls, numbers.
+  Color names are theme tokens (ADR 0036).
+-->
+<SyntaxDefinition name="Swift" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+  <Color name="Comment" />
+  <Color name="String" />
+  <Color name="Number" />
+  <Color name="Keyword" />
+  <Color name="ControlKeyword" />
+  <Color name="Function" />
+  <Color name="Type" />
+  <Color name="Preprocessor" />
+  <Color name="Text" />
+
+  <RuleSet>
+    <Span color="Comment" begin="//" />
+    <Span color="Comment" multiline="true" begin="/\*" end="\*/" ruleSet="BlockComment" />
+    <Span color="String" multiline="true" begin="#&quot;&quot;&quot;" end="&quot;&quot;&quot;#" />
+    <Span color="String" begin="#&quot;" end="&quot;#" />
+    <Span color="String" multiline="true" begin="&quot;&quot;&quot;" end="&quot;&quot;&quot;" ruleSet="Interpolated" />
+    <Span color="String" begin="&quot;" end="&quot;" ruleSet="Interpolated" />
+    <Rule color="Preprocessor">
+      \#(?:if|elseif|else|endif|available|unavailable|selector|keyPath|warning|error|sourceLocation|file|fileID|filePath|line|column|function)\b
+    </Rule>
+    <Rule color="Type">@[A-Za-z_]\w*</Rule>
+
+    <Keywords color="ControlKeyword">
+      <Word>if</Word>
+      <Word>else</Word>
+      <Word>guard</Word>
+      <Word>switch</Word>
+      <Word>case</Word>
+      <Word>default</Word>
+      <Word>for</Word>
+      <Word>in</Word>
+      <Word>while</Word>
+      <Word>repeat</Word>
+      <Word>break</Word>
+      <Word>continue</Word>
+      <Word>fallthrough</Word>
+      <Word>return</Word>
+      <Word>throw</Word>
+      <Word>do</Word>
+      <Word>catch</Word>
+      <Word>try</Word>
+      <Word>defer</Word>
+      <Word>await</Word>
+    </Keywords>
+    <Keywords color="Keyword">
+      <Word>associatedtype</Word>
+      <Word>class</Word>
+      <Word>deinit</Word>
+      <Word>enum</Word>
+      <Word>extension</Word>
+      <Word>fileprivate</Word>
+      <Word>func</Word>
+      <Word>import</Word>
+      <Word>init</Word>
+      <Word>inout</Word>
+      <Word>internal</Word>
+      <Word>let</Word>
+      <Word>open</Word>
+      <Word>operator</Word>
+      <Word>private</Word>
+      <Word>precedencegroup</Word>
+      <Word>protocol</Word>
+      <Word>public</Word>
+      <Word>rethrows</Word>
+      <Word>static</Word>
+      <Word>struct</Word>
+      <Word>subscript</Word>
+      <Word>typealias</Word>
+      <Word>var</Word>
+      <Word>async</Word>
+      <Word>actor</Word>
+      <Word>some</Word>
+      <Word>any</Word>
+      <Word>nonisolated</Word>
+      <Word>convenience</Word>
+      <Word>dynamic</Word>
+      <Word>final</Word>
+      <Word>lazy</Word>
+      <Word>mutating</Word>
+      <Word>nonmutating</Word>
+      <Word>optional</Word>
+      <Word>override</Word>
+      <Word>required</Word>
+      <Word>unowned</Word>
+      <Word>weak</Word>
+      <Word>indirect</Word>
+      <Word>throws</Word>
+      <Word>where</Word>
+      <Word>as</Word>
+      <Word>is</Word>
+      <Word>nil</Word>
+      <Word>self</Word>
+      <Word>Self</Word>
+      <Word>super</Word>
+      <Word>true</Word>
+      <Word>false</Word>
+    </Keywords>
+    <Rule color="Type">\b(?=[A-Z]\w*[a-z])[A-Z]\w*</Rule>
+    <Rule color="Function">\b[A-Za-z_]\w*(?=\s*(?:&lt;[^&lt;&gt;()]*(?:&lt;[^&lt;&gt;()]*&gt;[^&lt;&gt;()]*)*&gt;\s*)?\()</Rule>
+    <Rule color="Number">
+      \b(?:0x[\da-fA-F_]+(?:\.[\da-fA-F_]+)?(?:[pP][+-]?\d+)?|0o[0-7_]+|0b[01_]+|\d[\d_]*(?:\.\d[\d_]*)?(?:[eE][+-]?\d[\d_]*)?)\b
+    </Rule>
+  </RuleSet>
+
+  <RuleSet name="BlockComment">
+    <Span multiline="true" begin="/\*" end="\*/" ruleSet="BlockComment" />
+  </RuleSet>
+
+  <!-- \(expression) uses the text color; interpolation is matched before plain escapes. -->
+  <RuleSet name="Interpolated">
+    <Span color="Text" multiline="true" ruleSet="Code">
+      <Begin color="Keyword">\\\(</Begin>
+      <End color="Keyword">\)</End>
+    </Span>
+    <Span begin="\\" end="." />
+  </RuleSet>
+
+  <RuleSet name="Code">
+    <Span multiline="true" begin="\(" end="\)" ruleSet="Code" />
+    <Import ruleSet="" />
+  </RuleSet>
+</SyntaxDefinition>

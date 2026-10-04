@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="ModuleName" xml:space="preserve"><value>Updates</value></data>
+  <data name="Category" xml:space="preserve"><value>Update</value></data>
+  <data name="CheckCommand" xml:space="preserve"><value>Check for Updates…</value></data>
+  <data name="CheckMenu" xml:space="preserve"><value>Check for _Updates…</value></data>
+  <data name="RestartCommand" xml:space="preserve"><value>Restart to Update</value></data>
+  <data name="NotInstalled" xml:space="preserve"><value>Updates work in the installed app (Setup.exe from the GitHub releases); this copy runs from a build folder.</value></data>
+  <data name="Checking" xml:space="preserve"><value>Checking for updates…</value></data>
+  <data name="CheckInProgress" xml:space="preserve"><value>An update is already being checked or downloaded.</value></data>
+  <data name="UpToDate" xml:space="preserve"><value>Breeze {0} is the latest version.</value></data>
+  <data name="CheckFailed" xml:space="preserve"><value>Couldn't check for updates: {0}</value></data>
+  <data name="Downloading" xml:space="preserve"><value>Downloading update {0}: {1}%</value></data>
+  <data name="DownloadFailed" xml:space="preserve"><value>Couldn't download update {0}: {1}</value></data>
+  <data name="Ready" xml:space="preserve"><value>Update {0} is downloaded: restart Breeze to install it, or it installs at the next start.</value></data>
+  <data name="ReadyItem" xml:space="preserve"><value>Update {0}</value></data>
+  <data name="ReadyToolTip" xml:space="preserve"><value>Restart Breeze and install the update; the folder and tabs reopen</value></data>
+  <data name="RestartPrompt" xml:space="preserve"><value>Update {0} is downloaded. Restart Breeze now to install it?</value></data>
+  <data name="RestartDetail" xml:space="preserve"><value>The folder and tabs reopen after the restart. Otherwise the update installs at the next start.</value></data>
+  <data name="RestartConfirm" xml:space="preserve"><value>Restart</value></data>
+  <data name="NothingToApply" xml:space="preserve"><value>No update is downloaded yet: run "Check for Updates…".</value></data>
+</root>

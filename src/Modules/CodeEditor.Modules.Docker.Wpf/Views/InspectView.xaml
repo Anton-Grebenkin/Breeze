@@ -1,0 +1,63 @@
+<UserControl x:Class="CodeEditor.Modules.Docker.Wpf.Views.InspectView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:avalon="http://icsharpcode.net/sharpdevelop/avalonedit"
+             xmlns:tabs="clr-namespace:CodeEditor.Modules.Docker.ViewModels.Tabs;assembly=CodeEditor.Modules.Docker"
+             xmlns:ui="clr-namespace:CodeEditor.UI.Themes;assembly=CodeEditor.UI"
+             xmlns:controls="clr-namespace:CodeEditor.UI.Controls;assembly=CodeEditor.UI"
+             xmlns:res="clr-namespace:CodeEditor.Modules.Docker.Resources;assembly=CodeEditor.Modules.Docker"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=tabs:InspectViewModel}"
+             AutomationProperties.AutomationId="Docker.Inspect">
+  <UserControl.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="ReadOnlyTextResources.xaml" />
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </UserControl.Resources>
+
+  <!-- docker inspect output: read-only JSON with secret variable values hidden. -->
+  <DockPanel>
+    <Border DockPanel.Dock="Top" Padding="8,2,4,2" BorderThickness="0,0,0,1" BorderBrush="{DynamicResource Brush.Border}">
+      <DockPanel>
+        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+          <Button Style="{StaticResource Button.Toolbar}" Content="{x:Static ui:IconGlyphs.Search}" ToolTip="{x:Static res:Strings.FindInLog}"
+                  Click="OnFindClick"
+                  AutomationProperties.AutomationId="Docker.Inspect.Find" AutomationProperties.Name="{x:Static res:Strings.FindInLog}" />
+          <Button Style="{StaticResource Button.Toolbar}" Content="{x:Static ui:IconGlyphs.Copy}" ToolTip="{x:Static res:Strings.CopyAll}"
+                  Command="{Binding CopyCommand}"
+                  AutomationProperties.AutomationId="Docker.Inspect.Copy" AutomationProperties.Name="{x:Static res:Strings.CopyAll}" />
+          <Button Style="{StaticResource Button.Toolbar}" Content="{x:Static ui:IconGlyphs.Refresh}" ToolTip="{x:Static res:Strings.PanelRefresh}"
+                  Command="{Binding RefreshCommand}"
+                  AutomationProperties.AutomationId="Docker.Inspect.Refresh" AutomationProperties.Name="{x:Static res:Strings.PanelRefresh}" />
+        </StackPanel>
+        <Grid VerticalAlignment="Center">
+          <TextBlock FontSize="{DynamicResource FontSize.Small}" Foreground="{DynamicResource Brush.Text.Secondary}"
+                     Text="{x:Static res:Strings.Loading}"
+                     Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibility}}"
+                     AutomationProperties.AutomationId="Docker.Inspect.Loading" />
+          <TextBlock TextWrapping="Wrap" FontSize="{DynamicResource FontSize.Small}" Foreground="{DynamicResource Brush.Error.Foreground}"
+                     Text="{Binding Error}"
+                     Visibility="{Binding Error, Converter={x:Static controls:NullToCollapsedConverter.Instance}}"
+                     AutomationProperties.AutomationId="Docker.Inspect.Error" />
+        </Grid>
+      </DockPanel>
+    </Border>
+
+    <avalon:TextEditor x:Name="Editor"
+                       Padding="4,0,0,0"
+                       ShowLineNumbers="True"
+                       HorizontalScrollBarVisibility="Auto"
+                       VerticalScrollBarVisibility="Auto"
+                       Background="{DynamicResource Brush.Editor.Background}"
+                       Foreground="{DynamicResource Brush.Editor.Foreground}"
+                       LineNumbersForeground="{DynamicResource Brush.Editor.LineNumber}"
+                       FontFamily="{DynamicResource Font.Code}"
+                       FontSize="{DynamicResource FontSize.Code}"
+                       AutomationProperties.AutomationId="Docker.Inspect.Text"
+                       AutomationProperties.Name="{x:Static res:Strings.InspectText}" />
+  </DockPanel>
+</UserControl>

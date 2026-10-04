@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Hot path benchmarks. See CONTRIBUTING.md for the run command. -->
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Platform\CodeEditor.Core\CodeEditor.Core.csproj" />
+    <ProjectReference Include="..\..\src\Platform\CodeEditor.Shell\CodeEditor.Shell.csproj" />
+    <ProjectReference Include="..\..\src\Modules\CodeEditor.Modules.Search\CodeEditor.Modules.Search.csproj" />
+    <ProjectReference Include="..\..\src\Modules\CodeEditor.Modules.Viewers\CodeEditor.Modules.Viewers.csproj" />
+    <ProjectReference Include="..\CodeEditor.Testing\CodeEditor.Testing.csproj" />
+  </ItemGroup>
+
+</Project>

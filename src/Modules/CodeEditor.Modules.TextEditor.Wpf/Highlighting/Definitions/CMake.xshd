@@ -1,0 +1,117 @@
+<?xml version="1.0"?>
+<!--
+  CMake: # and #[[ … ]] comments, "…" and [[ … ]] strings, nested ${VAR} and $ENV{VAR} variables, generator
+  expressions $&lt;…&gt;, name( commands as functions, control commands if/foreach/function, argument keywords
+  (PUBLIC, REQUIRED, STREQUAL…), numbers and versions. Color names are theme tokens (ADR 0036).
+-->
+<SyntaxDefinition name="CMake" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+  <Color name="Comment" />
+  <Color name="String" />
+  <Color name="Number" />
+  <Color name="Keyword" />
+  <Color name="ControlKeyword" />
+  <Color name="Function" />
+  <Color name="Variable" />
+  <Color name="Preprocessor" />
+
+  <RuleSet>
+    <Span color="Comment" multiline="true" begin="#\[\[" end="\]\]" />
+    <Span color="Comment" multiline="true" begin="#\[=\[" end="\]=\]" />
+    <Span color="Comment" begin="#" />
+    <Span color="String" multiline="true" begin="\[\[" end="\]\]" />
+    <Span color="String" multiline="true" begin="&quot;" end="&quot;" ruleSet="Quoted" />
+    <Import ruleSet="References" />
+
+    <Rule color="ControlKeyword">
+      (?i)\b(?:if|elseif|else|endif|foreach|endforeach|while|endwhile|function|endfunction|macro|endmacro|return|break|continue|block|endblock)
+      (?=\s*\()
+    </Rule>
+    <Rule color="Function">\b[A-Za-z_]\w*(?=\s*\()</Rule>
+    <Keywords color="Keyword">
+      <Word>PUBLIC</Word>
+      <Word>PRIVATE</Word>
+      <Word>INTERFACE</Word>
+      <Word>REQUIRED</Word>
+      <Word>COMPONENTS</Word>
+      <Word>QUIET</Word>
+      <Word>CONFIG</Word>
+      <Word>MODULE</Word>
+      <Word>STATIC</Word>
+      <Word>SHARED</Word>
+      <Word>OBJECT</Word>
+      <Word>ALIAS</Word>
+      <Word>IMPORTED</Word>
+      <Word>GLOBAL</Word>
+      <Word>EXCLUDE_FROM_ALL</Word>
+      <Word>ON</Word>
+      <Word>OFF</Word>
+      <Word>TRUE</Word>
+      <Word>FALSE</Word>
+      <Word>YES</Word>
+      <Word>NO</Word>
+      <Word>AND</Word>
+      <Word>OR</Word>
+      <Word>NOT</Word>
+      <Word>STREQUAL</Word>
+      <Word>STRLESS</Word>
+      <Word>STRGREATER</Word>
+      <Word>EQUAL</Word>
+      <Word>LESS</Word>
+      <Word>GREATER</Word>
+      <Word>LESS_EQUAL</Word>
+      <Word>GREATER_EQUAL</Word>
+      <Word>MATCHES</Word>
+      <Word>VERSION_LESS</Word>
+      <Word>VERSION_GREATER</Word>
+      <Word>VERSION_EQUAL</Word>
+      <Word>VERSION_LESS_EQUAL</Word>
+      <Word>VERSION_GREATER_EQUAL</Word>
+      <Word>DEFINED</Word>
+      <Word>EXISTS</Word>
+      <Word>IS_DIRECTORY</Word>
+      <Word>IS_ABSOLUTE</Word>
+      <Word>COMMAND</Word>
+      <Word>TARGET</Word>
+      <Word>POLICY</Word>
+      <Word>IN</Word>
+      <Word>LISTS</Word>
+      <Word>ITEMS</Word>
+      <Word>RANGE</Word>
+      <Word>CACHE</Word>
+      <Word>STRING</Word>
+      <Word>BOOL</Word>
+      <Word>PATH</Word>
+      <Word>FILEPATH</Word>
+      <Word>INTERNAL</Word>
+      <Word>FORCE</Word>
+      <Word>PARENT_SCOPE</Word>
+      <Word>DESTINATION</Word>
+      <Word>TARGETS</Word>
+      <Word>FILES</Word>
+      <Word>DIRECTORY</Word>
+      <Word>RUNTIME</Word>
+      <Word>LIBRARY</Word>
+      <Word>ARCHIVE</Word>
+      <Word>INCLUDES</Word>
+      <Word>EXPORT</Word>
+      <Word>NAMESPACE</Word>
+      <Word>PROPERTIES</Word>
+      <Word>VERSION</Word>
+      <Word>LANGUAGES</Word>
+      <Word>DESCRIPTION</Word>
+      <Word>APPEND</Word>
+    </Keywords>
+    <Rule color="Number">\b\d+(?:\.\d+)*\b</Rule>
+  </RuleSet>
+
+  <RuleSet name="Quoted">
+    <Span begin="\\" end="." />
+    <Import ruleSet="References" />
+  </RuleSet>
+
+  <!-- ${VAR}, $ENV{VAR}, $CACHE{VAR} and $<…>, possibly nested. -->
+  <RuleSet name="References">
+    <Span color="Variable" begin="\$(?:ENV|CACHE)?\{" end="\}" ruleSet="References" />
+    <Span color="Preprocessor" begin="\$&lt;" end="&gt;" ruleSet="References" />
+  </RuleSet>
+</SyntaxDefinition>

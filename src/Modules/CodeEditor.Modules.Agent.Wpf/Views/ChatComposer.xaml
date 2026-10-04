@@ -1,0 +1,261 @@
+<UserControl x:Class="CodeEditor.Modules.Agent.Wpf.Views.ChatComposer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:chat="clr-namespace:CodeEditor.Modules.Agent.ViewModels.Chat;assembly=CodeEditor.Modules.Agent"
+             xmlns:composer="clr-namespace:CodeEditor.Modules.Agent.ViewModels.Composer;assembly=CodeEditor.Modules.Agent"
+             xmlns:ui="clr-namespace:CodeEditor.UI.Themes;assembly=CodeEditor.UI"
+             xmlns:controls="clr-namespace:CodeEditor.UI.Controls;assembly=CodeEditor.UI"
+             xmlns:res="clr-namespace:CodeEditor.Modules.Agent.Resources;assembly=CodeEditor.Modules.Agent"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=chat:ChatViewModel}">
+  <UserControl.Resources>
+    <ResourceDictionary Source="ChatTemplates.xaml" />
+  </UserControl.Resources>
+
+  <!-- Input box: file context and attachments above; model, parameters and context below. Dropped files are
+       attached to the message. -->
+  <Border x:Name="Frame" CornerRadius="6" BorderThickness="1" AllowDrop="True" PreviewDragOver="OnPreviewDragOver" PreviewDrop="OnPreviewDrop">
+    <Border.Style>
+      <Style TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource Brush.Input.Background}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Brush.Input.Border}" />
+        <Style.Triggers>
+          <Trigger Property="IsKeyboardFocusWithin" Value="True">
+            <Setter Property="BorderBrush" Value="{DynamicResource Brush.Focus.Border}" />
+          </Trigger>
+        </Style.Triggers>
+      </Style>
+    </Border.Style>
+    <DockPanel>
+      <!-- Context details above the input, full width; Esc or a click outside closes them. -->
+      <Popup x:Name="ContextPopup"
+             DockPanel.Dock="Top"
+             DataContext="{Binding Context}"
+             IsOpen="{Binding IsDetailsOpen, Mode=TwoWay}"
+             PlacementTarget="{Binding ElementName=Frame}"
+             Placement="Top"
+             StaysOpen="False"
+             AllowsTransparency="True"
+             Opened="OnContextPopupOpened">
+        <controls:AutomationBorder Margin="0,0,0,4" Padding="12" Width="{Binding ActualWidth, ElementName=Frame}" Style="{DynamicResource Border.Widget}"
+                PreviewKeyDown="OnContextPopupKeyDown"
+                AutomationProperties.AutomationId="Agent.ContextDetails">
+          <StackPanel>
+            <TextBlock FontWeight="SemiBold" Foreground="{DynamicResource Brush.Text.Primary}" Text="{x:Static res:Strings.ParamContextWindow}" />
+            <TextBlock Margin="0,8,0,0" TextWrapping="Wrap" Foreground="{DynamicResource Brush.Text.Primary}" Text="{Binding Summary}" />
+            <TextBlock Margin="0,4,0,0" Style="{StaticResource TextBlock.Note}" Text="{Binding Spent}" />
+            <TextBlock Margin="0,8,0,0" Style="{StaticResource TextBlock.Note}" Text="{Binding Hint}" />
+            <Button x:Name="ContextNewChat" Margin="0,12,0,0" HorizontalAlignment="Left" Style="{StaticResource Button.Secondary}"
+                    Content="{x:Static res:Strings.NewChat}"
+                    Command="{Binding DataContext.NewChatCommand, ElementName=Frame}"
+                    AutomationProperties.AutomationId="Agent.ContextDetails.NewChat" />
+          </StackPanel>
+        </controls:AutomationBorder>
+      </Popup>
+
+      <!-- Messages typed while the agent works; each goes out between steps, the cross removes it. -->
+      <ItemsControl DockPanel.Dock="Top" Margin="4,4,4,0" Focusable="False"
+                    ItemsSource="{Binding Queued.Items}"
+                    Visibility="{Binding Queued.HasItems, Converter={StaticResource BoolToVisibility}}"
+                    AutomationProperties.AutomationId="Agent.Queued">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate DataType="{x:Type composer:QueuedMessageViewModel}">
+            <controls:AutomationBorder Margin="0,0,0,4" Padding="8,2,2,2" CornerRadius="4" BorderThickness="1"
+                                       BorderBrush="{DynamicResource Brush.Widget.Border}"
+                                       ToolTip="{Binding FullText}"
+                                       AutomationProperties.AutomationId="{Binding AutomationId}"
+                                       AutomationProperties.Name="{Binding Text}">
+              <DockPanel>
+                <Button DockPanel.Dock="Right" Padding="1" Style="{StaticResource Button.Toolbar}" Content="{x:Static ui:IconGlyphs.Close}"
+                        Foreground="{DynamicResource Brush.Text.Secondary}"
+                        ToolTip="{x:Static res:Strings.RemoveQueued}"
+                        Command="{Binding RemoveCommand}"
+                        AutomationProperties.AutomationId="{Binding RemoveAutomationId}"
+                        AutomationProperties.Name="{x:Static res:Strings.RemoveQueued}" />
+                <TextBlock VerticalAlignment="Center" Style="{StaticResource TextBlock.Note}" Text="{x:Static res:Strings.Queued}" />
+                <TextBlock Margin="8,0,0,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                           FontSize="{DynamicResource FontSize.Small}" Foreground="{DynamicResource Brush.Text.Primary}" Text="{Binding Text}" />
+              </DockPanel>
+            </controls:AutomationBorder>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+
+      <!-- The open file (click toggles sharing it with the agent) and attached files with remove buttons. -->
+      <WrapPanel DockPanel.Dock="Top">
+        <Button Margin="4,4,0,0" Padding="4,1" MaxWidth="260"
+                DataContext="{Binding ActiveFile}"
+                Command="{Binding ToggleCommand}"
+                ToolTip="{Binding ToolTip}"
+                Visibility="{Binding HasFile, Converter={StaticResource BoolToVisibility}}"
+                AutomationProperties.AutomationId="Agent.ActiveFile"
+                AutomationProperties.Name="{Binding FileName, TargetNullValue=''}">
+          <Button.Style>
+            <Style TargetType="Button" BasedOn="{StaticResource Button.Subtle}">
+              <Setter Property="BorderThickness" Value="1" />
+              <Setter Property="BorderBrush" Value="{DynamicResource Brush.Widget.Border}" />
+              <Style.Triggers>
+                <DataTrigger Binding="{Binding IsAttached}" Value="False">
+                  <Setter Property="Opacity" Value="0.6" />
+                  <Setter Property="BorderBrush" Value="Transparent" />
+                </DataTrigger>
+              </Style.Triggers>
+            </Style>
+          </Button.Style>
+          <StackPanel Orientation="Horizontal">
+            <TextBlock VerticalAlignment="Center" FontFamily="{DynamicResource Font.Icons}" FontSize="{DynamicResource FontSize.Normal}"
+                       Text="{x:Static ui:IconGlyphs.File}" />
+            <TextBlock x:Name="FileName" Margin="4,0,0,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                       FontSize="{DynamicResource FontSize.Small}" Text="{Binding FileName}" />
+          </StackPanel>
+        </Button>
+        <ItemsControl ItemsSource="{Binding Attachments.Items}" Focusable="False" AutomationProperties.AutomationId="Agent.Attachments">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <WrapPanel />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate DataType="{x:Type composer:ChatAttachmentViewModel}">
+              <controls:AutomationBorder Margin="4,4,0,0" Padding="4,1,1,1" CornerRadius="4" BorderThickness="1"
+                                         BorderBrush="{DynamicResource Brush.Widget.Border}"
+                                         ToolTip="{Binding Display}"
+                                         AutomationProperties.AutomationId="{Binding AutomationId}"
+                                         AutomationProperties.Name="{Binding Name}">
+                <StackPanel Orientation="Horizontal">
+                  <TextBlock VerticalAlignment="Center" FontFamily="{DynamicResource Font.Icons}" FontSize="{DynamicResource FontSize.Normal}">
+                    <TextBlock.Style>
+                      <Style TargetType="TextBlock">
+                        <Setter Property="Text" Value="{x:Static ui:IconGlyphs.File}" />
+                        <Style.Triggers>
+                          <DataTrigger Binding="{Binding IsImage}" Value="True">
+                            <Setter Property="Text" Value="{x:Static ui:IconGlyphs.FileMedia}" />
+                          </DataTrigger>
+                        </Style.Triggers>
+                      </Style>
+                    </TextBlock.Style>
+                  </TextBlock>
+                  <TextBlock Margin="4,0,0,0" MaxWidth="200" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                             FontSize="{DynamicResource FontSize.Small}" Text="{Binding Name}" />
+                  <Button Margin="2,0,0,0" Padding="1" Style="{StaticResource Button.Toolbar}" Content="{x:Static ui:IconGlyphs.Close}"
+                          Foreground="{DynamicResource Brush.Text.Secondary}"
+                          ToolTip="{x:Static res:Strings.RemoveAttachment}"
+                          Command="{Binding RemoveCommand}"
+                          AutomationProperties.AutomationId="{Binding RemoveAutomationId}"
+                          AutomationProperties.Name="{x:Static res:Strings.RemoveAttachment}" />
+                </StackPanel>
+              </controls:AutomationBorder>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </WrapPanel>
+
+      <DockPanel DockPanel.Dock="Bottom" Margin="4,0,4,4">
+        <!-- Sending works during a turn too: the message goes out at the next step boundary (queue above the input). -->
+        <Button DockPanel.Dock="Right" Style="{StaticResource Button.Toolbar}" Content="{x:Static ui:IconGlyphs.Send}" ToolTip="{x:Static res:Strings.SendToolTip}"
+                Command="{Binding SendCommand}"
+                AutomationProperties.AutomationId="Agent.Send" AutomationProperties.Name="{x:Static res:Strings.Send}" />
+        <Button DockPanel.Dock="Right" Style="{StaticResource Button.Toolbar}" Content="{x:Static ui:IconGlyphs.Stop}" ToolTip="{x:Static res:Strings.StopToolTip}"
+                Command="{Binding StopCommand}"
+                Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibility}}"
+                AutomationProperties.AutomationId="Agent.Stop" AutomationProperties.Name="{x:Static res:Strings.Stop}" />
+
+        <!-- Context fill: ring and percentage; click for details. -->
+        <Button x:Name="ContextButton" DockPanel.Dock="Right" Margin="0,0,4,0" Padding="4,2" Style="{StaticResource Button.Subtle}"
+                DataContext="{Binding Context}"
+                Command="{Binding ShowDetailsCommand}"
+                ToolTip="{Binding Summary}"
+                AutomationProperties.AutomationId="Agent.Context"
+                AutomationProperties.Name="{Binding Summary}">
+          <StackPanel Orientation="Horizontal">
+            <controls:UsageRing Width="14" Height="14" VerticalAlignment="Center" Fraction="{Binding Fraction}"
+                                Track="{DynamicResource Brush.Widget.Border}">
+              <controls:UsageRing.Style>
+                <Style TargetType="controls:UsageRing">
+                  <Setter Property="Foreground" Value="{DynamicResource Brush.Accent}" />
+                  <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsNearlyFull}" Value="True">
+                      <Setter Property="Foreground" Value="{DynamicResource Brush.Warning.Foreground}" />
+                    </DataTrigger>
+                  </Style.Triggers>
+                </Style>
+              </controls:UsageRing.Style>
+            </controls:UsageRing>
+            <TextBlock Margin="4,0,0,0" VerticalAlignment="Center" Style="{StaticResource TextBlock.Note}" Text="{Binding PercentText}" />
+          </StackPanel>
+        </Button>
+
+        <Button DockPanel.Dock="Left" Style="{StaticResource Button.Toolbar}" Padding="3"
+                Content="{x:Static ui:IconGlyphs.Attach}"
+                Foreground="{DynamicResource Brush.Text.Secondary}"
+                Command="{Binding Attachments.PickCommand}"
+                ToolTip="{x:Static res:Strings.AttachFilesToolTip}"
+                AutomationProperties.AutomationId="Agent.Attach"
+                AutomationProperties.Name="{x:Static res:Strings.AttachFilesTitle}" />
+
+        <Button DockPanel.Dock="Left" Padding="4,2" Style="{StaticResource Button.Subtle}"
+                DataContext="{Binding Mode}"
+                Command="{Binding PickModeCommand}"
+                ToolTip="{Binding ToolTip}"
+                AutomationProperties.AutomationId="Agent.Mode"
+                AutomationProperties.Name="{Binding Title}">
+          <StackPanel Orientation="Horizontal">
+            <TextBlock VerticalAlignment="Center" Style="{StaticResource TextBlock.Note}" TextWrapping="NoWrap" Text="{Binding Title}" />
+            <TextBlock Margin="2,0,0,0" VerticalAlignment="Center" Foreground="{DynamicResource Brush.Text.Secondary}"
+                       FontFamily="{DynamicResource Font.Icons}" Text="{x:Static ui:IconGlyphs.ChevronDown}" />
+          </StackPanel>
+        </Button>
+
+        <StackPanel Orientation="Horizontal" DataContext="{Binding Model}">
+          <Button Padding="4,2" Style="{StaticResource Button.Subtle}"
+                  Command="{Binding PickModelCommand}"
+                  ToolTip="{Binding Model}"
+                  AutomationProperties.AutomationId="Agent.Model"
+                  AutomationProperties.Name="{Binding Model}">
+            <StackPanel Orientation="Horizontal">
+              <TextBlock VerticalAlignment="Center" MaxWidth="160" TextTrimming="CharacterEllipsis" Style="{StaticResource TextBlock.Note}"
+                         TextWrapping="NoWrap" Text="{Binding ModelShortName}" />
+              <TextBlock Margin="2,0,0,0" VerticalAlignment="Center" Foreground="{DynamicResource Brush.Text.Secondary}"
+                         FontFamily="{DynamicResource Font.Icons}" Text="{x:Static ui:IconGlyphs.ChevronDown}" />
+            </StackPanel>
+          </Button>
+          <Button x:Name="ParametersButton" Style="{StaticResource Button.Toolbar}" Padding="3"
+                  Content="{x:Static ui:IconGlyphs.Parameters}"
+                  Foreground="{DynamicResource Brush.Text.Secondary}"
+                  Command="{Binding ShowParametersCommand}"
+                  ToolTip="{Binding ParametersSummary}"
+                  AutomationProperties.AutomationId="Agent.Parameters"
+                  AutomationProperties.Name="{x:Static res:Strings.CommandModelParameters}">
+            <Button.ContextMenu>
+              <ContextMenu x:Name="ParametersMenu"
+                           ItemsSource="{Binding ParameterMenu}"
+                           ItemContainerStyle="{StaticResource MenuItem.Bound}"
+                           Placement="Top"
+                           Closed="OnParametersMenuClosed"
+                           AutomationProperties.AutomationId="Agent.ParametersMenu" />
+            </Button.ContextMenu>
+          </Button>
+        </StackPanel>
+      </DockPanel>
+
+      <TextBox x:Name="InputBox"
+               MinHeight="40"
+               MaxHeight="200"
+               Padding="8,6"
+               BorderThickness="0"
+               Background="Transparent"
+               Style="{StaticResource TextBox.Input}"
+               FontSize="{DynamicResource FontSize.Chat}"
+               Tag="{x:Static res:Strings.InputPlaceholder}"
+               AcceptsReturn="True"
+               TextWrapping="Wrap"
+               VerticalScrollBarVisibility="Auto"
+               Text="{Binding Input, UpdateSourceTrigger=PropertyChanged}"
+               PreviewKeyDown="OnInputPreviewKeyDown"
+               AutomationProperties.AutomationId="Agent.Input"
+               AutomationProperties.Name="{x:Static res:Strings.InputName}" />
+    </DockPanel>
+  </Border>
+</UserControl>

@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Updates module: checks GitHub releases with Velopack, downloads in the background, applies on restart. No WPF. -->
+
+  <ItemGroup>
+    <PackageReference Include="Velopack" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Platform\CodeEditor.Core\CodeEditor.Core.csproj" />
+    <ProjectReference Include="..\..\Platform\CodeEditor.Shell\CodeEditor.Shell.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Browser panel view on WebView2 (ADR 0027). The WebView2 package is about 2 MB of assemblies; Windows 11 already has
+    the Edge engine. WebView2 assemblies load only on first panel show, so startup is unaffected.
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Web.WebView2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CodeEditor.Modules.Browser\CodeEditor.Modules.Browser.csproj" />
+    <ProjectReference Include="..\..\Platform\CodeEditor.UI\CodeEditor.UI.csproj" />
+    <ProjectReference Include="..\..\Platform\CodeEditor.Shell.Wpf\CodeEditor.Shell.Wpf.csproj" />
+  </ItemGroup>
+
+</Project>

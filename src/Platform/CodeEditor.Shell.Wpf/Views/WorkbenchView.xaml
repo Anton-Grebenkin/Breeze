@@ -1,0 +1,265 @@
+<UserControl x:Class="CodeEditor.Shell.Wpf.Views.WorkbenchView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:CodeEditor.Shell.ViewModels;assembly=CodeEditor.Shell"
+             xmlns:tw="clr-namespace:CodeEditor.Shell.ToolWindows;assembly=CodeEditor.Shell"
+             xmlns:ui="clr-namespace:CodeEditor.UI.Themes;assembly=CodeEditor.UI"
+             xmlns:controls="clr-namespace:CodeEditor.UI.Controls;assembly=CodeEditor.UI"
+             xmlns:views="clr-namespace:CodeEditor.Shell.Wpf.Views"
+             xmlns:res="clr-namespace:CodeEditor.Shell.Resources;assembly=CodeEditor.Shell"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:MainWindowViewModel}">
+  <UserControl.Resources>
+    <!-- Area header with tool window tabs and a Hide button, for the bottom panel and the secondary side bar. -->
+    <DataTemplate x:Key="AreaHeader" DataType="{x:Type tw:ToolWindowAreaViewModel}">
+      <DockPanel>
+        <Button DockPanel.Dock="Right"
+                Margin="0,0,8,0"
+                Padding="4"
+                Style="{StaticResource Button.Subtle}"
+                FontFamily="{DynamicResource Font.Icons}"
+                FontSize="{DynamicResource FontSize.CaptionIcon}"
+                Content="{x:Static ui:IconGlyphs.Close}"
+                ToolTip="{x:Static res:Strings.Hide}"
+                Command="{Binding HideCommand}"
+                AutomationProperties.AutomationId="{Binding Location, StringFormat={}{0}.Close}"
+                AutomationProperties.Name="{x:Static res:Strings.Hide}" />
+        <!-- Maximize the bottom panel to the editor area height and back (ADR 0031). -->
+        <Button DockPanel.Dock="Right"
+                Padding="4"
+                FontFamily="{DynamicResource Font.Icons}"
+                FontSize="{DynamicResource FontSize.CaptionIcon}"
+                Command="{Binding ToggleMaximizedCommand}"
+                Visibility="{Binding CanMaximize, Converter={StaticResource BoolToVisibility}}"
+                AutomationProperties.AutomationId="{Binding Location, StringFormat={}{0}.Maximize}">
+          <Button.Style>
+            <Style TargetType="Button" BasedOn="{StaticResource Button.Subtle}">
+              <Setter Property="Content" Value="{x:Static ui:IconGlyphs.ChevronUp}" />
+              <Setter Property="ToolTip" Value="{x:Static res:Strings.MaximizePanel}" />
+              <Setter Property="AutomationProperties.Name" Value="{x:Static res:Strings.MaximizePanel}" />
+              <Style.Triggers>
+                <DataTrigger Binding="{Binding IsMaximized}" Value="True">
+                  <Setter Property="Content" Value="{x:Static ui:IconGlyphs.ChevronDown}" />
+                  <Setter Property="ToolTip" Value="{x:Static res:Strings.RestorePanel}" />
+                  <Setter Property="AutomationProperties.Name" Value="{x:Static res:Strings.RestorePanel}" />
+                </DataTrigger>
+              </Style.Triggers>
+            </Style>
+          </Button.Style>
+        </Button>
+        <ItemsControl ItemsSource="{Binding Items}" Margin="4,0,0,0" Focusable="False">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <StackPanel Orientation="Horizontal" />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate DataType="{x:Type tw:ToolWindowViewModel}">
+              <Button Height="35"
+                      Style="{StaticResource Button.PanelTab}"
+                      PreviewMouseLeftButtonDown="OnToolWindowMouseDown" PreviewMouseMove="OnToolWindowMouseMove"
+                      ToolTip="{Binding ToolTip}"
+                      Command="{Binding DataContext.ToggleItemCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                      CommandParameter="{Binding}"
+                      AutomationProperties.AutomationId="{Binding Id, StringFormat=Panel.Tab.{0}}"
+                      AutomationProperties.Name="{Binding Title}">
+                <!-- Right click: move the tool window to another area or the editor (ADR 0031). -->
+                <Button.ContextMenu>
+                  <ContextMenu ItemsSource="{Binding MoveMenu}" ItemContainerStyle="{StaticResource MenuItem.Bound}"
+                               AutomationProperties.AutomationId="{Binding Id, StringFormat=ToolWindow.{0}.MoveMenu}" />
+                </Button.ContextMenu>
+                <TextBlock Style="{StaticResource TextBlock.AreaHeader}" Margin="0" Text="{Binding Title}" />
+              </Button>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </DockPanel>
+    </DataTemplate>
+  </UserControl.Resources>
+
+  <!--
+    Layout as in VS Code: activity bar, side bar, documents with the bottom panel, secondary side bar on the right
+    (ADR 0002). Documents, bottom panel and secondary side bar are cards on the window background (ADR 0038).
+  -->
+  <Grid Margin="0,0,6,0">
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="48" />
+      <ColumnDefinition Width="{Binding Layout.SideBar.GridSize, Mode=TwoWay, Converter={x:Static controls:PixelGridLengthConverter.Instance}}" />
+      <ColumnDefinition Width="Auto" />
+      <ColumnDefinition Width="*" MinWidth="200" />
+      <ColumnDefinition Width="Auto" />
+      <ColumnDefinition Width="{Binding Layout.SecondarySideBar.GridSize, Mode=TwoWay, Converter={x:Static controls:PixelGridLengthConverter.Instance}}" />
+    </Grid.ColumnDefinitions>
+
+    <!-- Activity bar: side bar tool window icons, Manage at the bottom. -->
+    <Grid Grid.Column="0"
+          DataContext="{Binding ActivityBar}"
+          Tag="SideBar" AllowDrop="True" DragOver="OnAreaDragOver" Drop="OnAreaDrop"
+          Background="{DynamicResource Brush.ActivityBar.Background}">
+      <ItemsControl ItemsSource="{Binding SideBar.Items}"
+                    Focusable="False"
+                    VerticalAlignment="Top"
+                    AutomationProperties.AutomationId="ActivityBar.Items">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate DataType="{x:Type tw:ToolWindowViewModel}">
+            <Button Style="{StaticResource Button.ActivityItem}"
+                    PreviewMouseLeftButtonDown="OnToolWindowMouseDown" PreviewMouseMove="OnToolWindowMouseMove"
+                    Content="{Binding Icon, Converter={x:Static controls:IconGlyphConverter.Instance}}"
+                    ToolTip="{Binding ToolTip}"
+                    Command="{Binding DataContext.SideBar.ToggleItemCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                    CommandParameter="{Binding}"
+                    AutomationProperties.AutomationId="{Binding Id, StringFormat=ActivityBar.{0}}"
+                    AutomationProperties.Name="{Binding Title}">
+              <Button.ContextMenu>
+                <ContextMenu ItemsSource="{Binding MoveMenu}" ItemContainerStyle="{StaticResource MenuItem.Bound}"
+                             AutomationProperties.AutomationId="{Binding Id, StringFormat=ToolWindow.{0}.MoveMenu}" />
+              </Button.ContextMenu>
+            </Button>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+
+      <Button x:Name="ManageButton"
+              VerticalAlignment="Bottom"
+              Style="{StaticResource Button.ActivityBar}"
+              Content="{x:Static ui:IconGlyphs.Settings}"
+              ToolTip="{x:Static res:Strings.Manage}"
+              Click="OnManageClick"
+              AutomationProperties.AutomationId="ActivityBar.Manage"
+              AutomationProperties.Name="{x:Static res:Strings.Manage}">
+        <Button.ContextMenu>
+          <ContextMenu ItemsSource="{Binding Manage.Items}"
+                       ItemContainerStyle="{StaticResource MenuItem.Bound}"
+                       Placement="Right"
+                       Opened="OnManageMenuOpened"
+                       AutomationProperties.AutomationId="ActivityBar.ManageMenu" />
+        </Button.ContextMenu>
+      </Button>
+    </Grid>
+
+    <DockPanel Grid.Column="1"
+               DataContext="{Binding Layout.SideBar}"
+               Tag="SideBar" AllowDrop="True" DragOver="OnAreaDragOver" Drop="OnAreaDrop"
+               Background="{DynamicResource Brush.ActivityBar.Background}"
+               Visibility="{Binding IsVisible, Converter={StaticResource BoolToVisibility}}"
+               AutomationProperties.AutomationId="SideBar">
+      <Grid DockPanel.Dock="Top" Height="35">
+        <TextBlock Style="{StaticResource TextBlock.AreaHeader}" Text="{Binding Title}" />
+      </Grid>
+      <ContentControl Content="{Binding Active.Content}" Focusable="False" />
+    </DockPanel>
+
+    <GridSplitter Grid.Column="2"
+                  Width="6"
+                  HorizontalAlignment="Stretch"
+                  Style="{StaticResource GridSplitter.Thin}"
+                  Visibility="{Binding Layout.SideBar.IsVisible, Converter={StaticResource BoolToVisibility}}" />
+
+    <!-- Documents and the bottom panel. -->
+    <Grid Grid.Column="3">
+      <!-- A maximized bottom panel takes the documents' height. -->
+      <Grid.RowDefinitions>
+        <RowDefinition>
+          <RowDefinition.Style>
+            <Style TargetType="RowDefinition">
+              <Setter Property="Height" Value="*" />
+              <Setter Property="MinHeight" Value="100" />
+              <Style.Triggers>
+                <DataTrigger Binding="{Binding Layout.Panel.IsMaximized}" Value="True">
+                  <Setter Property="Height" Value="0" />
+                  <Setter Property="MinHeight" Value="0" />
+                </DataTrigger>
+              </Style.Triggers>
+            </Style>
+          </RowDefinition.Style>
+        </RowDefinition>
+        <RowDefinition Height="Auto" />
+        <RowDefinition>
+          <RowDefinition.Style>
+            <Style TargetType="RowDefinition">
+              <Setter Property="Height" Value="{Binding Layout.Panel.GridSize, Mode=TwoWay, Converter={x:Static controls:PixelGridLengthConverter.Instance}}" />
+              <Style.Triggers>
+                <DataTrigger Binding="{Binding Layout.Panel.IsMaximized}" Value="True">
+                  <Setter Property="Height" Value="*" />
+                </DataTrigger>
+              </Style.Triggers>
+            </Style>
+          </RowDefinition.Style>
+        </RowDefinition>
+      </Grid.RowDefinitions>
+
+      <!-- Documents; the welcome page when no tabs are open. -->
+      <controls:ClipBorder Grid.Row="0"
+              CornerRadius="8"
+              BorderThickness="1"
+              BorderBrush="{DynamicResource Brush.Card.Border}"
+              Background="{DynamicResource Brush.Editor.Background}"
+              Tag="Editor" AllowDrop="True" DragOver="OnAreaDragOver" Drop="OnAreaDrop"
+              AutomationProperties.AutomationId="Workbench">
+        <Grid>
+          <views:WelcomeView DataContext="{Binding Welcome}"
+                             Visibility="{Binding DataContext.EditorArea.Editors.HasTabs, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={x:Static controls:InverseBoolToVisibilityConverter.Instance}}" />
+          <views:EditorAreaView DataContext="{Binding EditorArea}"
+                                Visibility="{Binding Editors.HasTabs, Converter={StaticResource BoolToVisibility}}" />
+        </Grid>
+      </controls:ClipBorder>
+
+      <GridSplitter Grid.Row="1"
+                    Height="6"
+                    HorizontalAlignment="Stretch">
+        <GridSplitter.Style>
+          <Style TargetType="GridSplitter" BasedOn="{StaticResource GridSplitter.Thin}">
+            <Setter Property="Visibility" Value="Collapsed" />
+            <Style.Triggers>
+              <DataTrigger Binding="{Binding Layout.Panel.IsVisible}" Value="True">
+                <Setter Property="Visibility" Value="Visible" />
+              </DataTrigger>
+              <DataTrigger Binding="{Binding Layout.Panel.IsMaximized}" Value="True">
+                <Setter Property="Visibility" Value="Collapsed" />
+              </DataTrigger>
+            </Style.Triggers>
+          </Style>
+        </GridSplitter.Style>
+      </GridSplitter>
+
+      <controls:ClipBorder Grid.Row="2"
+                           DataContext="{Binding Layout.Panel}"
+                           CornerRadius="8"
+                           BorderThickness="1"
+                           BorderBrush="{DynamicResource Brush.Card.Border}"
+                           Background="{DynamicResource Brush.Editor.Background}"
+                           Visibility="{Binding IsVisible, Converter={StaticResource BoolToVisibility}}">
+        <DockPanel Tag="Panel" AllowDrop="True" DragOver="OnAreaDragOver" Drop="OnAreaDrop"
+                   Background="Transparent"
+                   AutomationProperties.AutomationId="Panel">
+          <ContentControl DockPanel.Dock="Top" Height="35" Content="{Binding}" ContentTemplate="{StaticResource AreaHeader}" Focusable="False" />
+          <ContentControl Content="{Binding Active.Content}" Focusable="False" />
+        </DockPanel>
+      </controls:ClipBorder>
+    </Grid>
+
+    <GridSplitter Grid.Column="4"
+                  Width="6"
+                  HorizontalAlignment="Stretch"
+                  Style="{StaticResource GridSplitter.Thin}"
+                  Visibility="{Binding Layout.SecondarySideBar.IsVisible, Converter={StaticResource BoolToVisibility}}" />
+
+    <!-- Secondary side bar on the right: agent chat. -->
+    <controls:ClipBorder Grid.Column="5"
+                         DataContext="{Binding Layout.SecondarySideBar}"
+                         CornerRadius="8"
+                         BorderThickness="1"
+                         BorderBrush="{DynamicResource Brush.Card.Border}"
+                         Background="{DynamicResource Brush.Panel.Background}"
+                         Visibility="{Binding IsVisible, Converter={StaticResource BoolToVisibility}}">
+      <DockPanel Tag="SecondarySideBar" AllowDrop="True" DragOver="OnAreaDragOver" Drop="OnAreaDrop"
+                 Background="Transparent"
+                 AutomationProperties.AutomationId="SecondarySideBar">
+        <ContentControl DockPanel.Dock="Top" Height="35" Content="{Binding}" ContentTemplate="{StaticResource AreaHeader}" Focusable="False" />
+        <ContentControl Content="{Binding Active.Content}" Focusable="False" />
+      </DockPanel>
+    </controls:ClipBorder>
+  </Grid>
+</UserControl>

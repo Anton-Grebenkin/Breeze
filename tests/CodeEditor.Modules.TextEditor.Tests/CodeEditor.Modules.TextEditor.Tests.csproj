@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Editor logic and syntax highlighting: AvalonEdit definitions are tested without a window (ADR 0036). -->
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+  </ItemGroup>
+
+  <!-- WPF drops the implicit System.IO (Path clashes in XAML); there is no XAML here. -->
+  <ItemGroup>
+    <Using Include="Xunit" />
+    <Using Include="System.IO" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Modules\CodeEditor.Modules.TextEditor\CodeEditor.Modules.TextEditor.csproj" />
+    <ProjectReference Include="..\..\src\Modules\CodeEditor.Modules.TextEditor.Wpf\CodeEditor.Modules.TextEditor.Wpf.csproj" />
+    <ProjectReference Include="..\CodeEditor.Testing\CodeEditor.Testing.csproj" />
+  </ItemGroup>
+
+</Project>

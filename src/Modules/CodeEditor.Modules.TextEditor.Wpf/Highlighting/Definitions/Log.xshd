@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!--
+  Logs (.log): levels in theme status colors (ERROR, FATAL, fail: as error; WARN as warning; INFO as success;
+  DEBUG as keyword; TRACE muted), exception names, "at …" stack lines, date and time as comments, quoted strings,
+  numbers, GUIDs, links. Rules only, no spans: a log line never affects the next, so large files highlight line by
+  line. Color names are theme tokens (ADR 0036).
+-->
+<SyntaxDefinition name="Log" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+  <Color name="Comment" />
+  <Color name="String" />
+  <Color name="Number" />
+  <Color name="Keyword" />
+  <Color name="Type" />
+  <Color name="Preprocessor" />
+  <Color name="Error" />
+  <Color name="Warning" />
+  <Color name="Success" />
+
+  <RuleSet>
+    <Rule color="Preprocessor">^\s+at\s.*</Rule>
+    <Rule color="Type">\b(?:https?|ftp|file)://[^\s&quot;'&lt;&gt;]+</Rule>
+    <Rule color="Comment">
+      \b\d{4}-\d{2}-\d{2}(?:[T\ ]\d{2}:\d{2}(?::\d{2}(?:[.,]\d+)?)?(?:Z|[+-]\d{2}:?\d{2})?)?
+      | \b\d{1,2}:\d{2}:\d{2}(?:[.,]\d+)?\b
+      | \b\d{1,2}[./]\d{1,2}[./]\d{4}\b
+    </Rule>
+    <Rule color="Error">
+      \b(?:FATAL|Fatal|CRITICAL|Critical|CRIT|ERROR|Error|ERR|EROR|FAIL|FAILED|Failed|FTL|EXCEPTION|PANIC|SEVERE|EMERGENCY|ALERT)\b
+      | \b(?:fail|crit):
+      | \b\w*(?:Exception|Error)\b
+    </Rule>
+    <Rule color="Warning">\b(?:WARNING|Warning|WARN|Warn|WRN)\b|\bwarn:</Rule>
+    <Rule color="Success">\b(?:INFO|Info|INF|NOTICE|Notice|SUCCESS|Success)\b|\binfo:</Rule>
+    <Rule color="Keyword">\b(?:DEBUG|Debug|DBG|DBUG)\b|\bdbug:</Rule>
+    <Rule color="Preprocessor">\b(?:TRACE|Trace|TRC|VERBOSE|Verbose|VRB)\b|\btrce:</Rule>
+    <Rule color="String">&quot;[^&quot;\r\n]*&quot;|(?&lt;!\w)'[^'\r\n]*'(?!\w)</Rule>
+    <Rule color="Keyword">\b(?:true|false|null|True|False|None)\b</Rule>
+    <Rule color="Number">
+      \b[\da-fA-F]{8}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{12}\b
+      | \b0x[\da-fA-F]+\b
+      | \b\d+(?:\.\d+)?\b
+    </Rule>
+  </RuleSet>
+</SyntaxDefinition>

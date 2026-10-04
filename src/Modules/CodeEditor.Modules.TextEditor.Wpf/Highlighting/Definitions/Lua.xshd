@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<!--
+  Lua: line and block comments (with [==[ levels up to two =), "…", '…' and long [[…]] strings, keywords, built-in
+  functions, calls, const and close variable attributes, numbers (including hex with a fraction).
+  Color names are theme tokens (ADR 0036).
+-->
+<SyntaxDefinition name="Lua" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+  <Color name="Comment" />
+  <Color name="String" />
+  <Color name="Number" />
+  <Color name="Keyword" />
+  <Color name="ControlKeyword" />
+  <Color name="Function" />
+
+  <RuleSet>
+    <Span color="Comment" multiline="true" begin="--\[\[" end="\]\]" />
+    <Span color="Comment" multiline="true" begin="--\[=\[" end="\]=\]" />
+    <Span color="Comment" multiline="true" begin="--\[==\[" end="\]==\]" />
+    <Span color="Comment" begin="--" />
+    <Span color="String" multiline="true" begin="\[\[" end="\]\]" />
+    <Span color="String" multiline="true" begin="\[=\[" end="\]=\]" />
+    <Span color="String" multiline="true" begin="\[==\[" end="\]==\]" />
+    <Span color="String" begin="&quot;" end="&quot;" ruleSet="Escapes" />
+    <Span color="String" begin="'" end="'" ruleSet="Escapes" />
+
+    <Keywords color="ControlKeyword">
+      <Word>if</Word>
+      <Word>then</Word>
+      <Word>elseif</Word>
+      <Word>else</Word>
+      <Word>end</Word>
+      <Word>for</Word>
+      <Word>in</Word>
+      <Word>while</Word>
+      <Word>do</Word>
+      <Word>repeat</Word>
+      <Word>until</Word>
+      <Word>break</Word>
+      <Word>return</Word>
+      <Word>goto</Word>
+    </Keywords>
+    <Keywords color="Keyword">
+      <Word>and</Word>
+      <Word>or</Word>
+      <Word>not</Word>
+      <Word>local</Word>
+      <Word>function</Word>
+      <Word>nil</Word>
+      <Word>true</Word>
+      <Word>false</Word>
+      <Word>self</Word>
+    </Keywords>
+    <Keywords color="Function">
+      <Word>print</Word>
+      <Word>pairs</Word>
+      <Word>ipairs</Word>
+      <Word>require</Word>
+      <Word>type</Word>
+      <Word>tostring</Word>
+      <Word>tonumber</Word>
+      <Word>setmetatable</Word>
+      <Word>getmetatable</Word>
+      <Word>pcall</Word>
+      <Word>xpcall</Word>
+      <Word>error</Word>
+      <Word>assert</Word>
+      <Word>select</Word>
+      <Word>next</Word>
+      <Word>rawget</Word>
+      <Word>rawset</Word>
+      <Word>rawequal</Word>
+      <Word>unpack</Word>
+    </Keywords>
+    <Rule color="Keyword">&lt;(?:const|close)&gt;</Rule>
+    <Rule color="Function">\b[A-Za-z_]\w*(?=\s*\()</Rule>
+    <Rule color="Number">
+      \b(?:0[xX][\da-fA-F]*(?:\.[\da-fA-F]*)?(?:[pP][+-]?\d+)?|\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)
+      | (?&lt;!\w)\.\d+(?:[eE][+-]?\d+)?
+    </Rule>
+  </RuleSet>
+
+  <RuleSet name="Escapes">
+    <Span begin="\\" end="." />
+  </RuleSet>
+</SyntaxDefinition>

@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!--
+  INI and relatives (.cfg, .conf, .editorconfig, .properties, .env, .gitconfig): [section] as a type, the key before
+  = or : as an attribute, ; # ! comments at the line start and ; # after a space, quoted strings, true/false and
+  numbers when they are the whole value, ${VAR}, export before a key in .env. Color names are theme tokens (ADR 0036).
+-->
+<SyntaxDefinition name="Ini" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+  <Color name="Comment" />
+  <Color name="String" />
+  <Color name="Number" />
+  <Color name="Keyword" />
+  <Color name="Type" />
+  <Color name="Variable" />
+
+  <RuleSet ignoreCase="true">
+    <Span color="Comment" begin="^\s*[;#!]" />
+    <Span color="Comment" begin="(?&lt;=\s)[;#](?=\s|$)" />
+    <!-- The whole section, quotes included: [remote "origin"]. -->
+    <Span color="Type" begin="^\s*\[" end="\]" />
+    <Span color="String" begin="(?&lt;=[=:\s]|^)&quot;" end="&quot;" ruleSet="Quoted" />
+    <Span color="String" begin="(?&lt;=[=:\s]|^)'" end="'" />
+
+    <Rule color="Keyword">^\s*export(?=[\ \t])</Rule>
+    <Rule color="Variable">(?&lt;=^\s*(?:export[\ \t]+)?)[^\s=:;\#\[!][^\s=:]*(?=[\ \t]*[=:])</Rule>
+    <Rule color="Keyword">(?&lt;=[=:][\ \t]*)(?:true|false|yes|no|on|off|none|null)(?=[\ \t]*$)</Rule>
+    <Rule color="Number">(?&lt;=[=:][\ \t]*)[-+]?\d+(?:\.\d+)?(?=[\ \t]*$)</Rule>
+    <Rule color="Variable">\$\{[^}\r\n]*\}</Rule>
+  </RuleSet>
+
+  <RuleSet name="Quoted">
+    <Span begin="\\" end="." />
+    <Rule color="Variable">\$\{[^}\r\n]*\}</Rule>
+  </RuleSet>
+</SyntaxDefinition>

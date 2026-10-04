@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Diagrams module (ADR 0035): Mermaid diagrams with live preview, SVG and PNG export, and the diagram agent tool.
+    Logic only, no WPF; the WebView2 renderer lives in CodeEditor.Modules.Diagrams.Wpf.
+  -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Platform\CodeEditor.Core\CodeEditor.Core.csproj" />
+    <ProjectReference Include="..\..\Platform\CodeEditor.Shell\CodeEditor.Shell.csproj" />
+    <ProjectReference Include="..\CodeEditor.Modules.Agent.Contracts\CodeEditor.Modules.Agent.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>

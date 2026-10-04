@@ -1,0 +1,256 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:tree="clr-namespace:CodeEditor.Modules.Docker.ViewModels.Tree;assembly=CodeEditor.Modules.Docker"
+                    xmlns:model="clr-namespace:CodeEditor.Modules.Docker.Services.Model;assembly=CodeEditor.Modules.Docker"
+                    xmlns:ui="clr-namespace:CodeEditor.UI.Themes;assembly=CodeEditor.UI"
+                    xmlns:controls="clr-namespace:CodeEditor.UI.Controls;assembly=CodeEditor.UI"
+                    xmlns:res="clr-namespace:CodeEditor.Modules.Docker.Resources;assembly=CodeEditor.Modules.Docker">
+
+  <!--
+    Docker tree rows: icon colored by state, name, grey detail, port links, and action buttons on hover or selection,
+    like inline tree actions in VS Code. The same actions are in the context menu, tree keys and the palette.
+  -->
+
+  <Style x:Key="Button.Toolbar" TargetType="Button" BasedOn="{StaticResource Button.Subtle}">
+    <Setter Property="Padding" Value="4" />
+    <Setter Property="FontFamily" Value="{DynamicResource Font.Icons}" />
+    <Setter Property="FontSize" Value="{DynamicResource FontSize.Icon}" />
+  </Style>
+
+  <!-- Row button for the mouse; the keyboard gets the same via Enter, Delete, the context menu and the palette. -->
+  <Style x:Key="Button.Row" TargetType="Button" BasedOn="{StaticResource Button.Toolbar}">
+    <Setter Property="Padding" Value="2,0" />
+    <Setter Property="Focusable" Value="False" />
+    <Setter Property="CommandParameter" Value="{Binding}" />
+  </Style>
+
+  <!-- Port link: opens the local address in the browser. -->
+  <Style x:Key="Button.PortLink" TargetType="Button">
+    <Setter Property="Focusable" Value="False" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Margin" Value="4,0,0,0" />
+    <Setter Property="Foreground" Value="{DynamicResource Brush.Markdown.Link}" />
+    <Setter Property="FontSize" Value="{DynamicResource FontSize.Small}" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Button">
+          <TextBlock x:Name="Label" Background="Transparent" VerticalAlignment="Center" Text="{TemplateBinding Content}" />
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+              <Setter TargetName="Label" Property="TextDecorations" Value="Underline" />
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!-- Node icon colored by state tone; a progress icon while an action runs. -->
+  <Style x:Key="TextBlock.NodeIcon" TargetType="TextBlock">
+    <Setter Property="Width" Value="16" />
+    <Setter Property="Margin" Value="0,0,4,0" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="FontFamily" Value="{DynamicResource Font.Icons}" />
+    <Setter Property="FontSize" Value="{DynamicResource FontSize.Icon}" />
+    <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Secondary}" />
+    <Setter Property="Text" Value="{Binding Icon, Converter={x:Static controls:IconGlyphConverter.Instance}}" />
+    <Style.Triggers>
+      <DataTrigger Binding="{Binding Tone}" Value="{x:Static tree:DockerTone.Running}">
+        <Setter Property="Foreground" Value="{DynamicResource Brush.Success.Foreground}" />
+      </DataTrigger>
+      <DataTrigger Binding="{Binding Tone}" Value="{x:Static tree:DockerTone.Warning}">
+        <Setter Property="Foreground" Value="{DynamicResource Brush.Warning.Foreground}" />
+      </DataTrigger>
+      <DataTrigger Binding="{Binding Tone}" Value="{x:Static tree:DockerTone.Error}">
+        <Setter Property="Foreground" Value="{DynamicResource Brush.Error.Foreground}" />
+      </DataTrigger>
+      <DataTrigger Binding="{Binding IsBusy}" Value="True">
+        <Setter Property="Text" Value="{x:Static ui:IconGlyphs.Loading}" />
+        <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Secondary}" />
+      </DataTrigger>
+    </Style.Triggers>
+  </Style>
+
+  <!-- Name and detail on one line; a long detail is trimmed, the full text is in the row tooltip. -->
+  <Style x:Key="TextBlock.NodeText" TargetType="TextBlock">
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+  </Style>
+
+  <Style x:Key="Run.Detail" TargetType="Run">
+    <Setter Property="FontSize" Value="{DynamicResource FontSize.Small}" />
+    <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Secondary}" />
+  </Style>
+
+  <!-- Ports of a container or service row. -->
+  <DataTemplate x:Key="PortLink" DataType="{x:Type model:PublishedPort}">
+    <Button Style="{StaticResource Button.PortLink}"
+            Content="{Binding Label}"
+            Command="{Binding DataContext.OpenPortCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+            CommandParameter="{Binding}"
+            AutomationProperties.AutomationId="Docker.Port"
+            AutomationProperties.Name="{Binding Label}">
+      <Button.ToolTip>
+        <TextBlock Text="{Binding Url, StringFormat={x:Static res:Strings.OpenPortToolTip}}" />
+      </Button.ToolTip>
+    </Button>
+  </DataTemplate>
+
+  <ItemsPanelTemplate x:Key="Panel.Horizontal">
+    <StackPanel Orientation="Horizontal" />
+  </ItemsPanelTemplate>
+
+  <HierarchicalDataTemplate DataType="{x:Type tree:DockerSectionViewModel}" ItemsSource="{Binding Children}">
+    <TextBlock Style="{StaticResource TextBlock.NodeText}">
+      <Run FontWeight="SemiBold" Text="{Binding Title, Mode=OneWay}" /><Run Text="  " /><Run Style="{StaticResource Run.Detail}" Text="{Binding Detail, Mode=OneWay}" />
+    </TextBlock>
+  </HierarchicalDataTemplate>
+
+  <HierarchicalDataTemplate DataType="{x:Type tree:ContainerGroupViewModel}" ItemsSource="{Binding Children}">
+    <DockPanel>
+      <TextBlock Style="{StaticResource TextBlock.NodeIcon}" />
+      <TextBlock Style="{StaticResource TextBlock.NodeText}">
+        <Run Text="{Binding Title, Mode=OneWay}" /><Run Text="  " /><Run Style="{StaticResource Run.Detail}" Text="{Binding Detail, Mode=OneWay}" />
+      </TextBlock>
+    </DockPanel>
+  </HierarchicalDataTemplate>
+
+  <DataTemplate DataType="{x:Type tree:ContainerNodeViewModel}">
+    <DockPanel x:Name="Row" Background="Transparent">
+      <StackPanel x:Name="Actions" DockPanel.Dock="Right" Orientation="Horizontal" Visibility="Collapsed">
+        <Button x:Name="StartButton" Style="{StaticResource Button.Row}"
+                Content="{Binding Source=debug-start, Converter={x:Static controls:IconGlyphConverter.Instance}}"
+                ToolTip="{x:Static res:Strings.MenuStart}"
+                Command="{Binding DataContext.StartCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                AutomationProperties.AutomationId="Docker.Row.Start" AutomationProperties.Name="{x:Static res:Strings.MenuStart}" />
+        <Button x:Name="StopButton" Style="{StaticResource Button.Row}"
+                Content="{Binding Source=debug-stop, Converter={x:Static controls:IconGlyphConverter.Instance}}"
+                ToolTip="{x:Static res:Strings.MenuStop}"
+                Command="{Binding DataContext.StopCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                AutomationProperties.AutomationId="Docker.Row.Stop" AutomationProperties.Name="{x:Static res:Strings.MenuStop}" />
+        <Button x:Name="RestartButton" Style="{StaticResource Button.Row}"
+                Content="{Binding Source=debug-restart, Converter={x:Static controls:IconGlyphConverter.Instance}}"
+                ToolTip="{x:Static res:Strings.MenuRestart}"
+                Command="{Binding DataContext.RestartCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                AutomationProperties.AutomationId="Docker.Row.Restart" AutomationProperties.Name="{x:Static res:Strings.MenuRestart}" />
+        <Button Style="{StaticResource Button.Row}"
+                Content="{x:Static ui:IconGlyphs.Output}"
+                ToolTip="{x:Static res:Strings.MenuLogs}"
+                Command="{Binding DataContext.LogsCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                AutomationProperties.AutomationId="Docker.Row.Logs" AutomationProperties.Name="{x:Static res:Strings.MenuLogs}" />
+      </StackPanel>
+      <ItemsControl DockPanel.Dock="Right" Focusable="False" ItemsSource="{Binding Links}"
+                    ItemTemplate="{StaticResource PortLink}" ItemsPanel="{StaticResource Panel.Horizontal}" />
+      <TextBlock Style="{StaticResource TextBlock.NodeIcon}" />
+      <TextBlock Style="{StaticResource TextBlock.NodeText}">
+        <Run Text="{Binding Title, Mode=OneWay}" /><Run Text="  " /><Run Style="{StaticResource Run.Detail}" Text="{Binding Detail, Mode=OneWay}" />
+      </TextBlock>
+    </DockPanel>
+    <DataTemplate.Triggers>
+      <Trigger SourceName="Row" Property="IsMouseOver" Value="True">
+        <Setter TargetName="Actions" Property="Visibility" Value="Visible" />
+      </Trigger>
+      <DataTrigger Binding="{Binding IsSelected}" Value="True">
+        <Setter TargetName="Actions" Property="Visibility" Value="Visible" />
+      </DataTrigger>
+      <DataTrigger Binding="{Binding Container.IsRunning}" Value="True">
+        <Setter TargetName="StartButton" Property="Visibility" Value="Collapsed" />
+      </DataTrigger>
+      <DataTrigger Binding="{Binding Container.IsRunning}" Value="False">
+        <Setter TargetName="StopButton" Property="Visibility" Value="Collapsed" />
+        <Setter TargetName="RestartButton" Property="Visibility" Value="Collapsed" />
+      </DataTrigger>
+    </DataTemplate.Triggers>
+  </DataTemplate>
+
+  <DataTemplate DataType="{x:Type tree:ImageNodeViewModel}">
+    <DockPanel>
+      <TextBlock Style="{StaticResource TextBlock.NodeIcon}" />
+      <TextBlock Style="{StaticResource TextBlock.NodeText}">
+        <Run Text="{Binding Title, Mode=OneWay}" /><Run Text="  " /><Run Style="{StaticResource Run.Detail}" Text="{Binding Detail, Mode=OneWay}" />
+      </TextBlock>
+    </DockPanel>
+  </DataTemplate>
+
+  <HierarchicalDataTemplate DataType="{x:Type tree:ComposeFileNodeViewModel}" ItemsSource="{Binding Children}">
+    <DockPanel x:Name="Row" Background="Transparent">
+      <StackPanel x:Name="Actions" DockPanel.Dock="Right" Orientation="Horizontal" Visibility="Collapsed">
+        <Button Style="{StaticResource Button.Row}"
+                Content="{Binding Source=debug-start, Converter={x:Static controls:IconGlyphConverter.Instance}}"
+                ToolTip="{x:Static res:Strings.MenuComposeUp}"
+                Command="{Binding DataContext.ComposeUpCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                AutomationProperties.AutomationId="Docker.Row.ComposeUp" AutomationProperties.Name="{x:Static res:Strings.MenuComposeUp}" />
+        <Button Style="{StaticResource Button.Row}"
+                Content="{Binding Source=debug-stop, Converter={x:Static controls:IconGlyphConverter.Instance}}"
+                ToolTip="{x:Static res:Strings.MenuComposeDown}"
+                Command="{Binding DataContext.ComposeDownCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                AutomationProperties.AutomationId="Docker.Row.ComposeDown" AutomationProperties.Name="{x:Static res:Strings.MenuComposeDown}" />
+      </StackPanel>
+      <TextBlock Style="{StaticResource TextBlock.NodeIcon}" />
+      <TextBlock Style="{StaticResource TextBlock.NodeText}">
+        <Run Text="{Binding Title, Mode=OneWay}" /><Run Text="  " /><Run Style="{StaticResource Run.Detail}" Text="{Binding Detail, Mode=OneWay}" />
+      </TextBlock>
+    </DockPanel>
+    <HierarchicalDataTemplate.Triggers>
+      <Trigger SourceName="Row" Property="IsMouseOver" Value="True">
+        <Setter TargetName="Actions" Property="Visibility" Value="Visible" />
+      </Trigger>
+      <DataTrigger Binding="{Binding IsSelected}" Value="True">
+        <Setter TargetName="Actions" Property="Visibility" Value="Visible" />
+      </DataTrigger>
+    </HierarchicalDataTemplate.Triggers>
+  </HierarchicalDataTemplate>
+
+  <DataTemplate DataType="{x:Type tree:ComposeServiceNodeViewModel}">
+    <DockPanel x:Name="Row" Background="Transparent">
+      <StackPanel x:Name="Actions" DockPanel.Dock="Right" Orientation="Horizontal" Visibility="Collapsed">
+        <Button x:Name="UpButton" Style="{StaticResource Button.Row}"
+                Content="{Binding Source=debug-start, Converter={x:Static controls:IconGlyphConverter.Instance}}"
+                ToolTip="{x:Static res:Strings.MenuComposeUpService}"
+                Command="{Binding DataContext.ComposeUpCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                AutomationProperties.AutomationId="Docker.Row.ServiceUp" AutomationProperties.Name="{x:Static res:Strings.MenuComposeUpService}" />
+        <Button x:Name="RestartButton" Style="{StaticResource Button.Row}"
+                Content="{Binding Source=debug-restart, Converter={x:Static controls:IconGlyphConverter.Instance}}"
+                ToolTip="{x:Static res:Strings.MenuComposeRestart}"
+                Command="{Binding DataContext.RestartServiceCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                AutomationProperties.AutomationId="Docker.Row.RestartService" AutomationProperties.Name="{x:Static res:Strings.MenuComposeRestart}" />
+        <Button x:Name="LogsButton" Style="{StaticResource Button.Row}"
+                Content="{x:Static ui:IconGlyphs.Output}"
+                ToolTip="{x:Static res:Strings.MenuLogs}"
+                Command="{Binding DataContext.LogsCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                AutomationProperties.AutomationId="Docker.Row.Logs" AutomationProperties.Name="{x:Static res:Strings.MenuLogs}" />
+      </StackPanel>
+      <ItemsControl DockPanel.Dock="Right" Focusable="False" ItemsSource="{Binding Links}"
+                    ItemTemplate="{StaticResource PortLink}" ItemsPanel="{StaticResource Panel.Horizontal}" />
+      <TextBlock Style="{StaticResource TextBlock.NodeIcon}" />
+      <TextBlock Style="{StaticResource TextBlock.NodeText}">
+        <Run Text="{Binding Title, Mode=OneWay}" /><Run Text="  " /><Run Style="{StaticResource Run.Detail}" Text="{Binding Detail, Mode=OneWay}" />
+      </TextBlock>
+    </DockPanel>
+    <DataTemplate.Triggers>
+      <Trigger SourceName="Row" Property="IsMouseOver" Value="True">
+        <Setter TargetName="Actions" Property="Visibility" Value="Visible" />
+      </Trigger>
+      <DataTrigger Binding="{Binding IsSelected}" Value="True">
+        <Setter TargetName="Actions" Property="Visibility" Value="Visible" />
+      </DataTrigger>
+      <DataTrigger Binding="{Binding Container.IsRunning, FallbackValue=False}" Value="True">
+        <Setter TargetName="UpButton" Property="Visibility" Value="Collapsed" />
+      </DataTrigger>
+      <DataTrigger Binding="{Binding Container.IsRunning, FallbackValue=False}" Value="False">
+        <Setter TargetName="RestartButton" Property="Visibility" Value="Collapsed" />
+      </DataTrigger>
+      <DataTrigger Binding="{Binding Container}" Value="{x:Null}">
+        <Setter TargetName="LogsButton" Property="Visibility" Value="Collapsed" />
+      </DataTrigger>
+    </DataTemplate.Triggers>
+  </DataTemplate>
+
+  <DataTemplate DataType="{x:Type tree:DockerHintViewModel}">
+    <DockPanel>
+      <TextBlock Style="{StaticResource TextBlock.NodeIcon}" />
+      <TextBlock Style="{StaticResource TextBlock.NodeText}" Foreground="{DynamicResource Brush.Text.Secondary}" Text="{Binding Title}" />
+    </DockPanel>
+  </DataTemplate>
+
+</ResourceDictionary>

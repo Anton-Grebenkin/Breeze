@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!--
+  Diagram preview tab page (ADR 0035): shows the renderer's finished SVGs, with zoom and dragging. Diagrams carry no
+  scripts of their own: the policy forbids inline handlers and scripts from markup.
+-->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:">
+<title>Diagram preview</title>
+<link rel="stylesheet" href="preview.css">
+<script src="preview.js" defer></script>
+</head>
+<body>
+<main id="viewport" tabindex="0"><div id="content"></div></main>
+</body>
+</html>

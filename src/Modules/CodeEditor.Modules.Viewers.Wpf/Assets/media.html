@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!--
+  Player page (ADR 0037): audio and video elements with the browser's controls. Playback never starts on its own.
+  The policy forbids inline scripts; media loads only from the file's folder address; no network.
+-->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; media-src https://*.codeeditor.example">
+<title>Player</title>
+<link rel="stylesheet" href="viewer.css">
+<script src="media.js" defer></script>
+</head>
+<body>
+<main id="stage"></main>
+</body>
+</html>

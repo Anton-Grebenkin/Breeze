@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="ArgumentMissing" xml:space="preserve"><value>Нет аргумента «{0}».</value></data>
+  <data name="ArgumentEmpty" xml:space="preserve"><value>Пустой аргумент «{0}».</value></data>
+  <data name="ArgumentInvalid" xml:space="preserve"><value>Аргумент «{0}» неверного вида: {1}</value></data>
+  <data name="FileForgottenAfterCompaction" xml:space="preserve"><value>{0}: после сжатия контекста текста файла в разговоре больше нет. Прочитайте нужное место read_file заново, затем правьте.</value></data>
+  <data name="FileNotRead" xml:space="preserve"><value>{0}: файл ещё не прочитан в этом чате. Сначала прочитайте нужное место read_file, затем правьте.</value></data>
+  <data name="FileChangedSinceRead" xml:space="preserve"><value>{0} изменился после вашего последнего чтения (правил пользователь или файл изменился на диске). Прочитайте нужное место заново.</value></data>
+  <data name="WorkspaceNotOpen" xml:space="preserve"><value>Рабочая папка не открыта.</value></data>
+  <data name="PathOutsideWorkspace" xml:space="preserve"><value>Путь «{0}» вне рабочей папки: доступны только файлы внутри неё.</value></data>
+  <data name="SecretFile" xml:space="preserve"><value>«{0}» похож на файл с секретами: агент его не читает и не правит. Если он нужен — попросите пользователя.</value></data>
+  <data name="ProtectedFolder" xml:space="preserve"><value>«{0}» — служебная папка (история git, результаты сборки, история чатов): агент её не правит.</value></data>
+  <data name="OutputTruncated" xml:space="preserve"><value>…(обрезано: показано {0} из {1} символов; уточните запрос)</value></data>
+  <data name="OutputOmittedLines" xml:space="preserve"><value>… пропущено строк: {0} …</value></data>
+  <data name="FrontMatterNotClosed" xml:space="preserve"><value>Шапка не закрыта: добавьте строку --- после настроек.</value></data>
+  <data name="FrontMatterBadLine" xml:space="preserve"><value>Строка {0}: ожидается «ключ: значение», пункт списка «- значение» или «имя: значение» под ключом.</value></data>
+  <data name="FrontMatterDuplicateKey" xml:space="preserve"><value>Строка {0}: «{1}» уже задан выше.</value></data>
+</root>

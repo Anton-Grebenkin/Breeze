@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="ModuleName" xml:space="preserve"><value>Поиск</value></data>
+  <data name="ViewModuleName" xml:space="preserve"><value>Поиск: представление</value></data>
+  <data name="MatchCase" xml:space="preserve"><value>Учитывать регистр</value></data>
+  <data name="WholeWord" xml:space="preserve"><value>Слово целиком</value></data>
+  <data name="UseRegex" xml:space="preserve"><value>Регулярное выражение</value></data>
+  <data name="MatchCaseToolTip" xml:space="preserve"><value>Учитывать регистр (Alt+C)</value></data>
+  <data name="WholeWordToolTip" xml:space="preserve"><value>Слово целиком (Alt+W)</value></data>
+  <data name="UseRegexToolTip" xml:space="preserve"><value>Регулярное выражение (Alt+R)</value></data>
+  <data name="ClearSearchResults" xml:space="preserve"><value>Очистить результаты поиска</value></data>
+  <data name="ClearResults" xml:space="preserve"><value>Очистить результаты</value></data>
+  <data name="ToggleCollapseAll" xml:space="preserve"><value>Свернуть или развернуть все</value></data>
+  <data name="MenuFindInFiles" xml:space="preserve"><value>Найти в _файлах</value></data>
+  <data name="QueryPlaceholder" xml:space="preserve"><value>Поиск</value></data>
+  <data name="FilePatterns" xml:space="preserve"><value>Маски файлов</value></data>
+  <data name="IncludeFiles" xml:space="preserve"><value>Включить файлы</value></data>
+  <data name="IncludeExample" xml:space="preserve"><value>например, *.cs, src/</value></data>
+  <data name="ExcludeFiles" xml:space="preserve"><value>Исключить файлы</value></data>
+  <data name="ExcludeExample" xml:space="preserve"><value>например, *.Designer.cs, docs/</value></data>
+  <data name="OpenFolderToSearch" xml:space="preserve"><value>Откройте папку, чтобы искать по файлам.</value></data>
+  <data name="CountInFiles" xml:space="preserve"><value>{0} в {1}</value></data>
+  <data name="ResultForms" xml:space="preserve"><value>результат|результата|результатов</value></data>
+  <data name="MatchForms" xml:space="preserve"><value>совпадение|совпадения|совпадений</value></data>
+  <data name="InFileForms" xml:space="preserve"><value>файле|файлах|файлах</value></data>
+  <data name="SummaryTruncated" xml:space="preserve"><value>{0}. Показаны первые — уточните запрос</value></data>
+  <data name="NothingFoundHint" xml:space="preserve"><value>Ничего не найдено. Проверьте маски и исключения</value></data>
+  <data name="LineColumn" xml:space="preserve"><value>Строка {0}, столбец {1}</value></data>
+  <data name="InvalidRegex" xml:space="preserve"><value>Неверное регулярное выражение: {0}</value></data>
+  <data name="SearchTitle" xml:space="preserve"><value>Поиск «{0}»</value></data>
+  <data name="NothingFound" xml:space="preserve"><value>ничего не найдено</value></data>
+  <data name="ToolEmptyQuery" xml:space="preserve"><value>Пустой запрос.</value></data>
+  <data name="ToolRegexFallback" xml:space="preserve"><value>(запрос — не регулярное выражение, искал как обычный текст: {0})</value></data>
+  <data name="ToolFoundAsText" xml:space="preserve"><value>(по регулярному выражению ничего не нашлось — ниже совпадения запроса как обычного текста)</value></data>
+  <data name="ToolFoundAsRegex" xml:space="preserve"><value>(как обычный текст ничего не нашлось — ниже совпадения запроса как регулярного выражения)</value></data>
+  <data name="RelatedFound" xml:space="preserve"><value>Имена из запроса, найденные в коде (буквальные совпадения — зацепки для проверки, а не доказательство причины): {0}.</value></data>
+  <data name="RelatedMissing" xml:space="preserve"><value>В коде нигде нет: {0} — вероятно, собираются во время работы (имена операций API, алиасы SQL, сообщения) или названы иначе; ищите код, который их строит, а не сам текст.</value></data>
+  <data name="RelatedFilesMore" xml:space="preserve"><value> и ещё {0}</value></data>
+  <data name="ToolNothingFound" xml:space="preserve"><value>(ничего не найдено)</value></data>
+  <data name="ToolPathNotFound" xml:space="preserve"><value>«{0}» — не файл и не папка рабочей папки.</value></data>
+  <data name="ToolIncludeMatchesNothing" xml:space="preserve"><value>(под маску «{0}»{1} не попал ни один файл — поиск не выполнялся; текст вполне может быть в других файлах.)</value></data>
+  <data name="ToolInPath" xml:space="preserve"><value> в «{0}»</value></data>
+  <data name="ToolSimilarPaths" xml:space="preserve"><value> Похожие пути в папке: {0}.</value></data>
+  <data name="ToolEmptyStreakHint" xml:space="preserve"><value>Подсказка: {0} поисков подряд ничего не нашли. Текст, который появляется во время выполнения (SQL, сгенерированные имена, сообщения об ошибках), в коде обычно не лежит: начните с точки входа из задачи и идите по цепочке вызовов (обработчики, перехватчики, сервисы, конфигурация) или отдайте вопрос explore.</value></data>
+  <data name="ToolSameFileHint" xml:space="preserve"><value>Подсказка: несколько поисков подряд по {0} — прочитайте файл через read_file (до 1000 строк за вызов).</value></data>
+  <data name="ToolCountHeader" xml:space="preserve"><value>Совпадений: {0} в {1} файлах.</value></data>
+  <data name="ToolMoreFiles" xml:space="preserve"><value>…(показано {0}–{1} из {2} файлов; продолжение — offset={3})</value></data>
+  <data name="ToolMoreMatches" xml:space="preserve"><value>…(показано {0}–{1} из {2} совпадений; продолжение — offset={3})</value></data>
+</root>

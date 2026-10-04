@@ -1,0 +1,20 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!-- Viewer toolbar buttons: Codicons glyphs and zoom text, as on the diagram preview toolbar. -->
+
+  <Style x:Key="Button.ToolbarIcon" TargetType="Button" BasedOn="{StaticResource Button.Subtle}">
+    <Setter Property="Padding" Value="4" />
+    <Setter Property="Margin" Value="4,0,0,0" />
+    <Setter Property="FontFamily" Value="{DynamicResource Font.Icons}" />
+    <Setter Property="FontSize" Value="{DynamicResource FontSize.Icon}" />
+  </Style>
+
+  <Style x:Key="Button.ToolbarText" TargetType="Button" BasedOn="{StaticResource Button.Subtle}">
+    <Setter Property="Padding" Value="8,4" />
+    <Setter Property="Margin" Value="4,0,0,0" />
+    <Setter Property="FontFamily" Value="{DynamicResource Font.Ui.Small}" />
+    <Setter Property="FontSize" Value="{DynamicResource FontSize.Small}" />
+  </Style>
+
+</ResourceDictionary>

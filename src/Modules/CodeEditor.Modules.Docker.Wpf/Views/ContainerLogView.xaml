@@ -1,0 +1,78 @@
+<UserControl x:Class="CodeEditor.Modules.Docker.Wpf.Views.ContainerLogView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:avalon="http://icsharpcode.net/sharpdevelop/avalonedit"
+             xmlns:tabs="clr-namespace:CodeEditor.Modules.Docker.ViewModels.Tabs;assembly=CodeEditor.Modules.Docker"
+             xmlns:ui="clr-namespace:CodeEditor.UI.Themes;assembly=CodeEditor.UI"
+             xmlns:controls="clr-namespace:CodeEditor.UI.Controls;assembly=CodeEditor.UI"
+             xmlns:res="clr-namespace:CodeEditor.Modules.Docker.Resources;assembly=CodeEditor.Modules.Docker"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=tabs:ContainerLogViewModel}"
+             AutomationProperties.AutomationId="Docker.Logs">
+  <UserControl.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="ReadOnlyTextResources.xaml" />
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </UserControl.Resources>
+
+  <!-- Stream state and text actions on top, the log below. -->
+  <DockPanel>
+    <Border DockPanel.Dock="Top" Padding="8,2,4,2" BorderThickness="0,0,0,1" BorderBrush="{DynamicResource Brush.Border}">
+      <DockPanel>
+        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+          <ToggleButton Style="{StaticResource ToggleButton.Toolbar}"
+                        Content="{Binding Source=fold-down, Converter={x:Static controls:IconGlyphConverter.Instance}}"
+                        ToolTip="{x:Static res:Strings.AutoScrollToolTip}"
+                        IsChecked="{Binding AutoScroll}"
+                        AutomationProperties.AutomationId="Docker.Logs.AutoScroll" AutomationProperties.Name="{x:Static res:Strings.AutoScroll}" />
+          <ToggleButton Style="{StaticResource ToggleButton.Toolbar}"
+                        Content="{Binding Source=word-wrap, Converter={x:Static controls:IconGlyphConverter.Instance}}"
+                        ToolTip="{x:Static res:Strings.WordWrap}"
+                        IsChecked="{Binding WordWrap}"
+                        AutomationProperties.AutomationId="Docker.Logs.WordWrap" AutomationProperties.Name="{x:Static res:Strings.WordWrap}" />
+          <Button Margin="4,0,0,0" Style="{StaticResource Button.Toolbar}" Content="{x:Static ui:IconGlyphs.Search}" ToolTip="{x:Static res:Strings.FindInLog}"
+                  Click="OnFindClick"
+                  AutomationProperties.AutomationId="Docker.Logs.Find" AutomationProperties.Name="{x:Static res:Strings.FindInLog}" />
+          <Button Style="{StaticResource Button.Toolbar}" Content="{x:Static ui:IconGlyphs.Refresh}" ToolTip="{x:Static res:Strings.ReconnectToolTip}"
+                  Command="{Binding StartCommand}"
+                  AutomationProperties.AutomationId="Docker.Logs.Reconnect" AutomationProperties.Name="{x:Static res:Strings.Reconnect}" />
+          <Button Style="{StaticResource Button.Toolbar}" Content="{x:Static ui:IconGlyphs.ClearAll}" ToolTip="{x:Static res:Strings.ClearLog}"
+                  Command="{Binding ClearCommand}"
+                  AutomationProperties.AutomationId="Docker.Logs.Clear" AutomationProperties.Name="{x:Static res:Strings.ClearLog}" />
+        </StackPanel>
+        <TextBlock x:Name="Status" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                   FontSize="{DynamicResource FontSize.Small}"
+                   Text="{Binding Status}"
+                   AutomationProperties.AutomationId="Docker.Logs.Status">
+          <TextBlock.Style>
+            <Style TargetType="TextBlock">
+              <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Secondary}" />
+              <Style.Triggers>
+                <DataTrigger Binding="{Binding State}" Value="{x:Static tabs:LogState.Failed}">
+                  <Setter Property="Foreground" Value="{DynamicResource Brush.Error.Foreground}" />
+                </DataTrigger>
+              </Style.Triggers>
+            </Style>
+          </TextBlock.Style>
+        </TextBlock>
+      </DockPanel>
+    </Border>
+
+    <avalon:TextEditor x:Name="Editor"
+                       Padding="4,0,0,0"
+                       ShowLineNumbers="False"
+                       WordWrap="{Binding WordWrap}"
+                       HorizontalScrollBarVisibility="Auto"
+                       VerticalScrollBarVisibility="Auto"
+                       Background="{DynamicResource Brush.Editor.Background}"
+                       Foreground="{DynamicResource Brush.Editor.Foreground}"
+                       FontFamily="{DynamicResource Font.Code}"
+                       FontSize="{DynamicResource FontSize.Code}"
+                       AutomationProperties.AutomationId="Docker.Logs.Text"
+                       AutomationProperties.Name="{x:Static res:Strings.LogText}" />
+  </DockPanel>
+</UserControl>

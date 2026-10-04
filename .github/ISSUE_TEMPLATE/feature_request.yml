@@ -1,0 +1,22 @@
+name: Предложение
+description: Новая возможность или улучшение
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Какую задачу это решает
+      description: Что сейчас неудобно или невозможно. Опишите задачу, а не только решение.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Как это могло бы работать
+      description: Команда, пункт меню, сочетание клавиш, поведение агента. Можно сослаться на VS Code, Visual Studio или Rider.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Как вы обходитесь сейчас

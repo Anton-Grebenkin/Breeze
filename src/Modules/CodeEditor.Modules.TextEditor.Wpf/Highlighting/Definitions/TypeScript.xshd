@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<!--
+  TypeScript: JavaScript rules plus TypeScript words (declarations, modifiers, type operators, built-in types).
+  Member access (obj.type) and a key before a colon ({ type: 1 }) are not keywords: those JavaScript rules come
+  first. Color names are theme tokens (ADR 0036).
+-->
+<SyntaxDefinition name="TypeScript" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+  <Color name="Keyword" />
+  <Color name="Type" />
+
+  <RuleSet>
+    <Import ruleSet="JavaScript/" />
+    <Keywords color="Keyword">
+      <Word>interface</Word>
+      <Word>type</Word>
+      <Word>enum</Word>
+      <Word>namespace</Word>
+      <Word>module</Word>
+      <Word>declare</Word>
+      <Word>abstract</Word>
+      <Word>readonly</Word>
+      <Word>public</Word>
+      <Word>private</Word>
+      <Word>protected</Word>
+      <Word>implements</Word>
+      <Word>override</Word>
+      <Word>keyof</Word>
+      <Word>infer</Word>
+      <Word>is</Word>
+      <Word>asserts</Word>
+      <Word>satisfies</Word>
+      <Word>unique</Word>
+      <Word>accessor</Word>
+    </Keywords>
+    <Keywords color="Type">
+      <Word>string</Word>
+      <Word>number</Word>
+      <Word>boolean</Word>
+      <Word>bigint</Word>
+      <Word>symbol</Word>
+      <Word>object</Word>
+      <Word>any</Word>
+      <Word>unknown</Word>
+      <Word>never</Word>
+    </Keywords>
+  </RuleSet>
+</SyntaxDefinition>

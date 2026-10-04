@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="ModuleName" xml:space="preserve"><value>File Viewers</value></data>
+  <data name="ViewModuleName" xml:space="preserve"><value>File viewer views</value></data>
+  <!-- File sizes. -->
+  <data name="ByteForms" xml:space="preserve"><value>byte|bytes</value></data>
+  <data name="SizeKilobytes" xml:space="preserve"><value>{0} KB</value></data>
+  <data name="SizeMegabytes" xml:space="preserve"><value>{0} MB</value></data>
+  <data name="SizeGigabytes" xml:space="preserve"><value>{0} GB</value></data>
+  <data name="SizeTerabytes" xml:space="preserve"><value>{0} TB</value></data>
+  <data name="SizeExact" xml:space="preserve"><value>{0} ({1})</value></data>
+  <!-- Tab toolbar info. -->
+  <data name="ImageSummary" xml:space="preserve"><value>{0} × {1} · {2} · {3}</value></data>
+  <data name="FileSummary" xml:space="preserve"><value>{0} · {1}</value></data>
+  <data name="PixelDimensions" xml:space="preserve"><value>{0} × {1}</value></data>
+  <data name="VideoFormat" xml:space="preserve"><value>Video {0}</value></data>
+  <data name="AudioFormat" xml:space="preserve"><value>Audio {0}</value></data>
+  <data name="ImageReduced" xml:space="preserve"><value>Shown reduced to {0} × {1} to save memory.</value></data>
+  <data name="ImageFirstFrame" xml:space="preserve"><value>Frame 1 of {0} is shown: the animation is not played.</value></data>
+  <data name="ImageFirstPage" xml:space="preserve"><value>Page 1 of {0} is shown.</value></data>
+  <data name="HexOffsetHeader" xml:space="preserve"><value>Offset</value></data>
+  <data name="HexTextHeader" xml:space="preserve"><value>Text</value></data>
+  <data name="HexTruncated" xml:space="preserve"><value>Only the first 32 GB of the file are shown.</value></data>
+  <!-- Errors. -->
+  <data name="ViewerLoadFailed" xml:space="preserve"><value>The file cannot be shown: {0}</value></data>
+  <data name="OpenExternalFailed" xml:space="preserve"><value>The file cannot be opened in an external application: {0}</value></data>
+  <data name="FileMissing" xml:space="preserve"><value>The file was deleted or moved.</value></data>
+  <data name="WebPCodecMissing" xml:space="preserve"><value>Windows has no WebP decoder. Install “WebP Image Extensions” from Microsoft Store or open the file in an external application.</value></data>
+  <data name="ImageCodecMissing" xml:space="preserve"><value>Windows has no decoder for {0} images. Open the file in an external application.</value></data>
+  <data name="ImageDamaged" xml:space="preserve"><value>The image is damaged or the file is not an image: {0}</value></data>
+  <data name="SvgInvalid" xml:space="preserve"><value>The SVG cannot be drawn: the file is not valid SVG. Open it as text to fix it.</value></data>
+  <data name="MediaUnsupported" xml:space="preserve"><value>The built-in player cannot play this file: the codec or the format is not supported. Open it in an external application.</value></data>
+  <data name="WebViewUnavailable" xml:space="preserve"><value>The built-in viewer (WebView2) is not available: {0}</value></data>
+  <!-- Go to offset. -->
+  <data name="GoToOffsetPlaceholder" xml:space="preserve"><value>Offset: 0x1F40 (hexadecimal) or 8000 (decimal)</value></data>
+  <data name="GoToOffsetEmptyFile" xml:space="preserve"><value>The file is empty: there is nowhere to go.</value></data>
+  <data name="GoToOffsetRange" xml:space="preserve"><value>Type an offset from 0 to {0}.</value></data>
+  <data name="GoToOffsetItem" xml:space="preserve"><value>Go to {0} ({1})</value></data>
+  <data name="OffsetHexadecimal" xml:space="preserve"><value>hexadecimal</value></data>
+  <data name="OffsetDecimal" xml:space="preserve"><value>decimal</value></data>
+  <!-- Tab toolbar and element names. -->
+  <data name="Refresh" xml:space="preserve"><value>Refresh</value></data>
+  <data name="OpenExternal" xml:space="preserve"><value>Open in External Application</value></data>
+  <data name="OpenAsText" xml:space="preserve"><value>Open as Text</value></data>
+  <data name="Loading" xml:space="preserve"><value>Loading…</value></data>
+  <data name="ZoomIn" xml:space="preserve"><value>Zoom In</value></data>
+  <data name="ZoomOut" xml:space="preserve"><value>Zoom Out</value></data>
+  <data name="ZoomActualSize" xml:space="preserve"><value>Actual Size (100%)</value></data>
+  <data name="ZoomToFit" xml:space="preserve"><value>Fit to Window</value></data>
+  <data name="GoToOffset" xml:space="preserve"><value>Go to Offset…</value></data>
+  <data name="Picture" xml:space="preserve"><value>Image</value></data>
+  <data name="Player" xml:space="preserve"><value>Player</value></data>
+  <data name="Bytes" xml:space="preserve"><value>Bytes</value></data>
+  <!-- Commands. -->
+  <data name="Category" xml:space="preserve"><value>File Viewer</value></data>
+  <data name="CommandRefresh" xml:space="preserve"><value>Refresh</value></data>
+  <data name="CommandOpenExternal" xml:space="preserve"><value>Open in External Application</value></data>
+  <data name="CommandOpenAsText" xml:space="preserve"><value>Open SVG as Text</value></data>
+  <data name="CommandZoomIn" xml:space="preserve"><value>Zoom In</value></data>
+  <data name="CommandZoomOut" xml:space="preserve"><value>Zoom Out</value></data>
+  <data name="CommandZoomActualSize" xml:space="preserve"><value>Actual Size (100%)</value></data>
+  <data name="CommandZoomToFit" xml:space="preserve"><value>Fit to Window</value></data>
+  <data name="CommandGoToOffset" xml:space="preserve"><value>Go to Offset…</value></data>
+  <data name="MenuZoomIn" xml:space="preserve"><value>Zoom _In</value></data>
+  <data name="MenuZoomOut" xml:space="preserve"><value>Zoom _Out</value></data>
+  <data name="MenuZoomActualSize" xml:space="preserve"><value>_Actual Size</value></data>
+  <data name="MenuZoomToFit" xml:space="preserve"><value>_Fit to Window</value></data>
+  <data name="MenuGoToOffset" xml:space="preserve"><value>_Go to Offset…</value></data>
+  <data name="MenuOpenAsText" xml:space="preserve"><value>Open as _Text</value></data>
+  <data name="MenuRefresh" xml:space="preserve"><value>Re_fresh</value></data>
+  <data name="MenuOpenExternal" xml:space="preserve"><value>Open in E_xternal Application</value></data>
+</root>

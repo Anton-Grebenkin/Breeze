@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<!--
+  JSX and TSX: TypeScript rules plus elements. An element starts where a comparison or type parameters are impossible:
+  < after an operator, bracket, line start or return, directly followed by a name (Array<string>, a < b, <T,> are not
+  elements). Inside a tag: attributes, strings and {expressions}; after > the content up to the closing tag: text,
+  nested elements and {expressions}. Color names are theme tokens (ADR 0036).
+-->
+<SyntaxDefinition name="Jsx" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+  <Color name="Comment" />
+  <Color name="String" />
+  <Color name="Keyword" />
+  <Color name="Tag" />
+  <Color name="Attribute" />
+
+  <RuleSet>
+    <Span multiline="true" ruleSet="Element">
+      <Begin color="Tag">
+        (?&lt;=(?:^|[^\w$)\]\s]|\b(?:return|yield|await|default|case|else|do))\s*)
+        &lt;(?&gt;[A-Za-z_$][\w$.:-]*)(?=[\s/&gt;]|$)(?!\s+extends\b)
+      </Begin>
+      <End color="Tag">/&gt;|&lt;/(?&gt;[\w$.:-]*)\s*&gt;</End>
+    </Span>
+    <Span multiline="true" ruleSet="Content">
+      <Begin color="Tag">(?&lt;=(?:^|[^\w$)\]\s]|\b(?:return|yield|await|default|case|else|do))\s*)&lt;&gt;</Begin>
+      <End color="Tag">&lt;/&gt;</End>
+    </Span>
+    <!-- A closing tag without a recognized opening tag. -->
+    <Rule color="Tag">&lt;/(?&gt;[\w$.:-]*)\s*&gt;</Rule>
+    <Import ruleSet="TypeScript/" />
+  </RuleSet>
+
+  <!-- Tag: attributes up to > or />. -->
+  <RuleSet name="Element">
+    <Span color="Comment" multiline="true" begin="/\*" end="\*/" />
+    <Span color="String" begin="&quot;" end="&quot;" />
+    <Span color="String" begin="'" end="'" />
+    <Span multiline="true" ruleSet="Code">
+      <Begin color="Keyword">\{</Begin>
+      <End color="Keyword">\}</End>
+    </Span>
+    <Span multiline="true" ruleSet="Content">
+      <Begin color="Tag">&gt;</Begin>
+      <End>(?=&lt;/)</End>
+    </Span>
+    <Rule color="Attribute">[A-Za-z_$][\w$:-]*</Rule>
+  </RuleSet>
+
+  <!-- Element content: text without code rules (the apostrophe in "Don't" doesn't open a string). -->
+  <RuleSet name="Content">
+    <Span multiline="true" ruleSet="Code">
+      <Begin color="Keyword">\{</Begin>
+      <End color="Keyword">\}</End>
+    </Span>
+    <Span multiline="true" ruleSet="Element">
+      <Begin color="Tag">&lt;(?&gt;[A-Za-z_$][\w$.:-]*)</Begin>
+      <End color="Tag">/&gt;|&lt;/(?&gt;[\w$.:-]*)\s*&gt;</End>
+    </Span>
+    <Span multiline="true" ruleSet="Content">
+      <Begin color="Tag">&lt;&gt;</Begin>
+      <End color="Tag">&lt;/&gt;</End>
+    </Span>
+  </RuleSet>
+
+  <!-- {Expression}: nested braces are balanced; the rest uses the main rule set. -->
+  <RuleSet name="Code">
+    <Span multiline="true" begin="\{" end="\}" ruleSet="Code" />
+    <Import ruleSet="" />
+  </RuleSet>
+</SyntaxDefinition>

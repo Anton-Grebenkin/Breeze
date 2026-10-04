@@ -1,0 +1,57 @@
+<UserControl x:Class="CodeEditor.Modules.TextEditor.Wpf.Views.TextEditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:avalon="http://icsharpcode.net/sharpdevelop/avalonedit"
+             xmlns:ui="clr-namespace:CodeEditor.UI.Themes;assembly=CodeEditor.UI"
+             xmlns:res="clr-namespace:CodeEditor.Modules.TextEditor.Resources;assembly=CodeEditor.Modules.TextEditor"
+             xmlns:vm="clr-namespace:CodeEditor.Modules.TextEditor.ViewModels;assembly=CodeEditor.Modules.TextEditor"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:TextEditorViewModel}">
+  <DockPanel>
+    <!-- Agent changes bar above the editor, like Copilot's: summary, navigation, accept or reject all. -->
+    <Border DockPanel.Dock="Top" Padding="8,4" BorderThickness="0,0,0,1"
+            DataContext="{Binding AgentChanges}"
+            Background="{DynamicResource Brush.Widget.Background}"
+            BorderBrush="{DynamicResource Brush.Widget.Border}"
+            Visibility="{Binding HasChanges, Converter={StaticResource BoolToVisibility}, FallbackValue=Collapsed}"
+            AutomationProperties.AutomationId="TextEditor.AgentChanges">
+      <DockPanel>
+        <Button DockPanel.Dock="Right" Margin="4,0,0,0" Padding="8,2" Style="{StaticResource Button.Subtle}" Content="{x:Static res:Strings.RejectAll}"
+                ToolTip="{x:Static res:Strings.RejectAllToolTip}" Command="{Binding RejectAllCommand}"
+                AutomationProperties.AutomationId="TextEditor.AgentChanges.RejectAll" />
+        <Button DockPanel.Dock="Right" Padding="8,2" Style="{StaticResource Button.Primary}" Content="{x:Static res:Strings.AcceptAll}"
+                ToolTip="{x:Static res:Strings.AcceptAllToolTip}" Command="{Binding AcceptAllCommand}"
+                AutomationProperties.AutomationId="TextEditor.AgentChanges.AcceptAll" />
+        <Button DockPanel.Dock="Right" Margin="0,0,8,0" Style="{StaticResource Button.Subtle}" Padding="6,2" Content="{x:Static ui:IconGlyphs.ArrowDown}"
+                ToolTip="{x:Static res:Strings.NextChangeToolTip}" Command="{Binding NextCommand}"
+                CommandParameter="{Binding DataContext.CaretLine, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                AutomationProperties.AutomationId="TextEditor.AgentChanges.Next" AutomationProperties.Name="{x:Static res:Strings.NextAgentChange}" />
+        <Button DockPanel.Dock="Right" Style="{StaticResource Button.Subtle}" Padding="6,2" Content="{x:Static ui:IconGlyphs.ArrowUp}"
+                ToolTip="{x:Static res:Strings.PreviousChangeToolTip}" Command="{Binding PreviousCommand}"
+                CommandParameter="{Binding DataContext.CaretLine, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                AutomationProperties.AutomationId="TextEditor.AgentChanges.Previous" AutomationProperties.Name="{x:Static res:Strings.PreviousAgentChange}" />
+        <TextBlock VerticalAlignment="Center" Foreground="{DynamicResource Brush.Text.Primary}" Text="{Binding Summary}"
+                   AutomationProperties.AutomationId="TextEditor.AgentChanges.Summary" />
+      </DockPanel>
+    </Border>
+    <!--
+      Display formatting mode, as in Visual Studio: monospace text snapped to pixels is crisper. Grayscale
+      antialiasing like the rest of the window, without ClearType color fringes (ADR 0038).
+    -->
+    <avalon:TextEditor x:Name="Editor"
+                       Padding="4,0,0,0"
+                       ShowLineNumbers="{Binding Settings.ShowLineNumbers}"
+                       WordWrap="{Binding Settings.WordWrap}"
+                       HorizontalScrollBarVisibility="Auto"
+                       VerticalScrollBarVisibility="Auto"
+                       Background="{DynamicResource Brush.Editor.Background}"
+                       Foreground="{DynamicResource Brush.Editor.Foreground}"
+                       LineNumbersForeground="{DynamicResource Brush.Editor.LineNumber}"
+                       FontSize="{Binding Settings.FontSize}"
+                       TextOptions.TextFormattingMode="Display"
+                       AutomationProperties.AutomationId="TextEditor"
+                       AutomationProperties.Name="{Binding Document.Name}" />
+  </DockPanel>
+</UserControl>

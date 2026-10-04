@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Shell views: main window, palette, tool windows, keyboard, theme. -->
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CodeEditor.Core\CodeEditor.Core.csproj" />
+    <ProjectReference Include="..\CodeEditor.Shell\CodeEditor.Shell.csproj" />
+    <ProjectReference Include="..\CodeEditor.UI\CodeEditor.UI.csproj" />
+  </ItemGroup>
+
+</Project>

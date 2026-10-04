@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="ModuleName" xml:space="preserve"><value>Documents</value></data>
+  <data name="ViewModuleName" xml:space="preserve"><value>Document viewers</value></data>
+  <!-- Document content for the model and the viewer. -->
+  <data name="ImagePlaceholder" xml:space="preserve"><value>[image: {0}]</value></data>
+  <data name="ImageWithoutName" xml:space="preserve"><value>[image]</value></data>
+  <data name="NotesLabel" xml:space="preserve"><value>Notes:</value></data>
+  <data name="SlideNumber" xml:space="preserve"><value>Slide {0}</value></data>
+  <data name="EmptyCell" xml:space="preserve"><value>(empty)</value></data>
+  <data name="EmptySheet" xml:space="preserve"><value>empty</value></data>
+  <data name="HiddenSheet" xml:space="preserve"><value>hidden</value></data>
+  <data name="HiddenSheetTitle" xml:space="preserve"><value>{0} (hidden)</value></data>
+  <!-- File read errors. -->
+  <data name="NotOfficeDocument" xml:space="preserve"><value>The file is not a Word, Excel or PowerPoint document, is damaged or is protected with a password.</value></data>
+  <data name="CsvIsBinary" xml:space="preserve"><value>The file is binary, not CSV text.</value></data>
+  <data name="PdfEncrypted" xml:space="preserve"><value>The PDF is protected with a password.</value></data>
+  <data name="NotPdf" xml:space="preserve"><value>The file is not a PDF, or it is damaged.</value></data>
+  <data name="PdfCannotImport" xml:space="preserve"><value>Pages cannot be taken from this PDF.</value></data>
+  <data name="NoPdfFonts" xml:space="preserve"><value>No Windows fonts with Cyrillic letters were found (Segoe UI, Arial or Tahoma): the PDF cannot be created.</value></data>
+  <!-- Model tool replies: reading. -->
+  <data name="UnsupportedFormat" xml:space="preserve"><value>'{0}' is not a supported document. Supported: {1}. Other files are read with read_file.</value></data>
+  <data name="FileNotFound" xml:space="preserve"><value>'{0}' was not found.</value></data>
+  <data name="PathIsFolder" xml:space="preserve"><value>'{0}' is a folder, not a document.</value></data>
+  <data name="FileNotReadable" xml:space="preserve"><value>'{0}' cannot be read: {1}</value></data>
+  <data name="FileNotWritable" xml:space="preserve"><value>'{0}' cannot be written: {1} The file may be open in Word or Excel — ask the user to close it.</value></data>
+  <data name="DocumentNotReadable" xml:space="preserve"><value>'{0}' cannot be read: {1}</value></data>
+  <data name="PdfHeader" xml:space="preserve"><value>{0}: PDF, {1} pages.</value></data>
+  <data name="PageMarker" xml:space="preserve"><value>--- page {0} ---</value></data>
+  <data name="PageWithoutText" xml:space="preserve"><value>(no text on the page)</value></data>
+  <data name="PdfWithoutText" xml:space="preserve"><value>The PDF has no text layer: it looks like scanned images, and text recognition is not available.</value></data>
+  <data name="MorePages" xml:space="preserve"><value>Shown pages {0} of {1}. Read the rest with pages: '{2}-'.</value></data>
+  <data name="InvalidPages" xml:space="preserve"><value>Pages '{0}' are not valid: use '3', '2-5' or '1,4-6' within 1–{1}.</value></data>
+  <data name="SheetList" xml:space="preserve"><value>Sheets: {0}</value></data>
+  <data name="SheetHeader" xml:space="preserve"><value>Sheet '{0}', {1}:</value></data>
+  <data name="SheetIsEmpty" xml:space="preserve"><value>Sheet '{0}' is empty.</value></data>
+  <data name="MoreRows" xml:space="preserve"><value>Shown {0} of {1} rows with data. Read the rest with range: '{2}'.</value></data>
+  <data name="MoreColumns" xml:space="preserve"><value>Columns {0}–{1} are not shown: read them with range.</value></data>
+  <data name="InvalidRange" xml:space="preserve"><value>Range '{0}' is not valid: use 'A1:F50', 'B:D' or '10:40'.</value></data>
+  <data name="RangeHasNoData" xml:space="preserve"><value>Range '{0}' of sheet '{1}' has no data: the used range is {2}.</value></data>
+  <data name="SheetNotFound" xml:space="preserve"><value>No sheet '{0}' in the workbook. Sheets: {1}.</value></data>
+  <data name="NotWorksheet" xml:space="preserve"><value>'{0}' is a chart sheet, not a sheet with cells.</value></data>
+  <!-- Model tool replies: editing. -->
+  <data name="UnknownAction" xml:space="preserve"><value>Unknown action '{0}'. Use one of: {1}.</value></data>
+  <data name="ArgumentRequired" xml:space="preserve"><value>The {0} action needs the {1} argument.</value></data>
+  <data name="WrongFormatForAction" xml:space="preserve"><value>The {0} action works with {1} files, not '{2}'.</value></data>
+  <data name="FileExists" xml:space="preserve"><value>'{0}' already exists. Change it with the editing actions, or set overwrite: true to replace it.</value></data>
+  <data name="TextNotFound" xml:space="preserve"><value>Text '{0}' was not found in the document. Read the document and copy the text exactly, without Markdown marks; it must be within one paragraph.</value></data>
+  <data name="TextFoundManyTimes" xml:space="preserve"><value>Text '{0}' occurs {1} times. Add neighbouring words to make it unique, or set all: true to replace every occurrence.</value></data>
+  <data name="AnchorNotUnique" xml:space="preserve"><value>Text '{0}' occurs in more than one paragraph: add words to make it unique.</value></data>
+  <data name="FormulaUnbalanced" xml:space="preserve"><value>'{0}' is not a valid formula: parentheses or quotes are not balanced. To write text that starts with '=', begin it with an apostrophe: '=text.</value></data>
+  <data name="FormulaSemicolon" xml:space="preserve"><value>The formula '{0}' separates arguments with ';'. In the file formulas use commas and English function names: =SUM(A1,A2), =IF(B2>0,"yes","no").</value></data>
+  <data name="FormulaLocalized" xml:space="preserve"><value>The formula '{0}' uses a localized function name. In the file functions are English: SUM, IF, VLOOKUP.</value></data>
+  <data name="TableHeaderNotText" xml:space="preserve"><value>{0} is a column header of the table '{1}': only a non-empty text can be written there — it becomes the column name.</value></data>
+  <data name="TableHeaderTaken" xml:space="preserve"><value>The table '{1}' already has a column '{0}': column names in a table must differ.</value></data>
+  <data name="InvalidCellAddress" xml:space="preserve"><value>'{0}' is not a cell address: use A1, B12, AA3.</value></data>
+  <data name="InvalidSheetName" xml:space="preserve"><value>'{0}' is not a valid sheet name: 1–{1} characters, without : \ / ? * [ ] and without an apostrophe at the start or end.</value></data>
+  <data name="SheetExists" xml:space="preserve"><value>The workbook already has a sheet '{0}'.</value></data>
+  <data name="NotPdfSource" xml:space="preserve"><value>'{0}' is not a PDF: only PDF pages can be joined.</value></data>
+  <data name="DocumentCreated" xml:space="preserve"><value>{0} is written.</value></data>
+  <data name="TextReplaced" xml:space="preserve"><value>Replaced {0} time(s) in {1}; the formatting is kept.</value></data>
+  <data name="BlocksInserted" xml:space="preserve"><value>Inserted {0} block(s) into {1}.</value></data>
+  <data name="WorkbookCreated" xml:space="preserve"><value>{0} is written; sheets: {1}.</value></data>
+  <data name="CellsWritten" xml:space="preserve"><value>Wrote {0} cell(s) on sheet '{1}' of {2}.</value></data>
+  <data name="FormulasRecalculated" xml:space="preserve"><value>Excel recalculates formulas when the file is opened; until then the document tool shows the values saved before.</value></data>
+  <data name="SheetAdded" xml:space="preserve"><value>Added sheet '{0}' to {1}.</value></data>
+  <data name="SheetRenamed" xml:space="preserve"><value>Renamed sheet '{0}' to '{1}' in {2}; references to it in formulas, names and charts are updated.</value></data>
+  <data name="PdfCreated" xml:space="preserve"><value>{0} is written: {1} pages.</value></data>
+  <data name="PreviousInRecycleBin" xml:space="preserve"><value>The previous file is in the Recycle Bin.</value></data>
+  <data name="PreviewNotShown" xml:space="preserve"><value>Nothing was changed: the confirmation card could not be prepared (the file may have been busy), so the user has not seen this change. Call again.</value></data>
+  <data name="ChangedSincePreview" xml:space="preserve"><value>Nothing was changed: {0} changed after the user saw the confirmation card. Read it again and repeat the change.</value></data>
+  <data name="SourcePages" xml:space="preserve"><value>{0}: pages {1} ({2})</value></data>
+  <data name="TotalPages" xml:space="preserve"><value>Total: {0} pages</value></data>
+  <!-- Approval cards. -->
+  <data name="ApprovalWordCreate" xml:space="preserve"><value>The agent wants to write a Word document</value></data>
+  <data name="ApprovalWordEdit" xml:space="preserve"><value>The agent wants to change a Word document</value></data>
+  <data name="ApprovalExcelCreate" xml:space="preserve"><value>The agent wants to write an Excel workbook</value></data>
+  <data name="ApprovalExcelEdit" xml:space="preserve"><value>The agent wants to change an Excel workbook</value></data>
+  <data name="ApprovalPdfCreate" xml:space="preserve"><value>The agent wants to write a PDF</value></data>
+  <data name="ApprovalPdfCombine" xml:space="preserve"><value>The agent wants to put PDF pages together</value></data>
+  <!-- Agent feed lines. -->
+  <data name="FeedReadRunning" xml:space="preserve"><value>Reading {0}</value></data>
+  <data name="FeedReadDone" xml:space="preserve"><value>Read {0}</value></data>
+  <data name="FeedCreateRunning" xml:space="preserve"><value>Writing {0}</value></data>
+  <data name="FeedCreateDone" xml:space="preserve"><value>Written {0}</value></data>
+  <data name="FeedEditRunning" xml:space="preserve"><value>Changing {0}</value></data>
+  <data name="FeedEditDone" xml:space="preserve"><value>Changed {0}</value></data>
+  <data name="FeedCombineRunning" xml:space="preserve"><value>Putting pages into {0}</value></data>
+  <data name="FeedCombineDone" xml:space="preserve"><value>Pages put into {0}</value></data>
+  <data name="FeedPages" xml:space="preserve"><value>pages {0}</value></data>
+  <data name="FeedSheet" xml:space="preserve"><value>sheet '{0}'</value></data>
+  <data name="FeedReplace" xml:space="preserve"><value>'{0}' → '{1}'</value></data>
+  <data name="CellForms" xml:space="preserve"><value>cell|cells</value></data>
+  <!-- Viewers. -->
+  <data name="ViewerLoadFailed" xml:space="preserve"><value>The file cannot be shown: {0}</value></data>
+  <data name="OpenExternalFailed" xml:space="preserve"><value>The file cannot be opened in an external application: {0}</value></data>
+  <data name="FileMissing" xml:space="preserve"><value>The file was deleted or moved.</value></data>
+  <data name="SlideForms" xml:space="preserve"><value>slide|slides</value></data>
+  <data name="RowForms" xml:space="preserve"><value>row|rows</value></data>
+  <data name="ColumnForms" xml:space="preserve"><value>column|columns</value></data>
+  <data name="Refresh" xml:space="preserve"><value>Refresh</value></data>
+  <data name="OpenExternal" xml:space="preserve"><value>Open in External Application</value></data>
+  <data name="OpenAsText" xml:space="preserve"><value>Open as Text</value></data>
+  <data name="Loading" xml:space="preserve"><value>Loading…</value></data>
+  <data name="Truncated" xml:space="preserve"><value>Only part of the sheet is shown: open the file in an external application to see it all.</value></data>
+  <data name="DocumentTruncated" xml:space="preserve"><value>The document is long: only its beginning is shown. Open it in an external application to see it all.</value></data>
+  <data name="SheetTabs" xml:space="preserve"><value>Sheets</value></data>
+  <data name="Cells" xml:space="preserve"><value>Cells</value></data>
+  <data name="Document" xml:space="preserve"><value>Document</value></data>
+  <data name="PdfUnavailable" xml:space="preserve"><value>The built-in PDF viewer is not available: {0}</value></data>
+  <!-- Commands. -->
+  <data name="CategoryDocuments" xml:space="preserve"><value>Documents</value></data>
+  <data name="CommandRefresh" xml:space="preserve"><value>Refresh Document</value></data>
+  <data name="CommandOpenExternal" xml:space="preserve"><value>Open in External Application</value></data>
+  <data name="CommandOpenAsText" xml:space="preserve"><value>Open CSV as Text</value></data>
+  <data name="MenuRefresh" xml:space="preserve"><value>Re_fresh</value></data>
+  <data name="MenuOpenExternal" xml:space="preserve"><value>Open in E_xternal Application</value></data>
+  <data name="MenuOpenAsText" xml:space="preserve"><value>Open as _Text</value></data>
+</root>

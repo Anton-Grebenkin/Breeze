@@ -1,0 +1,110 @@
+<?xml version="1.0"?>
+<!--
+  Mermaid: %% comments, %%{init: …}%% directives, diagram types and keywords, arrows and links, strings, node labels
+  A[text] and B(text), link labels |text|, numbers. Color names are theme tokens (ADR 0036).
+-->
+<SyntaxDefinition name="Mermaid" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+  <Color name="Comment" />
+  <Color name="String" />
+  <Color name="Number" />
+  <Color name="Keyword" />
+  <Color name="ControlKeyword" />
+  <Color name="Preprocessor" />
+
+  <RuleSet>
+    <Span color="Preprocessor" multiline="true" begin="%%\{" end="\}%%" />
+    <Span color="Comment" begin="%%" />
+    <Span color="String" begin="&quot;" end="&quot;" />
+    <Span color="String" begin="(?&lt;=\w)\[" end="\]" />
+    <Span color="String" begin="(?&lt;=\w)\(\(" end="\)\)" />
+    <Span color="String" begin="(?&lt;=\w)\((?!\()" end="\)" />
+    <Rule color="String">\|[^|\r\n]*\|</Rule>
+
+    <!-- Arrows and links of all diagram types: A arrow B, class inheritance, entity relationship. -->
+    <Rule color="Keyword">
+      [&lt;*]?\|?(?:-{2,}|={2,}|\.{2,}|-\.+-|~{3,})(?:&gt;{1,2}|\|?&gt;|[ox)](?!\w)|[|o]?[|}{](?!\w))?
+      | -{1,2}(?:&gt;&gt;?|x(?!\w)|\))
+    </Rule>
+
+    <Keywords color="Keyword">
+      <Word>graph</Word>
+      <Word>flowchart</Word>
+      <Word>sequenceDiagram</Word>
+      <Word>classDiagram</Word>
+      <Word>stateDiagram</Word>
+      <Word>erDiagram</Word>
+      <Word>journey</Word>
+      <Word>gantt</Word>
+      <Word>pie</Word>
+      <Word>quadrantChart</Word>
+      <Word>requirementDiagram</Word>
+      <Word>gitGraph</Word>
+      <Word>mindmap</Word>
+      <Word>timeline</Word>
+      <Word>kanban</Word>
+      <Word>zenuml</Word>
+      <Word>C4Context</Word>
+      <Word>C4Container</Word>
+      <Word>C4Component</Word>
+      <Word>C4Dynamic</Word>
+      <Word>C4Deployment</Word>
+      <Word>TB</Word>
+      <Word>TD</Word>
+      <Word>BT</Word>
+      <Word>RL</Word>
+      <Word>LR</Word>
+      <Word>subgraph</Word>
+      <Word>participant</Word>
+      <Word>actor</Word>
+      <Word>as</Word>
+      <Word>note</Word>
+      <Word>Note</Word>
+      <Word>over</Word>
+      <Word>of</Word>
+      <Word>left</Word>
+      <Word>right</Word>
+      <Word>activate</Word>
+      <Word>deactivate</Word>
+      <Word>autonumber</Word>
+      <Word>class</Word>
+      <Word>classDef</Word>
+      <Word>style</Word>
+      <Word>linkStyle</Word>
+      <Word>click</Word>
+      <Word>callback</Word>
+      <Word>call</Word>
+      <Word>href</Word>
+      <Word>section</Word>
+      <Word>title</Word>
+      <Word>dateFormat</Word>
+      <Word>axisFormat</Word>
+      <Word>excludes</Word>
+      <Word>includes</Word>
+      <Word>todayMarker</Word>
+      <Word>tickInterval</Word>
+      <Word>direction</Word>
+      <Word>state</Word>
+      <Word>accTitle</Word>
+      <Word>accDescr</Word>
+      <Word>commit</Word>
+      <Word>branch</Word>
+      <Word>checkout</Word>
+      <Word>merge</Word>
+    </Keywords>
+    <!-- Hyphenated diagram types: stateDiagram-v2, xychart-beta, sankey-beta… -->
+    <Rule color="Keyword">\b(?:stateDiagram-v2|[a-z]+-beta|cherry-pick)\b</Rule>
+    <Keywords color="ControlKeyword">
+      <Word>loop</Word>
+      <Word>alt</Word>
+      <Word>else</Word>
+      <Word>opt</Word>
+      <Word>par</Word>
+      <Word>and</Word>
+      <Word>critical</Word>
+      <Word>break</Word>
+      <Word>rect</Word>
+      <Word>end</Word>
+    </Keywords>
+    <Rule color="Number">\b\d+(?:\.\d+)?\b</Rule>
+  </RuleSet>
+</SyntaxDefinition>

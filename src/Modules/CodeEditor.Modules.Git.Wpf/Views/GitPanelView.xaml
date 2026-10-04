@@ -1,0 +1,219 @@
+<UserControl x:Class="CodeEditor.Modules.Git.Wpf.Views.GitPanelView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:CodeEditor.Modules.Git.ViewModels;assembly=CodeEditor.Modules.Git"
+             xmlns:cmd="clr-namespace:CodeEditor.Modules.Git.Commands;assembly=CodeEditor.Modules.Git"
+             xmlns:res="clr-namespace:CodeEditor.Modules.Git.Resources;assembly=CodeEditor.Modules.Git"
+             xmlns:ui="clr-namespace:CodeEditor.UI.Themes;assembly=CodeEditor.UI"
+             xmlns:controls="clr-namespace:CodeEditor.UI.Controls;assembly=CodeEditor.UI"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:GitPanelViewModel}"
+             AutomationProperties.AutomationId="Git">
+  <UserControl.Resources>
+    <ResourceDictionary Source="GitStyles.xaml" />
+  </UserControl.Resources>
+
+  <Grid>
+    <!-- No folder, no git, loading, no repository: a hint, as in VS Code. -->
+    <TextBlock Margin="16" TextWrapping="Wrap" Foreground="{DynamicResource Brush.Text.Secondary}" Text="{x:Static res:Strings.NoFolderText}"
+               Visibility="{Binding IsNoFolder, Converter={StaticResource BoolToVisibility}}" AutomationProperties.AutomationId="Git.NoFolder" />
+    <TextBlock Margin="16" TextWrapping="Wrap" Foreground="{DynamicResource Brush.Text.Secondary}" Text="{x:Static res:Strings.NoGitText}"
+               Visibility="{Binding IsNoGit, Converter={StaticResource BoolToVisibility}}" AutomationProperties.AutomationId="Git.NoGit" />
+    <TextBlock Margin="16" TextWrapping="Wrap" Foreground="{DynamicResource Brush.Text.Secondary}" Text="{x:Static res:Strings.LoadingText}"
+               Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibility}}" AutomationProperties.AutomationId="Git.Loading" />
+    <StackPanel Margin="16" Visibility="{Binding IsNotRepository, Converter={StaticResource BoolToVisibility}}">
+      <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource Brush.Text.Secondary}" Text="{x:Static res:Strings.NotRepositoryText}" />
+      <TextBox Margin="0,8,0,0" MaxHeight="120" Style="{StaticResource TextBox.Message}" Foreground="{DynamicResource Brush.Error.Foreground}"
+               Text="{Binding Repository.Error, Mode=OneWay}"
+               Visibility="{Binding Repository.Error, Converter={x:Static controls:NullToCollapsedConverter.Instance}}"
+               AutomationProperties.AutomationId="Git.LocateError" />
+      <Button Margin="0,12,0,0" HorizontalAlignment="Stretch" Style="{StaticResource Button.Primary}"
+              Content="{x:Static res:Strings.CommandInit}" Command="{Binding RunCommand}" CommandParameter="{x:Static cmd:GitCommandIds.Init}"
+              AutomationProperties.AutomationId="Git.Init" />
+    </StackPanel>
+
+    <DockPanel Visibility="{Binding IsReady, Converter={StaticResource BoolToVisibility}}">
+      <!-- Header: branch (click opens the branch picker) and actions. -->
+      <DockPanel DockPanel.Dock="Top" Height="26" Margin="8,0,4,2">
+        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+          <Button Style="{StaticResource Button.Toolbar}" Content="{x:Static ui:IconGlyphs.Refresh}" ToolTip="{x:Static res:Strings.RefreshToolTip}"
+                  Command="{Binding RunCommand}" CommandParameter="{x:Static cmd:GitCommandIds.Refresh}"
+                  AutomationProperties.AutomationId="Git.Refresh" AutomationProperties.Name="{x:Static res:Strings.RefreshToolTip}" />
+          <Button Style="{StaticResource Button.Toolbar}" ToolTip="{x:Static res:Strings.PullToolTip}" IsEnabled="{Binding CanAct}"
+                  Content="{Binding Source=repo-pull, Mode=OneTime, Converter={x:Static controls:IconGlyphConverter.Instance}}"
+                  Command="{Binding RunCommand}" CommandParameter="{x:Static cmd:GitCommandIds.Pull}"
+                  AutomationProperties.AutomationId="Git.Pull" AutomationProperties.Name="{x:Static res:Strings.PullToolTip}" />
+          <Button Style="{StaticResource Button.Toolbar}" ToolTip="{x:Static res:Strings.PushToolTip}" IsEnabled="{Binding CanAct}"
+                  Content="{Binding Source=repo-push, Mode=OneTime, Converter={x:Static controls:IconGlyphConverter.Instance}}"
+                  Command="{Binding RunCommand}" CommandParameter="{x:Static cmd:GitCommandIds.Push}"
+                  AutomationProperties.AutomationId="Git.Push" AutomationProperties.Name="{x:Static res:Strings.PushToolTip}" />
+          <Button x:Name="MoreButton" Style="{StaticResource Button.Toolbar}" Content="{x:Static ui:IconGlyphs.More}" ToolTip="{x:Static res:Strings.MoreActions}"
+                  Click="OnMoreClick" AutomationProperties.AutomationId="Git.More" AutomationProperties.Name="{x:Static res:Strings.MoreActions}">
+            <Button.ContextMenu>
+              <ContextMenu ItemsSource="{Binding MoreMenu.Items}" ItemContainerStyle="{StaticResource MenuItem.Bound}" Placement="Bottom"
+                           Opened="OnMoreMenuOpened" AutomationProperties.AutomationId="Git.MoreMenu" />
+            </Button.ContextMenu>
+          </Button>
+        </StackPanel>
+        <Button HorizontalAlignment="Left" Padding="4,0" Style="{StaticResource Button.Subtle}" ToolTip="{Binding BranchToolTip}"
+                Command="{Binding RunCommand}" CommandParameter="{x:Static cmd:GitCommandIds.Checkout}"
+                AutomationProperties.AutomationId="Git.Branch" AutomationProperties.Name="{Binding BranchText}">
+          <StackPanel Orientation="Horizontal">
+            <TextBlock VerticalAlignment="Center" FontFamily="{DynamicResource Font.Icons}" FontSize="{DynamicResource FontSize.Icon}"
+                       Foreground="{DynamicResource Brush.Text.Secondary}"
+                       Text="{Binding Source=git-branch, Mode=OneTime, Converter={x:Static controls:IconGlyphConverter.Instance}}" />
+            <TextBlock Margin="4,0,0,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" FontWeight="SemiBold"
+                       FontSize="{DynamicResource FontSize.Small}" Text="{Binding BranchText}" />
+          </StackPanel>
+        </Button>
+      </DockPanel>
+
+      <!-- Action progress and git error; the error text is selectable. -->
+      <TextBlock DockPanel.Dock="Top" Margin="12,0,8,4" FontSize="{DynamicResource FontSize.Small}" Foreground="{DynamicResource Brush.Text.Secondary}"
+                 Visibility="{Binding Repository.IsBusy, Converter={StaticResource BoolToVisibility}}" AutomationProperties.AutomationId="Git.Activity">
+        <Run FontFamily="{DynamicResource Font.Icons}" Text="{x:Static ui:IconGlyphs.Loading}" /> <Run Text="{Binding Repository.Activity, Mode=OneWay}" /><Run Text="…" />
+      </TextBlock>
+      <DockPanel DockPanel.Dock="Top" Margin="12,0,4,6"
+                 Visibility="{Binding Repository.Error, Converter={x:Static controls:NullToCollapsedConverter.Instance}}">
+        <Button DockPanel.Dock="Right" VerticalAlignment="Top" Style="{StaticResource Button.Toolbar}" Content="{x:Static ui:IconGlyphs.Close}"
+                ToolTip="{x:Static res:Strings.DismissError}" Command="{Binding DismissErrorCommand}"
+                AutomationProperties.AutomationId="Git.DismissError" AutomationProperties.Name="{x:Static res:Strings.DismissError}" />
+        <TextBox MaxHeight="140" Style="{StaticResource TextBox.Message}" Foreground="{DynamicResource Brush.Error.Foreground}"
+                 Text="{Binding Repository.Error, Mode=OneWay}" AutomationProperties.AutomationId="Git.Error" />
+      </DockPanel>
+
+      <!-- Commit message; Ctrl+Enter commits. -->
+      <TextBox x:Name="MessageInput" DockPanel.Dock="Top" Margin="12,0,8,0" MinHeight="52" MaxHeight="160"
+               Style="{StaticResource TextBox.Field}" AcceptsReturn="True" TextWrapping="Wrap"
+               Tag="{Binding Commit.Placeholder}" Text="{Binding Commit.Message, UpdateSourceTrigger=PropertyChanged}"
+               IsKeyboardFocusWithinChanged="OnMessageFocusChanged"
+               AutomationProperties.AutomationId="Git.CommitMessage" AutomationProperties.Name="{x:Static res:Strings.CommitMessageName}" />
+      <Button DockPanel.Dock="Top" Margin="12,6,8,8" HorizontalAlignment="Stretch" Style="{StaticResource Button.Primary}" IsEnabled="{Binding CanAct}"
+              Command="{Binding RunCommand}" CommandParameter="{x:Static cmd:GitCommandIds.Commit}"
+              AutomationProperties.AutomationId="Git.Commit" AutomationProperties.Name="{x:Static res:Strings.CommitButton}">
+        <StackPanel Orientation="Horizontal">
+          <TextBlock VerticalAlignment="Center" FontFamily="{DynamicResource Font.Icons}" FontSize="{DynamicResource FontSize.Icon}" Text="{x:Static ui:IconGlyphs.Check}" />
+          <TextBlock Margin="6,0,0,0" VerticalAlignment="Center" Text="{x:Static res:Strings.CommitButton}" />
+        </StackPanel>
+      </Button>
+
+      <TextBlock DockPanel.Dock="Top" Margin="12,4" Foreground="{DynamicResource Brush.Text.Secondary}" Text="{x:Static res:Strings.NoChanges}"
+                 Visibility="{Binding HasNoChanges, Converter={StaticResource BoolToVisibility}}" AutomationProperties.AutomationId="Git.NoChanges" />
+
+      <!-- Groups and files: single click previews changes, double click or Enter opens a tab. -->
+      <TreeView x:Name="Changes"
+                Style="{StaticResource TreeView.Files}"
+                ItemsSource="{Binding Changes.Groups}"
+                IsKeyboardFocusWithinChanged="OnChangesFocusChanged"
+                AutomationProperties.AutomationId="Git.Changes"
+                AutomationProperties.Name="{x:Static res:Strings.ChangesList}">
+        <TreeView.ItemContainerStyle>
+          <Style TargetType="TreeViewItem" BasedOn="{StaticResource TreeViewItem.Row}">
+            <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+            <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+            <Setter Property="ToolTip" Value="{Binding ToolTip}" />
+            <Setter Property="AutomationProperties.AutomationId" Value="{Binding AutomationId}" />
+            <Setter Property="AutomationProperties.Name" Value="{Binding Title}" />
+            <EventSetter Event="PreviewMouseRightButtonDown" Handler="OnRowRightButtonDown" />
+          </Style>
+        </TreeView.ItemContainerStyle>
+        <TreeView.Resources>
+          <HierarchicalDataTemplate DataType="{x:Type vm:GitChangeGroupViewModel}" ItemsSource="{Binding Items}">
+            <HierarchicalDataTemplate.ItemContainerStyle>
+              <Style TargetType="TreeViewItem" BasedOn="{StaticResource TreeViewItem.Row}">
+                <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+                <Setter Property="ToolTip" Value="{Binding ToolTip}" />
+                <Setter Property="AutomationProperties.AutomationId" Value="{Binding AutomationId}" />
+                <Setter Property="AutomationProperties.Name" Value="{Binding Path}" />
+                <EventSetter Event="PreviewMouseLeftButtonUp" Handler="OnChangeClick" />
+                <EventSetter Event="MouseDoubleClick" Handler="OnChangeDoubleClick" />
+                <EventSetter Event="PreviewMouseRightButtonDown" Handler="OnRowRightButtonDown" />
+              </Style>
+            </HierarchicalDataTemplate.ItemContainerStyle>
+            <DockPanel x:Name="Row" Margin="0,0,4,0" Background="Transparent">
+              <Border DockPanel.Dock="Right" Margin="4,0,0,0" VerticalAlignment="Center" Style="{StaticResource Border.Badge}">
+                <TextBlock HorizontalAlignment="Center" Text="{Binding CountText}" />
+              </Border>
+              <StackPanel x:Name="Actions" DockPanel.Dock="Right" Orientation="Horizontal" Visibility="Hidden">
+                <Button x:Name="StageAll" Style="{StaticResource Button.RowAction}" Content="{x:Static ui:IconGlyphs.Add}" ToolTip="{x:Static res:Strings.StageAllToolTip}"
+                        Command="{Binding DataContext.StageGroupCommand, RelativeSource={RelativeSource AncestorType=TreeView}}" CommandParameter="{Binding}"
+                        AutomationProperties.AutomationId="Git.Group.StageAll" AutomationProperties.Name="{x:Static res:Strings.StageAllToolTip}" />
+                <Button x:Name="UnstageAll" Style="{StaticResource Button.RowAction}" Visibility="Collapsed" ToolTip="{x:Static res:Strings.UnstageAllToolTip}"
+                        Content="{Binding Source=remove, Mode=OneTime, Converter={x:Static controls:IconGlyphConverter.Instance}}"
+                        Command="{Binding DataContext.UnstageGroupCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
+                        AutomationProperties.AutomationId="Git.Group.UnstageAll" AutomationProperties.Name="{x:Static res:Strings.UnstageAllToolTip}" />
+              </StackPanel>
+              <TextBlock VerticalAlignment="Center" TextTrimming="CharacterEllipsis" FontWeight="SemiBold" Text="{Binding Title}" />
+            </DockPanel>
+            <HierarchicalDataTemplate.Triggers>
+              <DataTrigger Binding="{Binding IsStaged}" Value="True">
+                <Setter TargetName="StageAll" Property="Visibility" Value="Collapsed" />
+                <Setter TargetName="UnstageAll" Property="Visibility" Value="Visible" />
+              </DataTrigger>
+              <Trigger SourceName="Row" Property="IsMouseOver" Value="True">
+                <Setter TargetName="Actions" Property="Visibility" Value="Visible" />
+              </Trigger>
+              <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                <Setter TargetName="Actions" Property="Visibility" Value="Visible" />
+              </DataTrigger>
+            </HierarchicalDataTemplate.Triggers>
+          </HierarchicalDataTemplate>
+
+          <DataTemplate DataType="{x:Type vm:GitChangeItemViewModel}">
+            <DockPanel x:Name="Row" Margin="0,0,4,0" Background="Transparent">
+              <TextBlock x:Name="Letter" DockPanel.Dock="Right" Style="{StaticResource TextBlock.StatusLetter}" Text="{Binding Letter}" ToolTip="{Binding StatusText}" />
+              <StackPanel x:Name="Actions" DockPanel.Dock="Right" Orientation="Horizontal" Visibility="Hidden">
+                <Button x:Name="OpenFile" Style="{StaticResource Button.RowAction}" ToolTip="{x:Static res:Strings.OpenFileToolTip}"
+                        Content="{Binding Source=go-to-file, Mode=OneTime, Converter={x:Static controls:IconGlyphConverter.Instance}}"
+                        Command="{Binding DataContext.OpenFileCommand, RelativeSource={RelativeSource AncestorType=TreeView}}" CommandParameter="{Binding}"
+                        AutomationProperties.AutomationId="Git.Change.OpenFile" AutomationProperties.Name="{x:Static res:Strings.OpenFileToolTip}" />
+                <Button x:Name="Discard" Style="{StaticResource Button.RowAction}" Visibility="Collapsed" Content="{x:Static ui:IconGlyphs.Discard}"
+                        ToolTip="{x:Static res:Strings.DiscardToolTip}"
+                        Command="{Binding DataContext.DiscardCommand, RelativeSource={RelativeSource AncestorType=TreeView}}" CommandParameter="{Binding}"
+                        AutomationProperties.AutomationId="Git.Change.Discard" AutomationProperties.Name="{x:Static res:Strings.DiscardToolTip}" />
+                <Button x:Name="Stage" Style="{StaticResource Button.RowAction}" Content="{x:Static ui:IconGlyphs.Add}" ToolTip="{x:Static res:Strings.StageToolTip}"
+                        Command="{Binding DataContext.StageCommand, RelativeSource={RelativeSource AncestorType=TreeView}}" CommandParameter="{Binding}"
+                        AutomationProperties.AutomationId="Git.Change.Stage" AutomationProperties.Name="{x:Static res:Strings.StageToolTip}" />
+                <Button x:Name="Unstage" Style="{StaticResource Button.RowAction}" Visibility="Collapsed" ToolTip="{x:Static res:Strings.UnstageToolTip}"
+                        Content="{Binding Source=remove, Mode=OneTime, Converter={x:Static controls:IconGlyphConverter.Instance}}"
+                        Command="{Binding DataContext.UnstageCommand, RelativeSource={RelativeSource AncestorType=TreeView}}" CommandParameter="{Binding}"
+                        AutomationProperties.AutomationId="Git.Change.Unstage" AutomationProperties.Name="{x:Static res:Strings.UnstageToolTip}" />
+              </StackPanel>
+              <TextBlock x:Name="Name" VerticalAlignment="Center" TextTrimming="CharacterEllipsis">
+                <Run Text="{Binding Name, Mode=OneWay}" />
+                <Run FontSize="{DynamicResource FontSize.Small}" Foreground="{DynamicResource Brush.Text.Secondary}" Text="{Binding Directory, Mode=OneWay}" />
+              </TextBlock>
+            </DockPanel>
+            <DataTemplate.Triggers>
+              <DataTrigger Binding="{Binding IsStaged}" Value="True">
+                <Setter TargetName="Stage" Property="Visibility" Value="Collapsed" />
+                <Setter TargetName="Unstage" Property="Visibility" Value="Visible" />
+              </DataTrigger>
+              <DataTrigger Binding="{Binding CanDiscard}" Value="True">
+                <Setter TargetName="Discard" Property="Visibility" Value="Visible" />
+              </DataTrigger>
+              <DataTrigger Binding="{Binding IsDeleted}" Value="True">
+                <Setter TargetName="Name" Property="TextDecorations" Value="Strikethrough" />
+                <Setter TargetName="OpenFile" Property="Visibility" Value="Collapsed" />
+              </DataTrigger>
+              <Trigger SourceName="Row" Property="IsMouseOver" Value="True">
+                <Setter TargetName="Actions" Property="Visibility" Value="Visible" />
+              </Trigger>
+              <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                <Setter TargetName="Actions" Property="Visibility" Value="Visible" />
+              </DataTrigger>
+            </DataTemplate.Triggers>
+          </DataTemplate>
+        </TreeView.Resources>
+        <TreeView.ContextMenu>
+          <ContextMenu ItemsSource="{Binding ContextMenu.Items}"
+                       ItemContainerStyle="{StaticResource MenuItem.Bound}"
+                       Opened="OnContextMenuOpened"
+                       AutomationProperties.AutomationId="Git.ContextMenu" />
+        </TreeView.ContextMenu>
+      </TreeView>
+    </DockPanel>
+  </Grid>
+</UserControl>

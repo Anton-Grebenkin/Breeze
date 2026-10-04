@@ -1,0 +1,85 @@
+/*
+  File viewer pages (ADR 0037): SVG drawing and player. Colors are editor theme tokens sent by the tab (--background
+  and others); this file only does layout. Spacing 8/16, as in the rest of the UI.
+*/
+:root {
+  color-scheme: light dark;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--background, Canvas);
+  color: var(--foreground, CanvasText);
+  font: 13px/1.4 "Segoe UI Variable Text", "Segoe UI", sans-serif;
+}
+
+/* SVG drawing: centered when smaller than the window; when larger, scrolls from the left edge and can be dragged. */
+#viewport {
+  position: absolute;
+  inset: 0;
+  overflow: auto;
+  outline: none;
+}
+
+#viewport:focus-visible {
+  outline: 1px solid var(--focus, Highlight);
+  outline-offset: -1px;
+}
+
+#viewport.pannable {
+  cursor: grab;
+}
+
+#viewport.dragging {
+  cursor: grabbing;
+}
+
+#content {
+  display: flex;
+  width: max-content;
+  height: max-content;
+  min-width: 100%;
+  min-height: 100%;
+}
+
+/* Checkerboard under transparent parts of the drawing, 8 px squares, as in the VS Code image preview. */
+#picture {
+  display: block;
+  flex: none;
+  margin: auto;
+  background-color: var(--checker-background, transparent);
+  background-image:
+    linear-gradient(45deg, var(--checker-square, transparent) 25%, transparent 25%, transparent 75%, var(--checker-square, transparent) 75%),
+    linear-gradient(45deg, var(--checker-square, transparent) 25%, transparent 25%, transparent 75%, var(--checker-square, transparent) 75%);
+  background-position: 0 0, 8px 8px;
+  background-size: 16px 16px;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+#picture.waiting {
+  visibility: hidden;
+}
+
+/* Player: video fits the window, audio is a bar in the middle. */
+#stage {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+video {
+  max-width: 100%;
+  max-height: 100%;
+  outline: none;
+}
+
+audio {
+  width: min(480px, calc(100% - 32px));
+  outline: none;
+}

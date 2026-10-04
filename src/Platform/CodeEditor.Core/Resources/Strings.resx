@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="ContextExpressionError" xml:space="preserve"><value>{0} (position {1}) in condition '{2}'.</value></data>
+  <data name="ContextExpressionExtraText" xml:space="preserve"><value>Unexpected text after the condition</value></data>
+  <data name="ContextExpressionConditionExpected" xml:space="preserve"><value>Condition expected</value></data>
+  <data name="ContextExpressionClosingParenExpected" xml:space="preserve"><value>')' expected</value></data>
+  <data name="ContextExpressionUnexpectedChar" xml:space="preserve"><value>Unexpected character '{0}'</value></data>
+  <data name="ContextExpressionValueExpected" xml:space="preserve"><value>Value expected</value></data>
+  <data name="ContextExpressionUnclosedQuote" xml:space="preserve"><value>Unclosed quote</value></data>
+  <data name="DocumentTooLarge" xml:space="preserve"><value>File '{0}' is larger than {1} MB.</value></data>
+  <data name="DocumentBinary" xml:space="preserve"><value>File '{0}' is binary.</value></data>
+  <data name="DocumentReadFailed" xml:space="preserve"><value>Could not read '{0}': {1}</value></data>
+  <data name="EncodingUtf8WithBom" xml:space="preserve"><value>UTF-8 with BOM</value></data>
+  <data name="PathAlreadyExists" xml:space="preserve"><value>'{0}' already exists.</value></data>
+  <data name="RecycleBinDeleteFailed" xml:space="preserve"><value>Could not move '{0}' to the Recycle Bin.</value></data>
+  <data name="FolderNotFound" xml:space="preserve"><value>Folder '{0}' not found.</value></data>
+  <data name="KeybindingRuleNotObject" xml:space="preserve"><value>rule must be an object { "key": …, "command": … }</value></data>
+  <data name="KeybindingRuleNoCommand" xml:space="preserve"><value>rule has no "command"</value></data>
+  <data name="KeybindingRuleUnknownKey" xml:space="preserve"><value>unknown key combination '{0}' for '{1}'</value></data>
+  <data name="KeybindingRuleNoKey" xml:space="preserve"><value>rule '{0}' has no "key"</value></data>
+  <data name="KeybindingRuleInvalidWhen" xml:space="preserve"><value>invalid condition '{0}' for '{1}': {2}</value></data>
+  <data name="KeybindingsNotArray" xml:space="preserve"><value>Expected an array of rules: [ { "key": …, "command": … } ].</value></data>
+  <data name="KeybindingsTemplateHeader" xml:space="preserve"><value>Breeze key bindings on top of the defaults, as in VS Code:</value></data>
+  <data name="FileError" xml:space="preserve"><value>Error in {0}: {1}</value></data>
+  <data name="OutputLogChannel" xml:space="preserve"><value>Log</value></data>
+  <data name="SettingsNotObjectExample" xml:space="preserve"><value>Settings must be a JSON object: { "key": value }.</value></data>
+  <data name="SettingsNotObject" xml:space="preserve"><value>Settings must be a JSON object.</value></data>
+  <data name="SettingsNoClosingBrace" xml:space="preserve"><value>The closing brace of the settings object was not found.</value></data>
+  <data name="SettingsTemplateHeader" xml:space="preserve"><value>Breeze settings. Keys are the same as in VS Code, for example:</value></data>
+  <data name="SettingsWriteFailedFix" xml:space="preserve"><value>Could not write settings: fix the error in {0}. {1}</value></data>
+  <data name="SettingsWriteFailed" xml:space="preserve"><value>Could not write settings: {0}</value></data>
+  <!-- Processes. -->
+  <data name="LinesSkipped" xml:space="preserve"><value>…({0} lines skipped)…</value></data>
+  <data name="ProcessStartFailed" xml:space="preserve"><value>Could not start '{0}': {1}</value></data>
+</root>

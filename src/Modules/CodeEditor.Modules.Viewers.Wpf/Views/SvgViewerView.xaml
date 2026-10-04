@@ -1,0 +1,24 @@
+<UserControl x:Class="CodeEditor.Modules.Viewers.Wpf.Views.SvgViewerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:CodeEditor.Modules.Viewers.ViewModels;assembly=CodeEditor.Modules.Viewers"
+             xmlns:views="clr-namespace:CodeEditor.Modules.Viewers.Wpf.Views"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:SvgViewerViewModel}"
+             Background="{DynamicResource Brush.Editor.Background}"
+             AutomationProperties.AutomationId="SvgViewer">
+  <!-- The browser (WebView2) draws the SVG as an img element: scripts and links inside the drawing do not run. -->
+  <DockPanel>
+    <views:ViewerToolbar DockPanel.Dock="Top">
+      <views:ViewerToolbar.Tools>
+        <views:ZoomBar />
+      </views:ViewerToolbar.Tools>
+    </views:ViewerToolbar>
+    <TextBlock x:Name="Unavailable" DockPanel.Dock="Top" Margin="8" TextWrapping="Wrap" Visibility="Collapsed"
+               Foreground="{DynamicResource Brush.Error.Foreground}"
+               AutomationProperties.AutomationId="SvgViewer.Unavailable" />
+    <ContentControl x:Name="Host" Focusable="False" AutomationProperties.AutomationId="SvgViewer.Host" />
+  </DockPanel>
+</UserControl>

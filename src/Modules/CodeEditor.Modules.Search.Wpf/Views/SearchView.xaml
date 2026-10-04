@@ -1,0 +1,135 @@
+<UserControl x:Class="CodeEditor.Modules.Search.Wpf.Views.SearchView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:CodeEditor.Modules.Search.ViewModels;assembly=CodeEditor.Modules.Search"
+             xmlns:ui="clr-namespace:CodeEditor.UI.Themes;assembly=CodeEditor.UI"
+             xmlns:controls="clr-namespace:CodeEditor.UI.Controls;assembly=CodeEditor.UI"
+             xmlns:res="clr-namespace:CodeEditor.Modules.Search.Resources;assembly=CodeEditor.Modules.Search"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:SearchViewModel}"
+             IsKeyboardFocusWithinChanged="OnFocusWithinChanged"
+             AutomationProperties.AutomationId="Search">
+  <UserControl.Resources>
+    <Style x:Key="Button.Toolbar" TargetType="Button" BasedOn="{StaticResource Button.Subtle}">
+      <Setter Property="Padding" Value="4" />
+      <Setter Property="FontFamily" Value="{DynamicResource Font.Icons}" />
+      <Setter Property="FontSize" Value="{DynamicResource FontSize.Icon}" />
+    </Style>
+  </UserControl.Resources>
+
+  <DockPanel Margin="0,4,0,0">
+    <!-- Query box with option toggles inside, on the right. -->
+    <Grid DockPanel.Dock="Top" Margin="12,0,8,0">
+      <TextBox x:Name="QueryBox"
+               Style="{StaticResource TextBox.Field}"
+               Padding="4,3,76,3"
+               Tag="{x:Static res:Strings.QueryPlaceholder}"
+               Text="{Binding Query, UpdateSourceTrigger=PropertyChanged}"
+               PreviewKeyDown="OnQueryPreviewKeyDown"
+               AutomationProperties.AutomationId="Search.Query"
+               AutomationProperties.Name="{x:Static res:Strings.QueryPlaceholder}" />
+      <StackPanel Margin="0,0,3,0" HorizontalAlignment="Right" VerticalAlignment="Center" Orientation="Horizontal">
+        <ToggleButton Style="{StaticResource ToggleButton.OptionIcon}" Content="{x:Static ui:IconGlyphs.CaseSensitive}" ToolTip="{x:Static res:Strings.MatchCaseToolTip}"
+                      IsChecked="{Binding MatchCase}" AutomationProperties.AutomationId="Search.MatchCase" AutomationProperties.Name="{x:Static res:Strings.MatchCase}" />
+        <ToggleButton Style="{StaticResource ToggleButton.OptionIcon}" Content="{x:Static ui:IconGlyphs.WholeWord}" ToolTip="{x:Static res:Strings.WholeWordToolTip}"
+                      IsChecked="{Binding WholeWord}" AutomationProperties.AutomationId="Search.WholeWord" AutomationProperties.Name="{x:Static res:Strings.WholeWord}" />
+        <ToggleButton Style="{StaticResource ToggleButton.OptionIcon}" Content="{x:Static ui:IconGlyphs.Regex}" ToolTip="{x:Static res:Strings.UseRegexToolTip}"
+                      IsChecked="{Binding UseRegex}" AutomationProperties.AutomationId="Search.Regex" AutomationProperties.Name="{x:Static res:Strings.UseRegex}" />
+      </StackPanel>
+    </Grid>
+
+    <TextBlock DockPanel.Dock="Top"
+               Margin="12,4,8,0"
+               TextWrapping="Wrap"
+               Foreground="{DynamicResource Brush.Error.Foreground}"
+               Text="{Binding Error}"
+               Visibility="{Binding Error, Converter={x:Static controls:NullToCollapsedConverter.Instance}}"
+               AutomationProperties.AutomationId="Search.Error" />
+
+    <!-- File globs, expanded by the "…" button. -->
+    <DockPanel DockPanel.Dock="Top" Margin="12,2,8,0">
+      <Button DockPanel.Dock="Right" Style="{StaticResource Button.Toolbar}" Padding="2,0"
+              Content="{x:Static ui:IconGlyphs.More}" ToolTip="{x:Static res:Strings.FilePatterns}"
+              Command="{Binding ToggleFiltersCommand}"
+              AutomationProperties.AutomationId="Search.ToggleFilters" AutomationProperties.Name="{x:Static res:Strings.FilePatterns}" />
+      <Border />
+    </DockPanel>
+    <StackPanel DockPanel.Dock="Top" Margin="12,0,8,4"
+                Visibility="{Binding ShowFilters, Converter={StaticResource BoolToVisibility}}">
+      <TextBlock Margin="0,0,0,2" FontSize="{DynamicResource FontSize.Small}" Foreground="{DynamicResource Brush.Text.Secondary}" Text="{x:Static res:Strings.IncludeFiles}" />
+      <TextBox Style="{StaticResource TextBox.Field}" Tag="{x:Static res:Strings.IncludeExample}"
+               Text="{Binding Include, UpdateSourceTrigger=PropertyChanged}"
+               AutomationProperties.AutomationId="Search.Include" AutomationProperties.Name="{x:Static res:Strings.IncludeFiles}" />
+      <TextBlock Margin="0,6,0,2" FontSize="{DynamicResource FontSize.Small}" Foreground="{DynamicResource Brush.Text.Secondary}" Text="{x:Static res:Strings.ExcludeFiles}" />
+      <TextBox Style="{StaticResource TextBox.Field}" Tag="{x:Static res:Strings.ExcludeExample}"
+               Text="{Binding Exclude, UpdateSourceTrigger=PropertyChanged}"
+               AutomationProperties.AutomationId="Search.Exclude" AutomationProperties.Name="{x:Static res:Strings.ExcludeFiles}" />
+    </StackPanel>
+
+    <!-- Summary and result actions. -->
+    <DockPanel DockPanel.Dock="Top" Margin="12,2,4,2" MinHeight="22">
+      <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+        <Button Style="{StaticResource Button.Toolbar}" Content="{x:Static ui:IconGlyphs.ClearAll}" ToolTip="{x:Static res:Strings.ClearResults}"
+                Command="{Binding ClearCommand}" AutomationProperties.AutomationId="Search.Clear" AutomationProperties.Name="{x:Static res:Strings.ClearResults}" />
+        <Button Style="{StaticResource Button.Toolbar}" Content="{x:Static ui:IconGlyphs.CollapseAll}" ToolTip="{x:Static res:Strings.ToggleCollapseAll}"
+                Command="{Binding ToggleCollapseAllCommand}" AutomationProperties.AutomationId="Search.CollapseAll" AutomationProperties.Name="{x:Static res:Strings.ToggleCollapseAll}" />
+      </StackPanel>
+      <TextBlock VerticalAlignment="Center"
+                 TextTrimming="CharacterEllipsis"
+                 FontSize="{DynamicResource FontSize.Small}"
+                 Foreground="{DynamicResource Brush.Text.Secondary}"
+                 Text="{Binding Summary}"
+                 AutomationProperties.AutomationId="Search.Summary" />
+    </DockPanel>
+
+    <Grid>
+      <TextBlock Margin="12,8" TextWrapping="Wrap"
+                 Foreground="{DynamicResource Brush.Text.Secondary}"
+                 Text="{x:Static res:Strings.OpenFolderToSearch}"
+                 Visibility="{Binding HasWorkspace, Converter={x:Static controls:InverseBoolToVisibilityConverter.Instance}}" />
+
+      <TreeView x:Name="Results"
+                Style="{StaticResource TreeView.Files}"
+                ItemsSource="{Binding Files}"
+                PreviewKeyDown="OnResultsPreviewKeyDown"
+                AutomationProperties.AutomationId="Search.Results">
+        <TreeView.ItemContainerStyle>
+          <Style TargetType="TreeViewItem" BasedOn="{StaticResource TreeViewItem.Row}">
+            <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+            <Setter Property="AutomationProperties.AutomationId" Value="{Binding AutomationId}" />
+            <Setter Property="AutomationProperties.Name" Value="{Binding RelativePath}" />
+          </Style>
+        </TreeView.ItemContainerStyle>
+        <TreeView.Resources>
+          <HierarchicalDataTemplate DataType="{x:Type vm:SearchFileViewModel}" ItemsSource="{Binding Matches}">
+            <HierarchicalDataTemplate.ItemContainerStyle>
+              <Style TargetType="TreeViewItem" BasedOn="{StaticResource TreeViewItem.Row}">
+                <Setter Property="AutomationProperties.AutomationId" Value="{Binding AutomationId}" />
+                <Setter Property="AutomationProperties.Name" Value="{Binding Text}" />
+                <Setter Property="ToolTip" Value="{Binding ToolTip}" />
+                <EventSetter Event="PreviewMouseLeftButtonUp" Handler="OnMatchClick" />
+                <EventSetter Event="MouseDoubleClick" Handler="OnMatchDoubleClick" />
+              </Style>
+            </HierarchicalDataTemplate.ItemContainerStyle>
+            <DockPanel Margin="0,0,8,0">
+              <Border DockPanel.Dock="Right" Style="{StaticResource Border.Badge}" ToolTip="{Binding CountToolTip}">
+                <TextBlock HorizontalAlignment="Center" Text="{Binding Count}" />
+              </Border>
+              <TextBlock VerticalAlignment="Center" TextTrimming="CharacterEllipsis" ToolTip="{Binding RelativePath}">
+                <Run Text="{Binding Name, Mode=OneWay}" />
+                <Run FontSize="{DynamicResource FontSize.Small}" Foreground="{DynamicResource Brush.Text.Secondary}" Text="{Binding Directory, Mode=OneWay}" />
+              </TextBlock>
+            </DockPanel>
+          </HierarchicalDataTemplate>
+          <DataTemplate DataType="{x:Type vm:SearchMatchViewModel}">
+            <TextBlock VerticalAlignment="Center" TextTrimming="CharacterEllipsis">
+              <Run Text="{Binding Before, Mode=OneWay}" /><Run Background="{DynamicResource Brush.Editor.FindMatch}" Text="{Binding Text, Mode=OneWay}" /><Run Text="{Binding After, Mode=OneWay}" />
+            </TextBlock>
+          </DataTemplate>
+        </TreeView.Resources>
+      </TreeView>
+    </Grid>
+  </DockPanel>
+</UserControl>

@@ -1,0 +1,47 @@
+<UserControl x:Class="CodeEditor.Modules.Documents.Wpf.Views.ViewerToolbar"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:CodeEditor.Modules.Documents.ViewModels;assembly=CodeEditor.Modules.Documents"
+             xmlns:res="clr-namespace:CodeEditor.Modules.Documents.Resources;assembly=CodeEditor.Modules.Documents"
+             xmlns:controls="clr-namespace:CodeEditor.UI.Controls;assembly=CodeEditor.UI"
+             xmlns:views="clr-namespace:CodeEditor.Modules.Documents.Wpf.Views"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:DocumentViewerViewModel}"
+             AutomationProperties.AutomationId="DocumentViewer.Toolbar">
+  <UserControl.Resources>
+    <Style x:Key="Button.Toolbar" TargetType="Button" BasedOn="{StaticResource Button.Subtle}">
+      <Setter Property="Padding" Value="4" />
+      <Setter Property="Margin" Value="4,0,0,0" />
+      <Setter Property="FontFamily" Value="{DynamicResource Font.Icons}" />
+      <Setter Property="FontSize" Value="{DynamicResource FontSize.Icon}" />
+    </Style>
+  </UserControl.Resources>
+
+  <!-- Viewer bar: document info, loading, error, and the same actions as in the palette and tab menu. -->
+  <Border BorderThickness="0,0,0,1" BorderBrush="{DynamicResource Brush.Border}" Background="{DynamicResource Brush.Editor.Background}">
+    <DockPanel Margin="8,4">
+      <Button DockPanel.Dock="Right" Style="{StaticResource Button.Toolbar}" Content="{x:Static views:DocumentGlyphs.OpenExternal}"
+              ToolTip="{x:Static res:Strings.OpenExternal}" Command="{Binding OpenExternalCommand}"
+              AutomationProperties.AutomationId="DocumentViewer.OpenExternal" AutomationProperties.Name="{x:Static res:Strings.OpenExternal}" />
+      <Button DockPanel.Dock="Right" Style="{StaticResource Button.Toolbar}" Content="{x:Static views:DocumentGlyphs.Refresh}"
+              ToolTip="{x:Static res:Strings.Refresh}" Command="{Binding RefreshCommand}"
+              AutomationProperties.AutomationId="DocumentViewer.Refresh" AutomationProperties.Name="{x:Static res:Strings.Refresh}" />
+      <Button DockPanel.Dock="Right" Style="{StaticResource Button.Toolbar}" Content="{x:Static views:DocumentGlyphs.OpenAsText}"
+              ToolTip="{x:Static res:Strings.OpenAsText}" Command="{Binding OpenAsTextCommand}"
+              Visibility="{Binding CanOpenAsText, Converter={StaticResource BoolToVisibility}}"
+              AutomationProperties.AutomationId="DocumentViewer.OpenAsText" AutomationProperties.Name="{x:Static res:Strings.OpenAsText}" />
+      <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+        <TextBlock Text="{Binding Summary}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Small}"
+                   AutomationProperties.AutomationId="DocumentViewer.Summary" />
+        <TextBlock Margin="8,0,0,0" Text="{x:Static res:Strings.Loading}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Small}"
+                   Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibility}}"
+                   AutomationProperties.AutomationId="DocumentViewer.Loading" />
+        <TextBlock Margin="8,0,0,0" TextWrapping="Wrap" Text="{Binding Error}" Foreground="{DynamicResource Brush.Error.Foreground}" FontSize="{DynamicResource FontSize.Small}"
+                   Visibility="{Binding Error, Converter={x:Static controls:NullToCollapsedConverter.Instance}}"
+                   AutomationProperties.AutomationId="DocumentViewer.Error" />
+      </StackPanel>
+    </DockPanel>
+  </Border>
+</UserControl>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="ModuleName" xml:space="preserve"><value>Search</value></data>
+  <data name="ViewModuleName" xml:space="preserve"><value>Search: view</value></data>
+  <data name="MatchCase" xml:space="preserve"><value>Match Case</value></data>
+  <data name="WholeWord" xml:space="preserve"><value>Match Whole Word</value></data>
+  <data name="UseRegex" xml:space="preserve"><value>Use Regular Expression</value></data>
+  <data name="MatchCaseToolTip" xml:space="preserve"><value>Match Case (Alt+C)</value></data>
+  <data name="WholeWordToolTip" xml:space="preserve"><value>Match Whole Word (Alt+W)</value></data>
+  <data name="UseRegexToolTip" xml:space="preserve"><value>Use Regular Expression (Alt+R)</value></data>
+  <data name="ClearSearchResults" xml:space="preserve"><value>Clear Search Results</value></data>
+  <data name="ClearResults" xml:space="preserve"><value>Clear Results</value></data>
+  <data name="ToggleCollapseAll" xml:space="preserve"><value>Collapse or Expand All</value></data>
+  <data name="MenuFindInFiles" xml:space="preserve"><value>Find in _Files</value></data>
+  <data name="QueryPlaceholder" xml:space="preserve"><value>Search</value></data>
+  <data name="FilePatterns" xml:space="preserve"><value>File Patterns</value></data>
+  <data name="IncludeFiles" xml:space="preserve"><value>Files to include</value></data>
+  <data name="IncludeExample" xml:space="preserve"><value>e.g. *.cs, src/</value></data>
+  <data name="ExcludeFiles" xml:space="preserve"><value>Files to exclude</value></data>
+  <data name="ExcludeExample" xml:space="preserve"><value>e.g. *.Designer.cs, docs/</value></data>
+  <data name="OpenFolderToSearch" xml:space="preserve"><value>Open a folder to search in files.</value></data>
+  <data name="CountInFiles" xml:space="preserve"><value>{0} in {1}</value></data>
+  <data name="ResultForms" xml:space="preserve"><value>result|results</value></data>
+  <data name="MatchForms" xml:space="preserve"><value>match|matches</value></data>
+  <data name="InFileForms" xml:space="preserve"><value>file|files</value></data>
+  <data name="SummaryTruncated" xml:space="preserve"><value>{0}. Showing the first ones — refine your search</value></data>
+  <data name="NothingFoundHint" xml:space="preserve"><value>No results found. Review your file patterns and exclusions</value></data>
+  <data name="LineColumn" xml:space="preserve"><value>Line {0}, column {1}</value></data>
+  <data name="InvalidRegex" xml:space="preserve"><value>Invalid regular expression: {0}</value></data>
+  <data name="SearchTitle" xml:space="preserve"><value>Search '{0}'</value></data>
+  <data name="NothingFound" xml:space="preserve"><value>nothing found</value></data>
+  <data name="ToolEmptyQuery" xml:space="preserve"><value>The query is empty.</value></data>
+  <data name="ToolRegexFallback" xml:space="preserve"><value>(not a valid regular expression, searched as literal text: {0})</value></data>
+  <data name="ToolFoundAsText" xml:space="preserve"><value>(nothing matched the regular expression; below are matches of the query as literal text)</value></data>
+  <data name="ToolFoundAsRegex" xml:space="preserve"><value>(nothing matched the literal text; below are matches of the query as a regular expression)</value></data>
+  <data name="RelatedFound" xml:space="preserve"><value>Names from the request found in the code (literal matches — leads to check, not proof of the cause): {0}.</value></data>
+  <data name="RelatedMissing" xml:space="preserve"><value>Not found anywhere in the code: {0} — probably built at runtime (API operation names, SQL aliases, messages) or named differently; find the code that builds them rather than the literal text.</value></data>
+  <data name="RelatedFilesMore" xml:space="preserve"><value> and {0} more</value></data>
+  <data name="ToolNothingFound" xml:space="preserve"><value>(nothing found)</value></data>
+  <data name="ToolPathNotFound" xml:space="preserve"><value>'{0}' is not a file or folder in the workspace.</value></data>
+  <data name="ToolIncludeMatchesNothing" xml:space="preserve"><value>(no workspace files match include '{0}'{1} — nothing was searched; the text may well exist elsewhere.)</value></data>
+  <data name="ToolInPath" xml:space="preserve"><value> in '{0}'</value></data>
+  <data name="ToolSimilarPaths" xml:space="preserve"><value> Similar paths in the workspace: {0}.</value></data>
+  <data name="ToolEmptyStreakHint" xml:space="preserve"><value>Hint: {0} searches in a row found nothing. Text produced at runtime (SQL, generated names, error messages) is usually not in the code: start from the entry point named in the task and follow the call chain (handlers, interceptors, services, configuration), or hand the question to explore.</value></data>
+  <data name="ToolSameFileHint" xml:space="preserve"><value>Hint: several searches in {0} in a row — read the file with read_file instead (up to 1000 lines per call).</value></data>
+  <data name="ToolCountHeader" xml:space="preserve"><value>Matches: {0} in {1} files.</value></data>
+  <data name="ToolMoreFiles" xml:space="preserve"><value>…(showing {0}–{1} of {2} files; next page: offset={3})</value></data>
+  <data name="ToolMoreMatches" xml:space="preserve"><value>…(showing {0}–{1} of {2} matches; next page: offset={3})</value></data>
+</root>

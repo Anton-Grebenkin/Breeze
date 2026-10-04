@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<!--
+  GraphQL: # comments, strings and """…""" descriptions, keywords, $name variables, @name directives, field and
+  argument names before a colon, the operation name, capitalized types and built-in scalars, numbers.
+  Color names are theme tokens (ADR 0036).
+-->
+<SyntaxDefinition name="GraphQL" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+  <Color name="Comment" />
+  <Color name="String" />
+  <Color name="Number" />
+  <Color name="Keyword" />
+  <Color name="Function" />
+  <Color name="Type" />
+  <Color name="Variable" />
+
+  <RuleSet>
+    <Span color="Comment" begin="#" />
+    <Span color="String" multiline="true" begin="&quot;&quot;&quot;" end="&quot;&quot;&quot;" />
+    <Span color="String" begin="&quot;" end="&quot;" ruleSet="Escapes" />
+
+    <Rule color="Variable">\$[A-Za-z_]\w*</Rule>
+    <Rule color="Function">@[A-Za-z_]\w*</Rule>
+    <Rule color="Variable">\b[A-Za-z_]\w*(?=\s*:)</Rule>
+    <Rule color="Function">(?&lt;=\b(?:query|mutation|subscription|fragment)\s+)[A-Za-z_]\w*</Rule>
+    <Keywords color="Keyword">
+      <Word>query</Word>
+      <Word>mutation</Word>
+      <Word>subscription</Word>
+      <Word>fragment</Word>
+      <Word>on</Word>
+      <Word>type</Word>
+      <Word>interface</Word>
+      <Word>union</Word>
+      <Word>enum</Word>
+      <Word>input</Word>
+      <Word>scalar</Word>
+      <Word>schema</Word>
+      <Word>extend</Word>
+      <Word>implements</Word>
+      <Word>directive</Word>
+      <Word>repeatable</Word>
+      <Word>true</Word>
+      <Word>false</Word>
+      <Word>null</Word>
+    </Keywords>
+    <Keywords color="Type">
+      <Word>Int</Word>
+      <Word>Float</Word>
+      <Word>String</Word>
+      <Word>Boolean</Word>
+      <Word>ID</Word>
+    </Keywords>
+    <Rule color="Type">\b(?=[A-Z]\w*[a-z])[A-Z]\w*</Rule>
+    <Rule color="Number">-?\b\d+(?:\.\d+)?(?:[eE][+-]?\d+)?\b</Rule>
+  </RuleSet>
+
+  <RuleSet name="Escapes">
+    <Span begin="\\" end="." />
+  </RuleSet>
+</SyntaxDefinition>

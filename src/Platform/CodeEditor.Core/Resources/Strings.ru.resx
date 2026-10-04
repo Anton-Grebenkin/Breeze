@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="ContextExpressionError" xml:space="preserve"><value>{0} (позиция {1}) в условии «{2}».</value></data>
+  <data name="ContextExpressionExtraText" xml:space="preserve"><value>Лишний текст после условия</value></data>
+  <data name="ContextExpressionConditionExpected" xml:space="preserve"><value>Ожидалось условие</value></data>
+  <data name="ContextExpressionClosingParenExpected" xml:space="preserve"><value>Ожидалась «)»</value></data>
+  <data name="ContextExpressionUnexpectedChar" xml:space="preserve"><value>Неожиданный символ «{0}»</value></data>
+  <data name="ContextExpressionValueExpected" xml:space="preserve"><value>Ожидалось значение</value></data>
+  <data name="ContextExpressionUnclosedQuote" xml:space="preserve"><value>Не закрыта кавычка</value></data>
+  <data name="DocumentTooLarge" xml:space="preserve"><value>Файл «{0}» больше {1} МБ.</value></data>
+  <data name="DocumentBinary" xml:space="preserve"><value>Файл «{0}» двоичный.</value></data>
+  <data name="DocumentReadFailed" xml:space="preserve"><value>Не удалось прочитать «{0}»: {1}</value></data>
+  <data name="EncodingUtf8WithBom" xml:space="preserve"><value>UTF-8 с BOM</value></data>
+  <data name="PathAlreadyExists" xml:space="preserve"><value>«{0}» уже существует.</value></data>
+  <data name="RecycleBinDeleteFailed" xml:space="preserve"><value>Не удалось удалить «{0}» в корзину.</value></data>
+  <data name="FolderNotFound" xml:space="preserve"><value>Папка «{0}» не найдена.</value></data>
+  <data name="KeybindingRuleNotObject" xml:space="preserve"><value>правило должно быть объектом { "key": …, "command": … }</value></data>
+  <data name="KeybindingRuleNoCommand" xml:space="preserve"><value>у правила нет "command"</value></data>
+  <data name="KeybindingRuleUnknownKey" xml:space="preserve"><value>неизвестное сочетание «{0}» для «{1}»</value></data>
+  <data name="KeybindingRuleNoKey" xml:space="preserve"><value>у правила «{0}» нет "key"</value></data>
+  <data name="KeybindingRuleInvalidWhen" xml:space="preserve"><value>неверное условие «{0}» для «{1}»: {2}</value></data>
+  <data name="KeybindingsNotArray" xml:space="preserve"><value>Ожидался массив правил: [ { "key": …, "command": … } ].</value></data>
+  <data name="KeybindingsTemplateHeader" xml:space="preserve"><value>Сочетания клавиш Breeze поверх стандартных, как в VS Code:</value></data>
+  <data name="FileError" xml:space="preserve"><value>Ошибка в {0}: {1}</value></data>
+  <data name="OutputLogChannel" xml:space="preserve"><value>Журнал</value></data>
+  <data name="SettingsNotObjectExample" xml:space="preserve"><value>Настройки должны быть объектом JSON: { "ключ": значение }.</value></data>
+  <data name="SettingsNotObject" xml:space="preserve"><value>Настройки должны быть объектом JSON.</value></data>
+  <data name="SettingsNoClosingBrace" xml:space="preserve"><value>Не найдена закрывающая скобка объекта настроек.</value></data>
+  <data name="SettingsTemplateHeader" xml:space="preserve"><value>Настройки Breeze. Ключи — как в VS Code, например:</value></data>
+  <data name="SettingsWriteFailedFix" xml:space="preserve"><value>Не удалось записать в настройки: исправьте ошибку в {0}. {1}</value></data>
+  <data name="SettingsWriteFailed" xml:space="preserve"><value>Не удалось записать в настройки: {0}</value></data>
+  <!-- Processes. -->
+  <data name="LinesSkipped" xml:space="preserve"><value>…(пропущено строк: {0})…</value></data>
+  <data name="ProcessStartFailed" xml:space="preserve"><value>Не удалось запустить «{0}»: {1}</value></data>
+</root>

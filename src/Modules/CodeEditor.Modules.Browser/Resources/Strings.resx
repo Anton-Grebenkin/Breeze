@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="ModuleName" xml:space="preserve"><value>Browser</value></data>
+  <data name="ViewModuleName" xml:space="preserve"><value>Browser view</value></data>
+  <!-- Panel. -->
+  <data name="Address" xml:space="preserve"><value>Address</value></data>
+  <data name="AddressPlaceholder" xml:space="preserve"><value>Address: localhost:5000 or a site</value></data>
+  <data name="Back" xml:space="preserve"><value>Back</value></data>
+  <data name="Forward" xml:space="preserve"><value>Forward</value></data>
+  <data name="Reload" xml:space="preserve"><value>Reload</value></data>
+  <data name="Go" xml:space="preserve"><value>Go</value></data>
+  <!-- Browser. -->
+  <data name="BrowserUnavailable" xml:space="preserve"><value>The browser is not available: {0}</value></data>
+  <data name="NavigationFailed" xml:space="preserve"><value>The page did not open: {0}</value></data>
+  <data name="LoadTimedOut" xml:space="preserve"><value>The page did not load in {0} s.</value></data>
+  <data name="NoPage" xml:space="preserve"><value>No page is open: open one with navigate.</value></data>
+  <!-- Agent tool. -->
+  <data name="UnknownAction" xml:space="preserve"><value>Unknown action '{0}'. Use one of: {1}.</value></data>
+  <data name="ArgumentRequired" xml:space="preserve"><value>This action needs the {0} argument.</value></data>
+  <data name="OnlyHttp" xml:space="preserve"><value>Only http and https addresses can be opened: {0}</value></data>
+  <data name="ElementNotFound" xml:space="preserve"><value>No element with this ref on the page: take a new snapshot.</value></data>
+  <data name="NoSuchOption" xml:space="preserve"><value>The list has no such option.</value></data>
+  <data name="EmptyPage" xml:space="preserve"><value>(the page is empty)</value></data>
+  <data name="SnapshotTruncated" xml:space="preserve"><value>…(the page is longer: the rest is cut)</value></data>
+  <data name="ConsoleEmpty" xml:space="preserve"><value>No console messages or page errors since the last call.</value></data>
+  <data name="ApprovalTitle" xml:space="preserve"><value>The agent wants to open a page in the browser</value></data>
+  <!-- Agent feed rows. -->
+  <data name="FeedTitle" xml:space="preserve"><value>Browser: {0}</value></data>
+  <data name="FeedClick" xml:space="preserve"><value>click {0}</value></data>
+  <data name="FeedType" xml:space="preserve"><value>typing into {0}</value></data>
+  <data name="FeedBack" xml:space="preserve"><value>back</value></data>
+  <data name="FeedReload" xml:space="preserve"><value>reload</value></data>
+  <data name="FeedConsole" xml:space="preserve"><value>console</value></data>
+  <data name="FeedSnapshot" xml:space="preserve"><value>page</value></data>
+  <data name="ScreenshotResult" xml:space="preserve"><value>The screenshot of {0} is in the next message.</value></data>
+  <data name="ScreenshotNotSeen" xml:space="preserve"><value>This model does not see images: read the page with snapshot.</value></data>
+  <data name="ScreenshotTooLarge" xml:space="preserve"><value>The screenshot is larger than 5 MB even as JPEG: read the page with snapshot.</value></data>
+  <data name="ScreenshotFailed" xml:space="preserve"><value>The browser did not return a screenshot.</value></data>
+  <data name="FeedScreenshot" xml:space="preserve"><value>screenshot</value></data>
+</root>

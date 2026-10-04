@@ -1,0 +1,56 @@
+<UserControl x:Class="CodeEditor.Modules.Output.Wpf.Views.OutputView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:CodeEditor.Modules.Output.ViewModels;assembly=CodeEditor.Modules.Output"
+             xmlns:ui="clr-namespace:CodeEditor.UI.Themes;assembly=CodeEditor.UI"
+             xmlns:res="clr-namespace:CodeEditor.Modules.Output.Resources;assembly=CodeEditor.Modules.Output"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:OutputViewModel}"
+             AutomationProperties.AutomationId="Output">
+  <DockPanel>
+    <!-- Channels and actions. -->
+    <DockPanel DockPanel.Dock="Top" Margin="8,4">
+      <Button DockPanel.Dock="Right"
+              Padding="4"
+              Style="{StaticResource Button.Subtle}"
+              FontFamily="{DynamicResource Font.Icons}"
+              FontSize="{DynamicResource FontSize.CaptionIcon}"
+              Content="{x:Static ui:IconGlyphs.Delete}"
+              ToolTip="{x:Static res:Strings.ClearOutput}"
+              Command="{Binding ClearCommand}"
+              AutomationProperties.AutomationId="Output.Clear"
+              AutomationProperties.Name="{x:Static res:Strings.ClearOutput}" />
+      <ListBox ItemsSource="{Binding Channels}"
+               SelectedItem="{Binding SelectedChannel}"
+               DisplayMemberPath="Name"
+               Style="{StaticResource ListBox.Results}"
+               ScrollViewer.VerticalScrollBarVisibility="Disabled"
+               AutomationProperties.AutomationId="Output.Channels">
+        <ListBox.ItemsPanel>
+          <ItemsPanelTemplate>
+            <StackPanel Orientation="Horizontal" />
+          </ItemsPanelTemplate>
+        </ListBox.ItemsPanel>
+      </ListBox>
+    </DockPanel>
+
+    <TextBox x:Name="OutputText"
+             Padding="8,0"
+             IsReadOnly="True"
+             IsReadOnlyCaretVisible="True"
+             BorderThickness="0"
+             Background="{DynamicResource Brush.Editor.Background}"
+             Foreground="{DynamicResource Brush.Editor.Foreground}"
+             SelectionBrush="{DynamicResource Brush.Accent}"
+             FontFamily="{DynamicResource Font.Code}"
+             FontSize="{DynamicResource FontSize.Normal}"
+             TextWrapping="NoWrap"
+             HorizontalScrollBarVisibility="Auto"
+             VerticalScrollBarVisibility="Auto"
+             Text="{Binding Text, Mode=OneWay}"
+             AutomationProperties.AutomationId="Output.Text"
+             AutomationProperties.Name="{x:Static res:Strings.ModuleName}" />
+  </DockPanel>
+</UserControl>

@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!--
+  Ignore files (.gitignore, .dockerignore, .npmignore…) and .gitattributes: # comments, ! negation at the line
+  start, wildcards * ** ? and [set], attributes after the pattern (text, -diff, eol=lf). Color names are theme
+  tokens (ADR 0036).
+-->
+<SyntaxDefinition name="Ignore" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+  <Color name="Comment" />
+  <Color name="Keyword" />
+  <Color name="ControlKeyword" />
+  <Color name="Attribute" />
+
+  <RuleSet>
+    <Span color="Comment" begin="^\s*#" />
+    <Rule color="ControlKeyword">^!</Rule>
+    <Rule>\\.</Rule>
+    <Rule color="Keyword">\*\*|[*?]|\[[^\]\r\n]*\]</Rule>
+    <Rule color="Attribute">(?&lt;=\s)[-!]?[\w.\-]+(?:=\S*)?</Rule>
+  </RuleSet>
+</SyntaxDefinition>

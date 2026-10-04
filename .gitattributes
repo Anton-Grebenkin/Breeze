@@ -1,0 +1,19 @@
+* text=auto
+
+*.cs      text diff=csharp
+*.xaml    text
+*.csproj  text
+*.slnx    text
+*.props   text
+*.targets text
+*.json    text
+*.md      text diff=markdown
+*.ps1     text
+*.yml     text
+
+*.png  binary
+*.ico  binary
+*.ttf  binary
+
+# Third-party script bundles (Mermaid) stay as is: line endings unchanged, hash matches the source.
+*.min.js binary

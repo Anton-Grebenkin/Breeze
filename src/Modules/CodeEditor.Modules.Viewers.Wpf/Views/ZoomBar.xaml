@@ -1,0 +1,32 @@
+<UserControl x:Class="CodeEditor.Modules.Viewers.Wpf.Views.ZoomBar"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:CodeEditor.Modules.Viewers.ViewModels;assembly=CodeEditor.Modules.Viewers"
+             xmlns:res="clr-namespace:CodeEditor.Modules.Viewers.Resources;assembly=CodeEditor.Modules.Viewers"
+             xmlns:views="clr-namespace:CodeEditor.Modules.Viewers.Wpf.Views"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:ImageViewerViewModel}"
+             AutomationProperties.AutomationId="FileViewer.Zoom">
+  <UserControl.Resources>
+    <ResourceDictionary Source="ToolbarStyles.xaml" />
+  </UserControl.Resources>
+
+  <!-- Image zoom: the same commands as Ctrl+=, Ctrl+-, Ctrl+0 and Fit to window in the palette. -->
+  <StackPanel Orientation="Horizontal">
+    <Button Style="{StaticResource Button.ToolbarIcon}" Content="{x:Static views:ViewerGlyphs.ZoomOut}"
+            Command="{Binding Zoom.ZoomOutCommand}" ToolTip="{x:Static res:Strings.ZoomOut}"
+            AutomationProperties.AutomationId="FileViewer.ZoomOut" AutomationProperties.Name="{x:Static res:Strings.ZoomOut}" />
+    <Button Style="{StaticResource Button.ToolbarText}" Content="{Binding Zoom.Text}" MinWidth="56"
+            Command="{Binding Zoom.ActualSizeCommand}" ToolTip="{x:Static res:Strings.ZoomActualSize}"
+            AutomationProperties.AutomationId="FileViewer.ZoomActualSize" AutomationProperties.Name="{x:Static res:Strings.ZoomActualSize}" />
+    <Button Style="{StaticResource Button.ToolbarIcon}" Content="{x:Static views:ViewerGlyphs.ZoomIn}"
+            Command="{Binding Zoom.ZoomInCommand}" ToolTip="{x:Static res:Strings.ZoomIn}"
+            AutomationProperties.AutomationId="FileViewer.ZoomIn" AutomationProperties.Name="{x:Static res:Strings.ZoomIn}" />
+    <Button Style="{StaticResource Button.ToolbarIcon}" Content="{x:Static views:ViewerGlyphs.Fit}"
+            Command="{Binding Zoom.FitCommand}" ToolTip="{x:Static res:Strings.ZoomToFit}"
+            AutomationProperties.AutomationId="FileViewer.ZoomToFit" AutomationProperties.Name="{x:Static res:Strings.ZoomToFit}" />
+    <Border Width="1" Margin="4" Background="{DynamicResource Brush.Border}" />
+  </StackPanel>
+</UserControl>

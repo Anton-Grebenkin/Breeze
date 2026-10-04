@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<!--
+  Protocol Buffers (.proto): comments, strings, keywords, scalar types, capitalized message and enum names, the
+  method name after rpc, field numbers. Color names are theme tokens (ADR 0036).
+-->
+<SyntaxDefinition name="Protobuf" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+  <Color name="Comment" />
+  <Color name="String" />
+  <Color name="Number" />
+  <Color name="Keyword" />
+  <Color name="Function" />
+  <Color name="Type" />
+
+  <RuleSet>
+    <Span color="Comment" begin="//" />
+    <Span color="Comment" multiline="true" begin="/\*" end="\*/" />
+    <Span color="String" begin="&quot;" end="&quot;" ruleSet="Escapes" />
+    <Span color="String" begin="'" end="'" ruleSet="Escapes" />
+
+    <Keywords color="Keyword">
+      <Word>syntax</Word>
+      <Word>edition</Word>
+      <Word>package</Word>
+      <Word>import</Word>
+      <Word>public</Word>
+      <Word>weak</Word>
+      <Word>option</Word>
+      <Word>message</Word>
+      <Word>enum</Word>
+      <Word>service</Word>
+      <Word>rpc</Word>
+      <Word>returns</Word>
+      <Word>stream</Word>
+      <Word>oneof</Word>
+      <Word>map</Word>
+      <Word>reserved</Word>
+      <Word>extend</Word>
+      <Word>extensions</Word>
+      <Word>to</Word>
+      <Word>max</Word>
+      <Word>optional</Word>
+      <Word>repeated</Word>
+      <Word>required</Word>
+      <Word>group</Word>
+      <Word>true</Word>
+      <Word>false</Word>
+    </Keywords>
+    <Keywords color="Type">
+      <Word>double</Word>
+      <Word>float</Word>
+      <Word>int32</Word>
+      <Word>int64</Word>
+      <Word>uint32</Word>
+      <Word>uint64</Word>
+      <Word>sint32</Word>
+      <Word>sint64</Word>
+      <Word>fixed32</Word>
+      <Word>fixed64</Word>
+      <Word>sfixed32</Word>
+      <Word>sfixed64</Word>
+      <Word>bool</Word>
+      <Word>string</Word>
+      <Word>bytes</Word>
+    </Keywords>
+    <Rule color="Function">(?&lt;=\brpc\s+)[A-Za-z_]\w*</Rule>
+    <Rule color="Type">\b(?=[A-Z][\w.]*[a-z])[A-Z][\w.]*</Rule>
+    <Rule color="Number">\b(?:0[xX][\da-fA-F]+|\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)\b</Rule>
+  </RuleSet>
+
+  <RuleSet name="Escapes">
+    <Span begin="\\" end="." />
+  </RuleSet>
+</SyntaxDefinition>

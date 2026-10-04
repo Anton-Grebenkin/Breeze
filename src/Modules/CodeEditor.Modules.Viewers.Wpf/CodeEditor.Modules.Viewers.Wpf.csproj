@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    File viewer views (ADR 0037): images use WPF and Windows codecs (WIC), the hex view a virtualized list, SVG, audio
+    and video WebView2 pages (the same package as the browser, so no extra assemblies). WebView2 assemblies load when
+    an SVG or media tab is first shown.
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Web.WebView2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CodeEditor.Modules.Viewers\CodeEditor.Modules.Viewers.csproj" />
+    <ProjectReference Include="..\..\Platform\CodeEditor.UI\CodeEditor.UI.csproj" />
+    <ProjectReference Include="..\..\Platform\CodeEditor.Shell.Wpf\CodeEditor.Shell.Wpf.csproj" />
+  </ItemGroup>
+
+  <!-- SVG and player pages go to the Viewers folder next to the program; WebView2 serves it from a virtual host. -->
+  <ItemGroup>
+    <Content Include="Assets\**" Link="Viewers\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

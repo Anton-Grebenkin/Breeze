@@ -1,0 +1,108 @@
+<UserControl x:Class="CodeEditor.Shell.Wpf.Views.WelcomeView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:CodeEditor.Shell.ViewModels;assembly=CodeEditor.Shell"
+             xmlns:res="clr-namespace:CodeEditor.Shell.Resources;assembly=CodeEditor.Shell"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:WelcomeViewModel}"
+             AutomationProperties.AutomationId="Welcome">
+  <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+    <!-- Logo and name (ADR 0038): italic "Breeze" with "Code Editor" below. -->
+    <StackPanel HorizontalAlignment="Center" Margin="0,0,0,28" Orientation="Horizontal">
+      <Path Width="88" Height="64"
+            Margin="0,0,16,0"
+            VerticalAlignment="Center"
+            Stretch="Uniform"
+            Data="{StaticResource Geometry.BrandMark}"
+            Fill="{DynamicResource Brush.Brand}" />
+      <StackPanel VerticalAlignment="Center">
+        <TextBlock FontFamily="{DynamicResource Font.Display}"
+                   FontSize="{DynamicResource FontSize.Heading}"
+                   FontWeight="Bold"
+                   FontStyle="Italic"
+                   Foreground="{DynamicResource Brush.Text.Primary}"
+                   Text="{Binding Heading, Mode=OneTime}"
+                   AutomationProperties.AutomationId="Welcome.Heading" />
+        <TextBlock Margin="3,0,0,0"
+                   FontWeight="SemiBold"
+                   Foreground="{DynamicResource Brush.Text.Secondary}"
+                   Text="{x:Static res:Strings.ProductTagline}" />
+      </StackPanel>
+    </StackPanel>
+
+    <!-- Each row is a button, so a command runs by its keybinding or by click. -->
+    <ItemsControl x:Name="ShortcutList"
+                  ItemsSource="{Binding Shortcuts}"
+                  Focusable="False"
+                  AutomationProperties.AutomationId="Welcome.Shortcuts">
+      <ItemsControl.ItemTemplate>
+        <DataTemplate DataType="{x:Type vm:ShortcutItem}">
+          <Button Margin="0,2"
+                  Style="{StaticResource Button.Subtle}"
+                  Command="{Binding DataContext.ExecuteCommand, ElementName=ShortcutList}"
+                  CommandParameter="{Binding}"
+                  AutomationProperties.AutomationId="{Binding CommandId, StringFormat=Welcome.{0}}"
+                  AutomationProperties.Name="{Binding Title}">
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" SharedSizeGroup="Title" />
+                <ColumnDefinition Width="12" />
+                <ColumnDefinition Width="*" SharedSizeGroup="Keys" />
+              </Grid.ColumnDefinitions>
+              <TextBlock Grid.Column="0"
+                         HorizontalAlignment="Right"
+                         VerticalAlignment="Center"
+                         Foreground="{DynamicResource Brush.Text.Secondary}"
+                         Text="{Binding Title}" />
+              <Border Grid.Column="2"
+                      HorizontalAlignment="Left"
+                      Style="{StaticResource Border.Keycap}">
+                <TextBlock Foreground="{DynamicResource Brush.Text.Primary}" Text="{Binding Keys}" />
+              </Border>
+            </Grid>
+          </Button>
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+      <ItemsControl.ItemsPanel>
+        <ItemsPanelTemplate>
+          <StackPanel Grid.IsSharedSizeScope="True" />
+        </ItemsPanelTemplate>
+      </ItemsControl.ItemsPanel>
+    </ItemsControl>
+
+    <!-- Recent folders: name and path, click to open. The full list is in File → Open Recent. -->
+    <StackPanel Margin="0,24,0,0"
+                Visibility="{Binding HasRecentFolders, Converter={StaticResource BoolToVisibility}}">
+      <TextBlock Margin="8,0,0,4"
+                 Style="{StaticResource TextBlock.AreaHeader}"
+                 Text="{x:Static res:Strings.WelcomeRecent}" />
+      <ItemsControl x:Name="RecentList"
+                    ItemsSource="{Binding RecentFolders}"
+                    Focusable="False"
+                    AutomationProperties.AutomationId="Welcome.Recent">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate DataType="{x:Type vm:RecentFolderItem}">
+            <Button HorizontalContentAlignment="Left"
+                    Style="{StaticResource Button.Subtle}"
+                    Command="{Binding DataContext.OpenRecentCommand, ElementName=RecentList}"
+                    CommandParameter="{Binding}"
+                    ToolTip="{Binding Path}"
+                    AutomationProperties.AutomationId="{Binding Name, StringFormat=Welcome.Recent.{0}}"
+                    AutomationProperties.Name="{Binding Name}">
+              <StackPanel Orientation="Horizontal">
+                <TextBlock Foreground="{DynamicResource Brush.Accent}" Text="{Binding Name}" />
+                <TextBlock Margin="12,0,0,0"
+                           MaxWidth="360"
+                           TextTrimming="CharacterEllipsis"
+                           Foreground="{DynamicResource Brush.Text.Secondary}"
+                           Text="{Binding Path}" />
+              </StackPanel>
+            </Button>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </StackPanel>
+  </StackPanel>
+</UserControl>

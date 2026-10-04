@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<!--
+  YAML: keys (as tags, like VS Code), quoted strings, unquoted values as strings, numbers and true/false/null when
+  they are the whole value, anchors and aliases, tags, directives, comments.
+  A block scalar after | or > continues while the indent exceeds the key column. AvalonEdit doesn't track indent, so
+  each key column (0, 2 … 12) gets its own span: it starts at the end of a line with | and ends at a line indented no
+  more than that column. The span begins with $ plus a lookbehind, so the regex jumps straight to the line end.
+  Rules (Rule) are read with IgnorePatternWhitespace: escape spaces and # in them. Color names are theme tokens (ADR 0036).
+-->
+<SyntaxDefinition name="Yaml" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+  <Color name="Comment" />
+  <Color name="String" />
+  <Color name="Number" />
+  <Color name="Keyword" />
+  <Color name="Type" />
+  <Color name="Tag" />
+  <Color name="Preprocessor" />
+
+  <RuleSet>
+    <Span color="Comment" begin="(?&lt;=^|\s)#" />
+    <Span color="String" multiline="true" begin="$(?&lt;=^[ \-]{0}[^\s\-#][^#]*\s[|&gt;][\-+0-9]*[ \t]*)" end="^(?=[ ]{0,0}\S)" />
+    <Span color="String" multiline="true" begin="$(?&lt;=^[ \-]{2}[^\s\-#][^#]*\s[|&gt;][\-+0-9]*[ \t]*)" end="^(?=[ ]{0,2}\S)" />
+    <Span color="String" multiline="true" begin="$(?&lt;=^[ \-]{4}[^\s\-#][^#]*\s[|&gt;][\-+0-9]*[ \t]*)" end="^(?=[ ]{0,4}\S)" />
+    <Span color="String" multiline="true" begin="$(?&lt;=^[ \-]{6}[^\s\-#][^#]*\s[|&gt;][\-+0-9]*[ \t]*)" end="^(?=[ ]{0,6}\S)" />
+    <Span color="String" multiline="true" begin="$(?&lt;=^[ \-]{8}[^\s\-#][^#]*\s[|&gt;][\-+0-9]*[ \t]*)" end="^(?=[ ]{0,8}\S)" />
+    <Span color="String" multiline="true" begin="$(?&lt;=^[ \-]{10}[^\s\-#][^#]*\s[|&gt;][\-+0-9]*[ \t]*)" end="^(?=[ ]{0,10}\S)" />
+    <Span color="String" multiline="true" begin="$(?&lt;=^[ \-]{12}[^\s\-#][^#]*\s[|&gt;][\-+0-9]*[ \t]*)" end="^(?=[ ]{0,12}\S)" />
+    <Span color="String" begin="(?&lt;=^|[\s\[{,:?\-])&quot;" end="&quot;" ruleSet="Escapes" />
+    <Span color="String" begin="(?&lt;=^|[\s\[{,:?\-])'" end="'" />
+
+    <Rule color="Preprocessor">^%[A-Za-z]+.*</Rule>
+    <Rule color="Keyword">^(?:---|\.\.\.)(?=[\ \t]|$)</Rule>
+    <!-- Key: at the line start after indent and list markers, up to a colon followed by a space or line end. -->
+    <!--
+      Each rule checks the first char (?=…) before looking behind (?<=…): otherwise, on a long line of spaces, the
+      lookbehind would scan back to the line start from every position, which is quadratic.
+    -->
+    <Rule color="Tag">
+      (?=[^\s\#'"\[\]{},:&amp;*!|&gt;%@`\-?]|[\-?:]\S)
+      (?&lt;=^[\ \t]*(?:-[\ \t]+)*)
+      [^\#]+?(?=[\ \t]*:(?:[\ \t]|$))
+    </Rule>
+    <!-- Whole value: after "key:", a list marker, at the line start or inside brackets. -->
+    <Rule color="Keyword">
+      (?=[tTfFnNyYoO~])
+      (?&lt;=:[\ \t]+|(?:^|[\ \t])-[\ \t]+|^[\ \t]*|[\[{,][\ \t]*)
+      (?:true|True|TRUE|false|False|FALSE|null|Null|NULL|yes|Yes|YES|no|No|NO|on|On|ON|off|Off|OFF|~)
+      (?=[\ \t]*(?:[,\]}]|$))
+    </Rule>
+    <Rule color="Number">
+      (?=[-+.\d])
+      (?&lt;=:[\ \t]+|(?:^|[\ \t])-[\ \t]+|^[\ \t]*|[\[{,][\ \t]*)
+      [-+]?(?:0x[\da-fA-F_]+|0o[0-7_]+|\d[\d_]*(?:\.\d*)?(?:[eE][-+]?\d+)?|\.\d+(?:[eE][-+]?\d+)?|\.(?:inf|Inf|INF|nan|NaN|NAN))
+      (?=[\ \t]*(?:[,\]}]|$))
+    </Rule>
+    <!-- Anchor &name and alias *name, tag !!str or !Ref, block scalar indicator | or >. -->
+    <Rule color="Type">(?=[&amp;*])(?&lt;=:[\ \t]+|(?:^|[\ \t])-[\ \t]+|^[\ \t]*|[\[{,][\ \t]*)[&amp;*][^\s,\[\]{}]+</Rule>
+    <Rule color="Keyword">(?=!)(?&lt;=:[\ \t]+|(?:^|[\ \t])-[\ \t]+|^[\ \t]*|[\[{,][\ \t]*)![^\s,\[\]{}]*</Rule>
+    <Rule color="Keyword">(?=[|&gt;])(?&lt;=:[\ \t]+|(?:^|[\ \t])-[\ \t]+)[|&gt;][\-+0-9]*(?=[\ \t]*$)</Rule>
+    <!-- An unquoted value is a string, as in VS Code; so is a multi-line value's continuation. -->
+    <Rule color="String">
+      (?=[^\s\#|&gt;&amp;*!'"\[\]{},%@`?:\-]|[\-?:]\S)
+      (?&lt;=:[\ \t]+|(?:^|[\ \t])-[\ \t]+|^[\ \t]+)
+      .+
+    </Rule>
+  </RuleSet>
+
+  <RuleSet name="Escapes">
+    <Span begin="\\" end="." />
+  </RuleSet>
+</SyntaxDefinition>

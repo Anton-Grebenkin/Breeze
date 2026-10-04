@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="ModuleName" xml:space="preserve"><value>Docker</value></data>
+  <!-- Tool replies to the model. -->
+  <data name="UnknownAction" xml:space="preserve"><value>Unknown action '{0}'. Use one of: {1}.</value></data>
+  <data name="ArgumentRequired" xml:space="preserve"><value>The {0} action needs the {1} argument.</value></data>
+  <data name="InvalidName" xml:space="preserve"><value>'{0}' is not a valid name: it must not be empty, start with '-' or contain spaces.</value></data>
+  <data name="InvalidVariable" xml:space="preserve"><value>'{0}' is not a variable: use NAME=value.</value></data>
+  <data name="NoComposeFile" xml:space="preserve"><value>No compose file in the workspace root ({0}). Pass the file argument.</value></data>
+  <data name="DockerFailed" xml:space="preserve"><value>docker {0} failed with exit code {1}:
+{2}</value></data>
+  <data name="DockerTimedOut" xml:space="preserve"><value>docker {0} did not finish in {1} s.</value></data>
+  <data name="EmptyOutput" xml:space="preserve"><value>(no output)</value></data>
+  <data name="Done" xml:space="preserve"><value>Done.</value></data>
+  <!-- Approval card. -->
+  <data name="ApprovalTitle" xml:space="preserve"><value>The agent wants to change Docker</value></data>
+  <data name="ApprovalHeader" xml:space="preserve"><value>docker commands</value></data>
+  <!-- Agent feed rows. -->
+  <data name="FeedTitle" xml:space="preserve"><value>Docker: {0}</value></data>
+  <data name="FeedContainers" xml:space="preserve"><value>containers</value></data>
+  <data name="FeedImages" xml:space="preserve"><value>images</value></data>
+  <data name="FeedLogs" xml:space="preserve"><value>logs of {0}</value></data>
+  <data name="FeedInspect" xml:space="preserve"><value>details of {0}</value></data>
+  <data name="FeedComposeServices" xml:space="preserve"><value>compose services</value></data>
+  <data name="FeedComposeLogs" xml:space="preserve"><value>compose logs</value></data>
+  <data name="FeedBuild" xml:space="preserve"><value>building {0}</value></data>
+  <data name="FeedStart" xml:space="preserve"><value>starting {0}</value></data>
+  <data name="FeedExec" xml:space="preserve"><value>{0} in {1}</value></data>
+  <data name="FeedStop" xml:space="preserve"><value>stopping {0}</value></data>
+  <data name="FeedRestart" xml:space="preserve"><value>restarting {0}</value></data>
+  <data name="FeedRemove" xml:space="preserve"><value>removing {0}</value></data>
+  <data name="FeedComposeUp" xml:space="preserve"><value>compose up</value></data>
+  <data name="FeedComposeDown" xml:space="preserve"><value>compose down</value></data>
+  <!-- Docker panel (ADR 0033): time and size in the UI language. -->
+  <data name="UnitSeconds" xml:space="preserve"><value>{0} s</value></data>
+  <data name="UnitMinutes" xml:space="preserve"><value>{0} min</value></data>
+  <data name="UnitHours" xml:space="preserve"><value>{0} h</value></data>
+  <data name="UnitDays" xml:space="preserve"><value>{0} d</value></data>
+  <data name="UnitWeeks" xml:space="preserve"><value>{0} wk</value></data>
+  <data name="UnitMonths" xml:space="preserve"><value>{0} mo</value></data>
+  <data name="UnitYears" xml:space="preserve"><value>{0} y</value></data>
+  <data name="SizeBytes" xml:space="preserve"><value>{0} B</value></data>
+  <data name="SizeKilobytes" xml:space="preserve"><value>{0} kB</value></data>
+  <data name="SizeMegabytes" xml:space="preserve"><value>{0} MB</value></data>
+  <data name="SizeGigabytes" xml:space="preserve"><value>{0} GB</value></data>
+  <data name="SizeTerabytes" xml:space="preserve"><value>{0} TB</value></data>
+  <!-- Docker panel: tree sections and nodes. -->
+  <data name="SectionContainers" xml:space="preserve"><value>Containers</value></data>
+  <data name="SectionImages" xml:space="preserve"><value>Images</value></data>
+  <data name="SectionCompose" xml:space="preserve"><value>Compose</value></data>
+  <data name="NoContainers" xml:space="preserve"><value>No containers</value></data>
+  <data name="NoImages" xml:space="preserve"><value>No images</value></data>
+  <data name="NoComposeFiles" xml:space="preserve"><value>No compose files in the folder</value></data>
+  <data name="OpenFolderForCompose" xml:space="preserve"><value>Open a folder to see its compose files</value></data>
+  <data name="RunningSummary" xml:space="preserve"><value>{0} of {1} {2}</value></data>
+  <data name="RunningForms" xml:space="preserve"><value>running</value></data>
+  <data name="StateRunning" xml:space="preserve"><value>running</value></data>
+  <data name="StateRunningFor" xml:space="preserve"><value>running {0}</value></data>
+  <data name="StatePaused" xml:space="preserve"><value>paused</value></data>
+  <data name="StateRestarting" xml:space="preserve"><value>restarting</value></data>
+  <data name="StateCreated" xml:space="preserve"><value>created, not started</value></data>
+  <data name="StateRemoving" xml:space="preserve"><value>removing</value></data>
+  <data name="StateDead" xml:space="preserve"><value>dead</value></data>
+  <data name="StateExited" xml:space="preserve"><value>stopped</value></data>
+  <data name="StateExitedAgo" xml:space="preserve"><value>stopped {0} ago</value></data>
+  <data name="StateFailed" xml:space="preserve"><value>exited with code {0}</value></data>
+  <data name="StateFailedAgo" xml:space="preserve"><value>exited with code {1} {0} ago</value></data>
+  <data name="HealthUnhealthy" xml:space="preserve"><value>unhealthy</value></data>
+  <data name="HealthStarting" xml:space="preserve"><value>health check starting</value></data>
+  <data name="ServiceNotStarted" xml:space="preserve"><value>not started</value></data>
+  <data name="ComposeProjectName" xml:space="preserve"><value>project {0}</value></data>
+  <data name="ComposeReadFailed" xml:space="preserve"><value>not read: {0}</value></data>
+  <data name="ToolTipImage" xml:space="preserve"><value>Image: {0}</value></data>
+  <data name="ToolTipState" xml:space="preserve"><value>State: {0}</value></data>
+  <data name="ToolTipPorts" xml:space="preserve"><value>Ports: {0}</value></data>
+  <data name="ToolTipCompose" xml:space="preserve"><value>Compose: {0}, service {1}</value></data>
+  <data name="ToolTipProject" xml:space="preserve"><value>Compose project {0}</value></data>
+  <data name="ToolTipId" xml:space="preserve"><value>ID: {0}</value></data>
+  <data name="ToolTipSize" xml:space="preserve"><value>Size: {0}</value></data>
+  <data name="ToolTipCreated" xml:space="preserve"><value>Created: {0}</value></data>
+  <data name="DockerNotResponding" xml:space="preserve"><value>docker did not answer in {0} s.</value></data>
+  <!-- Docker panel: panel state. -->
+  <data name="Loading" xml:space="preserve"><value>Reading the Docker state…</value></data>
+  <data name="NotInstalledMessage" xml:space="preserve"><value>Docker is not installed or is not on PATH. Install Docker Desktop, then refresh the panel.</value></data>
+  <data name="EngineStoppedMessage" xml:space="preserve"><value>The Docker engine is not running. Start Docker Desktop, then refresh the panel.</value></data>
+  <data name="FailedMessage" xml:space="preserve"><value>Docker answered with an error: {0}</value></data>
+  <data name="OutputChannel" xml:space="preserve"><value>Docker</value></data>
+  <!-- Docker panel: actions, progress and results. -->
+  <data name="BusyStarting" xml:space="preserve"><value>starting…</value></data>
+  <data name="BusyStopping" xml:space="preserve"><value>stopping…</value></data>
+  <data name="BusyRestarting" xml:space="preserve"><value>restarting…</value></data>
+  <data name="BusyRemoving" xml:space="preserve"><value>removing…</value></data>
+  <data name="ActionStart" xml:space="preserve"><value>starting {0}</value></data>
+  <data name="ActionStop" xml:space="preserve"><value>stopping {0}</value></data>
+  <data name="ActionRestart" xml:space="preserve"><value>restarting {0}</value></data>
+  <data name="ActionRemove" xml:space="preserve"><value>removing {0}</value></data>
+  <data name="ActionComposeUp" xml:space="preserve"><value>compose up {0}</value></data>
+  <data name="ActionComposeBuild" xml:space="preserve"><value>compose up with rebuild {0}</value></data>
+  <data name="ActionComposeDown" xml:space="preserve"><value>compose down {0}</value></data>
+  <data name="ActionProgress" xml:space="preserve"><value>Docker: {0}…</value></data>
+  <data name="ActionDone" xml:space="preserve"><value>Docker: {0} — done.</value></data>
+  <data name="ActionFailed" xml:space="preserve"><value>Docker: {0} — failed: {1}</value></data>
+  <data name="ActionTimedOut" xml:space="preserve"><value>docker did not finish in {0} min</value></data>
+  <data name="RemoveContainerQuestion" xml:space="preserve"><value>Remove container '{0}'?</value></data>
+  <data name="RemoveRunningContainerQuestion" xml:space="preserve"><value>Container '{0}' is running. Stop and remove it?</value></data>
+  <data name="RemoveContainerDetail" xml:space="preserve"><value>Data inside the container that is not in a volume is lost. This cannot be undone.</value></data>
+  <data name="RemoveImageQuestion" xml:space="preserve"><value>Remove image '{0}'?</value></data>
+  <data name="RemoveImageDetail" xml:space="preserve"><value>The image can be pulled or built again. Docker does not remove an image that a container uses.</value></data>
+  <data name="ConfirmRemove" xml:space="preserve"><value>Remove</value></data>
+  <data name="IdCopied" xml:space="preserve"><value>Docker: ID copied.</value></data>
+  <data name="NothingToPick" xml:space="preserve"><value>Docker: there is nothing suitable to choose from.</value></data>
+  <!-- Docker panel: palette pickers for commands without a node. -->
+  <data name="PickContainer" xml:space="preserve"><value>Select a container</value></data>
+  <data name="PickRunningContainer" xml:space="preserve"><value>Select a running container</value></data>
+  <data name="PickStoppedContainer" xml:space="preserve"><value>Select a stopped container</value></data>
+  <data name="PickContainerWithPorts" xml:space="preserve"><value>Select a container with published ports</value></data>
+  <data name="PickContainerOrImage" xml:space="preserve"><value>Select a container or an image</value></data>
+  <data name="PickImage" xml:space="preserve"><value>Select an image</value></data>
+  <data name="PickComposeFile" xml:space="preserve"><value>Select a compose file</value></data>
+  <data name="PickService" xml:space="preserve"><value>Select a compose service</value></data>
+  <data name="PickPort" xml:space="preserve"><value>Select a port to open</value></data>
+  <!-- Docker panel: log and inspect tabs. -->
+  <data name="LogsTitle" xml:space="preserve"><value>{0} (logs)</value></data>
+  <data name="LogsToolTip" xml:space="preserve"><value>Logs of container {0} ({1})</value></data>
+  <data name="InspectTitle" xml:space="preserve"><value>{0} (inspect)</value></data>
+  <data name="LogLive" xml:space="preserve"><value>Following new output</value></data>
+  <data name="LogEnded" xml:space="preserve"><value>The stream ended: the container stopped.</value></data>
+  <data name="LogFailed" xml:space="preserve"><value>Logs are unavailable: {0}</value></data>
+  <data name="InspectFailed" xml:space="preserve"><value>docker inspect failed.</value></data>
+  <!-- Docker panel: context menu. -->
+  <data name="MenuLogs" xml:space="preserve"><value>View Logs</value></data>
+  <data name="MenuInspect" xml:space="preserve"><value>Inspect</value></data>
+  <data name="MenuOpenInBrowser" xml:space="preserve"><value>Open in Browser</value></data>
+  <data name="MenuOpenComposeFile" xml:space="preserve"><value>Open File</value></data>
+  <data name="MenuStart" xml:space="preserve"><value>Start</value></data>
+  <data name="MenuComposeUpService" xml:space="preserve"><value>Start Service (up)</value></data>
+  <data name="MenuComposeUp" xml:space="preserve"><value>Compose Up</value></data>
+  <data name="MenuComposeUpBuild" xml:space="preserve"><value>Rebuild and Start (up --build)</value></data>
+  <data name="MenuStop" xml:space="preserve"><value>Stop</value></data>
+  <data name="MenuRestart" xml:space="preserve"><value>Restart</value></data>
+  <data name="MenuComposeRestart" xml:space="preserve"><value>Restart Service</value></data>
+  <data name="MenuComposeDown" xml:space="preserve"><value>Compose Down</value></data>
+  <data name="MenuCopyId" xml:space="preserve"><value>Copy ID</value></data>
+  <data name="MenuRemove" xml:space="preserve"><value>Remove…</value></data>
+  <data name="MenuRemoveImage" xml:space="preserve"><value>Remove Image…</value></data>
+  <data name="MenuRefresh" xml:space="preserve"><value>Refresh</value></data>
+  <!-- Docker panel: palette commands ("Docker" category). -->
+  <data name="CommandRefresh" xml:space="preserve"><value>Refresh</value></data>
+  <data name="CommandStart" xml:space="preserve"><value>Start Container</value></data>
+  <data name="CommandStop" xml:space="preserve"><value>Stop Container</value></data>
+  <data name="CommandRestart" xml:space="preserve"><value>Restart Container</value></data>
+  <data name="CommandRemove" xml:space="preserve"><value>Remove Container…</value></data>
+  <data name="CommandLogs" xml:space="preserve"><value>View Container Logs</value></data>
+  <data name="CommandInspect" xml:space="preserve"><value>Inspect</value></data>
+  <data name="CommandCopyId" xml:space="preserve"><value>Copy ID</value></data>
+  <data name="CommandOpenInBrowser" xml:space="preserve"><value>Open Container Port in Browser</value></data>
+  <data name="CommandRemoveImage" xml:space="preserve"><value>Remove Image…</value></data>
+  <data name="CommandComposeUp" xml:space="preserve"><value>Compose Up</value></data>
+  <data name="CommandComposeUpBuild" xml:space="preserve"><value>Compose Up with Rebuild</value></data>
+  <data name="CommandComposeDown" xml:space="preserve"><value>Compose Down</value></data>
+  <data name="CommandComposeRestart" xml:space="preserve"><value>Restart Compose Service</value></data>
+  <data name="CommandOpenComposeFile" xml:space="preserve"><value>Open Compose File</value></data>
+  <!-- Docker panel: views. -->
+  <data name="ViewModuleName" xml:space="preserve"><value>Docker panel</value></data>
+  <data name="PanelRefresh" xml:space="preserve"><value>Refresh</value></data>
+  <data name="PanelCollapseAll" xml:space="preserve"><value>Collapse All</value></data>
+  <data name="DismissError" xml:space="preserve"><value>Dismiss</value></data>
+  <data name="OpenPortToolTip" xml:space="preserve"><value>Open {0} in the browser</value></data>
+  <data name="AutoScroll" xml:space="preserve"><value>Auto-scroll</value></data>
+  <data name="AutoScrollToolTip" xml:space="preserve"><value>Scroll to new lines</value></data>
+  <data name="WordWrap" xml:space="preserve"><value>Word Wrap</value></data>
+  <data name="FindInLog" xml:space="preserve"><value>Find (Ctrl+F)</value></data>
+  <data name="Reconnect" xml:space="preserve"><value>Reconnect</value></data>
+  <data name="ReconnectToolTip" xml:space="preserve"><value>Read the last lines again and follow new ones</value></data>
+  <data name="ClearLog" xml:space="preserve"><value>Clear</value></data>
+  <data name="CopyAll" xml:space="preserve"><value>Copy All</value></data>
+  <data name="LogText" xml:space="preserve"><value>Container logs</value></data>
+  <data name="InspectText" xml:space="preserve"><value>Details</value></data>
+  <data name="FindPlaceholder" xml:space="preserve"><value>Find</value></data>
+  <data name="MatchCase" xml:space="preserve"><value>Match Case</value></data>
+  <data name="MatchWholeWord" xml:space="preserve"><value>Match Whole Word</value></data>
+  <data name="UseRegex" xml:space="preserve"><value>Use Regular Expression</value></data>
+  <data name="PreviousMatch" xml:space="preserve"><value>Previous Match (Shift+F3)</value></data>
+  <data name="NextMatch" xml:space="preserve"><value>Next Match (F3)</value></data>
+  <data name="CloseFind" xml:space="preserve"><value>Close (Escape)</value></data>
+  <!-- Docker panel: log and inspect tab commands. -->
+  <data name="CommandLogsReconnect" xml:space="preserve"><value>Container Logs: Reconnect</value></data>
+  <data name="CommandLogsClear" xml:space="preserve"><value>Container Logs: Clear</value></data>
+  <data name="CommandLogsAutoScroll" xml:space="preserve"><value>Container Logs: Toggle Auto-scroll</value></data>
+  <data name="CommandLogsWordWrap" xml:space="preserve"><value>Container Logs: Toggle Word Wrap</value></data>
+  <data name="CommandInspectRefresh" xml:space="preserve"><value>Inspect: Refresh</value></data>
+  <data name="CommandInspectCopy" xml:space="preserve"><value>Inspect: Copy All</value></data>
+</root>

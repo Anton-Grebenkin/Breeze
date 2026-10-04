@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="ModuleName" xml:space="preserve"><value>Вывод</value></data>
+  <data name="Clear" xml:space="preserve"><value>Очистить</value></data>
+  <data name="ClearOutput" xml:space="preserve"><value>Очистить вывод</value></data>
+  <data name="ViewModuleName" xml:space="preserve"><value>Вывод: представление</value></data>
+  <data name="LevelInformation" xml:space="preserve"><value>Инфо</value></data>
+  <data name="LevelWarning" xml:space="preserve"><value>Внимание</value></data>
+  <data name="LevelError" xml:space="preserve"><value>Ошибка</value></data>
+  <data name="LevelCritical" xml:space="preserve"><value>Критично</value></data>
+</root>

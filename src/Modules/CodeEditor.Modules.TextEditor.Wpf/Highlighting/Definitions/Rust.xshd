@@ -1,0 +1,113 @@
+<?xml version="1.0"?>
+<!--
+  Rust: comments (block comments nest), #[…] and #![…] attributes, "…", b"…", c"…" and raw r"…", r#"…"#, r##"…"##
+  strings, chars and bytes, 'a lifetimes, name! macros, keywords, built-in types, capitalized types and variants,
+  function calls (including turbofish ::&lt;T&gt;), suffixed numbers. Color names are theme tokens (ADR 0036).
+-->
+<SyntaxDefinition name="Rust" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+  <Color name="Comment" />
+  <Color name="String" />
+  <Color name="Number" />
+  <Color name="Keyword" />
+  <Color name="ControlKeyword" />
+  <Color name="Function" />
+  <Color name="Type" />
+  <Color name="Preprocessor" />
+
+  <RuleSet>
+    <Span color="Comment" begin="//" />
+    <Span color="Comment" multiline="true" begin="/\*" end="\*/" ruleSet="BlockComment" />
+    <Span color="Preprocessor" multiline="true" begin="#!?\[" end="\]" ruleSet="Attribute" />
+    <Span color="String" multiline="true" begin="(?&lt;!\w)b?r##&quot;" end="&quot;##" />
+    <Span color="String" multiline="true" begin="(?&lt;!\w)b?r#&quot;" end="&quot;#" />
+    <Span color="String" multiline="true" begin="(?&lt;!\w)b?r&quot;" end="&quot;" />
+    <Span color="String" multiline="true" begin="(?&lt;!\w)[bc]?&quot;" end="&quot;" ruleSet="Escapes" />
+    <Rule color="String">(?&lt;!\w)b?'(?:\\(?:[nrt\\0'&quot;]|x[\da-fA-F]{2}|u\{[\da-fA-F]{1,6}\})|[^'\\\r\n])'</Rule>
+    <Rule color="Type">'[A-Za-z_]\w*</Rule>
+
+    <Keywords color="ControlKeyword">
+      <Word>break</Word>
+      <Word>continue</Word>
+      <Word>else</Word>
+      <Word>for</Word>
+      <Word>if</Word>
+      <Word>in</Word>
+      <Word>loop</Word>
+      <Word>match</Word>
+      <Word>return</Word>
+      <Word>while</Word>
+      <Word>yield</Word>
+      <Word>await</Word>
+    </Keywords>
+    <Keywords color="Keyword">
+      <Word>as</Word>
+      <Word>async</Word>
+      <Word>const</Word>
+      <Word>crate</Word>
+      <Word>dyn</Word>
+      <Word>enum</Word>
+      <Word>extern</Word>
+      <Word>fn</Word>
+      <Word>impl</Word>
+      <Word>let</Word>
+      <Word>mod</Word>
+      <Word>move</Word>
+      <Word>mut</Word>
+      <Word>pub</Word>
+      <Word>ref</Word>
+      <Word>self</Word>
+      <Word>Self</Word>
+      <Word>static</Word>
+      <Word>struct</Word>
+      <Word>super</Word>
+      <Word>trait</Word>
+      <Word>type</Word>
+      <Word>union</Word>
+      <Word>unsafe</Word>
+      <Word>use</Word>
+      <Word>where</Word>
+      <Word>true</Word>
+      <Word>false</Word>
+      <Word>macro_rules</Word>
+    </Keywords>
+    <Keywords color="Type">
+      <Word>bool</Word>
+      <Word>char</Word>
+      <Word>str</Word>
+      <Word>u8</Word>
+      <Word>u16</Word>
+      <Word>u32</Word>
+      <Word>u64</Word>
+      <Word>u128</Word>
+      <Word>usize</Word>
+      <Word>i8</Word>
+      <Word>i16</Word>
+      <Word>i32</Word>
+      <Word>i64</Word>
+      <Word>i128</Word>
+      <Word>isize</Word>
+      <Word>f32</Word>
+      <Word>f64</Word>
+    </Keywords>
+    <Rule color="Function">\b[A-Za-z_]\w*!(?=\s*[(\[{])</Rule>
+    <Rule color="Type">\b(?=[A-Z]\w*[a-z])[A-Z]\w*</Rule>
+    <Rule color="Function">\b[a-z_]\w*(?=\s*(?:(?:::)?\s*&lt;[^&lt;&gt;()]*(?:&lt;[^&lt;&gt;()]*&gt;[^&lt;&gt;()]*)*&gt;\s*)?\()</Rule>
+    <Rule color="Number">
+      \b(?:0x[\da-fA-F_]+|0o[0-7_]+|0b[01_]+|\d[\d_]*(?:\.\d[\d_]*)?(?:[eE][+-]?[\d_]+)?)(?:[iu](?:8|16|32|64|128|size)|f32|f64)?\b
+    </Rule>
+  </RuleSet>
+
+  <RuleSet name="BlockComment">
+    <Span multiline="true" begin="/\*" end="\*/" ruleSet="BlockComment" />
+  </RuleSet>
+
+  <RuleSet name="Escapes">
+    <Span begin="\\" end="." />
+  </RuleSet>
+
+  <!-- #[…]: strings and nested brackets -->
+  <RuleSet name="Attribute">
+    <Span color="String" begin="&quot;" end="&quot;" ruleSet="Escapes" />
+    <Span begin="\[" end="\]" ruleSet="Attribute" />
+  </RuleSet>
+</SyntaxDefinition>

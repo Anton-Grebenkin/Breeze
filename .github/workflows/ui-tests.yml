@@ -1,0 +1,39 @@
+# UI tests (FlaUI) start the real window and click with the mouse, so they run on demand, not on every push.
+# Run them locally before a release (./build/test.ps1 -Ui); this workflow is for a check on a clean machine.
+name: UI tests
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  ui:
+    name: UI tests
+    runs-on: windows-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - name: Build
+        run: dotnet build CodeEditor.slnx -c Release
+
+      - name: UI tests
+        run: dotnet test --project tests/CodeEditor.UI.Tests -c Release --no-build
+
+      - name: Screenshots
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: ui-screenshots
+          path: tests/CodeEditor.UI.Tests/bin/Release/**/screenshots/
+          if-no-files-found: ignore

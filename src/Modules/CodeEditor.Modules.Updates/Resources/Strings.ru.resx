@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="ModuleName" xml:space="preserve"><value>Обновления</value></data>
+  <data name="Category" xml:space="preserve"><value>Обновление</value></data>
+  <data name="CheckCommand" xml:space="preserve"><value>Проверить наличие обновлений…</value></data>
+  <data name="CheckMenu" xml:space="preserve"><value>Проверить _обновления…</value></data>
+  <data name="RestartCommand" xml:space="preserve"><value>Перезапустить и обновить</value></data>
+  <data name="NotInstalled" xml:space="preserve"><value>Обновления работают в установленной программе (Setup.exe со страницы выпусков на GitHub), а эта копия запущена из папки сборки.</value></data>
+  <data name="Checking" xml:space="preserve"><value>Проверка обновлений…</value></data>
+  <data name="CheckInProgress" xml:space="preserve"><value>Обновление уже проверяется или загружается.</value></data>
+  <data name="UpToDate" xml:space="preserve"><value>Установлена последняя версия Breeze — {0}.</value></data>
+  <data name="CheckFailed" xml:space="preserve"><value>Не удалось проверить обновления: {0}</value></data>
+  <data name="Downloading" xml:space="preserve"><value>Загрузка обновления {0}: {1} %</value></data>
+  <data name="DownloadFailed" xml:space="preserve"><value>Не удалось загрузить обновление {0}: {1}</value></data>
+  <data name="Ready" xml:space="preserve"><value>Обновление {0} загружено: перезапустите Breeze, чтобы установить его, или оно установится при следующем запуске.</value></data>
+  <data name="ReadyItem" xml:space="preserve"><value>Обновление {0}</value></data>
+  <data name="ReadyToolTip" xml:space="preserve"><value>Перезапустить Breeze и установить обновление; папка и вкладки откроются снова</value></data>
+  <data name="RestartPrompt" xml:space="preserve"><value>Обновление {0} загружено. Перезапустить Breeze сейчас, чтобы установить его?</value></data>
+  <data name="RestartDetail" xml:space="preserve"><value>После перезапуска папка и вкладки откроются снова. Если отложить, обновление установится при следующем запуске.</value></data>
+  <data name="RestartConfirm" xml:space="preserve"><value>Перезапустить</value></data>
+  <data name="NothingToApply" xml:space="preserve"><value>Обновление ещё не загружено: выполните «Проверить наличие обновлений…».</value></data>
+</root>

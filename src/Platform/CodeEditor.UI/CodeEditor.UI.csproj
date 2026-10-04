@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Design system: theme tokens, styles, shared controls. Depends on no other CodeEditor assembly. -->
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <!-- Codicons 0.0.45 (Microsoft, icons CC BY 4.0): font and name → glyph table. See THIRD-PARTY-NOTICES.md. -->
+  <ItemGroup>
+    <Resource Include="Fonts\codicon.ttf" />
+    <EmbeddedResource Include="Fonts\codicon.csv" LogicalName="CodeEditor.UI.Codicons.csv" />
+  </ItemGroup>
+
+  <!--
+    Inter 4.1 (The Inter Project Authors, SIL OFL 1.1, Fonts\Inter-OFL.txt): UI and chat font (ADR 0038).
+    Static weights only: WPF doesn't understand variable fonts and renders semibold as regular.
+  -->
+  <ItemGroup>
+    <Resource Include="Fonts\Inter-Regular.ttf" />
+    <Resource Include="Fonts\Inter-SemiBold.ttf" />
+    <Resource Include="Fonts\Inter-Bold.ttf" />
+  </ItemGroup>
+
+  <!-- Markdown parsing for agent replies; the assembly loads on first render. -->
+  <ItemGroup>
+    <PackageReference Include="Markdig" />
+  </ItemGroup>
+
+</Project>

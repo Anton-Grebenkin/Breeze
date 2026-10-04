@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Model × mode agent benchmark (ADR 0008): a headless agent solves tasks on sample repositories, and the run
+    checks the result with a build and hidden tests. Usage is in README.md.
+  -->
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <!-- Sample repositories and hidden tests are run data, not code of this project. -->
+  <ItemGroup>
+    <Compile Remove="Fixtures/**;Hidden/**" />
+    <None Include="Fixtures/**;Hidden/**" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Modules\CodeEditor.Modules.Agent\CodeEditor.Modules.Agent.csproj" />
+    <ProjectReference Include="..\..\src\Modules\CodeEditor.Modules.Explorer\CodeEditor.Modules.Explorer.csproj" />
+    <ProjectReference Include="..\..\src\Modules\CodeEditor.Modules.Git\CodeEditor.Modules.Git.csproj" />
+    <ProjectReference Include="..\..\src\Modules\CodeEditor.Modules.Docker\CodeEditor.Modules.Docker.csproj" />
+    <ProjectReference Include="..\..\src\Modules\CodeEditor.Modules.Documents\CodeEditor.Modules.Documents.csproj" />
+    <ProjectReference Include="..\..\src\Modules\CodeEditor.Modules.Output\CodeEditor.Modules.Output.csproj" />
+    <ProjectReference Include="..\..\src\Modules\CodeEditor.Modules.Search\CodeEditor.Modules.Search.csproj" />
+    <ProjectReference Include="..\..\src\Modules\CodeEditor.Modules.Terminal\CodeEditor.Modules.Terminal.csproj" />
+    <ProjectReference Include="..\..\src\Modules\CodeEditor.Modules.TextEditor\CodeEditor.Modules.TextEditor.csproj" />
+    <ProjectReference Include="..\..\src\Modules\CodeEditor.Modules.Tools\CodeEditor.Modules.Tools.csproj" />
+    <ProjectReference Include="..\CodeEditor.Testing\CodeEditor.Testing.csproj" />
+  </ItemGroup>
+
+</Project>

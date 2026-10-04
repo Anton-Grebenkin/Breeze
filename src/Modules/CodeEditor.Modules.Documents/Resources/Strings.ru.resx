@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="ModuleName" xml:space="preserve"><value>Документы</value></data>
+  <data name="ViewModuleName" xml:space="preserve"><value>Просмотр документов</value></data>
+  <!-- Document content for the model and the viewer. -->
+  <data name="ImagePlaceholder" xml:space="preserve"><value>[изображение: {0}]</value></data>
+  <data name="ImageWithoutName" xml:space="preserve"><value>[изображение]</value></data>
+  <data name="NotesLabel" xml:space="preserve"><value>Заметки:</value></data>
+  <data name="SlideNumber" xml:space="preserve"><value>Слайд {0}</value></data>
+  <data name="EmptyCell" xml:space="preserve"><value>(пусто)</value></data>
+  <data name="EmptySheet" xml:space="preserve"><value>пустой</value></data>
+  <data name="HiddenSheet" xml:space="preserve"><value>скрыт</value></data>
+  <data name="HiddenSheetTitle" xml:space="preserve"><value>{0} (скрыт)</value></data>
+  <!-- File read errors. -->
+  <data name="NotOfficeDocument" xml:space="preserve"><value>Файл — не документ Word, Excel или PowerPoint, повреждён или защищён паролем.</value></data>
+  <data name="CsvIsBinary" xml:space="preserve"><value>Файл двоичный, а не текст CSV.</value></data>
+  <data name="PdfEncrypted" xml:space="preserve"><value>PDF защищён паролем.</value></data>
+  <data name="NotPdf" xml:space="preserve"><value>Файл — не PDF либо повреждён.</value></data>
+  <data name="PdfCannotImport" xml:space="preserve"><value>Страницы из этого PDF взять нельзя.</value></data>
+  <data name="NoPdfFonts" xml:space="preserve"><value>Не найдены шрифты Windows с кириллицей (Segoe UI, Arial или Tahoma): PDF не создать.</value></data>
+  <!-- Model tool replies: reading. -->
+  <data name="UnsupportedFormat" xml:space="preserve"><value>«{0}» — не поддерживаемый документ. Поддерживаются: {1}. Другие файлы читает read_file.</value></data>
+  <data name="FileNotFound" xml:space="preserve"><value>«{0}» не найден.</value></data>
+  <data name="PathIsFolder" xml:space="preserve"><value>«{0}» — папка, а не документ.</value></data>
+  <data name="FileNotReadable" xml:space="preserve"><value>«{0}» не прочитать: {1}</value></data>
+  <data name="FileNotWritable" xml:space="preserve"><value>«{0}» не записать: {1} Возможно, файл открыт в Word или Excel — попросите пользователя его закрыть.</value></data>
+  <data name="DocumentNotReadable" xml:space="preserve"><value>«{0}» не прочитать: {1}</value></data>
+  <data name="PdfHeader" xml:space="preserve"><value>{0}: PDF, страниц: {1}.</value></data>
+  <data name="PageMarker" xml:space="preserve"><value>--- страница {0} ---</value></data>
+  <data name="PageWithoutText" xml:space="preserve"><value>(на странице нет текста)</value></data>
+  <data name="PdfWithoutText" xml:space="preserve"><value>В PDF нет текстового слоя: похоже на сканы страниц, а распознавания текста нет.</value></data>
+  <data name="MorePages" xml:space="preserve"><value>Показаны страницы {0} из {1}. Остальные — с pages: «{2}-».</value></data>
+  <data name="InvalidPages" xml:space="preserve"><value>Страницы «{0}» не годятся: пишите «3», «2-5» или «1,4-6» в пределах 1–{1}.</value></data>
+  <data name="SheetList" xml:space="preserve"><value>Листы: {0}</value></data>
+  <data name="SheetHeader" xml:space="preserve"><value>Лист «{0}», {1}:</value></data>
+  <data name="SheetIsEmpty" xml:space="preserve"><value>Лист «{0}» пуст.</value></data>
+  <data name="MoreRows" xml:space="preserve"><value>Показано {0} из {1} строк с данными. Остальные — с range: «{2}».</value></data>
+  <data name="MoreColumns" xml:space="preserve"><value>Столбцы {0}–{1} не показаны: прочитайте их с range.</value></data>
+  <data name="InvalidRange" xml:space="preserve"><value>Диапазон «{0}» не годится: пишите «A1:F50», «B:D» или «10:40».</value></data>
+  <data name="RangeHasNoData" xml:space="preserve"><value>В диапазоне «{0}» листа «{1}» нет данных: занятый диапазон — {2}.</value></data>
+  <data name="SheetNotFound" xml:space="preserve"><value>В книге нет листа «{0}». Листы: {1}.</value></data>
+  <data name="NotWorksheet" xml:space="preserve"><value>«{0}» — лист диаграммы, а не лист с ячейками.</value></data>
+  <!-- Model tool replies: editing. -->
+  <data name="UnknownAction" xml:space="preserve"><value>Неизвестное действие «{0}». Допустимы: {1}.</value></data>
+  <data name="ArgumentRequired" xml:space="preserve"><value>Для действия {0} нужен аргумент {1}.</value></data>
+  <data name="WrongFormatForAction" xml:space="preserve"><value>Действие {0} работает с файлами {1}, а не «{2}».</value></data>
+  <data name="FileExists" xml:space="preserve"><value>«{0}» уже есть. Измените его действиями правки или задайте overwrite: true, чтобы заменить.</value></data>
+  <data name="TextNotFound" xml:space="preserve"><value>Текст «{0}» в документе не найден. Прочитайте документ и скопируйте текст точно, без разметки Markdown; он должен быть внутри одного абзаца.</value></data>
+  <data name="TextFoundManyTimes" xml:space="preserve"><value>Текст «{0}» встречается {1} раз(а). Добавьте соседние слова, чтобы он стал единственным, или задайте all: true, чтобы заменить все.</value></data>
+  <data name="AnchorNotUnique" xml:space="preserve"><value>Текст «{0}» есть больше чем в одном абзаце: добавьте слова, чтобы место стало единственным.</value></data>
+  <data name="FormulaUnbalanced" xml:space="preserve"><value>«{0}» — не формула: не закрыта скобка или кавычка. Текст, который начинается с «=», пишите с апострофом в начале: '=текст.</value></data>
+  <data name="FormulaSemicolon" xml:space="preserve"><value>В формуле «{0}» аргументы разделены «;». В файле формулы пишутся через запятую и с английскими именами функций: =SUM(A1,A2), =IF(B2>0,"да","нет").</value></data>
+  <data name="FormulaLocalized" xml:space="preserve"><value>В формуле «{0}» имя функции по-русски. В файле функции английские: SUM, IF, VLOOKUP.</value></data>
+  <data name="TableHeaderNotText" xml:space="preserve"><value>{0} — заголовок столбца таблицы «{1}»: туда можно записать только непустой текст, он станет именем столбца.</value></data>
+  <data name="TableHeaderTaken" xml:space="preserve"><value>В таблице «{1}» уже есть столбец «{0}»: имена столбцов таблицы не повторяются.</value></data>
+  <data name="InvalidCellAddress" xml:space="preserve"><value>«{0}» — не адрес ячейки: пишите A1, B12, AA3.</value></data>
+  <data name="InvalidSheetName" xml:space="preserve"><value>«{0}» не годится как имя листа: 1–{1} знаков, без : \ / ? * [ ] и без апострофа в начале и в конце.</value></data>
+  <data name="SheetExists" xml:space="preserve"><value>В книге уже есть лист «{0}».</value></data>
+  <data name="NotPdfSource" xml:space="preserve"><value>«{0}» — не PDF: объединять можно только страницы PDF.</value></data>
+  <data name="DocumentCreated" xml:space="preserve"><value>{0} записан.</value></data>
+  <data name="TextReplaced" xml:space="preserve"><value>Заменено в {1}: {0} раз(а); оформление сохранено.</value></data>
+  <data name="BlocksInserted" xml:space="preserve"><value>Вставлено блоков в {1}: {0}.</value></data>
+  <data name="WorkbookCreated" xml:space="preserve"><value>{0} записан; листы: {1}.</value></data>
+  <data name="CellsWritten" xml:space="preserve"><value>Записано ячеек на листе «{1}» в {2}: {0}.</value></data>
+  <data name="FormulasRecalculated" xml:space="preserve"><value>Формулы Excel пересчитает при открытии файла; до тех пор инструмент document показывает прежние сохранённые значения.</value></data>
+  <data name="SheetAdded" xml:space="preserve"><value>Лист «{0}» добавлен в {1}.</value></data>
+  <data name="SheetRenamed" xml:space="preserve"><value>Лист «{0}» переименован в «{1}» в {2}; ссылки на него в формулах, именах и диаграммах обновлены.</value></data>
+  <data name="PdfCreated" xml:space="preserve"><value>{0} записан: страниц: {1}.</value></data>
+  <data name="PreviousInRecycleBin" xml:space="preserve"><value>Прежний файл — в корзине.</value></data>
+  <data name="PreviewNotShown" xml:space="preserve"><value>Ничего не изменено: карточку подтверждения не удалось подготовить (возможно, файл был занят), и пользователь этого изменения не видел. Повторите вызов.</value></data>
+  <data name="ChangedSincePreview" xml:space="preserve"><value>Ничего не изменено: {0} изменился после того, как пользователь увидел карточку подтверждения. Прочитайте его заново и повторите правку.</value></data>
+  <data name="SourcePages" xml:space="preserve"><value>{0}: страницы {1} ({2})</value></data>
+  <data name="TotalPages" xml:space="preserve"><value>Всего страниц: {0}</value></data>
+  <!-- Approval cards. -->
+  <data name="ApprovalWordCreate" xml:space="preserve"><value>Агент хочет записать документ Word</value></data>
+  <data name="ApprovalWordEdit" xml:space="preserve"><value>Агент хочет изменить документ Word</value></data>
+  <data name="ApprovalExcelCreate" xml:space="preserve"><value>Агент хочет записать книгу Excel</value></data>
+  <data name="ApprovalExcelEdit" xml:space="preserve"><value>Агент хочет изменить книгу Excel</value></data>
+  <data name="ApprovalPdfCreate" xml:space="preserve"><value>Агент хочет записать PDF</value></data>
+  <data name="ApprovalPdfCombine" xml:space="preserve"><value>Агент хочет собрать страницы PDF</value></data>
+  <!-- Agent feed lines. -->
+  <data name="FeedReadRunning" xml:space="preserve"><value>Чтение {0}</value></data>
+  <data name="FeedReadDone" xml:space="preserve"><value>Прочитан {0}</value></data>
+  <data name="FeedCreateRunning" xml:space="preserve"><value>Запись {0}</value></data>
+  <data name="FeedCreateDone" xml:space="preserve"><value>Записан {0}</value></data>
+  <data name="FeedEditRunning" xml:space="preserve"><value>Правка {0}</value></data>
+  <data name="FeedEditDone" xml:space="preserve"><value>Изменён {0}</value></data>
+  <data name="FeedCombineRunning" xml:space="preserve"><value>Сборка страниц в {0}</value></data>
+  <data name="FeedCombineDone" xml:space="preserve"><value>Страницы собраны в {0}</value></data>
+  <data name="FeedPages" xml:space="preserve"><value>стр. {0}</value></data>
+  <data name="FeedSheet" xml:space="preserve"><value>лист «{0}»</value></data>
+  <data name="FeedReplace" xml:space="preserve"><value>«{0}» → «{1}»</value></data>
+  <data name="CellForms" xml:space="preserve"><value>ячейка|ячейки|ячеек</value></data>
+  <!-- Viewers. -->
+  <data name="ViewerLoadFailed" xml:space="preserve"><value>Файл не показать: {0}</value></data>
+  <data name="OpenExternalFailed" xml:space="preserve"><value>Файл не открыть во внешнем приложении: {0}</value></data>
+  <data name="FileMissing" xml:space="preserve"><value>Файл удалён или перемещён.</value></data>
+  <data name="SlideForms" xml:space="preserve"><value>слайд|слайда|слайдов</value></data>
+  <data name="RowForms" xml:space="preserve"><value>строка|строки|строк</value></data>
+  <data name="ColumnForms" xml:space="preserve"><value>столбец|столбца|столбцов</value></data>
+  <data name="Refresh" xml:space="preserve"><value>Обновить</value></data>
+  <data name="OpenExternal" xml:space="preserve"><value>Открыть во внешнем приложении</value></data>
+  <data name="OpenAsText" xml:space="preserve"><value>Открыть как текст</value></data>
+  <data name="Loading" xml:space="preserve"><value>Загрузка…</value></data>
+  <data name="Truncated" xml:space="preserve"><value>Показана только часть листа: целиком файл откроет внешнее приложение.</value></data>
+  <data name="DocumentTruncated" xml:space="preserve"><value>Документ длинный: показано только его начало. Целиком его откроет внешнее приложение.</value></data>
+  <data name="SheetTabs" xml:space="preserve"><value>Листы</value></data>
+  <data name="Cells" xml:space="preserve"><value>Ячейки</value></data>
+  <data name="Document" xml:space="preserve"><value>Документ</value></data>
+  <data name="PdfUnavailable" xml:space="preserve"><value>Встроенный просмотр PDF недоступен: {0}</value></data>
+  <!-- Commands. -->
+  <data name="CategoryDocuments" xml:space="preserve"><value>Документы</value></data>
+  <data name="CommandRefresh" xml:space="preserve"><value>Обновить документ</value></data>
+  <data name="CommandOpenExternal" xml:space="preserve"><value>Открыть во внешнем приложении</value></data>
+  <data name="CommandOpenAsText" xml:space="preserve"><value>Открыть CSV как текст</value></data>
+  <data name="MenuRefresh" xml:space="preserve"><value>О_бновить</value></data>
+  <data name="MenuOpenExternal" xml:space="preserve"><value>Открыть во _внешнем приложении</value></data>
+  <data name="MenuOpenAsText" xml:space="preserve"><value>Открыть как _текст</value></data>
+</root>

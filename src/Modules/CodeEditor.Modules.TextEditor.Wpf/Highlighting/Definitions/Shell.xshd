@@ -1,0 +1,124 @@
+<?xml version="1.0"?>
+<!--
+  Shell (sh, bash, zsh): #! at the file start, comments with # at a word start, "…" strings with substitutions and
+  '…' without, $'…', heredocs with common delimiters (EOF, END, EOT, EOM, EOL), $VAR and ${…} variables, command
+  substitution $(…) and `…` in the text color even inside strings. Keywords, builtins, function declarations.
+  Color names are theme tokens (ADR 0036).
+-->
+<SyntaxDefinition name="Shell" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+  <Color name="Comment" />
+  <Color name="String" />
+  <Color name="Number" />
+  <Color name="Keyword" />
+  <Color name="ControlKeyword" />
+  <Color name="Function" />
+  <Color name="Variable" />
+  <Color name="Preprocessor" />
+  <Color name="Text" />
+
+  <RuleSet>
+    <Span color="Preprocessor" begin="^#!" />
+    <Span color="Comment" begin="(?&lt;=^|[\s;&amp;|()])#" />
+    <Span begin="\\" end="." />
+    <Span color="String" multiline="true" ruleSet="Expansions"
+          begin="&lt;&lt;-?[ \t]*[&quot;']?(?:EOF|END|EOT|EOM|EOL)\b[&quot;']?" end="^[ \t]*(?:EOF|END|EOT|EOM|EOL)[ \t]*$" />
+    <Span color="String" multiline="true" begin="\$'" end="'" ruleSet="Escapes" />
+    <Span color="String" multiline="true" begin="&quot;" end="&quot;" ruleSet="DoubleQuoted" />
+    <Span color="String" multiline="true" begin="'" end="'" />
+    <Import ruleSet="Expansions" />
+
+    <Keywords color="ControlKeyword">
+      <Word>if</Word>
+      <Word>then</Word>
+      <Word>else</Word>
+      <Word>elif</Word>
+      <Word>fi</Word>
+      <Word>case</Word>
+      <Word>esac</Word>
+      <Word>for</Word>
+      <Word>select</Word>
+      <Word>while</Word>
+      <Word>until</Word>
+      <Word>do</Word>
+      <Word>done</Word>
+      <Word>in</Word>
+      <Word>break</Word>
+      <Word>continue</Word>
+      <Word>return</Word>
+      <Word>exit</Word>
+    </Keywords>
+    <Keywords color="Keyword">
+      <Word>function</Word>
+      <Word>time</Word>
+      <Word>coproc</Word>
+      <Word>local</Word>
+      <Word>declare</Word>
+      <Word>typeset</Word>
+      <Word>export</Word>
+      <Word>readonly</Word>
+      <Word>unset</Word>
+      <Word>true</Word>
+      <Word>false</Word>
+    </Keywords>
+    <Keywords color="Function">
+      <Word>echo</Word>
+      <Word>printf</Word>
+      <Word>read</Word>
+      <Word>cd</Word>
+      <Word>pwd</Word>
+      <Word>source</Word>
+      <Word>alias</Word>
+      <Word>set</Word>
+      <Word>shift</Word>
+      <Word>eval</Word>
+      <Word>exec</Word>
+      <Word>trap</Word>
+      <Word>wait</Word>
+      <Word>getopts</Word>
+      <Word>pushd</Word>
+      <Word>popd</Word>
+    </Keywords>
+    <!-- Function declaration: name() { … } or function name { … } -->
+    <Rule color="Function">(?&lt;![\w.:-])[A-Za-z_][\w.:-]*(?=[\ \t]*\([\ \t]*\))</Rule>
+    <Rule color="Function">(?&lt;=\bfunction[\ \t]+)[A-Za-z_][\w.:-]*</Rule>
+    <!-- Assignment: NAME=value -->
+    <Rule color="Variable">(?&lt;![\w$-])[A-Za-z_]\w*(?=\+?=)</Rule>
+    <Rule color="Number">(?&lt;![\w.$\-])\d+(?![\w.])</Rule>
+  </RuleSet>
+
+  <RuleSet name="Escapes">
+    <Span begin="\\" end="." />
+  </RuleSet>
+
+  <RuleSet name="DoubleQuoted">
+    <Span begin="\\" end="." />
+    <Import ruleSet="Expansions" />
+  </RuleSet>
+
+  <!-- Substitutions: in code, in "…" strings and in heredocs. -->
+  <RuleSet name="Expansions">
+    <Span color="Text" multiline="true" ruleSet="Command">
+      <Begin color="Variable">\$\(</Begin>
+      <End color="Variable">\)</End>
+    </Span>
+    <Span color="Text" multiline="true" ruleSet="Backquoted">
+      <Begin color="Variable">`</Begin>
+      <End color="Variable">`</End>
+    </Span>
+    <Span color="Variable" begin="\$\{" end="\}" ruleSet="Expansions" />
+    <Rule color="Variable">\$(?:[A-Za-z_]\w*|[0-9@\#?$!*\-])</Rule>
+  </RuleSet>
+
+  <!-- $( … ): nested parens are balanced; the rest uses the main rule set. -->
+  <RuleSet name="Command">
+    <Span multiline="true" begin="\(" end="\)" ruleSet="Command" />
+    <Import ruleSet="" />
+  </RuleSet>
+
+  <!-- `…`: no nested `, otherwise a backtick would open a new substitution. -->
+  <RuleSet name="Backquoted">
+    <Span begin="\\" end="." />
+    <Span color="Variable" begin="\$\{" end="\}" ruleSet="Expansions" />
+    <Rule color="Variable">\$(?:[A-Za-z_]\w*|[0-9@\#?$!*\-])</Rule>
+  </RuleSet>
+</SyntaxDefinition>

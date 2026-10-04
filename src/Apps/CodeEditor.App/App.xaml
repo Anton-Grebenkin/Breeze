@@ -1,0 +1,19 @@
+<Application x:Class="CodeEditor.App.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             ShutdownMode="OnMainWindowClose">
+  <Application.Resources>
+    <ResourceDictionary>
+      <!-- ThemeService (ShellWpfModule) inserts the color dictionary first, before the window is created. -->
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/CodeEditor.UI;component/Themes/Typography.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/CodeEditor.UI;component/Themes/Controls.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/CodeEditor.UI;component/Themes/Inputs.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/CodeEditor.UI;component/Themes/ScrollBars.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/CodeEditor.UI;component/Themes/Menus.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/CodeEditor.UI;component/Themes/Trees.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/CodeEditor.UI;component/Themes/Brand.xaml" />
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Application.Resources>
+</Application>

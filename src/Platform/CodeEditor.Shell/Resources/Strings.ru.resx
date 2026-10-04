@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="LanguageCategory" xml:space="preserve"><value>Язык</value></data>
+  <data name="LanguageMenu" xml:space="preserve"><value>_Язык</value></data>
+  <data name="LanguageMenuManage" xml:space="preserve"><value>Язык</value></data>
+  <data name="LanguageAuto" xml:space="preserve"><value>Язык интерфейса: как в Windows</value></data>
+  <data name="LanguageRussian" xml:space="preserve"><value>Язык интерфейса: Русский</value></data>
+  <data name="LanguageEnglish" xml:space="preserve"><value>Язык интерфейса: English</value></data>
+  <data name="LanguageAutoMenu" xml:space="preserve"><value>_Как в Windows</value></data>
+  <data name="LanguageRussianMenu" xml:space="preserve"><value>_Русский</value></data>
+  <data name="LanguageEnglishMenu" xml:space="preserve"><value>_English</value></data>
+  <data name="LanguageChanged" xml:space="preserve"><value>Язык: {0}. Перезапустите Breeze, чтобы применить</value></data>
+  <data name="LanguageNameAuto" xml:space="preserve"><value>как в Windows</value></data>
+  <data name="ShellModuleName" xml:space="preserve"><value>Оболочка</value></data>
+  <data name="CategoryDeveloper" xml:space="preserve"><value>Разработчик</value></data>
+  <data name="CategoryView" xml:space="preserve"><value>Вид</value></data>
+  <data name="CategoryFile" xml:space="preserve"><value>Файл</value></data>
+  <data name="CategoryTabs" xml:space="preserve"><value>Вкладки</value></data>
+  <data name="CategorySettings" xml:space="preserve"><value>Настройки</value></data>
+  <data name="CategoryAppearance" xml:space="preserve"><value>Оформление</value></data>
+  <data name="ShowMemory" xml:space="preserve"><value>Память после сборки мусора</value></data>
+  <data name="MemoryStatus" xml:space="preserve"><value>Память: куча {0} КБ, рабочий набор {1} МБ</value></data>
+  <data name="SideBar" xml:space="preserve"><value>Боковая панель</value></data>
+  <data name="Panel" xml:space="preserve"><value>Нижняя панель</value></data>
+  <data name="SecondarySideBar" xml:space="preserve"><value>Вторичная боковая панель</value></data>
+  <data name="ToggleVisibility" xml:space="preserve"><value>Показать или скрыть: {0}</value></data>
+  <data name="ShowToolWindow" xml:space="preserve"><value>Показать: {0}</value></data>
+  <data name="OpenLog" xml:space="preserve"><value>Открыть журнал</value></data>
+  <data name="RevealLogs" xml:space="preserve"><value>Показать папку журналов</value></data>
+  <data name="SetLogLevel" xml:space="preserve"><value>Уровень журнала…</value></data>
+  <data name="LogUnavailable" xml:space="preserve"><value>Журнал недоступен: не удалось открыть файл в {0}</value></data>
+  <data name="LogLevelCurrent" xml:space="preserve"><value>текущий · {0}</value></data>
+  <data name="LogLevelPickTitle" xml:space="preserve"><value>Уровень подробностей файла журнала</value></data>
+  <data name="LogLevelChanged" xml:space="preserve"><value>Уровень журнала: {0}</value></data>
+  <data name="LogLevelTrace" xml:space="preserve"><value>Трассировка</value></data>
+  <data name="LogLevelTraceDetail" xml:space="preserve"><value>всё, включая самые подробные записи</value></data>
+  <data name="LogLevelDebug" xml:space="preserve"><value>Отладка</value></data>
+  <data name="LogLevelDebugDetail" xml:space="preserve"><value>по умолчанию: команды, запросы к модели, решения по правкам</value></data>
+  <data name="LogLevelInformation" xml:space="preserve"><value>Сведения</value></data>
+  <data name="LogLevelInformationDetail" xml:space="preserve"><value>открытие и сохранение файлов, ходы агента, настройки</value></data>
+  <data name="LogLevelWarning" xml:space="preserve"><value>Предупреждения</value></data>
+  <data name="LogLevelWarningDetail" xml:space="preserve"><value>только проблемы и ошибки</value></data>
+  <data name="LogLevelError" xml:space="preserve"><value>Ошибки</value></data>
+  <data name="LogLevelErrorDetail" xml:space="preserve"><value>только ошибки</value></data>
+  <data name="OpenUserSettings" xml:space="preserve"><value>Открыть пользовательские настройки (JSON)</value></data>
+  <data name="OpenWorkspaceSettings" xml:space="preserve"><value>Открыть настройки папки (JSON)</value></data>
+  <data name="OpenKeybindings" xml:space="preserve"><value>Открыть сочетания клавиш (JSON)</value></data>
+  <data name="SettingsMenuManage" xml:space="preserve"><value>Настройки</value></data>
+  <data name="WorkspaceSettingsMenu" xml:space="preserve"><value>Настройки папки</value></data>
+  <data name="KeybindingsMenu" xml:space="preserve"><value>Сочетания клавиш</value></data>
+  <data name="SettingsMenuFile" xml:space="preserve"><value>_Настройки</value></data>
+  <data name="ThemeNameDark" xml:space="preserve"><value>тёмная</value></data>
+  <data name="ThemeNameLight" xml:space="preserve"><value>светлая</value></data>
+  <data name="ToggleTheme" xml:space="preserve"><value>Переключить тему</value></data>
+  <data name="DarkTheme" xml:space="preserve"><value>Тёмная тема</value></data>
+  <data name="LightTheme" xml:space="preserve"><value>Светлая тема</value></data>
+  <data name="DarkThemeMenu" xml:space="preserve"><value>_Тёмная</value></data>
+  <data name="LightThemeMenu" xml:space="preserve"><value>_Светлая</value></data>
+  <data name="ToggleThemeMenu" xml:space="preserve"><value>_Переключить</value></data>
+  <data name="ThemeChanged" xml:space="preserve"><value>Тема: {0}</value></data>
+  <data name="ShowAllCommands" xml:space="preserve"><value>Показать все команды</value></data>
+  <data name="GoToFile" xml:space="preserve"><value>Перейти к файлу…</value></data>
+  <data name="GoToLine" xml:space="preserve"><value>Перейти к строке…</value></data>
+  <data name="FileMenu" xml:space="preserve"><value>_Файл</value></data>
+  <data name="EditMenu" xml:space="preserve"><value>_Правка</value></data>
+  <data name="ViewMenu" xml:space="preserve"><value>_Вид</value></data>
+  <data name="GoMenu" xml:space="preserve"><value>П_ереход</value></data>
+  <data name="HelpMenu" xml:space="preserve"><value>_Справка</value></data>
+  <data name="CommandPaletteMenu" xml:space="preserve"><value>_Палитра команд…</value></data>
+  <data name="ThemeMenu" xml:space="preserve"><value>_Тема</value></data>
+  <data name="GoToFileMenu" xml:space="preserve"><value>Перейти к _файлу…</value></data>
+  <data name="GoToLineMenu" xml:space="preserve"><value>Перейти к _строке…</value></data>
+  <data name="CommandPaletteMenuManage" xml:space="preserve"><value>Палитра команд…</value></data>
+  <data name="ThemeMenuManage" xml:space="preserve"><value>Тема</value></data>
+  <data name="FileChangedOnDisk" xml:space="preserve"><value>Файл «{0}» изменён на диске.</value></data>
+  <data name="OverwriteQuestion" xml:space="preserve"><value>Перезаписать его вашей версией?</value></data>
+  <data name="Overwrite" xml:space="preserve"><value>Перезаписать</value></data>
+  <data name="SaveFailed" xml:space="preserve"><value>Не удалось сохранить «{0}»: {1}</value></data>
+  <data name="NoEditor" xml:space="preserve"><value>Нет редактора для «{0}».</value></data>
+  <data name="OpenFile" xml:space="preserve"><value>Открыть файл…</value></data>
+  <data name="Save" xml:space="preserve"><value>Сохранить</value></data>
+  <data name="SaveAll" xml:space="preserve"><value>Сохранить всё</value></data>
+  <data name="RevertFile" xml:space="preserve"><value>Отменить изменения в файле</value></data>
+  <data name="Close" xml:space="preserve"><value>Закрыть</value></data>
+  <data name="CloseOthers" xml:space="preserve"><value>Закрыть другие</value></data>
+  <data name="CloseToTheRight" xml:space="preserve"><value>Закрыть справа</value></data>
+  <data name="CloseAll" xml:space="preserve"><value>Закрыть все</value></data>
+  <data name="ReopenClosedTab" xml:space="preserve"><value>Открыть закрытую вкладку</value></data>
+  <data name="NextTab" xml:space="preserve"><value>Следующая вкладка</value></data>
+  <data name="PreviousTab" xml:space="preserve"><value>Предыдущая вкладка</value></data>
+  <data name="RecentTab" xml:space="preserve"><value>Недавняя вкладка</value></data>
+  <data name="CopyActivePath" xml:space="preserve"><value>Копировать путь активного файла</value></data>
+  <data name="OpenFileMenu" xml:space="preserve"><value>Открыть _файл…</value></data>
+  <data name="SaveMenu" xml:space="preserve"><value>_Сохранить</value></data>
+  <data name="SaveAllMenu" xml:space="preserve"><value>Сохранить _всё</value></data>
+  <data name="RevertFileMenu" xml:space="preserve"><value>Отменить изменения</value></data>
+  <data name="CloseEditorMenu" xml:space="preserve"><value>Закрыть _редактор</value></data>
+  <data name="CloseMenu" xml:space="preserve"><value>_Закрыть</value></data>
+  <data name="CloseOthersMenu" xml:space="preserve"><value>Закрыть _другие</value></data>
+  <data name="CloseToTheRightMenu" xml:space="preserve"><value>Закрыть _справа</value></data>
+  <data name="CloseAllMenu" xml:space="preserve"><value>Закрыть _все</value></data>
+  <data name="CopyPathMenu" xml:space="preserve"><value>_Копировать путь</value></data>
+  <data name="OpenFileDialogTitle" xml:space="preserve"><value>Открыть файл</value></data>
+  <data name="CommandsPlaceholder" xml:space="preserve"><value>Введите название команды</value></data>
+  <data name="NoMatchingCommands" xml:space="preserve"><value>Нет подходящих команд</value></data>
+  <data name="FilesPlaceholder" xml:space="preserve"><value>Поиск файлов по имени (: — строка, &gt; — команды)</value></data>
+  <data name="NoFolderOpen" xml:space="preserve"><value>Папка не открыта. Введите «&gt;» для команд.</value></data>
+  <data name="NoMatchingFiles" xml:space="preserve"><value>Нет подходящих файлов</value></data>
+  <data name="LineNumberPlaceholder" xml:space="preserve"><value>Номер строки</value></data>
+  <data name="OpenFileToGoToLine" xml:space="preserve"><value>Откройте файл, чтобы перейти к строке</value></data>
+  <data name="TypeLineNumber" xml:space="preserve"><value>Введите номер строки</value></data>
+  <data name="GoToLineNumber" xml:space="preserve"><value>Перейти к строке {0}</value></data>
+  <data name="NoMatchingItems" xml:space="preserve"><value>Нет подходящих вариантов</value></data>
+  <data name="StatusReady" xml:space="preserve"><value>Готово</value></data>
+  <data name="TitleBarSearch" xml:space="preserve"><value>Поиск</value></data>
+  <data name="OpenFolder" xml:space="preserve"><value>Открыть папку…</value></data>
+  <data name="CloseFolder" xml:space="preserve"><value>Закрыть папку</value></data>
+  <data name="OpenRecentFolder" xml:space="preserve"><value>Открыть недавнюю папку</value></data>
+  <data name="ClearRecentFolders" xml:space="preserve"><value>Очистить список недавних папок</value></data>
+  <data name="OpenFolderMenu" xml:space="preserve"><value>_Открыть папку…</value></data>
+  <data name="OpenRecentMenu" xml:space="preserve"><value>Открыть _недавние</value></data>
+  <data name="CloseFolderMenu" xml:space="preserve"><value>_Закрыть папку</value></data>
+  <data name="FolderNotFound" xml:space="preserve"><value>Папка не найдена: {0}</value></data>
+  <data name="OpenFolderDialogTitle" xml:space="preserve"><value>Открыть папку</value></data>
+  <data name="ClearRecentMenu" xml:space="preserve"><value>_Очистить список</value></data>
+  <data name="ShellWpfModuleName" xml:space="preserve"><value>Оболочка: представления</value></data>
+  <data name="Exit" xml:space="preserve"><value>Выход</value></data>
+  <data name="ExitMenu" xml:space="preserve"><value>_Выход</value></data>
+  <data name="WaitingForSecondChord" xml:space="preserve"><value>Нажато ({0}). Ожидание второй клавиши…</value></data>
+  <data name="ChordNotAssigned" xml:space="preserve"><value>Сочетание ({0}, {1}) не назначено</value></data>
+  <data name="SaveChangesToFile" xml:space="preserve"><value>Сохранить изменения в «{0}»?</value></data>
+  <data name="SaveChangesToFiles" xml:space="preserve"><value>Сохранить изменения в файлах ({0})?&#10;&#10;{1}</value></data>
+  <data name="UnsavedChangesLost" xml:space="preserve"><value>Если не сохранить, изменения будут потеряны.</value></data>
+  <data name="Minimize" xml:space="preserve"><value>Свернуть</value></data>
+  <data name="Maximize" xml:space="preserve"><value>Развернуть</value></data>
+  <data name="Restore" xml:space="preserve"><value>Восстановить</value></data>
+  <data name="CloseTabToolTip" xml:space="preserve"><value>Закрыть (Ctrl+W)</value></data>
+  <data name="SideBarToolTip" xml:space="preserve"><value>Боковая панель (Ctrl+B)</value></data>
+  <data name="PanelToolTip" xml:space="preserve"><value>Нижняя панель (Ctrl+J)</value></data>
+  <data name="SecondarySideBarToolTip" xml:space="preserve"><value>Вторичная боковая панель (Ctrl+Alt+B)</value></data>
+  <data name="SecretKey" xml:space="preserve"><value>Ключ</value></data>
+  <data name="SecretStorageNote" xml:space="preserve"><value>Ключ хранится зашифрованным для вашей учётной записи Windows и не попадает в файлы настроек.</value></data>
+  <data name="Cancel" xml:space="preserve"><value>Отмена</value></data>
+  <data name="WelcomeRecent" xml:space="preserve"><value>Недавние</value></data>
+  <!-- Welcome page tagline under the name: part of the logo, not translated (ADR 0038). -->
+  <data name="ProductTagline" xml:space="preserve"><value>Code Editor</value></data>
+  <data name="Hide" xml:space="preserve"><value>Скрыть</value></data>
+  <data name="Manage" xml:space="preserve"><value>Управление</value></data>
+  <data name="RestartCommand" xml:space="preserve"><value>Перезапустить Breeze</value></data>
+  <data name="RestartMenu" xml:space="preserve"><value>П_ерезапустить</value></data>
+  <data name="LanguageRestartPrompt" xml:space="preserve"><value>Перезапустить Breeze, чтобы сменить язык интерфейса на «{0}»?</value></data>
+  <data name="LanguageRestartDetail" xml:space="preserve"><value>Несохранённые файлы редактор предложит сохранить; папка и вкладки откроются снова.</value></data>
+  <data name="LanguageRestartConfirm" xml:space="preserve"><value>Перезапустить</value></data>
+  <data name="LanguageUnchanged" xml:space="preserve"><value>Язык: {0}</value></data>
+  <data name="EditorArea" xml:space="preserve"><value>Область редактора</value></data>
+  <data name="MoveToSideBar" xml:space="preserve"><value>Переместить в боковую панель</value></data>
+  <data name="MoveToSecondarySideBar" xml:space="preserve"><value>Переместить во вторичную боковую панель</value></data>
+  <data name="MoveToPanel" xml:space="preserve"><value>Переместить в нижнюю панель</value></data>
+  <data name="MoveToEditor" xml:space="preserve"><value>Переместить в область редактора</value></data>
+  <data name="MoveView" xml:space="preserve"><value>Переместить панель…</value></data>
+  <data name="ResetViewLocations" xml:space="preserve"><value>Вернуть панели на места</value></data>
+  <data name="PickViewToMove" xml:space="preserve"><value>Выберите панель, которую переместить</value></data>
+  <data name="PickViewLocation" xml:space="preserve"><value>Куда переместить «{0}»?</value></data>
+  <data name="SplitEditor" xml:space="preserve"><value>Разделить редактор</value></data>
+  <data name="MoveEditorToNextGroup" xml:space="preserve"><value>Переместить вкладку в группу справа</value></data>
+  <data name="MoveEditorToPreviousGroup" xml:space="preserve"><value>Переместить вкладку в группу слева</value></data>
+  <data name="FocusEditorGroup" xml:space="preserve"><value>Перейти в группу редактора {0}</value></data>
+  <data name="CloseEditorGroup" xml:space="preserve"><value>Закрыть группу редактора</value></data>
+  <data name="JoinEditorGroups" xml:space="preserve"><value>Объединить все группы редактора</value></data>
+  <data name="MaximizePanel" xml:space="preserve"><value>Развернуть панель</value></data>
+  <data name="RestorePanel" xml:space="preserve"><value>Вернуть размер панели</value></data>
+  <data name="ToggleMaximizedPanel" xml:space="preserve"><value>Развернуть или вернуть нижнюю панель</value></data>
+  <data name="ZoomIn" xml:space="preserve"><value>Увеличить масштаб</value></data>
+  <data name="ZoomOut" xml:space="preserve"><value>Уменьшить масштаб</value></data>
+  <data name="ZoomReset" xml:space="preserve"><value>Сбросить масштаб</value></data>
+  <data name="ZoomInMenu" xml:space="preserve"><value>_Увеличить</value></data>
+  <data name="ZoomOutMenu" xml:space="preserve"><value>У_меньшить</value></data>
+  <data name="ZoomResetMenu" xml:space="preserve"><value>Сбросить _масштаб</value></data>
+  <data name="ZoomLevel" xml:space="preserve"><value>Масштаб: {0}</value></data>
+  <data name="SecretGetKey" xml:space="preserve"><value>Где получить ключ: </value></data>
+  <data name="CategoryHelp" xml:space="preserve"><value>Справка</value></data>
+  <data name="About" xml:space="preserve"><value>О программе</value></data>
+  <data name="AboutMenu" xml:space="preserve"><value>_О программе</value></data>
+  <data name="AboutVersion" xml:space="preserve"><value>Версия: {0}</value></data>
+  <data name="AboutCommit" xml:space="preserve"><value>Коммит: {0}</value></data>
+  <data name="AboutRuntime" xml:space="preserve"><value>.NET: {0}</value></data>
+  <data name="AboutOs" xml:space="preserve"><value>ОС: {0}</value></data>
+  <data name="AboutLocalBuild" xml:space="preserve"><value>локальная сборка</value></data>
+  <data name="OpenRepository" xml:space="preserve"><value>Открыть страницу проекта</value></data>
+  <data name="OpenRepositoryMenu" xml:space="preserve"><value>_Страница проекта на GitHub</value></data>
+  <data name="ReleaseNotes" xml:space="preserve"><value>Показать заметки о выпуске</value></data>
+  <data name="ReleaseNotesMenu" xml:space="preserve"><value>_Заметки о выпуске</value></data>
+  <data name="ReportIssue" xml:space="preserve"><value>Сообщить о проблеме</value></data>
+  <data name="ReportIssueMenu" xml:space="preserve"><value>Сообщить о _проблеме…</value></data>
+</root>

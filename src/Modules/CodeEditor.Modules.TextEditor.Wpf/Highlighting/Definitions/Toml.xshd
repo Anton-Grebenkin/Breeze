@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!--
+  TOML: [table] and [[array of tables]] as types, (dotted) keys as attributes, all four string kinds, numbers,
+  dates and times, true/false, comments. Color names are theme tokens (ADR 0036).
+-->
+<SyntaxDefinition name="Toml" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+  <Color name="Comment" />
+  <Color name="String" />
+  <Color name="Number" />
+  <Color name="Keyword" />
+  <Color name="Type" />
+  <Color name="Variable" />
+
+  <RuleSet>
+    <Span color="Comment" begin="#" />
+    <Span color="String" multiline="true" begin="&quot;&quot;&quot;" end="&quot;&quot;&quot;(?!&quot;)" ruleSet="Escapes" />
+    <Span color="String" multiline="true" begin="'''" end="'''(?!')" />
+    <Span color="String" begin="&quot;" end="&quot;" ruleSet="Escapes" />
+    <Span color="String" begin="'" end="'" />
+
+    <Rule color="Type">^\s*\[\[?[^\]\r\n]*\]\]?</Rule>
+    <Rule color="Variable">(?&lt;=^\s*|[{,]\s*)[\w-]+(?:\s*\.\s*[\w-]+)*(?=\s*=)</Rule>
+    <Rule color="Number">
+      \d{4}-\d{2}-\d{2}(?:[Tt\ ]\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:[Zz]|[+-]\d{2}:\d{2})?)?
+      | \d{2}:\d{2}:\d{2}(?:\.\d+)?
+    </Rule>
+    <Rule color="Keyword">\b(?:true|false)\b</Rule>
+    <Rule color="Number">
+      (?&lt;![\w.\-])[-+]?(?:0x[\da-fA-F_]+|0o[0-7_]+|0b[01_]+|\d[\d_]*(?:\.\d[\d_]*)?(?:[eE][-+]?\d[\d_]*)?|inf|nan)(?![\w.])
+    </Rule>
+  </RuleSet>
+
+  <RuleSet name="Escapes">
+    <Span begin="\\" end="." />
+  </RuleSet>
+</SyntaxDefinition>

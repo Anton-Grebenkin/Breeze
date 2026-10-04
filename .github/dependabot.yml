@@ -1,0 +1,19 @@
+# Weekly pull requests for NuGet packages (Directory.Packages.props) and GitHub Actions versions.
+version: 2
+updates:
+  - package-ecosystem: nuget
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      microsoft-extensions:
+        patterns: ['Microsoft.Extensions.*']
+      agent-framework:
+        patterns: ['Microsoft.Agents.*']
+      tests:
+        patterns: ['xunit*', 'Microsoft.NET.Test.Sdk', 'FlaUI.*', 'BenchmarkDotNet']
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

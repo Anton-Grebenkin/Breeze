@@ -1,0 +1,129 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                    xmlns:po="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
+                    mc:Ignorable="po">
+
+  <!--
+    Light theme. Keys match Colors.Dark.xaml and ThemeKeys. Text is near-black (#1F1F1F, as in Windows 11): thin gray
+    #3B3B3B on white read poorly. Secondary text is no lighter than #5E5E5E (contrast at least 6:1). Inline code in
+    chat is muted teal on a neutral background: red paths on every line were noisy.
+  -->
+
+  <SolidColorBrush x:Key="Brush.Window.Background" Color="#ECEEF1" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Window.Border" Color="#C9CBCE" po:Freeze="True" />
+
+  <!-- Cards (ADR 0038): documents, bottom panel and secondary side bar sit on the window background with a thin stroke. -->
+  <SolidColorBrush x:Key="Brush.Card.Border" Color="#17000000" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Panel.Background" Color="#F7F8F9" po:Freeze="True" />
+  <!-- Breeze mark color, the same in both themes. -->
+  <SolidColorBrush x:Key="Brush.Brand" Color="#37BBC1" po:Freeze="True" />
+
+  <!-- Explorer file icon colors by file kind (ADR 0038): warm folders, code in the brand color. -->
+  <SolidColorBrush x:Key="Brush.FileIcon.Folder" Color="#B07A1F" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.FileIcon.Code" Color="#0B7D83" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.FileIcon.Data" Color="#7451C7" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.FileIcon.Document" Color="#2F6DBA" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.FileIcon.Media" Color="#B2457A" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.FileIcon.Table" Color="#2E8B57" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.FileIcon.Pdf" Color="#C0392B" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.FileIcon.Slides" Color="#C2611A" po:Freeze="True" />
+  <!-- Files with agent edits awaiting review: name in the explorer and the tab title (ADR 0040). -->
+  <SolidColorBrush x:Key="Brush.AgentChange.Foreground" Color="#0A7177" po:Freeze="True" />
+
+  <SolidColorBrush x:Key="Brush.TitleBar.Background" Color="#ECEEF1" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.TitleBar.Foreground" Color="#1E1E1E" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.TitleBar.InactiveForeground" Color="#6E6E6E" po:Freeze="True" />
+
+  <SolidColorBrush x:Key="Brush.ActivityBar.Background" Color="#ECEEF1" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.ActivityBar.Foreground" Color="#1F1F1F" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.ActivityBar.InactiveForeground" Color="#595959" po:Freeze="True" />
+
+  <SolidColorBrush x:Key="Brush.Editor.Background" Color="#FFFFFF" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Editor.Foreground" Color="#1F1F1F" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Editor.Selection" Color="#ADD6FF" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Editor.LineHighlight" Color="#F5F5F5" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Editor.LineNumber" Color="#6E6E6E" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Editor.FindMatch" Color="#66F8C9AB" po:Freeze="True" />
+
+  <SolidColorBrush x:Key="Brush.Syntax.Comment" Color="#008000" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Syntax.String" Color="#A31515" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Syntax.Number" Color="#098658" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Syntax.Keyword" Color="#0000FF" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Syntax.ControlKeyword" Color="#AF00DB" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Syntax.Function" Color="#795E26" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Syntax.Type" Color="#267F99" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Syntax.Tag" Color="#800000" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Syntax.Attribute" Color="#E50000" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Syntax.Variable" Color="#001080" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Syntax.Preprocessor" Color="#808080" po:Freeze="True" />
+
+  <SolidColorBrush x:Key="Brush.Tab.ActiveBackground" Color="#0F000000" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Tab.InactiveBackground" Color="#00000000" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Tab.ActiveForeground" Color="#1F1F1F" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Tab.InactiveForeground" Color="#5E5E5E" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Tab.Modified" Color="#333333" po:Freeze="True" />
+
+  <SolidColorBrush x:Key="Brush.StatusBar.Background" Color="#ECEEF1" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.StatusBar.Foreground" Color="#1F1F1F" po:Freeze="True" />
+
+  <SolidColorBrush x:Key="Brush.Border" Color="#E5E5E5" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Accent" Color="#0B7D83" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Accent.Foreground" Color="#FFFFFF" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Focus.Border" Color="#0B7D83" po:Freeze="True" />
+
+  <SolidColorBrush x:Key="Brush.Text.Primary" Color="#1A1A1A" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Text.Secondary" Color="#545454" po:Freeze="True" />
+
+  <SolidColorBrush x:Key="Brush.Control.HoverBackground" Color="#E8E8E8" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Control.PressedBackground" Color="#DADADA" po:Freeze="True" />
+
+  <SolidColorBrush x:Key="Brush.Input.Background" Color="#FFFFFF" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Input.Border" Color="#CECECE" po:Freeze="True" />
+
+  <SolidColorBrush x:Key="Brush.Caption.CloseHoverBackground" Color="#C42B1C" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Caption.CloseHoverForeground" Color="#FFFFFF" po:Freeze="True" />
+
+  <SolidColorBrush x:Key="Brush.Keycap.Background" Color="#F3F3F3" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Keycap.Border" Color="#D4D4D4" po:Freeze="True" />
+
+  <SolidColorBrush x:Key="Brush.Widget.Background" Color="#F8F8F8" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Widget.Border" Color="#CECECE" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Widget.Separator" Color="#E0E0E0" po:Freeze="True" />
+
+  <SolidColorBrush x:Key="Brush.List.HoverBackground" Color="#0A000000" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.List.SelectionBackground" Color="#14000000" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.List.SelectionForeground" Color="#1E1E1E" po:Freeze="True" />
+  <!-- Folder a dragged file would drop into: the accent, translucent. -->
+  <SolidColorBrush x:Key="Brush.List.DropBackground" Color="#240B7D83" po:Freeze="True" />
+
+  <SolidColorBrush x:Key="Brush.MatchHighlight.Foreground" Color="#0B7D83" po:Freeze="True" />
+
+  <SolidColorBrush x:Key="Brush.Error.Foreground" Color="#A1260D" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Warning.Foreground" Color="#BF8803" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Success.Foreground" Color="#388A34" po:Freeze="True" />
+  <!-- Git file status, like gitDecoration.* in VS Code. -->
+  <SolidColorBrush x:Key="Brush.Git.Modified" Color="#895503" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Git.Added" Color="#587C0C" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Git.Deleted" Color="#AD0707" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Git.Untracked" Color="#007100" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Git.Conflict" Color="#AD0707" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Badge.Background" Color="#CCCCCC" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Badge.Foreground" Color="#1F1F1F" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Diff.InsertedBackground" Color="#339BB955" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Diff.RemovedBackground" Color="#26FF0000" po:Freeze="True" />
+
+  <SolidColorBrush x:Key="Brush.Markdown.CodeBlockBackground" Color="#FFFFFF" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Markdown.InlineCodeBackground" Color="#0F000000" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Markdown.InlineCodeForeground" Color="#0B6A6F" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Markdown.Link" Color="#0B7D83" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Markdown.QuoteBorder" Color="#CCCCCC" po:Freeze="True" />
+
+  <!-- Checkerboard behind transparent images, as in VS Code's image preview. -->
+  <SolidColorBrush x:Key="Brush.Checkerboard.Background" Color="#FFFFFF" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Checkerboard.Square" Color="#E6E6E6" po:Freeze="True" />
+
+  <SolidColorBrush x:Key="Brush.Scrollbar.Thumb" Color="#66646464" po:Freeze="True" />
+  <SolidColorBrush x:Key="Brush.Scrollbar.ThumbHover" Color="#B3646464" po:Freeze="True" />
+
+</ResourceDictionary>

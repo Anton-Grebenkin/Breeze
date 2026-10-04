@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Tests for the file viewers module (ADR 0037). Logic runs without a window; the views assembly is referenced for the
+    WIC decoder and to check that registering the module doesn't load WebView2. The tests show no windows.
+  -->
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Modules\CodeEditor.Modules.Viewers\CodeEditor.Modules.Viewers.csproj" />
+    <ProjectReference Include="..\..\src\Modules\CodeEditor.Modules.Viewers.Wpf\CodeEditor.Modules.Viewers.Wpf.csproj" />
+    <ProjectReference Include="..\CodeEditor.Testing\CodeEditor.Testing.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<!--
+  Makefile: comments, "name:" targets as functions, "NAME := …" assignments as variables, $(VAR) and ${VAR}
+  references, nested $(patsubst …) function calls, automatic variables $@ $&lt; $^, ifeq … endif conditionals,
+  include and define directives, special targets like .PHONY. Recipe lines (tab-indented) are not targets.
+  Color names are theme tokens (ADR 0036).
+-->
+<SyntaxDefinition name="Makefile" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+  <Color name="Comment" />
+  <Color name="String" />
+  <Color name="Keyword" />
+  <Color name="ControlKeyword" />
+  <Color name="Function" />
+  <Color name="Variable" />
+  <Color name="Text" />
+
+  <RuleSet>
+    <Span color="Comment" begin="(?&lt;!\\)#" />
+    <Span color="Text" ruleSet="Reference">
+      <Begin color="Variable">\$[({]</Begin>
+      <End color="Variable">[)}]</End>
+    </Span>
+    <Span color="String" begin="&quot;" end="&quot;" ruleSet="Quoted" />
+    <Span color="String" begin="(?&lt;=\s)'" end="'" />
+
+    <Rule color="Variable">\$[@&lt;^?*%+|$]|\$\w</Rule>
+    <Rule color="ControlKeyword">^\s*(?:ifeq|ifneq|ifdef|ifndef|else|endif)\b</Rule>
+    <Rule color="Keyword">^\s*(?:-?include|sinclude|define|endef|override|export|unexport|vpath|private|undefine)\b</Rule>
+    <Rule color="Keyword">
+      ^\.(?:PHONY|SUFFIXES|DEFAULT|PRECIOUS|INTERMEDIATE|NOTINTERMEDIATE|SECONDARY|SECONDEXPANSION|DELETE_ON_ERROR|IGNORE
+      |LOW_RESOLUTION_TIME|SILENT|EXPORT_ALL_VARIABLES|NOTPARALLEL|ONESHELL|POSIX)\b
+    </Rule>
+    <!-- NAME = …, NAME := …, NAME ?= …, NAME += … is a variable; "name: prerequisites" is a target (not := or ::=). -->
+    <Rule color="Variable">(?&lt;=^(?:(?:override|export|private)[\ \t]+)*)[\w.\-]+(?=[\ \t]*(?::{1,3}|[?+!])?=)</Rule>
+    <Rule color="Function">^(?!\t)[^\s:\#=$][^:\#=]*?(?=[\ \t]*::?(?![:=]))</Rule>
+  </RuleSet>
+
+  <!-- Inside $( … ): a lone name is a variable, a first word before a space is a function; nested references and parens. -->
+  <RuleSet name="Reference">
+    <Span color="Text" ruleSet="Reference">
+      <Begin color="Variable">\$[({]</Begin>
+      <End color="Variable">[)}]</End>
+    </Span>
+    <Span begin="\(" end="\)" ruleSet="Reference" />
+    <Rule color="Variable">^[\w.\-]+(?=:|$)</Rule>
+    <Rule color="Function">^[\w\-]+(?=\s)</Rule>
+    <Rule color="Variable">\$[@&lt;^?*%+|$]|\$\w</Rule>
+  </RuleSet>
+
+  <RuleSet name="Quoted">
+    <Span begin="\\" end="." />
+    <Span color="Text" ruleSet="Reference">
+      <Begin color="Variable">\$[({]</Begin>
+      <End color="Variable">[)}]</End>
+    </Span>
+  </RuleSet>
+</SyntaxDefinition>

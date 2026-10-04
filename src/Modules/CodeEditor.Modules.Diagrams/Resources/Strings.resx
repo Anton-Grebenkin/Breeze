@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="ModuleName" xml:space="preserve"><value>Diagrams</value></data>
+  <data name="ViewModuleName" xml:space="preserve"><value>Diagram views</value></data>
+  <!-- Commands. -->
+  <data name="Category" xml:space="preserve"><value>Diagram</value></data>
+  <data name="OpenPreviewToSide" xml:space="preserve"><value>Open Preview to the Side</value></data>
+  <data name="OpenPreviewToSideMenu" xml:space="preserve"><value>Open Diagram Preview to the _Side</value></data>
+  <data name="ExportSvg" xml:space="preserve"><value>Export as SVG</value></data>
+  <data name="ExportPng" xml:space="preserve"><value>Export as PNG</value></data>
+  <data name="ExportSvgMenu" xml:space="preserve"><value>Export Diagram as S_VG</value></data>
+  <data name="ExportPngMenu" xml:space="preserve"><value>Export Diagram as P_NG</value></data>
+  <data name="ZoomIn" xml:space="preserve"><value>Zoom In</value></data>
+  <data name="ZoomOut" xml:space="preserve"><value>Zoom Out</value></data>
+  <data name="ZoomReset" xml:space="preserve"><value>Actual Size</value></data>
+  <data name="ZoomToFit" xml:space="preserve"><value>Fit to Window</value></data>
+  <!-- Preview. -->
+  <data name="PreviewTitle" xml:space="preserve"><value>Preview {0}</value></data>
+  <data name="PreviewPage" xml:space="preserve"><value>Diagram</value></data>
+  <data name="PreviewRendering" xml:space="preserve"><value>Rendering the diagram…</value></data>
+  <data name="PreviewNoBlocks" xml:space="preserve"><value>No ```mermaid blocks in this file.</value></data>
+  <data name="PreviewEmpty" xml:space="preserve"><value>The diagram is empty: write Mermaid text, for example "flowchart LR" and "A --&gt; B".</value></data>
+  <data name="PreviewNotRendered" xml:space="preserve"><value>The diagram is not rendered: see the error above.</value></data>
+  <data name="PreviewCaption" xml:space="preserve"><value>Diagram {0} · line {1}</value></data>
+  <data name="GoToError" xml:space="preserve"><value>Go to Line</value></data>
+  <data name="ErrorAtLine" xml:space="preserve"><value>Line {0}: {1}</value></data>
+  <data name="UnknownDiagramError" xml:space="preserve"><value>Mermaid could not render the diagram.</value></data>
+  <data name="ReadFailed" xml:space="preserve"><value>The file could not be read: {0}</value></data>
+  <data name="FormatSvg" xml:space="preserve"><value>SVG</value></data>
+  <data name="FormatPng" xml:space="preserve"><value>PNG</value></data>
+  <!-- Export. -->
+  <data name="ExportNothing" xml:space="preserve"><value>No Mermaid diagrams in the file.</value></data>
+  <data name="ExportSaved" xml:space="preserve"><value>Saved: {0}.</value></data>
+  <data name="ExportNotSaved" xml:space="preserve"><value>Not saved: {0}</value></data>
+  <data name="ExportFailed" xml:space="preserve"><value>The diagram was not saved: {0}</value></data>
+  <!-- Renderer. -->
+  <data name="RendererScriptFailed" xml:space="preserve"><value>The diagram renderer failed: {0}</value></data>
+  <data name="RendererNoAnswer" xml:space="preserve"><value>The diagram renderer did not answer.</value></data>
+  <data name="RendererUnavailable" xml:space="preserve"><value>Diagrams cannot be rendered: WebView2 is not available ({0}).</value></data>
+  <data name="RendererTimedOut" xml:space="preserve"><value>The diagram was not rendered in {0} s.</value></data>
+  <data name="MermaidUnavailable" xml:space="preserve"><value>Mermaid did not load ({0}). Check the internet connection or put mermaid.min.js into the Diagrams folder of the editor.</value></data>
+  <!-- Agent tool. -->
+  <data name="ToolUnavailable" xml:space="preserve"><value>Diagrams cannot be rendered here.</value></data>
+  <data name="ToolUnknownAction" xml:space="preserve"><value>Unknown action "{0}". Allowed: {1}.</value></data>
+  <data name="ToolPathOrText" xml:space="preserve"><value>Give the diagram file in path or Mermaid text in text.</value></data>
+  <data name="ToolNotDiagramFile" xml:space="preserve"><value>{0} is not a diagram file: diagrams live in .mmd and .mermaid files and in ```mermaid blocks of Markdown.</value></data>
+  <data name="ToolFileNotFound" xml:space="preserve"><value>File {0} not found.</value></data>
+  <data name="ToolNoDiagrams" xml:space="preserve"><value>There are no Mermaid diagrams in {0}.</value></data>
+  <data name="ToolNoSuchBlock" xml:space="preserve"><value>{0} has no block {1}: it has {2} ```mermaid blocks.</value></data>
+  <data name="ToolCheckPassed" xml:space="preserve"><value>{0}: no errors ({1}).</value></data>
+  <data name="ToolDiagramErrors" xml:space="preserve"><value>Errors in the diagram {0}:</value></data>
+  <data name="ToolViewNotSeen" xml:space="preserve"><value>This model does not see images: check the diagram with the action check.</value></data>
+  <data name="ToolViewTooLarge" xml:space="preserve"><value>The diagram image is larger than the model accepts: check it with the action check or view one block at a time.</value></data>
+  <data name="ToolViewResult" xml:space="preserve"><value>The diagram {0} is in the next message.</value></data>
+  <data name="ToolViewMore" xml:space="preserve"><value>Shown: the first {0}; view the others by block.</value></data>
+  <data name="ToolViewNotShown" xml:space="preserve"><value>Not shown, larger than the model accepts: {0}.</value></data>
+  <data name="ToolRenderNeedsPath" xml:space="preserve"><value>render saves the image next to a file: give path.</value></data>
+  <data name="ToolUnknownFormat" xml:space="preserve"><value>Unknown format "{0}": svg or png.</value></data>
+  <data name="ToolRenderSaved" xml:space="preserve"><value>Saved: {0}.</value></data>
+  <data name="ToolOverwriteTitle" xml:space="preserve"><value>The agent wants to save a diagram over existing files</value></data>
+  <data name="ToolOverwriteHeader" xml:space="preserve"><value>These files exist and will be overwritten</value></data>
+  <!-- Agent feed. -->
+  <data name="FeedCheck" xml:space="preserve"><value>Check diagram {0}</value></data>
+  <data name="FeedView" xml:space="preserve"><value>View diagram {0}</value></data>
+  <data name="FeedRender" xml:space="preserve"><value>Diagram {0} → {1}</value></data>
+  <data name="FeedText" xml:space="preserve"><value>(text)</value></data>
+</root>

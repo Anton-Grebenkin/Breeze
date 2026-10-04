@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!--
+  Dockerfile: an instruction at the line start and its arguments up to a line not ending with \; continuations,
+  comment lines inside RUN and heredocs (<<EOF … EOF) don't end the instruction. Strings, $VAR and ${VAR} variables,
+  ports, parser directives (# syntax=…). Color names are theme tokens (ADR 0036).
+-->
+<SyntaxDefinition name="Dockerfile" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+  <Color name="Comment" />
+  <Color name="String" />
+  <Color name="Number" />
+  <Color name="Keyword" />
+  <Color name="Variable" />
+  <Color name="Preprocessor" />
+
+  <RuleSet ignoreCase="true">
+    <Span color="Preprocessor" begin="^\s*#\s*(?:syntax|escape|check)\s*=" />
+    <Span color="Comment" begin="^\s*#" />
+    <Span multiline="true" ruleSet="Arguments" end="$(?&lt;!\\[ \t]*)(?&lt;!^\s*#.*)">
+      <Begin color="Keyword">
+        ^\s*(?:FROM|RUN|CMD|LABEL|MAINTAINER|EXPOSE|ENV|ADD|COPY|ENTRYPOINT|VOLUME|USER|WORKDIR|ARG|ONBUILD|STOPSIGNAL|HEALTHCHECK|SHELL)
+        (?=\s|$)
+      </Begin>
+    </Span>
+  </RuleSet>
+
+  <RuleSet name="Arguments" ignoreCase="true">
+    <Span color="Comment" begin="^\s*#" />
+    <Span color="String" multiline="true" begin="&lt;&lt;-?\s*[&quot;']?(?:EOF|END|EOT)\b[&quot;']?" end="^\s*(?:EOF|END|EOT)\s*$" ruleSet="Variables" />
+    <Span color="String" begin="&quot;" end="&quot;" ruleSet="Quoted" />
+    <Span color="String" begin="'" end="'" />
+    <Import ruleSet="Variables" />
+    <!-- FROM image AS stage -->
+    <Rule color="Keyword">(?&lt;=^\s*\S+\s+)AS(?=\s)</Rule>
+    <Rule color="Number">(?&lt;![\w.:/-])\d+(?:-\d+)?(?:/(?:tcp|udp))?(?![\w.:])</Rule>
+  </RuleSet>
+
+  <RuleSet name="Quoted">
+    <Span begin="\\" end="." />
+    <Import ruleSet="Variables" />
+  </RuleSet>
+
+  <RuleSet name="Variables">
+    <Rule color="Variable">\$\{[^}]*\}|\$[A-Za-z_]\w*</Rule>
+  </RuleSet>
+</SyntaxDefinition>

@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Diagrams on WebView2 (ADR 0035): the hidden Mermaid renderer page and the live preview tab. WebView2 assemblies
+    load on the first diagram render, so they do not affect startup.
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Web.WebView2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CodeEditor.Modules.Diagrams\CodeEditor.Modules.Diagrams.csproj" />
+    <ProjectReference Include="..\..\Platform\CodeEditor.UI\CodeEditor.UI.csproj" />
+    <ProjectReference Include="..\..\Platform\CodeEditor.Shell.Wpf\CodeEditor.Shell.Wpf.csproj" />
+  </ItemGroup>
+
+  <!--
+    The renderer and preview pages go to the Diagrams folder next to the app; WebView2 opens it via a virtual host.
+    Mermaid is a copy of mermaid.min.js 11.17.2 in Assets (MIT license, THIRD-PARTY-NOTICES.md), so diagrams render
+    offline.
+  -->
+  <ItemGroup>
+    <Content Include="Assets\**" Link="Diagrams\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

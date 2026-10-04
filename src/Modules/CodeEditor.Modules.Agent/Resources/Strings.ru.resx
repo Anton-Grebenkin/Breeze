@@ -1,0 +1,434 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <!-- Self-check: build and test gate (CorrectionHints). -->
+  <data name="HintBuildFailing" xml:space="preserve"><value>Сборка не проходит</value></data>
+  <data name="HintTestsFailing" xml:space="preserve"><value>Тесты не проходят</value></data>
+  <data name="HintSecondFailure" xml:space="preserve"><value>{0} второй раз подряд. Прежде чем править дальше: назови класс причины (опечатка, неверное допущение о коде, API, окружение) и какое твоё допущение оказалось ложным; исправь именно его.</value></data>
+  <data name="HintRepeatedFailure" xml:space="preserve"><value>{0} три раза подряд и больше: этот подход не работает. Смени подход или спроси пользователя через ask_user; не повторяй те же правки.</value></data>
+  <data name="ListAndMore" xml:space="preserve"><value>{0} и др.</value></data>
+  <data name="ReminderBuildFailed" xml:space="preserve"><value>Сборка после твоих правок не прошла. Исправь ошибки (get_errors покажет их) и снова запусти build. Если ошибки не связаны с твоими правками — докажи это ссылкой путь:строка и скажи в итоге.</value></data>
+  <data name="ReminderBuildMissing" xml:space="preserve"><value>Ты изменил код ({0}), но после последней правки не запускал build. Запусти build, исправь ошибки и только потом подведи итог. Если проверить нельзя — объясни почему.</value></data>
+  <data name="ReminderTestsFailed" xml:space="preserve"><value>Тесты после твоих правок не прошли. Исправь причину и запусти run_tests снова. Если падение не связано с твоими правками — докажи это и скажи в итоге.</value></data>
+  <data name="ReminderTestsMissing" xml:space="preserve"><value>Ты изменил код ({0}), но после последней правки не запускал run_tests. Запусти тесты затронутого проекта и только потом подведи итог.</value></data>
+  <data name="CheckBuildFailed" xml:space="preserve"><value>Проверка: сборка после правок не прошла — агент исправляет</value></data>
+  <data name="CheckBuildMissing" xml:space="preserve"><value>Проверка: после правок не было сборки — агент проверяет</value></data>
+  <data name="CheckTestsFailed" xml:space="preserve"><value>Проверка: тесты после правок не прошли — агент исправляет</value></data>
+  <data name="CheckTestsMissing" xml:space="preserve"><value>Проверка: после правок не запускались тесты — агент проверяет</value></data>
+  <data name="UnverifiedBuildFailed" xml:space="preserve"><value>Правки не проверены: сборка после них не прошла.</value></data>
+  <data name="UnverifiedBuildMissing" xml:space="preserve"><value>Правки не проверены: сборки после них не было.</value></data>
+  <data name="UnverifiedTestsFailed" xml:space="preserve"><value>Правки не проверены: тесты после них не прошли.</value></data>
+  <data name="UnverifiedTestsMissing" xml:space="preserve"><value>Правки не проверены: тесты после них не запускались.</value></data>
+  <!-- Tool and harness replies to the model. -->
+  <data name="ToolErrorPrefix" xml:space="preserve"><value>Ошибка:</value></data>
+  <data name="ToolBudgetExhausted" xml:space="preserve"><value>Не выполнено: лимит шагов хода исчерпан. Подведи итог без вызова инструментов.</value></data>
+  <data name="ToolRepeatNote" xml:space="preserve"><value>(Такой же вызов с теми же аргументами уже был в этом ходе. Не повторяй его — используй прежний результат или смени подход.)</value></data>
+  <data name="ToolRepeatBlocked" xml:space="preserve"><value>Не выполнено: этот вызов с теми же аргументами повторяется уже в третий раз за ход. Смени подход или спроси пользователя.</value></data>
+  <data name="ToolArgumentsInvalid" xml:space="preserve"><value>Не выполнено: аргументы не подходят к параметрам инструмента ({0}). Параметры: {1}. Передавай массивы и объекты значениями JSON, а не строками, и исправь вызов, а не обходи его.</value></data>
+  <data name="AdvisorBeforeEditResult" xml:space="preserve"><value>Пока не применено: перед первой правкой советник (другая модель) разобрал твой подход:
+
+{0}
+
+Сверь с кодом, поправь подход, если советник прав, и повтори правку.</value></data>
+  <data name="AdvisorBeforeEditNotice" xml:space="preserve"><value>**Советник** · риски перед первой правкой
+
+{0}</value></data>
+  <data name="AdvisorStuckResult" xml:space="preserve"><value>Советник (другая модель) посмотрел на это, потому что {0}:
+
+{1}</value></data>
+  <data name="AdvisorStuckNotice" xml:space="preserve"><value>**Советник** · {0}
+
+{1}</value></data>
+  <data name="StuckRepeatedBuild" xml:space="preserve"><value>сборка не прошла дважды подряд</value></data>
+  <data name="StuckRepeatedTests" xml:space="preserve"><value>тесты не прошли дважды подряд</value></data>
+  <data name="StuckSameFile" xml:space="preserve"><value>{0} правится третий раз</value></data>
+  <data name="StuckHalfBudget" xml:space="preserve"><value>потрачена половина лимита шагов, а проверки не проходят</value></data>
+  <data name="ReviewPassedStatus" xml:space="preserve"><value>Независимая проверка: доказанных ошибок нет</value></data>
+  <data name="ReviewFindingsStatus" xml:space="preserve"><value>Независимая проверка: блокирующих замечаний — {0}, агент разбирает</value></data>
+  <data name="ReviewNotice" xml:space="preserve"><value>**Ревьюер** · замечания
+
+{0}</value></data>
+  <data name="ReviewFindingsPrompt" xml:space="preserve"><value>Независимый ревьюер (другая модель, чистый контекст) проверил твои изменения:
+{0}
+По каждому блокирующему замечанию: если оно верно — исправь и проверь сборкой и тестами; если нет — опровергни с доказательством (path:line, команда или вывод теста). Рекомендательные — по желанию. Ничего сверх этих замечаний не меняй.</value></data>
+  <data name="OpenPlanItemsPrompt" xml:space="preserve"><value>В плане остались открытые пункты:
+{0}
+Продолжай их или обнови план, если они выполнены или больше не нужны.</value></data>
+  <data name="OpenPlanItemsStatus" xml:space="preserve"><value>План: остались открытые пункты — агент продолжает</value></data>
+  <data name="EmptyAnswerPrompt" xml:space="preserve"><value>Твой последний ответ пустой: ни текста, ни вызовов инструментов. Если инструмент вернул ошибку — исправь вызов, как она подсказывает, и продолжай. Если задача сделана — кратко отчитайся; если застрял — скажи, что мешает.</value></data>
+  <data name="EmptyAnswerStatus" xml:space="preserve"><value>Пустой ответ — агент продолжает</value></data>
+  <data name="TextToolCallPrompt" xml:space="preserve"><value>В твоём последнем ответе вызов инструмента написан текстом, а не сделан. Вызови инструмент через механизм функций (выданные тебе инструменты), а не текстом в ответе, и продолжай.</value></data>
+  <data name="TextToolCallStatus" xml:space="preserve"><value>Вызов инструмента написан текстом — агент повторяет его</value></data>
+  <data name="RequirementsAuditPrompt" xml:space="preserve"><value>Перед итогом сверь результат с запросом пользователя. Перечисли каждое требование из него — правила, члены API, примеры, ожидаемое поведение — и для каждого укажи, где оно выполнено (path:line) и чем проверено (сборка, существующий или запрошенный тест). Требование без места в коде — доделай. Тестов, о которых не просили, не добавляй: назови, что осталось непроверенным. Затем дай итог.</value></data>
+  <data name="RequirementsAuditStatus" xml:space="preserve"><value>Сверка с запросом — агент проверяет каждый пункт</value></data>
+  <data name="ExplorationStallNote" xml:space="preserve"><value>(Это уже {0} чтений и поисков подряд. Прежде чем читать дальше, подведи итог в 2–4 строках: что установлено (path:line), чего не хватает для ответа или правки и какой один следующий шаг это даст. Если данных уже хватает — отвечай или правь; широкую разведку можно отдать explore, он вернёт короткий отчёт.)</value></data>
+  <data name="ParamRoles" xml:space="preserve"><value>Роли</value></data>
+  <data name="ParamAdvisorReasoning" xml:space="preserve"><value>Рассуждения советника</value></data>
+  <data name="ParamExplorerReasoning" xml:space="preserve"><value>Рассуждения разведчика</value></data>
+  <data name="AdvisorModelPrompt" xml:space="preserve"><value>Модель советника (режим «Глубокий»): лучше всего — сильная модель другого вендора</value></data>
+  <data name="AdvisorModel" xml:space="preserve"><value>Модель советника</value></data>
+  <data name="AdvisorModelAction" xml:space="preserve"><value>Модель советника…</value></data>
+  <data name="CommandPickAdvisorModel" xml:space="preserve"><value>Модель советника (режим «Глубокий»)</value></data>
+  <data name="ExplorerReadOnlyCommands" xml:space="preserve"><value>Не выполнено: разведка запускает только команды чтения (списки файлов, git status, log, diff, show, blame).</value></data>
+  <data name="ExplorerNoAnswer" xml:space="preserve"><value>Разведчик ничего не нашёл. Поищи сам.</value></data>
+  <data name="ToolExplore" xml:space="preserve"><value>Разведка: {0}</value></data>
+  <data name="ExplorerModelPrompt" xml:space="preserve"><value>Модель разведчика: исследует код в своём контексте и отдаёт находки</value></data>
+  <data name="ExplorerModel" xml:space="preserve"><value>Модель разведчика</value></data>
+  <data name="ExplorerModelAction" xml:space="preserve"><value>Модель разведчика…</value></data>
+  <data name="CommandPickExplorerModel" xml:space="preserve"><value>Модель разведчика (исследование кода)</value></data>
+  <data name="MemorySaved" xml:space="preserve"><value>Сохранено в память: {0}.</value></data>
+  <data name="MemoryUpdated" xml:space="preserve"><value>Заметка {0} обновлена.</value></data>
+  <data name="MemoryDeleted" xml:space="preserve"><value>Удалено из памяти: {0}.</value></data>
+  <data name="MemoryNotFound" xml:space="preserve"><value>Заметки {0} в памяти нет.</value></data>
+  <data name="MemoryBadName" xml:space="preserve"><value>Имя заметки — строчные латинские буквы, цифры и дефисы, например build-commands.</value></data>
+  <data name="MemoryBadType" xml:space="preserve"><value>Тип заметки — user, feedback, project или reference.</value></data>
+  <data name="MemoryMissingField" xml:space="preserve"><value>Чтобы сохранить заметку, передай {0}.</value></data>
+  <data name="MemoryTooLong" xml:space="preserve"><value>Заметка — не больше {0} символов: оставь главное.</value></data>
+  <data name="MemoryFull" xml:space="preserve"><value>В памяти не больше {0} заметок: сначала объедини или удали старые.</value></data>
+  <data name="MemoryNoFolder" xml:space="preserve"><value>Память хранится для папки: сначала откройте папку.</value></data>
+  <data name="MemoryBadAction" xml:space="preserve"><value>action — read, save или delete.</value></data>
+  <data name="MemoryIndexHeader" xml:space="preserve"><value># Память агента для этой папки
+
+Заметки из прошлых чатов; агент видит этот список в начале каждого чата. Список собирается из заметок рядом: правьте или удаляйте сами заметки.</value></data>
+  <data name="MemoryAutoSaved" xml:space="preserve"><value>Запомнено для папки: {0} — {1}</value></data>
+  <data name="ToolMemorySave" xml:space="preserve"><value>Запомнено: {0}</value></data>
+  <data name="ToolMemoryRead" xml:space="preserve"><value>Память: {0}</value></data>
+  <data name="ToolMemoryDelete" xml:space="preserve"><value>Забыто: {0}</value></data>
+  <data name="CommandOpenMemory" xml:space="preserve"><value>Память папки</value></data>
+  <data name="MenuOpenMemory" xml:space="preserve"><value>Память агента для папки</value></data>
+  <data name="OutputSavedToFile" xml:space="preserve"><value>[Вывод: строк {0}, символов {1}; середина выше пропущена. Полный текст: {2} — читай через read_file (startLine) или ищи через search_text (include — этот путь).]</value></data>
+  <data name="OutputNotSaved" xml:space="preserve"><value>[Вывод: строк {0}, символов {1}; середина пропущена. Сузь команду, чтобы её увидеть.]</value></data>
+  <data name="ToolUnavailableInMode" xml:space="preserve"><value>Не выполнено: {0} недоступен в режиме «{1}». Продолжай без него или предложи перейти в режим «Агент».</value></data>
+  <data name="ChangesUnavailableInMode" xml:space="preserve"><value>Не выполнено: в режиме «{0}» изменения недоступны, ничего не изменено. Ответь, не меняя файлов, или предложи перейти в режим «Агент».</value></data>
+  <data name="QuestionEmpty" xml:space="preserve"><value>Пустой вопрос.</value></data>
+  <data name="UserAnswered" xml:space="preserve"><value>Пользователь ответил: {0}</value></data>
+  <data name="NoChangesInChat" xml:space="preserve"><value>В этом чате вы ещё ничего не меняли (или пользователь вернул файлы к исходному).</value></data>
+  <data name="PlanCleared" xml:space="preserve"><value>План очищен.</value></data>
+  <data name="PlanUpdated" xml:space="preserve"><value>План обновлён:</value></data>
+  <data name="PlanDuplicateIds" xml:space="preserve"><value>У пунктов плана повторяются id. Дайте каждому свой.</value></data>
+  <data name="PlanSingleInProgress" xml:space="preserve"><value>В работе может быть только один пункт. Остальные — pending или completed.</value></data>
+  <data name="PlanItemEmptyTitle" xml:space="preserve"><value>У пункта «{0}» пустой заголовок.</value></data>
+  <data name="PlanItemUnknownStatus" xml:space="preserve"><value>У пункта «{0}» неизвестное состояние «{1}»: нужно pending, in_progress или completed.</value></data>
+  <data name="PlanTooShort" xml:space="preserve"><value>(Пунктов меньше трёх — для такой задачи план обычно не нужен.)</value></data>
+  <data name="PlanTooLong" xml:space="preserve"><value>(Пунктов больше десяти — объедините мелкие: план для пользователя, а не протокол шагов.)</value></data>
+  <!-- Approval cards. -->
+  <data name="ApprovalAllowTool" xml:space="preserve"><value>Разрешить {0}?</value></data>
+  <data name="ApprovalEdit" xml:space="preserve"><value>Агент предлагает правку</value></data>
+  <data name="ApprovalEdits" xml:space="preserve"><value>Агент предлагает правки в {0} файлах</value></data>
+  <data name="ApprovalCreateFile" xml:space="preserve"><value>Агент хочет создать файл</value></data>
+  <data name="ApprovalDelete" xml:space="preserve"><value>Агент хочет удалить</value></data>
+  <data name="ApprovalMove" xml:space="preserve"><value>Агент хочет перенести</value></data>
+  <data name="ApprovalRunCommand" xml:space="preserve"><value>Агент хочет выполнить команду</value></data>
+  <data name="ApprovalRunTool" xml:space="preserve"><value>Агент хочет выполнить {0}</value></data>
+  <!-- Modes. -->
+  <data name="ModeAgent" xml:space="preserve"><value>Агент</value></data>
+  <data name="ModeAsk" xml:space="preserve"><value>Вопрос</value></data>
+  <data name="ModePlan" xml:space="preserve"><value>План</value></data>
+  <data name="ModeAgentDescription" xml:space="preserve"><value>делает задачу сам: читает, правит, собирает и проверяет</value></data>
+  <data name="ModeAskDescription" xml:space="preserve"><value>отвечает на вопросы по коду, ничего не меняя</value></data>
+  <data name="ModePlanDescription" xml:space="preserve"><value>изучает код и предлагает план; выполнить его — кнопкой под планом</value></data>
+  <data name="ModeDeep" xml:space="preserve"><value>Глубокий</value></data>
+  <data name="ModeDeepDescription" xml:space="preserve"><value>как «Агент», плюс модель-советник: разбирает риски до первой правки, помогает при застревании и независимо проверяет итог; сборка и тесты обязательны. Дольше и дороже — для сложных задач</value></data>
+  <!-- Model request errors. -->
+  <data name="ErrorApiKeyRejected" xml:space="preserve"><value>Ключ API не принят. Проверьте его командой «Агент: задать ключ API».</value></data>
+  <data name="ErrorModelNotFound" xml:space="preserve"><value>Модель «{0}» не найдена у {1}. Проверьте agent.model в настройках.</value></data>
+  <data name="ErrorPaymentRequired" xml:space="preserve"><value>Баланса сервиса не хватает на этот запрос (402). Сервис может резервировать стоимость входа и самого длинного возможного ответа, поэтому большому чату на дорогой модели нужен запас: пополните баланс, уменьшите предел ответа (agent.maxOutputTokens) или выберите модель дешевле. Сделанное сохранено — можно продолжить.</value></data>
+  <data name="ErrorTooManyRequests" xml:space="preserve"><value>Сервис ограничил частоту запросов (429): подождите минуту и повторите.</value></data>
+  <data name="ErrorService" xml:space="preserve"><value>Сервис вернул ошибку {0}: {1}</value></data>
+  <data name="ErrorStream" xml:space="preserve"><value>Сервис оборвал ответ ошибкой: {0}</value></data>
+  <data name="ErrorNoConnection" xml:space="preserve"><value>Нет связи с {0}. Проверьте подключение к интернету.</value></data>
+  <!-- Agent tool lines in the feed. -->
+  <data name="FileForms" xml:space="preserve"><value>файл|файла|файлов</value></data>
+  <data name="ToolAskUser" xml:space="preserve"><value>Вопрос пользователю</value></data>
+  <data name="ToolReviewChanges" xml:space="preserve"><value>Просмотр своих правок</value></data>
+  <data name="ToolPlanItem" xml:space="preserve"><value>План · {0}</value></data>
+  <data name="ToolPlanUpdated" xml:space="preserve"><value>План обновлён</value></data>
+  <data name="ToolPlanCleared" xml:space="preserve"><value>очищен</value></data>
+  <data name="ProgressOf" xml:space="preserve"><value>{0} из {1}</value></data>
+  <!-- Context compaction. -->
+  <data name="CompactedToolResults" xml:space="preserve"><value>[Старые результаты инструментов сжаты; нужное — вызовите заново]</value></data>
+  <data name="CompactedNoResult" xml:space="preserve"><value>(нет результата)</value></data>
+  <data name="CompactedEmptyResult" xml:space="preserve"><value>(пусто)</value></data>
+  <data name="ContextSummarized" xml:space="preserve"><value>Контекст сжат: ранняя часть разговора заменена резюме; файлы перед правкой агент перечитает</value></data>
+  <data name="ContextTruncated" xml:space="preserve"><value>Контекст переполнен: самые старые сообщения разговора отброшены</value></data>
+  <data name="WrapUpRequest" xml:space="preserve"><value>Лимит шагов этого режима исчерпан: инструменты больше не вызывай. Кратко подведи итог: что установлено по фактам (с path:line), что пока лишь гипотеза и почему, что сделано и как проверено, что осталось и с чего продолжить. Не выдавай непроверенную гипотезу за причину и не придумывай механизм, чтобы подогнать находки.</value></data>
+  <data name="CurrentPlan" xml:space="preserve"><value>Текущий план (manage_todo):</value></data>
+  <data name="UserChangedFiles" xml:space="preserve"><value>Пользователь изменил эти файлы после того, как ты их видел, — перечитай их перед правкой: {0}.</value></data>
+  <data name="UserRejectedChanges" xml:space="preserve"><value>отклонил твои правки</value></data>
+  <data name="UserDeletedFile" xml:space="preserve"><value>удалён</value></data>
+  <!-- Agent, chats, setup. -->
+  <data name="AgentTitle" xml:space="preserve"><value>Агент</value></data>
+  <data name="NewChat" xml:space="preserve"><value>Новый чат</value></data>
+  <data name="ChatToday" xml:space="preserve"><value>сегодня, {0}</value></data>
+  <data name="ChatYesterday" xml:space="preserve"><value>вчера, {0}</value></data>
+  <data name="TokensThousands" xml:space="preserve"><value>{0} тыс.</value></data>
+  <data name="TokensMillions" xml:space="preserve"><value>{0} млн</value></data>
+  <data name="FileNotFound" xml:space="preserve"><value>Файл не найден: {0}</value></data>
+  <data name="ErrorNoApiKey" xml:space="preserve"><value>Не задан ключ API. Выполните команду «Агент: задать ключ API».</value></data>
+  <data name="ErrorEndpointNotUrl" xml:space="preserve"><value>Адрес API «{0}» — не URL. Проверьте agent.endpoint в настройках.</value></data>
+  <!-- Chat feed. -->
+  <data name="AuthorUser" xml:space="preserve"><value>Вы</value></data>
+  <data name="AuthorTool" xml:space="preserve"><value>Инструмент</value></data>
+  <data name="AuthorApproval" xml:space="preserve"><value>Подтверждение</value></data>
+  <data name="AuthorReasoning" xml:space="preserve"><value>Рассуждения</value></data>
+  <data name="AuthorEditor" xml:space="preserve"><value>Редактор</value></data>
+  <data name="AuthorAgentQuestion" xml:space="preserve"><value>Вопрос агента</value></data>
+  <data name="AuthorCheck" xml:space="preserve"><value>Проверка</value></data>
+  <data name="AuthorReviewer" xml:space="preserve"><value>Рецензент</value></data>
+  <data name="AuthorError" xml:space="preserve"><value>Ошибка</value></data>
+  <data name="Exploring" xml:space="preserve"><value>Изучает…</value></data>
+  <data name="Explored" xml:space="preserve"><value>Изучено: {0}</value></data>
+  <data name="SearchForms" xml:space="preserve"><value>поиск|поиска|поисков</value></data>
+  <data name="FolderForms" xml:space="preserve"><value>папка|папки|папок</value></data>
+  <data name="StepForms" xml:space="preserve"><value>шаг|шага|шагов</value></data>
+  <data name="ContinueRequest" xml:space="preserve"><value>Продолжай с того места, где остановился.</value></data>
+  <data name="ExecutePlanRequest" xml:space="preserve"><value>Выполни этот план.</value></data>
+  <data name="ChatOpenDetail" xml:space="preserve"><value>{0} · открыт</value></data>
+  <data name="OpenChatPrompt" xml:space="preserve"><value>Открыть чат этой папки</value></data>
+  <data name="NoSavedChats" xml:space="preserve"><value>Сохранённых чатов пока нет</value></data>
+  <data name="OpenFolderForChats" xml:space="preserve"><value>Откройте папку: чаты хранятся в ней</value></data>
+  <!-- Changed files and diff. -->
+  <data name="ChangedFilesTitle" xml:space="preserve"><value>Изменено файлов: {0}</value></data>
+  <data name="ChangedFilesReadFailed" xml:space="preserve"><value>Не удалось прочитать изменённые файлы: {0}</value></data>
+  <data name="ChangesNotAccepted" xml:space="preserve"><value>Правки не приняты: {0}</value></data>
+  <data name="ChangesAccepted" xml:space="preserve"><value>Правки агента приняты: {0}</value></data>
+  <data name="ChangesReverted" xml:space="preserve"><value>Правки агента откачены: {0}</value></data>
+  <data name="FileReverted" xml:space="preserve"><value>Откачен {0}</value></data>
+  <data name="RevertFailed" xml:space="preserve"><value>Не удалось откатить {0}: {1}</value></data>
+  <data name="DiffNewFile" xml:space="preserve"><value>Новый файл {0}</value></data>
+  <data name="DiffDelete" xml:space="preserve"><value>Удалить {0} (в корзину)</value></data>
+  <data name="DiffMove" xml:space="preserve"><value>Перенести {0} → {1}</value></data>
+  <data name="DiffCommandInProject" xml:space="preserve"><value>Команда в папке проекта</value></data>
+  <data name="DiffCommandInFolder" xml:space="preserve"><value>Команда в папке {0}</value></data>
+  <data name="DiffEdit" xml:space="preserve"><value>Изменить {0}</value></data>
+  <data name="DiffMoreLines" xml:space="preserve"><value>…ещё {0} строк</value></data>
+  <!-- Context usage. -->
+  <data name="ContextSummary" xml:space="preserve"><value>Контекст: {0}{1} из {2} токенов ({3})</value></data>
+  <data name="ContextNoRequests" xml:space="preserve"><value>Запросов в этом чате ещё не было.</value></data>
+  <data name="ContextSpent" xml:space="preserve"><value>За чат: запросов {0}, отправлено {1}{2}, получено {1}{3}</value></data>
+  <data name="ContextSpentCached" xml:space="preserve"><value>; из кэша {0} ввода ({1} в последнем запросе).</value></data>
+  <data name="ContextNearlyFull" xml:space="preserve"><value>Контекст у предела: скоро старые результаты инструментов свернутся, а начало разговора сожмётся в резюме. Для новой темы лучше начать новый чат.</value></data>
+  <data name="ContextLimitHint" xml:space="preserve"><value>Предел чата — {0} токенов (окно модели — {1}): дальше старые результаты инструментов сворачиваются, а начало разговора сжимается в резюме. Меняется в agent.contextLimit.</value></data>
+  <data name="ContextWindowHint" xml:space="preserve"><value>Окно контекста задаётся в параметрах модели, если справочник его не знает.</value></data>
+  <!-- Agent turn in the feed. -->
+  <data name="DurationSeconds" xml:space="preserve"><value>{0} с</value></data>
+  <data name="DurationMinutes" xml:space="preserve"><value>{0} мин</value></data>
+  <data name="DurationMinutesSeconds" xml:space="preserve"><value>{0} мин {1} с</value></data>
+  <data name="WorkingFor" xml:space="preserve"><value>Работает · {0}</value></data>
+  <data name="WorkLog" xml:space="preserve"><value>Ход работы · {0}</value></data>
+  <data name="WorkedFor" xml:space="preserve"><value>Работал {0} · {1}</value></data>
+  <data name="ActionForms" xml:space="preserve"><value>действие|действия|действий</value></data>
+  <data name="Thoughts" xml:space="preserve"><value>Размышления</value></data>
+  <data name="ThinkingNow" xml:space="preserve"><value>Размышляет…</value></data>
+  <data name="ThinkingFor" xml:space="preserve"><value>Размышляет · {0}</value></data>
+  <data name="ThoughtFor" xml:space="preserve"><value>Размышлял {0}</value></data>
+  <data name="PlanReady" xml:space="preserve"><value>План готов. Выполнить его — в режиме «Агент»; уточнить — сообщением.</value></data>
+  <data name="StepLimitNotice" xml:space="preserve"><value>Достигнут лимит в {0} запросов к модели за ход: выше — итог на этот момент. Продолжить можно кнопкой или сообщением.</value></data>
+  <data name="QuestionWithdrawnNote" xml:space="preserve"><value>(вопрос снят)</value></data>
+  <data name="QuestionWithdrawn" xml:space="preserve"><value>Вопрос снят</value></data>
+  <data name="QuestionAnswered" xml:space="preserve"><value>Ответ: {0}</value></data>
+  <data name="ApprovalAppliedAutomatically" xml:space="preserve"><value>Применено без вопроса</value></data>
+  <data name="ApprovalApplied" xml:space="preserve"><value>Применено</value></data>
+  <data name="ApprovalRejected" xml:space="preserve"><value>Отклонено</value></data>
+  <data name="UserRejectedAction" xml:space="preserve"><value>Пользователь отклонил это действие.</value></data>
+  <data name="LengthLimitNotice" xml:space="preserve"><value>Ответ модели оборвался по лимиту длины: увеличьте «Длину ответа» в параметрах модели и продолжите сообщением.</value></data>
+  <data name="ContinueAfterLength" xml:space="preserve"><value>Твой ответ оборвался по лимиту длины. Продолжи ровно с места обрыва, без повторов, пересказа и извинений.</value></data>
+  <data name="Stopped" xml:space="preserve"><value>(остановлено)</value></data>
+  <data name="ActiveFileShared" xml:space="preserve"><value>Агент видит, какой файл открыт: {0}. Щелчок — не сообщать.</value></data>
+  <data name="ActiveFileNotShared" xml:space="preserve"><value>Файл не сообщается агенту. Щелчок — сообщать.</value></data>
+  <data name="TodoTitle" xml:space="preserve"><value>План · {0} из {1}</value></data>
+  <data name="FileStatusNew" xml:space="preserve"><value>новый</value></data>
+  <data name="FileStatusDeleted" xml:space="preserve"><value>удалён</value></data>
+  <!-- Mode and model. -->
+  <data name="ModeToolTip" xml:space="preserve"><value>Режим агента: {0} — {1}. Щелчок — выбрать другой.</value></data>
+  <data name="ModeChanged" xml:space="preserve"><value>Режим агента: {0}</value></data>
+  <data name="CurrentModeDetail" xml:space="preserve"><value>текущий · {0}</value></data>
+  <data name="ModePickTitle" xml:space="preserve"><value>Режим агента</value></data>
+  <data name="ParameterDefault" xml:space="preserve"><value>По умолчанию</value></data>
+  <data name="ParameterAuto" xml:space="preserve"><value>Авто</value></data>
+  <data name="SameAsAgent" xml:space="preserve"><value>Как у агента</value></data>
+  <data name="ReasoningNone" xml:space="preserve"><value>Без рассуждений</value></data>
+  <data name="ReasoningLow" xml:space="preserve"><value>Низкий</value></data>
+  <data name="ReasoningMedium" xml:space="preserve"><value>Средний</value></data>
+  <data name="ReasoningHigh" xml:space="preserve"><value>Высокий</value></data>
+  <data name="ReasoningExtraHigh" xml:space="preserve"><value>Максимальный</value></data>
+  <data name="ParametersSummary" xml:space="preserve"><value>Параметры модели — {0}</value></data>
+  <data name="CurrentModel" xml:space="preserve"><value>текущая</value></data>
+  <data name="PickModelPrompt" xml:space="preserve"><value>Модель агента: выберите или введите «вендор/модель»</value></data>
+  <data name="ModelChanged" xml:space="preserve"><value>Модель агента: {0}</value></data>
+  <data name="UseCustomModel" xml:space="preserve"><value>Использовать «{0}»</value></data>
+  <data name="HelperModelPrompt" xml:space="preserve"><value>Служебная модель: заметки памяти после хода и запасное резюме при сжатии</value></data>
+  <data name="HelperModel" xml:space="preserve"><value>Служебная модель</value></data>
+  <data name="ParamReasoning" xml:space="preserve"><value>Рассуждения</value></data>
+  <data name="ParamTemperature" xml:space="preserve"><value>Температура</value></data>
+  <data name="ParamMaxOutputTokens" xml:space="preserve"><value>Длина ответа</value></data>
+  <data name="ParamContextWindow" xml:space="preserve"><value>Окно контекста</value></data>
+  <data name="ParamApprovals" xml:space="preserve"><value>Подтверждение правок</value></data>
+  <data name="ApproveEachEdit" xml:space="preserve"><value>Каждую правку</value></data>
+  <data name="AcceptEditsImmediately" xml:space="preserve"><value>Принимать правки сразу</value></data>
+  <data name="PickModelAction" xml:space="preserve"><value>Выбрать модель…</value></data>
+  <data name="HelperModelAction" xml:space="preserve"><value>Служебная модель…</value></data>
+  <data name="AllSettingsAction" xml:space="preserve"><value>Все настройки…</value></data>
+  <!-- Commands. -->
+  <data name="CommandSetApiKey" xml:space="preserve"><value>Задать ключ API</value></data>
+  <data name="CommandClearApiKey" xml:space="preserve"><value>Удалить ключ API</value></data>
+  <data name="CommandShowHistory" xml:space="preserve"><value>История чатов папки</value></data>
+  <data name="CommandDeleteChat" xml:space="preserve"><value>Удалить текущий чат</value></data>
+  <data name="CommandPickMode" xml:space="preserve"><value>Режим работы</value></data>
+  <data name="CommandPickModel" xml:space="preserve"><value>Выбрать модель</value></data>
+  <data name="CommandPickHelperModel" xml:space="preserve"><value>Служебная модель (память, запасное резюме)</value></data>
+  <data name="CommandModelParameters" xml:space="preserve"><value>Параметры модели</value></data>
+  <data name="CommandContextDetails" xml:space="preserve"><value>Заполнение контекста</value></data>
+  <data name="CommandToggleActiveFile" xml:space="preserve"><value>Сообщать агенту открытый файл</value></data>
+  <data name="CommandCopyLastAnswer" xml:space="preserve"><value>Копировать последний ответ</value></data>
+  <data name="CommandContinue" xml:space="preserve"><value>Продолжить после лимита запросов</value></data>
+  <data name="ExecutePlan" xml:space="preserve"><value>Выполнить план</value></data>
+  <data name="CommandAcceptChanges" xml:space="preserve"><value>Принять правки агента</value></data>
+  <data name="CommandRevertChanges" xml:space="preserve"><value>Откатить все правки агента</value></data>
+  <data name="MenuApiKey" xml:space="preserve"><value>Ключ API агента…</value></data>
+  <data name="ApiKeyDialogTitle" xml:space="preserve"><value>Ключ API агента</value></data>
+  <data name="ApiKeyDialogPrompt" xml:space="preserve"><value>Вставьте API-ключ {0}.</value></data>
+  <data name="ApiKeySaved" xml:space="preserve"><value>Ключ API сохранён</value></data>
+  <data name="ClearApiKeyQuestion" xml:space="preserve"><value>Удалить ключ API агента?</value></data>
+  <data name="ClearApiKeyDetails" xml:space="preserve"><value>Чтобы снова пользоваться агентом, ключ придётся ввести заново.</value></data>
+  <data name="Delete" xml:space="preserve"><value>Удалить</value></data>
+  <data name="ApiKeyDeleted" xml:space="preserve"><value>Ключ API удалён</value></data>
+  <!-- Chat panel (CodeEditor.Modules.Agent.Wpf). -->
+  <data name="AgentViewModuleName" xml:space="preserve"><value>Агент: представление</value></data>
+  <data name="MoreActions" xml:space="preserve"><value>Другие действия</value></data>
+  <data name="ChatHistory" xml:space="preserve"><value>История чатов</value></data>
+  <data name="RevertAll" xml:space="preserve"><value>Откатить всё</value></data>
+  <data name="RevertAllToolTip" xml:space="preserve"><value>Вернуть исходный текст всех файлов (отменяется Ctrl+Z во вкладке)</value></data>
+  <data name="Accept" xml:space="preserve"><value>Принять</value></data>
+  <data name="AcceptToolTip" xml:space="preserve"><value>Сохранить файлы и очистить список</value></data>
+  <data name="RevertFile" xml:space="preserve"><value>Откатить файл</value></data>
+  <data name="RevertFileName" xml:space="preserve"><value>Откатить {0}</value></data>
+  <data name="ShowDiff" xml:space="preserve"><value>Показать дифф</value></data>
+  <data name="DiffFileName" xml:space="preserve"><value>Дифф {0}</value></data>
+  <data name="ApiKeyMissing" xml:space="preserve"><value>Чтобы говорить с агентом, задайте API-ключ сервиса моделей. Он хранится зашифрованным для вашей учётной записи Windows.</value></data>
+  <data name="WelcomeTitle" xml:space="preserve"><value>Спросите агента о коде этой папки</value></data>
+  <data name="WelcomeText" xml:space="preserve"><value>Агент читает и ищет файлы проекта, правки показывает диффом и применяет после подтверждения. Ссылки вида файл:строка в ответе открывают файл.</value></data>
+  <data name="WelcomeOpenFolder" xml:space="preserve"><value>Откройте папку, чтобы чаты сохранялись в ней.</value></data>
+  <data name="RecentChats" xml:space="preserve"><value>Недавние чаты</value></data>
+  <data name="AllFolderChats" xml:space="preserve"><value>Все чаты папки…</value></data>
+  <data name="Send" xml:space="preserve"><value>Отправить</value></data>
+  <data name="SendToolTip" xml:space="preserve"><value>Отправить (Enter)</value></data>
+  <data name="Stop" xml:space="preserve"><value>Остановить</value></data>
+  <data name="StopToolTip" xml:space="preserve"><value>Остановить (Esc)</value></data>
+  <data name="InputPlaceholder" xml:space="preserve"><value>Спросите агента</value></data>
+  <data name="InputName" xml:space="preserve"><value>Сообщение агенту</value></data>
+  <data name="Apply" xml:space="preserve"><value>Применить</value></data>
+  <data name="Reject" xml:space="preserve"><value>Отклонить</value></data>
+  <data name="AllowForChat" xml:space="preserve"><value>Разрешить для этого чата</value></data>
+  <data name="AllowForChatToolTip" xml:space="preserve"><value>Этот инструмент дальше в этом чате — без вопросов</value></data>
+  <data name="AllowAlways" xml:space="preserve"><value>Всегда разрешать «{0}»</value></data>
+  <data name="AllowAlwaysToolTip" xml:space="preserve"><value>Команды, которые начинаются с этих слов, — без вопросов во всех чатах. Правило сохраняется в настройке terminal.allowedCommands.</value></data>
+  <data name="AttachmentToolTip" xml:space="preserve"><value>Агент видел, какой файл открыт</value></data>
+  <data name="Waiting" xml:space="preserve"><value>Думает…</value></data>
+  <data name="Continue" xml:space="preserve"><value>Продолжить</value></data>
+  <data name="Answer" xml:space="preserve"><value>Ответить</value></data>
+  <data name="CustomAnswer" xml:space="preserve"><value>Свой ответ</value></data>
+  <data name="ModelsTitle" xml:space="preserve"><value>Модели</value></data>
+  <data name="ModelsHint" xml:space="preserve"><value>Включённые модели появятся в выборе модели в чате.</value></data>
+  <data name="ModelsSearchPlaceholder" xml:space="preserve"><value>Поиск моделей или «вендор/модель»</value></data>
+  <data name="ModelsLoading" xml:space="preserve"><value>Загружаю список моделей…</value></data>
+  <data name="ModelsLoadFailed" xml:space="preserve"><value>Не удалось загрузить список моделей: {0}</value></data>
+  <data name="ModelsVendorCount" xml:space="preserve"><value>{0} из {1}</value></data>
+  <data name="ModelsSummary" xml:space="preserve"><value>Моделей: {0}, включено: {1}</value></data>
+  <data name="ModelsAddCustom" xml:space="preserve"><value>Добавить</value></data>
+  <data name="ModelsAddCustomHint" xml:space="preserve"><value>Добавить введённую модель: вендор/модель</value></data>
+  <data name="ModelsBack" xml:space="preserve"><value>Назад к чату</value></data>
+  <data name="ModelsRefresh" xml:space="preserve"><value>Обновить список</value></data>
+  <data name="ModelsCurrent" xml:space="preserve"><value>текущая</value></data>
+  <data name="ManageModelsAction" xml:space="preserve"><value>Управление моделями…</value></data>
+  <data name="CommandManageModels" xml:space="preserve"><value>Управление моделями</value></data>
+  <data name="UseSupportedModelsAction" xml:space="preserve"><value>Только поддерживаемые модели</value></data>
+  <data name="CommandUseSupportedModels" xml:space="preserve"><value>Оставить только поддерживаемые модели</value></data>
+  <data name="ModelTierFast" xml:space="preserve"><value>быстрая</value></data>
+  <data name="ModelTierOptimal" xml:space="preserve"><value>оптимальная</value></data>
+  <data name="ModelTierPowerful" xml:space="preserve"><value>мощная</value></data>
+  <data name="RunCommand" xml:space="preserve"><value>Выполнить</value></data>
+  <data name="ApprovalAllowed" xml:space="preserve"><value>Разрешено</value></data>
+  <data name="ApprovalAllowedAutomatically" xml:space="preserve"><value>Разрешено без вопроса</value></data>
+  <data name="AttachFilesTitle" xml:space="preserve"><value>Прикрепить файлы</value></data>
+  <data name="AttachFilesToolTip" xml:space="preserve"><value>Прикрепить файлы: текст и изображения</value></data>
+  <data name="CommandAttachFiles" xml:space="preserve"><value>Прикрепить файлы…</value></data>
+  <data name="AttachmentRejected" xml:space="preserve"><value>Не прикреплено: {0}. Можно прикреплять текстовые файлы и изображения до 5 МБ.</value></data>
+  <data name="RemoveAttachment" xml:space="preserve"><value>Убрать</value></data>
+  <data name="AttachedFilesToolTip" xml:space="preserve"><value>Файлы, прикреплённые к вопросу</value></data>
+  <data name="AttachFilesFilter" xml:space="preserve"><value>Все файлы|*.*|Изображения|*.png;*.jpg;*.jpeg;*.gif;*.webp</value></data>
+  <data name="ParamService" xml:space="preserve"><value>Сервис</value></data>
+  <data name="ServiceChanged" xml:space="preserve"><value>Сервис: {0}. Если ключа этого сервиса ещё нет, задайте его командой «Агент: задать ключ API».</value></data>
+  <!-- Message queue during a turn (ADR 0026). -->
+  <data name="Queued" xml:space="preserve"><value>В очереди</value></data>
+  <data name="RemoveQueued" xml:space="preserve"><value>Убрать из очереди</value></data>
+  <!-- Web access (ADR 0025). -->
+  <data name="WebOnlyHttp" xml:space="preserve"><value>Читаются только адреса http и https: {0}</value></data>
+  <data name="WebHttpError" xml:space="preserve"><value>{0} ответил {1} {2}.</value></data>
+  <data name="WebNotText" xml:space="preserve"><value>{0} — не текстовая страница ({1}): прочитать её текстом нельзя.</value></data>
+  <data name="WebUnreachable" xml:space="preserve"><value>{0} недоступен: {1}</value></data>
+  <data name="WebTimedOut" xml:space="preserve"><value>{0} не ответил за {1} с.</value></data>
+  <data name="WebSearchFailed" xml:space="preserve"><value>Поиск в интернете не удался: {0}</value></data>
+  <data name="WebNothingFound" xml:space="preserve"><value>Ничего подходящего не найдено.</value></data>
+  <data name="WebSources" xml:space="preserve"><value>Источники:</value></data>
+  <data name="ApprovalWebFetch" xml:space="preserve"><value>Агент хочет открыть страницу</value></data>
+  <data name="ToolWebFetch" xml:space="preserve"><value>Страница {0}</value></data>
+  <data name="ToolWebSearch" xml:space="preserve"><value>Поиск в интернете «{0}»</value></data>
+  <data name="ViewImageResult" xml:space="preserve"><value>Картинка {0} — в следующем сообщении.</value></data>
+  <data name="ViewImageUnsupported" xml:space="preserve"><value>{0} — не картинка, которую видит модель: нужен png, jpg, gif или webp.</value></data>
+  <data name="ViewImageTooLarge" xml:space="preserve"><value>{0} больше 5 МБ: такую картинку модель не примет.</value></data>
+  <data name="ImagesNote" xml:space="preserve"><value>Картинки, которые вы открыли через view_image.</value></data>
+  <data name="ToolViewImage" xml:space="preserve"><value>Картинка {0}</value></data>
+  <data name="AskBeforeNewPackage" xml:space="preserve"><value>добавлением пакета</value></data>
+  <data name="AskBeforePublicApi" xml:space="preserve"><value>изменением публичного API (*.Contracts)</value></data>
+  <data name="AskBeforeDeleteTests" xml:space="preserve"><value>удалением тестов</value></data>
+  <data name="AskBeforeMigration" xml:space="preserve"><value>добавлением миграции</value></data>
+  <data name="RulesProtectedPath" xml:space="preserve"><value>agent.md защищает {0}.</value></data>
+  <data name="RulesAskBefore" xml:space="preserve"><value>agent.md требует вопроса перед {0}.</value></data>
+  <data name="RulesBeforeEdit" xml:space="preserve"><value>Пока не применено: в проекте есть правила для этих файлов. Следуйте им и повторите изменение.</value></data>
+  <data name="RulesUnknownCategory" xml:space="preserve"><value>{0}: неизвестное значение ask_before «{1}»; допустимые: {2}.</value></data>
+  <data name="RulesUnknownSetting" xml:space="preserve"><value>{0}: неизвестная настройка «{1}»; допустимые: {2}.</value></data>
+  <data name="RulesSkipped" xml:space="preserve"><value>{0}: не передан агенту — вместе правила длиннее {1} строк.</value></data>
+  <data name="RulesProblem" xml:space="preserve"><value>Правила агента: {0}</value></data>
+  <data name="RulesProblems" xml:space="preserve"><value>Правила агента: {0} (и ещё {1} в журнале)</value></data>
+  <data name="RulesFileFailed" xml:space="preserve"><value>Не удалось создать agent.md: {0}</value></data>
+  <data name="RulesNoFolder" xml:space="preserve"><value>Откройте папку, чтобы задать правила агенту.</value></data>
+  <data name="CommandOpenRules" xml:space="preserve"><value>Правила папки (agent.md)</value></data>
+  <data name="MenuOpenRules" xml:space="preserve"><value>Правила агента</value></data>
+  <data name="ApprovalReason" xml:space="preserve"><value>Почему спрашиваю</value></data>
+  <data name="AgentRulesTemplate" xml:space="preserve"><value>---
+# Настройки, которые исполняет редактор. Уберите «# » в начале строки, чтобы включить.
+# Пути, которые агент меняет только с вашего разрешения, даже когда правки принимаются сразу:
+# protected: ["**/*.csproj", ".github/**"]
+# Действия, перед которыми агент всегда спрашивает: new-package, public-api, delete-tests, migration.
+# ask_before: [new-package, delete-tests]
+---
+
+# Правила для агента
+
+Пишите указания, а не обзор проекта: код агент прочитает сам.
+Короче — лучше: файл уходит в каждый запрос, а длинные правила соблюдаются хуже.
+
+## Как работать
+- 
+
+## Нормы
+- 
+
+## Запреты
+- 
+
+&lt;!--
+Правила для части файлов: .breeze/rules/&lt;имя&gt;.md с шапкой, например
+---
+applies: "src/**/*.xaml"
+description: Стили XAML
+---
+Текст агент получит, когда прочитает или изменит подходящий файл.
+--&gt;
+</value></data>
+  <data name="ApiKeyDialogPromptCustom" xml:space="preserve"><value>Вставьте API-ключ сервиса {0} (настройка agent.endpoint). Сервис должен поддерживать OpenAI Chat Completions с вызовом инструментов и потоковыми ответами; агент проверен на AITUNNEL.</value></data>
+</root>

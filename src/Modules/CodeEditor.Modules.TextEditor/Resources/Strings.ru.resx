@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="ModuleName" xml:space="preserve"><value>Текстовый редактор</value></data>
+  <data name="ViewModuleName" xml:space="preserve"><value>Текстовый редактор: представление</value></data>
+  <data name="CategoryEdit" xml:space="preserve"><value>Правка</value></data>
+  <data name="CategoryView" xml:space="preserve"><value>Вид</value></data>
+  <data name="Undo" xml:space="preserve"><value>Отменить</value></data>
+  <data name="Redo" xml:space="preserve"><value>Повторить</value></data>
+  <data name="ZoomIn" xml:space="preserve"><value>Увеличить шрифт редактора</value></data>
+  <data name="ZoomOut" xml:space="preserve"><value>Уменьшить шрифт редактора</value></data>
+  <data name="ZoomReset" xml:space="preserve"><value>Сбросить масштаб редактора</value></data>
+  <data name="GoToLine" xml:space="preserve"><value>Перейти к строке</value></data>
+  <data name="FocusEditor" xml:space="preserve"><value>Перейти в редактор</value></data>
+  <data name="MenuUndo" xml:space="preserve"><value>_Отменить</value></data>
+  <data name="MenuRedo" xml:space="preserve"><value>_Повторить</value></data>
+  <data name="IndentationSpaces" xml:space="preserve"><value>Пробелы: {0}</value></data>
+  <data name="IndentationTabs" xml:space="preserve"><value>Табуляция: {0}</value></data>
+  <data name="Position" xml:space="preserve"><value>Стр. {0}, стлб. {1}</value></data>
+  <data name="PositionWithSelection" xml:space="preserve"><value>Стр. {0}, стлб. {1} (выделено {2})</value></data>
+  <data name="PlainText" xml:space="preserve"><value>Обычный текст</value></data>
+  <data name="IndentationToolTip" xml:space="preserve"><value>Отступы: editor.tabSize и editor.insertSpaces в настройках</value></data>
+  <data name="EncodingToolTip" xml:space="preserve"><value>Кодировка файла</value></data>
+  <data name="LineEndingToolTip" xml:space="preserve"><value>Переводы строк</value></data>
+  <data name="LanguageToolTip" xml:space="preserve"><value>Язык</value></data>
+  <data name="OpenDocumentsTitle" xml:space="preserve"><value>Открытые файлы</value></data>
+  <data name="SelectionTitle" xml:space="preserve"><value>Выделение в редакторе</value></data>
+  <data name="FileForms" xml:space="preserve"><value>файл|файла|файлов</value></data>
+  <data name="EditedTitle" xml:space="preserve"><value>Изменён {0}</value></data>
+  <data name="EditingTitle" xml:space="preserve"><value>Правка {0}</value></data>
+  <data name="CreatedTitle" xml:space="preserve"><value>Создан {0}</value></data>
+  <data name="CreatingTitle" xml:space="preserve"><value>Создание {0}</value></data>
+  <data name="NoOpenFiles" xml:space="preserve"><value>(нет открытых файлов)</value></data>
+  <data name="NoActiveEditor" xml:space="preserve"><value>(нет активного текстового редактора)</value></data>
+  <data name="ContextUnsaved" xml:space="preserve"><value> (есть несохранённые изменения)</value></data>
+  <data name="ContextOpenFile" xml:space="preserve"><value>Открыт файл {0}{1}.</value></data>
+  <data name="ContextOpenFileAtCaret" xml:space="preserve"><value>Открыт файл {0}{1}, курсор в строке {2}{3}.</value></data>
+  <data name="ContextSelectionInLine" xml:space="preserve"><value>; выделен фрагмент в строке {0}</value></data>
+  <data name="ContextSelectedLines" xml:space="preserve"><value>; выделены строки {0}–{1}</value></data>
+  <data name="FileChangedDuringEdit" xml:space="preserve"><value>{0} изменился во время правки. Прочитайте его заново.</value></data>
+  <data name="FilesEdited" xml:space="preserve"><value>Изменены файлы: {0}. Правки открыты во вкладках и ещё не сохранены; пользователь может отменить их Ctrl+Z. Перечитывать файлы для проверки правки не нужно: это делают сборка и тесты.</value></data>
+  <data name="FilesCreated" xml:space="preserve"><value>Созданы файлы: {0}.</value></data>
+  <data name="FileCreated" xml:space="preserve"><value>Создан файл {0}.</value></data>
+  <data name="FileAlreadyExists" xml:space="preserve"><value>«{0}» уже существует. Для изменения используйте apply_edits или apply_patch.</value></data>
+  <data name="CannotOpenFile" xml:space="preserve"><value>Не удалось открыть {0}.</value></data>
+  <data name="NoEdits" xml:space="preserve"><value>Нет правок.</value></data>
+  <data name="EditWithoutPath" xml:space="preserve"><value>У правки нет пути: укажите «path» в каждой правке или один раз на верхнем уровне вызова.</value></data>
+  <data name="EditTooLarge" xml:space="preserve"><value>Слишком большая правка (больше {0} символов). Разбейте её на части по файлам или местам.</value></data>
+  <data name="EmptyOldText" xml:space="preserve"><value>{0}: пустой oldText. Для нового файла используйте create_file.</value></data>
+  <data name="AnchorNotFound" xml:space="preserve"><value>{0}: нет строки «{1}» из «@@». Скопируйте её из read_file.</value></data>
+  <data name="EditsOverlap" xml:space="preserve"><value>{0}: правки пересекаются. Объедините их в одну.</value></data>
+  <data name="FileNotFound" xml:space="preserve"><value>Файла «{0}» нет. Для нового файла используйте create_file.</value></data>
+  <data name="BinaryFile" xml:space="preserve"><value>«{0}» — двоичный файл.</value></data>
+  <data name="QuotesUnescaped" xml:space="preserve"><value>{0}: кавычки в oldText и newText были экранированы лишний раз (\"), экранирование снято — проверьте результат.</value></data>
+  <data name="FoundIgnoringIndent" xml:space="preserve"><value>{0}: фрагмент найден без учёта отступов (строки {1}–{2}), отступы приведены к стилю файла — проверьте результат.</value></data>
+  <data name="FoundIgnoringTypography" xml:space="preserve"><value>{0}: фрагмент найден без учёта отступов и разницы тире, кавычек и особых пробелов (строки {1}–{2}); неизменённые строки сохранили знаки файла — проверьте результат.</value></data>
+  <data name="AndMore" xml:space="preserve"><value> и дальше</value></data>
+  <data name="FragmentAmbiguous" xml:space="preserve"><value>{0}: фрагмент oldText встречается несколько раз (строки {1}{2}). Добавьте соседние строки, чтобы он стал единственным.</value></data>
+  <data name="FragmentNotFound" xml:space="preserve"><value>{0}: фрагмент oldText не найден. Прочитайте файл заново (read_file) и скопируйте фрагмент точно, без номеров строк.</value></data>
+  <data name="FragmentSimilarAt" xml:space="preserve"><value>{0}: фрагмент oldText не найден целиком. Похожее место начинается в строке {1}:</value></data>
+  <data name="CopyFragmentExactly" xml:space="preserve"><value>Скопируйте фрагмент из файла точно, без номеров строк.</value></data>
+  <data name="PatchStart" xml:space="preserve"><value>Патч должен начинаться с «{0}», а файлы — с «{1} путь» или «{2} путь».</value></data>
+  <data name="PatchNoDelete" xml:space="preserve"><value>apply_patch не удаляет файлы: используйте delete_file.</value></data>
+  <data name="PatchUnknownLine" xml:space="preserve"><value>Непонятная строка патча «{0}»: ожидался «{1} путь» или «{2} путь».</value></data>
+  <data name="PatchEmpty" xml:space="preserve"><value>В патче нет изменений.</value></data>
+  <data name="PatchNoPath" xml:space="preserve"><value>У «{0}» нет пути файла.</value></data>
+  <data name="PatchNoMove" xml:space="preserve"><value>apply_patch не переносит файлы: перенесите {0} через move_file, затем правьте.</value></data>
+  <data name="PatchNoContext" xml:space="preserve"><value>{0}: у вставки нет контекста — добавьте строку «@@ …» или строки контекста с пробелом.</value></data>
+  <data name="AgentChangesSummary" xml:space="preserve"><value>Правки агента: {0} · +{1} −{2}</value></data>
+  <data name="AcceptAgentChange" xml:space="preserve"><value>Принять правку агента у курсора</value></data>
+  <data name="RejectAgentChange" xml:space="preserve"><value>Отклонить правку агента у курсора</value></data>
+  <data name="AcceptAgentChanges" xml:space="preserve"><value>Принять все правки агента в файле</value></data>
+  <data name="RejectAgentChanges" xml:space="preserve"><value>Отклонить все правки агента в файле</value></data>
+  <data name="NextAgentChange" xml:space="preserve"><value>Следующая правка агента</value></data>
+  <data name="PreviousAgentChange" xml:space="preserve"><value>Предыдущая правка агента</value></data>
+  <data name="MenuAcceptAgentChange" xml:space="preserve"><value>Принять правку _агента</value></data>
+  <data name="MenuRejectAgentChange" xml:space="preserve"><value>Отклонить правку а_гента</value></data>
+  <data name="MenuAcceptAgentChanges" xml:space="preserve"><value>Принять все правки агента в файле</value></data>
+  <data name="MenuRejectAgentChanges" xml:space="preserve"><value>Отклонить все правки агента в файле</value></data>
+  <data name="MenuNextAgentChange" xml:space="preserve"><value>Следующая правка агента</value></data>
+  <data name="MenuPreviousAgentChange" xml:space="preserve"><value>Предыдущая правка агента</value></data>
+  <data name="AcceptHunk" xml:space="preserve"><value>Принять</value></data>
+  <data name="AcceptHunkToolTip" xml:space="preserve"><value>Принять эту правку (Ctrl+Alt+Y)</value></data>
+  <data name="RejectHunk" xml:space="preserve"><value>Отклонить</value></data>
+  <data name="RejectHunkToolTip" xml:space="preserve"><value>Отклонить эту правку (Ctrl+Alt+N)</value></data>
+  <data name="AcceptAll" xml:space="preserve"><value>Принять всё</value></data>
+  <data name="AcceptAllToolTip" xml:space="preserve"><value>Принять все правки в файле и сохранить его (Ctrl+Alt+Shift+Y)</value></data>
+  <data name="RejectAll" xml:space="preserve"><value>Отклонить всё</value></data>
+  <data name="RejectAllToolTip" xml:space="preserve"><value>Вернуть файл к виду до агента (Ctrl+Alt+Shift+N)</value></data>
+  <data name="NextChangeToolTip" xml:space="preserve"><value>Следующая правка (F7)</value></data>
+  <data name="PreviousChangeToolTip" xml:space="preserve"><value>Предыдущая правка (Shift+F7)</value></data>
+  <data name="Cut" xml:space="preserve"><value>Вырезать</value></data>
+  <data name="MenuCut" xml:space="preserve"><value>_Вырезать</value></data>
+  <data name="Copy" xml:space="preserve"><value>Копировать</value></data>
+  <data name="MenuCopy" xml:space="preserve"><value>_Копировать</value></data>
+  <data name="Paste" xml:space="preserve"><value>Вставить</value></data>
+  <data name="MenuPaste" xml:space="preserve"><value>Вст_авить</value></data>
+  <data name="SelectAll" xml:space="preserve"><value>Выделить всё</value></data>
+  <data name="MenuSelectAll" xml:space="preserve"><value>Выделить в_сё</value></data>
+  <data name="FindInFile" xml:space="preserve"><value>Найти в файле</value></data>
+  <data name="MenuFind" xml:space="preserve"><value>_Найти</value></data>
+  <data name="ReplaceInFile" xml:space="preserve"><value>Заменить в файле</value></data>
+  <data name="MenuReplace" xml:space="preserve"><value>_Заменить</value></data>
+  <data name="ToggleReplace" xml:space="preserve"><value>Показать или скрыть замену</value></data>
+  <data name="ToggleReplaceToolTip" xml:space="preserve"><value>Показать или скрыть замену (Ctrl+H)</value></data>
+  <data name="Find" xml:space="preserve"><value>Найти</value></data>
+  <data name="MatchCase" xml:space="preserve"><value>Учитывать регистр</value></data>
+  <data name="MatchWholeWord" xml:space="preserve"><value>Слово целиком</value></data>
+  <data name="UseRegularExpression" xml:space="preserve"><value>Регулярное выражение</value></data>
+  <data name="PreviousMatch" xml:space="preserve"><value>Предыдущее (Shift+F3)</value></data>
+  <data name="NextMatch" xml:space="preserve"><value>Следующее (F3)</value></data>
+  <data name="CloseSearch" xml:space="preserve"><value>Закрыть (Esc)</value></data>
+  <data name="Replace" xml:space="preserve"><value>Заменить</value></data>
+  <data name="ReplaceToolTip" xml:space="preserve"><value>Заменить (Ctrl+Shift+1)</value></data>
+  <data name="ReplaceAll" xml:space="preserve"><value>Заменить все</value></data>
+  <data name="ReplaceAllToolTip" xml:space="preserve"><value>Заменить все (Ctrl+Alt+Enter)</value></data>
+  <data name="EditNotSaved" xml:space="preserve"><value>{0} изменён в редакторе, но не сохранён: {1}</value></data>
+  <data name="EditorFontSize" xml:space="preserve"><value>Размер шрифта редактора: {0}</value></data>
+</root>

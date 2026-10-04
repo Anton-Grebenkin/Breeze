@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="ModuleName" xml:space="preserve"><value>Просмотр файлов</value></data>
+  <data name="ViewModuleName" xml:space="preserve"><value>Представления просмотра файлов</value></data>
+  <!-- File sizes. -->
+  <data name="ByteForms" xml:space="preserve"><value>байт|байта|байт</value></data>
+  <data name="SizeKilobytes" xml:space="preserve"><value>{0} КБ</value></data>
+  <data name="SizeMegabytes" xml:space="preserve"><value>{0} МБ</value></data>
+  <data name="SizeGigabytes" xml:space="preserve"><value>{0} ГБ</value></data>
+  <data name="SizeTerabytes" xml:space="preserve"><value>{0} ТБ</value></data>
+  <data name="SizeExact" xml:space="preserve"><value>{0} ({1})</value></data>
+  <!-- Tab toolbar info. -->
+  <data name="ImageSummary" xml:space="preserve"><value>{0} × {1} · {2} · {3}</value></data>
+  <data name="FileSummary" xml:space="preserve"><value>{0} · {1}</value></data>
+  <data name="PixelDimensions" xml:space="preserve"><value>{0} × {1}</value></data>
+  <data name="VideoFormat" xml:space="preserve"><value>Видео {0}</value></data>
+  <data name="AudioFormat" xml:space="preserve"><value>Аудио {0}</value></data>
+  <data name="ImageReduced" xml:space="preserve"><value>Показана уменьшенной до {0} × {1}, чтобы не занимать память.</value></data>
+  <data name="ImageFirstFrame" xml:space="preserve"><value>Показан первый кадр из {0}: анимация не воспроизводится.</value></data>
+  <data name="ImageFirstPage" xml:space="preserve"><value>Показана первая страница из {0}.</value></data>
+  <data name="HexOffsetHeader" xml:space="preserve"><value>Смещение</value></data>
+  <data name="HexTextHeader" xml:space="preserve"><value>Текст</value></data>
+  <data name="HexTruncated" xml:space="preserve"><value>Показаны только первые 32 ГБ файла.</value></data>
+  <!-- Errors. -->
+  <data name="ViewerLoadFailed" xml:space="preserve"><value>Файл не показать: {0}</value></data>
+  <data name="OpenExternalFailed" xml:space="preserve"><value>Файл не открыть во внешнем приложении: {0}</value></data>
+  <data name="FileMissing" xml:space="preserve"><value>Файл удалён или перемещён.</value></data>
+  <data name="WebPCodecMissing" xml:space="preserve"><value>В Windows нет декодера WebP. Установите «Расширения для изображений WebP» из Microsoft Store или откройте файл во внешнем приложении.</value></data>
+  <data name="ImageCodecMissing" xml:space="preserve"><value>В Windows нет декодера картинок {0}. Откройте файл во внешнем приложении.</value></data>
+  <data name="ImageDamaged" xml:space="preserve"><value>Картинка повреждена или файл — не картинка: {0}</value></data>
+  <data name="SvgInvalid" xml:space="preserve"><value>SVG не нарисовать: файл — не правильный SVG. Откройте его как текст, чтобы исправить.</value></data>
+  <data name="MediaUnsupported" xml:space="preserve"><value>Встроенный проигрыватель не воспроизводит этот файл: кодек или формат не поддерживается. Откройте его во внешнем приложении.</value></data>
+  <data name="WebViewUnavailable" xml:space="preserve"><value>Встроенный просмотр (WebView2) недоступен: {0}</value></data>
+  <!-- Go to offset. -->
+  <data name="GoToOffsetPlaceholder" xml:space="preserve"><value>Смещение: 0x1F40 (шестнадцатеричное) или 8000 (десятичное)</value></data>
+  <data name="GoToOffsetEmptyFile" xml:space="preserve"><value>Файл пуст: переходить некуда.</value></data>
+  <data name="GoToOffsetRange" xml:space="preserve"><value>Введите смещение от 0 до {0}.</value></data>
+  <data name="GoToOffsetItem" xml:space="preserve"><value>Перейти к {0} ({1})</value></data>
+  <data name="OffsetHexadecimal" xml:space="preserve"><value>шестнадцатеричное</value></data>
+  <data name="OffsetDecimal" xml:space="preserve"><value>десятичное</value></data>
+  <!-- Tab toolbar and element names. -->
+  <data name="Refresh" xml:space="preserve"><value>Обновить</value></data>
+  <data name="OpenExternal" xml:space="preserve"><value>Открыть во внешнем приложении</value></data>
+  <data name="OpenAsText" xml:space="preserve"><value>Открыть как текст</value></data>
+  <data name="Loading" xml:space="preserve"><value>Загрузка…</value></data>
+  <data name="ZoomIn" xml:space="preserve"><value>Увеличить</value></data>
+  <data name="ZoomOut" xml:space="preserve"><value>Уменьшить</value></data>
+  <data name="ZoomActualSize" xml:space="preserve"><value>Реальный размер (100 %)</value></data>
+  <data name="ZoomToFit" xml:space="preserve"><value>По размеру окна</value></data>
+  <data name="GoToOffset" xml:space="preserve"><value>Перейти к смещению…</value></data>
+  <data name="Picture" xml:space="preserve"><value>Картинка</value></data>
+  <data name="Player" xml:space="preserve"><value>Проигрыватель</value></data>
+  <data name="Bytes" xml:space="preserve"><value>Байты</value></data>
+  <!-- Commands. -->
+  <data name="Category" xml:space="preserve"><value>Просмотр файла</value></data>
+  <data name="CommandRefresh" xml:space="preserve"><value>Обновить</value></data>
+  <data name="CommandOpenExternal" xml:space="preserve"><value>Открыть во внешнем приложении</value></data>
+  <data name="CommandOpenAsText" xml:space="preserve"><value>Открыть SVG как текст</value></data>
+  <data name="CommandZoomIn" xml:space="preserve"><value>Увеличить</value></data>
+  <data name="CommandZoomOut" xml:space="preserve"><value>Уменьшить</value></data>
+  <data name="CommandZoomActualSize" xml:space="preserve"><value>Реальный размер (100 %)</value></data>
+  <data name="CommandZoomToFit" xml:space="preserve"><value>По размеру окна</value></data>
+  <data name="CommandGoToOffset" xml:space="preserve"><value>Перейти к смещению…</value></data>
+  <data name="MenuZoomIn" xml:space="preserve"><value>_Увеличить</value></data>
+  <data name="MenuZoomOut" xml:space="preserve"><value>У_меньшить</value></data>
+  <data name="MenuZoomActualSize" xml:space="preserve"><value>_Реальный размер</value></data>
+  <data name="MenuZoomToFit" xml:space="preserve"><value>По размеру _окна</value></data>
+  <data name="MenuGoToOffset" xml:space="preserve"><value>Перейти к _смещению…</value></data>
+  <data name="MenuOpenAsText" xml:space="preserve"><value>Открыть как _текст</value></data>
+  <data name="MenuRefresh" xml:space="preserve"><value>О_бновить</value></data>
+  <data name="MenuOpenExternal" xml:space="preserve"><value>Открыть во _внешнем приложении</value></data>
+</root>

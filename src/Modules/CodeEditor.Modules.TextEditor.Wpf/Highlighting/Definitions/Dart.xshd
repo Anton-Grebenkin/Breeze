@@ -1,0 +1,135 @@
+<?xml version="1.0"?>
+<!--
+  Dart: comments (block comments nest), strings '…', "…", '''…''', """…""" with $name and ${expression}, raw r'…',
+  @… annotations, keywords, built-in and capitalized types, calls, numbers. Member access (list.first, stream.on)
+  is not a keyword. Color names are theme tokens (ADR 0036).
+-->
+<SyntaxDefinition name="Dart" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+  <Color name="Comment" />
+  <Color name="String" />
+  <Color name="Number" />
+  <Color name="Keyword" />
+  <Color name="ControlKeyword" />
+  <Color name="Function" />
+  <Color name="Type" />
+  <Color name="Variable" />
+  <Color name="Text" />
+
+  <RuleSet>
+    <Span color="Comment" begin="//" />
+    <Span color="Comment" multiline="true" begin="/\*" end="\*/" ruleSet="BlockComment" />
+    <Span color="String" multiline="true" begin="(?&lt;![\w$])r&quot;&quot;&quot;" end="&quot;&quot;&quot;" />
+    <Span color="String" multiline="true" begin="(?&lt;![\w$])r'''" end="'''" />
+    <Span color="String" begin="(?&lt;![\w$])r&quot;" end="&quot;" />
+    <Span color="String" begin="(?&lt;![\w$])r'" end="'" />
+    <Span color="String" multiline="true" begin="&quot;&quot;&quot;" end="&quot;&quot;&quot;" ruleSet="Interpolated" />
+    <Span color="String" multiline="true" begin="'''" end="'''" ruleSet="Interpolated" />
+    <Span color="String" begin="&quot;" end="&quot;" ruleSet="Interpolated" />
+    <Span color="String" begin="'" end="'" ruleSet="Interpolated" />
+    <Rule color="Type">@[A-Za-z_]\w*</Rule>
+
+    <Rule color="Function">(?&lt;=(?&lt;!\.)\.)(?&gt;[A-Za-z_$][\w$]*)(?=\s*(?:&lt;[^&lt;&gt;()]*&gt;\s*)?\()</Rule>
+    <Rule>(?&lt;!\.)\.(?&gt;[A-Za-z_$][\w$]*)(?!\s*(?:&lt;[^&lt;&gt;()]*&gt;\s*)?\()</Rule>
+
+    <Keywords color="ControlKeyword">
+      <Word>if</Word>
+      <Word>else</Word>
+      <Word>for</Word>
+      <Word>while</Word>
+      <Word>do</Word>
+      <Word>switch</Word>
+      <Word>case</Word>
+      <Word>default</Word>
+      <Word>break</Word>
+      <Word>continue</Word>
+      <Word>return</Word>
+      <Word>throw</Word>
+      <Word>try</Word>
+      <Word>catch</Word>
+      <Word>finally</Word>
+      <Word>on</Word>
+      <Word>rethrow</Word>
+      <Word>assert</Word>
+      <Word>yield</Word>
+      <Word>await</Word>
+      <Word>in</Word>
+    </Keywords>
+    <Keywords color="Keyword">
+      <Word>abstract</Word>
+      <Word>as</Word>
+      <Word>async</Word>
+      <Word>base</Word>
+      <Word>class</Word>
+      <Word>const</Word>
+      <Word>covariant</Word>
+      <Word>deferred</Word>
+      <Word>enum</Word>
+      <Word>export</Word>
+      <Word>extends</Word>
+      <Word>extension</Word>
+      <Word>external</Word>
+      <Word>factory</Word>
+      <Word>final</Word>
+      <Word>get</Word>
+      <Word>hide</Word>
+      <Word>implements</Word>
+      <Word>import</Word>
+      <Word>interface</Word>
+      <Word>is</Word>
+      <Word>late</Word>
+      <Word>library</Word>
+      <Word>mixin</Word>
+      <Word>new</Word>
+      <Word>null</Word>
+      <Word>of</Word>
+      <Word>operator</Word>
+      <Word>part</Word>
+      <Word>required</Word>
+      <Word>sealed</Word>
+      <Word>set</Word>
+      <Word>show</Word>
+      <Word>static</Word>
+      <Word>super</Word>
+      <Word>sync</Word>
+      <Word>this</Word>
+      <Word>typedef</Word>
+      <Word>var</Word>
+      <Word>when</Word>
+      <Word>with</Word>
+      <Word>true</Word>
+      <Word>false</Word>
+    </Keywords>
+    <Keywords color="Type">
+      <Word>int</Word>
+      <Word>double</Word>
+      <Word>num</Word>
+      <Word>bool</Word>
+      <Word>dynamic</Word>
+      <Word>void</Word>
+    </Keywords>
+    <Rule color="Type">\b(?=[A-Z][\w$]*[a-z])[A-Z][\w$]*</Rule>
+    <Rule color="Function">\b[A-Za-z_$][\w$]*(?=\s*(?:&lt;[^&lt;&gt;()]*(?:&lt;[^&lt;&gt;()]*&gt;[^&lt;&gt;()]*)*&gt;\s*)?\()</Rule>
+    <Rule color="Number">
+      \b(?:0[xX][\da-fA-F]+|\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)\b
+    </Rule>
+  </RuleSet>
+
+  <RuleSet name="BlockComment">
+    <Span multiline="true" begin="/\*" end="\*/" ruleSet="BlockComment" />
+  </RuleSet>
+
+  <!-- $name and ${expression}: the code inside uses the text color. -->
+  <RuleSet name="Interpolated">
+    <Span begin="\\" end="." />
+    <Span color="Text" multiline="true" ruleSet="Code">
+      <Begin color="Keyword">\$\{</Begin>
+      <End color="Keyword">\}</End>
+    </Span>
+    <Rule color="Variable">\$[A-Za-z_]\w*</Rule>
+  </RuleSet>
+
+  <RuleSet name="Code">
+    <Span multiline="true" begin="\{" end="\}" ruleSet="Code" />
+    <Import ruleSet="" />
+  </RuleSet>
+</SyntaxDefinition>

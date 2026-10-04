@@ -1,0 +1,29 @@
+<Project>
+
+  <!--
+    UI strings (ADR 0011): Resources/Strings.resx is English (neutral), Strings.ru.resx is Russian. The build
+    generates a public Strings class with a property per string: the compiler checks keys, and markup reads them
+    through {x:Static}.
+  -->
+  <ItemGroup Condition="Exists('$(MSBuildProjectDirectory)\Resources\Strings.resx')">
+    <EmbeddedResource Update="Resources\Strings.resx">
+      <StronglyTypedFileName>$(IntermediateOutputPath)Strings.Designer.cs</StronglyTypedFileName>
+      <StronglyTypedLanguage>CSharp</StronglyTypedLanguage>
+      <StronglyTypedNamespace>$(RootNamespace).Resources</StronglyTypedNamespace>
+      <StronglyTypedClassName>Strings</StronglyTypedClassName>
+      <PublicClass>true</PublicClass>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <!--
+    In WPF projects markup compiles code before ResGen, in a temporary *_wpftmp project without the Strings class.
+    So resources are generated before markup, and the temporary project includes the generated Strings.Designer.cs.
+  -->
+  <Target Name="GenerateStringsBeforeMarkup" BeforeTargets="MarkupCompilePass1" DependsOnTargets="PrepareResourceNames;ResGen"
+          Condition="'$(UseWPF)' == 'true' and Exists('$(MSBuildProjectDirectory)\Resources\Strings.resx')" />
+
+  <ItemGroup Condition="$(MSBuildProjectName.EndsWith('_wpftmp')) and Exists('$(MSBuildProjectDirectory)\Resources\Strings.resx')">
+    <Compile Include="$(IntermediateOutputPath)Strings.Designer.cs" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,73 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="README.md" />
+    <File Path="CONTRIBUTING.md" />
+    <File Path="CHANGELOG.md" />
+    <File Path="global.json" />
+  </Folder>
+  <Folder Name="/src/" />
+  <Folder Name="/src/Platform/">
+    <Project Path="src/Platform/CodeEditor.Core/CodeEditor.Core.csproj" />
+    <Project Path="src/Platform/CodeEditor.Shell/CodeEditor.Shell.csproj" />
+    <Project Path="src/Platform/CodeEditor.UI/CodeEditor.UI.csproj" />
+    <Project Path="src/Platform/CodeEditor.Shell.Wpf/CodeEditor.Shell.Wpf.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/">
+    <Project Path="src/Modules/CodeEditor.Modules.Output/CodeEditor.Modules.Output.csproj" />
+    <Project Path="src/Modules/CodeEditor.Modules.Output.Wpf/CodeEditor.Modules.Output.Wpf.csproj" />
+    <Project Path="src/Modules/CodeEditor.Modules.Explorer/CodeEditor.Modules.Explorer.csproj" />
+    <Project Path="src/Modules/CodeEditor.Modules.Explorer.Wpf/CodeEditor.Modules.Explorer.Wpf.csproj" />
+    <Project Path="src/Modules/CodeEditor.Modules.TextEditor/CodeEditor.Modules.TextEditor.csproj" />
+    <Project Path="src/Modules/CodeEditor.Modules.TextEditor.Wpf/CodeEditor.Modules.TextEditor.Wpf.csproj" />
+    <Project Path="src/Modules/CodeEditor.Modules.Search/CodeEditor.Modules.Search.csproj" />
+    <Project Path="src/Modules/CodeEditor.Modules.Search.Wpf/CodeEditor.Modules.Search.Wpf.csproj" />
+    <Project Path="src/Modules/CodeEditor.Modules.Agent.Contracts/CodeEditor.Modules.Agent.Contracts.csproj" />
+    <Project Path="src/Modules/CodeEditor.Modules.Agent/CodeEditor.Modules.Agent.csproj" />
+    <Project Path="src/Modules/CodeEditor.Modules.Agent.Wpf/CodeEditor.Modules.Agent.Wpf.csproj" />
+    <Project Path="src/Modules/CodeEditor.Modules.Terminal/CodeEditor.Modules.Terminal.csproj" />
+    <Project Path="src/Modules/CodeEditor.Modules.Git/CodeEditor.Modules.Git.csproj" />
+    <Project Path="src/Modules/CodeEditor.Modules.Git.Wpf/CodeEditor.Modules.Git.Wpf.csproj" />
+    <Project Path="src/Modules/CodeEditor.Modules.Docker/CodeEditor.Modules.Docker.csproj" />
+    <Project Path="src/Modules/CodeEditor.Modules.Docker.Wpf/CodeEditor.Modules.Docker.Wpf.csproj" />
+    <Project Path="src/Modules/CodeEditor.Modules.Tools/CodeEditor.Modules.Tools.csproj" />
+    <Project Path="src/Modules/CodeEditor.Modules.Updates/CodeEditor.Modules.Updates.csproj" />
+    <Project Path="src/Modules/CodeEditor.Modules.Browser/CodeEditor.Modules.Browser.csproj" />
+    <Project Path="src/Modules/CodeEditor.Modules.Browser.Wpf/CodeEditor.Modules.Browser.Wpf.csproj" />
+    <Project Path="src/Modules/CodeEditor.Modules.Diagrams/CodeEditor.Modules.Diagrams.csproj" />
+    <Project Path="src/Modules/CodeEditor.Modules.Diagrams.Wpf/CodeEditor.Modules.Diagrams.Wpf.csproj" />
+    <Project Path="src/Modules/CodeEditor.Modules.Documents/CodeEditor.Modules.Documents.csproj" />
+    <Project Path="src/Modules/CodeEditor.Modules.Documents.Wpf/CodeEditor.Modules.Documents.Wpf.csproj" />
+    <Project Path="src/Modules/CodeEditor.Modules.Viewers/CodeEditor.Modules.Viewers.csproj" />
+    <Project Path="src/Modules/CodeEditor.Modules.Viewers.Wpf/CodeEditor.Modules.Viewers.Wpf.csproj" />
+  </Folder>
+  <Folder Name="/src/Apps/">
+    <Project Path="src/Apps/CodeEditor.App/CodeEditor.App.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <File Path="tests/Directory.Build.props" />
+    <Project Path="tests/CodeEditor.Testing/CodeEditor.Testing.csproj" />
+    <Project Path="tests/CodeEditor.Core.Tests/CodeEditor.Core.Tests.csproj" />
+    <Project Path="tests/CodeEditor.Shell.Tests/CodeEditor.Shell.Tests.csproj" />
+    <Project Path="tests/CodeEditor.Modules.Output.Tests/CodeEditor.Modules.Output.Tests.csproj" />
+    <Project Path="tests/CodeEditor.Modules.Explorer.Tests/CodeEditor.Modules.Explorer.Tests.csproj" />
+    <Project Path="tests/CodeEditor.Modules.TextEditor.Tests/CodeEditor.Modules.TextEditor.Tests.csproj" />
+    <Project Path="tests/CodeEditor.Modules.Search.Tests/CodeEditor.Modules.Search.Tests.csproj" />
+    <Project Path="tests/CodeEditor.Modules.Agent.Tests/CodeEditor.Modules.Agent.Tests.csproj" />
+    <Project Path="tests/CodeEditor.Modules.Terminal.Tests/CodeEditor.Modules.Terminal.Tests.csproj" />
+    <Project Path="tests/CodeEditor.Modules.Git.Tests/CodeEditor.Modules.Git.Tests.csproj" />
+    <Project Path="tests/CodeEditor.Modules.Docker.Tests/CodeEditor.Modules.Docker.Tests.csproj" />
+    <Project Path="tests/CodeEditor.Modules.Tools.Tests/CodeEditor.Modules.Tools.Tests.csproj" />
+    <Project Path="tests/CodeEditor.Modules.Updates.Tests/CodeEditor.Modules.Updates.Tests.csproj" />
+    <Project Path="tests/CodeEditor.Modules.Browser.Tests/CodeEditor.Modules.Browser.Tests.csproj" />
+    <Project Path="tests/CodeEditor.Modules.Diagrams.Tests/CodeEditor.Modules.Diagrams.Tests.csproj" />
+    <Project Path="tests/CodeEditor.Modules.Documents.Tests/CodeEditor.Modules.Documents.Tests.csproj" />
+    <Project Path="tests/CodeEditor.Modules.Viewers.Tests/CodeEditor.Modules.Viewers.Tests.csproj" />
+    <Project Path="tests/CodeEditor.Architecture.Tests/CodeEditor.Architecture.Tests.csproj" />
+    <Project Path="tests/CodeEditor.UI.Tests/CodeEditor.UI.Tests.csproj" />
+    <Project Path="tests/CodeEditor.Benchmarks/CodeEditor.Benchmarks.csproj" />
+    <Project Path="tests/CodeEditor.Agent.Eval/CodeEditor.Agent.Eval.csproj" />
+  </Folder>
+</Solution>

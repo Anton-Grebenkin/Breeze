@@ -1,0 +1,122 @@
+<?xml version="1.0"?>
+<!--
+  JavaScript (ES2024), replacing AvalonEdit's built-in definition: template strings with ${…}, regexes, modern
+  keywords, function calls, classes. TypeScript and JSX import the main rule set. Color names are theme tokens
+  (ADR 0036). Rules (Rule, Begin, End) are read with IgnorePatternWhitespace: escape spaces and # in them.
+-->
+<SyntaxDefinition name="JavaScript" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+  <Color name="Comment" />
+  <Color name="String" />
+  <Color name="Number" />
+  <Color name="Keyword" />
+  <Color name="ControlKeyword" />
+  <Color name="Function" />
+  <Color name="Type" />
+  <Color name="Text" />
+
+  <RuleSet>
+    <Span color="Comment" begin="//" />
+    <Span color="Comment" multiline="true" begin="/\*" end="\*/" />
+    <Span color="String" begin="&quot;" end="&quot;" ruleSet="Escapes" />
+    <Span color="String" begin="'" end="'" ruleSet="Escapes" />
+    <Span color="String" multiline="true" begin="`" end="`" ruleSet="Template" />
+    <!-- Regex: a slash where division is impossible (after an operator, bracket or return). -->
+    <Span color="String" ruleSet="Regex" end="/[dgimsuvy]*"
+          begin="(?&lt;=(?:^|[(,=:\[!&amp;|?{};]|\b(?:return|typeof|case|in|of|delete|void|throw|yield|await))\s*)/(?![/*])" />
+
+    <!-- obj.catch(…) and obj.default are member names, not keywords. -->
+    <Rule color="Function">(?&lt;=(?&lt;!\.)\.)(?&gt;[A-Za-z_$][\w$]*)(?=\s*\()</Rule>
+    <Rule>(?&lt;!\.)\.(?&gt;[A-Za-z_$][\w$]*)(?!\s*\()</Rule>
+    <!-- Object key or parameter name before a colon: { type: 1 }, (from?: string). -->
+    <Rule>(?&lt;![?.]\s*)(?&lt;![\w$])(?!(?:default|case)\b)(?&gt;[A-Za-z_$][\w$]*)(?=\s*\??:)</Rule>
+
+    <Keywords color="ControlKeyword">
+      <Word>if</Word>
+      <Word>else</Word>
+      <Word>for</Word>
+      <Word>while</Word>
+      <Word>do</Word>
+      <Word>switch</Word>
+      <Word>case</Word>
+      <Word>default</Word>
+      <Word>break</Word>
+      <Word>continue</Word>
+      <Word>return</Word>
+      <Word>throw</Word>
+      <Word>try</Word>
+      <Word>catch</Word>
+      <Word>finally</Word>
+      <Word>await</Word>
+      <Word>yield</Word>
+      <Word>import</Word>
+      <Word>export</Word>
+      <Word>from</Word>
+    </Keywords>
+    <Keywords color="Keyword">
+      <Word>var</Word>
+      <Word>let</Word>
+      <Word>const</Word>
+      <Word>function</Word>
+      <Word>class</Word>
+      <Word>extends</Word>
+      <Word>static</Word>
+      <Word>async</Word>
+      <Word>new</Word>
+      <Word>delete</Word>
+      <Word>typeof</Word>
+      <Word>instanceof</Word>
+      <Word>in</Word>
+      <Word>of</Word>
+      <Word>as</Word>
+      <Word>void</Word>
+      <Word>this</Word>
+      <Word>super</Word>
+      <Word>true</Word>
+      <Word>false</Word>
+      <Word>null</Word>
+      <Word>undefined</Word>
+      <Word>NaN</Word>
+      <Word>Infinity</Word>
+      <Word>debugger</Word>
+      <Word>with</Word>
+    </Keywords>
+    <!-- get and set are keywords only before a name: get size() {…}. -->
+    <Rule color="Keyword">(?&lt;![\w$])(?:get|set)(?=\s+[A-Za-z_$\[\#])</Rule>
+
+    <!-- new Foo(…) is a class; otherwise a name before ( or &lt;Type&gt;( is a function call. -->
+    <Rule color="Type">(?&lt;=\bnew\s+)(?&gt;[A-Za-z_$][\w$]*)</Rule>
+    <Rule color="Function">(?&lt;![\w$])(?&gt;[A-Za-z_$][\w$]*)(?=\s*(?:&lt;[^&lt;&gt;()]*(?:&lt;[^&lt;&gt;()]*&gt;[^&lt;&gt;()]*)*&gt;\s*)?\()</Rule>
+    <!-- A capitalized mixed-case name is a class or type: Promise, HttpClient (like VS Code semantic highlighting). -->
+    <Rule color="Type">(?&lt;![\w$])(?=[A-Z][\w$]*[a-z])(?&gt;[A-Z][\w$]*)</Rule>
+    <Rule color="Function">@(?&gt;[A-Za-z_$][\w$]*)</Rule>
+    <Rule color="Number">
+      \b(?: 0[xX][\da-fA-F_]+ | 0[bB][01_]+ | 0[oO][0-7_]+ | \d[\d_]*(?:\.[\d_]*)?(?:[eE][+-]?\d[\d_]*)? )n?
+      | \.\d[\d_]*(?:[eE][+-]?\d[\d_]*)?
+    </Rule>
+  </RuleSet>
+
+  <RuleSet name="Escapes">
+    <Span begin="\\" end="." />
+  </RuleSet>
+
+  <!-- Template string: code inside ${…} uses the text color, not the string color. -->
+  <RuleSet name="Template">
+    <Span begin="\\" end="." />
+    <Span color="Text" multiline="true" ruleSet="Code">
+      <Begin color="Keyword">\$\{</Begin>
+      <End color="Keyword">\}</End>
+    </Span>
+  </RuleSet>
+
+  <!-- Code inside ${…}: nested braces are balanced; the rest uses the main rule set. -->
+  <RuleSet name="Code">
+    <Span multiline="true" begin="\{" end="\}" ruleSet="Code" />
+    <Import ruleSet="" />
+  </RuleSet>
+
+  <!-- Regex body: escapes and character classes, where / doesn't end the regex. -->
+  <RuleSet name="Regex">
+    <Span begin="\\" end="." />
+    <Span begin="\[" end="\]" ruleSet="Escapes" />
+  </RuleSet>
+</SyntaxDefinition>

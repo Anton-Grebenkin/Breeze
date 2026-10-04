@@ -1,0 +1,49 @@
+<UserControl x:Class="CodeEditor.Modules.Viewers.Wpf.Views.ViewerToolbar"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:CodeEditor.Modules.Viewers.ViewModels;assembly=CodeEditor.Modules.Viewers"
+             xmlns:res="clr-namespace:CodeEditor.Modules.Viewers.Resources;assembly=CodeEditor.Modules.Viewers"
+             xmlns:controls="clr-namespace:CodeEditor.UI.Controls;assembly=CodeEditor.UI"
+             xmlns:views="clr-namespace:CodeEditor.Modules.Viewers.Wpf.Views"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:ViewerViewModel}"
+             AutomationProperties.AutomationId="FileViewer.Toolbar">
+  <UserControl.Resources>
+    <ResourceDictionary Source="ToolbarStyles.xaml" />
+  </UserControl.Resources>
+
+  <!-- Viewer toolbar: file info, loading, note, error and actions (the same as in the palette and the tab menu). -->
+  <Border BorderThickness="0,0,0,1" BorderBrush="{DynamicResource Brush.Border}" Background="{DynamicResource Brush.Editor.Background}">
+    <DockPanel Margin="8,4">
+      <Button DockPanel.Dock="Right" Style="{StaticResource Button.ToolbarIcon}" Content="{x:Static views:ViewerGlyphs.OpenExternal}"
+              ToolTip="{x:Static res:Strings.OpenExternal}" Command="{Binding OpenExternalCommand}"
+              AutomationProperties.AutomationId="FileViewer.OpenExternal" AutomationProperties.Name="{x:Static res:Strings.OpenExternal}" />
+      <Button DockPanel.Dock="Right" Style="{StaticResource Button.ToolbarIcon}" Content="{x:Static views:ViewerGlyphs.Refresh}"
+              ToolTip="{x:Static res:Strings.Refresh}" Command="{Binding RefreshCommand}"
+              AutomationProperties.AutomationId="FileViewer.Refresh" AutomationProperties.Name="{x:Static res:Strings.Refresh}" />
+      <Button DockPanel.Dock="Right" Style="{StaticResource Button.ToolbarIcon}" Content="{x:Static views:ViewerGlyphs.OpenAsText}"
+              ToolTip="{x:Static res:Strings.OpenAsText}" Command="{Binding OpenAsTextCommand}"
+              Visibility="{Binding CanOpenAsText, Converter={StaticResource BoolToVisibility}}"
+              AutomationProperties.AutomationId="FileViewer.OpenAsText" AutomationProperties.Name="{x:Static res:Strings.OpenAsText}" />
+      <!-- Viewer-specific actions: image zoom, go to offset. -->
+      <Border x:Name="ToolsHost" DockPanel.Dock="Right" VerticalAlignment="Center" />
+      <StackPanel VerticalAlignment="Center">
+        <StackPanel Orientation="Horizontal">
+          <TextBlock Text="{Binding Summary}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Small}"
+                     TextTrimming="CharacterEllipsis" AutomationProperties.AutomationId="FileViewer.Summary" />
+          <TextBlock Margin="8,0,0,0" Text="{x:Static res:Strings.Loading}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Small}"
+                     Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibility}}"
+                     AutomationProperties.AutomationId="FileViewer.Loading" />
+        </StackPanel>
+        <TextBlock TextWrapping="Wrap" Text="{Binding Note}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Small}"
+                   Visibility="{Binding Note, Converter={x:Static controls:NullToCollapsedConverter.Instance}}"
+                   AutomationProperties.AutomationId="FileViewer.Note" />
+        <TextBlock TextWrapping="Wrap" Text="{Binding Error}" Foreground="{DynamicResource Brush.Error.Foreground}" FontSize="{DynamicResource FontSize.Small}"
+                   Visibility="{Binding Error, Converter={x:Static controls:NullToCollapsedConverter.Instance}}"
+                   AutomationProperties.AutomationId="FileViewer.Error" />
+      </StackPanel>
+    </DockPanel>
+  </Border>
+</UserControl>

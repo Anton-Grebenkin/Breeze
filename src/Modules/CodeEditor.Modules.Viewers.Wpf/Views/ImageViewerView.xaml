@@ -1,0 +1,70 @@
+<UserControl x:Class="CodeEditor.Modules.Viewers.Wpf.Views.ImageViewerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:CodeEditor.Modules.Viewers.ViewModels;assembly=CodeEditor.Modules.Viewers"
+             xmlns:res="clr-namespace:CodeEditor.Modules.Viewers.Resources;assembly=CodeEditor.Modules.Viewers"
+             xmlns:views="clr-namespace:CodeEditor.Modules.Viewers.Wpf.Views"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:ImageViewerViewModel}"
+             Background="{DynamicResource Brush.Editor.Background}"
+             AutomationProperties.AutomationId="ImageViewer">
+  <!-- Centered image on a checkerboard (shows transparency); larger than the window: scroll and drag. -->
+  <DockPanel>
+    <views:ViewerToolbar DockPanel.Dock="Top">
+      <views:ViewerToolbar.Tools>
+        <views:ZoomBar />
+      </views:ViewerToolbar.Tools>
+    </views:ViewerToolbar>
+    <Grid>
+      <ScrollViewer x:Name="Scroller" Focusable="True"
+                    AutomationProperties.AutomationId="ImageViewer.Scroller" AutomationProperties.Name="{x:Static res:Strings.Picture}">
+        <ScrollViewer.Style>
+          <!-- When fitted the image is no larger than the window: no scroll bars, so they don't flicker on rounding. -->
+          <Style TargetType="ScrollViewer" BasedOn="{StaticResource {x:Type ScrollViewer}}">
+            <Setter Property="HorizontalScrollBarVisibility" Value="Auto" />
+            <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
+            <Style.Triggers>
+              <DataTrigger Binding="{Binding Zoom.IsFit}" Value="True">
+                <Setter Property="HorizontalScrollBarVisibility" Value="Disabled" />
+                <Setter Property="VerticalScrollBarVisibility" Value="Disabled" />
+              </DataTrigger>
+            </Style.Triggers>
+          </Style>
+        </ScrollViewer.Style>
+        <Border x:Name="Frame" HorizontalAlignment="Center" VerticalAlignment="Center" UseLayoutRounding="True" Visibility="Collapsed">
+          <Border.Background>
+            <DrawingBrush TileMode="Tile" Viewport="0,0,16,16" ViewportUnits="Absolute" Stretch="None">
+              <DrawingBrush.Drawing>
+                <DrawingGroup>
+                  <GeometryDrawing Brush="{DynamicResource Brush.Checkerboard.Background}" Geometry="M0,0 H16 V16 H0 Z" />
+                  <GeometryDrawing Brush="{DynamicResource Brush.Checkerboard.Square}" Geometry="M0,0 H8 V8 H0 Z M8,8 H16 V16 H8 Z" />
+                </DrawingGroup>
+              </DrawingBrush.Drawing>
+            </DrawingBrush>
+          </Border.Background>
+          <Image x:Name="Picture" Source="{Binding Picture}" Stretch="Fill"
+                 AutomationProperties.AutomationId="ImageViewer.Picture" AutomationProperties.Name="{Binding FileName}">
+            <Image.Style>
+              <!-- High zoom: no smoothing so pixels show; otherwise high-quality downscaling. -->
+              <Style TargetType="Image">
+                <Setter Property="RenderOptions.BitmapScalingMode" Value="HighQuality" />
+                <Style.Triggers>
+                  <DataTrigger Binding="{Binding Zoom.IsPixelated}" Value="True">
+                    <Setter Property="RenderOptions.BitmapScalingMode" Value="NearestNeighbor" />
+                  </DataTrigger>
+                </Style.Triggers>
+              </Style>
+            </Image.Style>
+          </Image>
+        </Border>
+      </ScrollViewer>
+      <!-- The image cannot be shown (no WebP codec, damaged file): the toolbar shows why, this offers an external app. -->
+      <Button HorizontalAlignment="Center" VerticalAlignment="Center" Style="{StaticResource Button.Secondary}"
+              Content="{x:Static res:Strings.OpenExternal}" Command="{Binding OpenExternalCommand}"
+              Visibility="{Binding SuggestsExternalApp, Converter={StaticResource BoolToVisibility}}"
+              AutomationProperties.AutomationId="ImageViewer.OpenExternal" AutomationProperties.Name="{x:Static res:Strings.OpenExternal}" />
+    </Grid>
+  </DockPanel>
+</UserControl>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="ModuleName" xml:space="preserve"><value>Схемы</value></data>
+  <data name="ViewModuleName" xml:space="preserve"><value>Представления схем</value></data>
+  <!-- Commands. -->
+  <data name="Category" xml:space="preserve"><value>Схема</value></data>
+  <data name="OpenPreviewToSide" xml:space="preserve"><value>Открыть предпросмотр сбоку</value></data>
+  <data name="OpenPreviewToSideMenu" xml:space="preserve"><value>Предпросмотр _схемы сбоку</value></data>
+  <data name="ExportSvg" xml:space="preserve"><value>Экспорт в SVG</value></data>
+  <data name="ExportPng" xml:space="preserve"><value>Экспорт в PNG</value></data>
+  <data name="ExportSvgMenu" xml:space="preserve"><value>Экспорт схемы в S_VG</value></data>
+  <data name="ExportPngMenu" xml:space="preserve"><value>Экспорт схемы в P_NG</value></data>
+  <data name="ZoomIn" xml:space="preserve"><value>Увеличить</value></data>
+  <data name="ZoomOut" xml:space="preserve"><value>Уменьшить</value></data>
+  <data name="ZoomReset" xml:space="preserve"><value>Исходный размер</value></data>
+  <data name="ZoomToFit" xml:space="preserve"><value>По размеру окна</value></data>
+  <!-- Preview. -->
+  <data name="PreviewTitle" xml:space="preserve"><value>Предпросмотр {0}</value></data>
+  <data name="PreviewPage" xml:space="preserve"><value>Схема</value></data>
+  <data name="PreviewRendering" xml:space="preserve"><value>Отрисовка схемы…</value></data>
+  <data name="PreviewNoBlocks" xml:space="preserve"><value>В файле нет блоков ```mermaid.</value></data>
+  <data name="PreviewEmpty" xml:space="preserve"><value>Схема пуста: напишите текст Mermaid, например «flowchart LR» и «A --&gt; B».</value></data>
+  <data name="PreviewNotRendered" xml:space="preserve"><value>Схема не отрисована: ошибка — выше.</value></data>
+  <data name="PreviewCaption" xml:space="preserve"><value>Схема {0} · строка {1}</value></data>
+  <data name="GoToError" xml:space="preserve"><value>Перейти к строке</value></data>
+  <data name="ErrorAtLine" xml:space="preserve"><value>Строка {0}: {1}</value></data>
+  <data name="UnknownDiagramError" xml:space="preserve"><value>Mermaid не смог отрисовать схему.</value></data>
+  <data name="ReadFailed" xml:space="preserve"><value>Файл не прочитан: {0}</value></data>
+  <data name="FormatSvg" xml:space="preserve"><value>SVG</value></data>
+  <data name="FormatPng" xml:space="preserve"><value>PNG</value></data>
+  <!-- Export. -->
+  <data name="ExportNothing" xml:space="preserve"><value>В файле нет схем Mermaid.</value></data>
+  <data name="ExportSaved" xml:space="preserve"><value>Сохранено: {0}.</value></data>
+  <data name="ExportNotSaved" xml:space="preserve"><value>Не сохранено: {0}</value></data>
+  <data name="ExportFailed" xml:space="preserve"><value>Схема не сохранена: {0}</value></data>
+  <!-- Renderer. -->
+  <data name="RendererScriptFailed" xml:space="preserve"><value>Сбой рендерера схем: {0}</value></data>
+  <data name="RendererNoAnswer" xml:space="preserve"><value>Рендерер схем не ответил.</value></data>
+  <data name="RendererUnavailable" xml:space="preserve"><value>Схемы не отрисовать: WebView2 недоступен ({0}).</value></data>
+  <data name="RendererTimedOut" xml:space="preserve"><value>Схема не отрисовалась за {0} с.</value></data>
+  <data name="MermaidUnavailable" xml:space="preserve"><value>Mermaid не загрузился ({0}). Проверьте подключение к интернету или положите mermaid.min.js в папку Diagrams редактора.</value></data>
+  <!-- Agent tool. -->
+  <data name="ToolUnavailable" xml:space="preserve"><value>Схемы здесь не отрисовать.</value></data>
+  <data name="ToolUnknownAction" xml:space="preserve"><value>Неизвестное действие «{0}». Допустимы: {1}.</value></data>
+  <data name="ToolPathOrText" xml:space="preserve"><value>Укажи файл схемы в path или текст Mermaid в text.</value></data>
+  <data name="ToolNotDiagramFile" xml:space="preserve"><value>{0} — не файл схем: схемы бывают в файлах .mmd и .mermaid и в блоках ```mermaid Markdown.</value></data>
+  <data name="ToolFileNotFound" xml:space="preserve"><value>Файл {0} не найден.</value></data>
+  <data name="ToolNoDiagrams" xml:space="preserve"><value>В {0} нет схем Mermaid.</value></data>
+  <data name="ToolNoSuchBlock" xml:space="preserve"><value>В {0} нет блока {1}: блоков ```mermaid — {2}.</value></data>
+  <data name="ToolCheckPassed" xml:space="preserve"><value>{0}: ошибок нет ({1}).</value></data>
+  <data name="ToolDiagramErrors" xml:space="preserve"><value>Ошибки в схеме {0}:</value></data>
+  <data name="ToolViewNotSeen" xml:space="preserve"><value>Эта модель не видит картинок: проверь схему действием check.</value></data>
+  <data name="ToolViewTooLarge" xml:space="preserve"><value>Картинка схемы больше предела модели: проверь схему действием check или смотри по одному блоку.</value></data>
+  <data name="ToolViewResult" xml:space="preserve"><value>Схема {0} — в следующем сообщении.</value></data>
+  <data name="ToolViewMore" xml:space="preserve"><value>Показаны первые {0}; остальные смотри по номеру block.</value></data>
+  <data name="ToolViewNotShown" xml:space="preserve"><value>Не показаны — больше предела модели: {0}.</value></data>
+  <data name="ToolRenderNeedsPath" xml:space="preserve"><value>render сохраняет картинку рядом с файлом: укажи path.</value></data>
+  <data name="ToolUnknownFormat" xml:space="preserve"><value>Неизвестный формат «{0}»: svg или png.</value></data>
+  <data name="ToolRenderSaved" xml:space="preserve"><value>Сохранено: {0}.</value></data>
+  <data name="ToolOverwriteTitle" xml:space="preserve"><value>Агент хочет сохранить схему поверх файлов</value></data>
+  <data name="ToolOverwriteHeader" xml:space="preserve"><value>Эти файлы уже есть — будут перезаписаны</value></data>
+  <!-- Agent feed. -->
+  <data name="FeedCheck" xml:space="preserve"><value>Проверка схемы {0}</value></data>
+  <data name="FeedView" xml:space="preserve"><value>Просмотр схемы {0}</value></data>
+  <data name="FeedRender" xml:space="preserve"><value>Схема {0} → {1}</value></data>
+  <data name="FeedText" xml:space="preserve"><value>(текст)</value></data>
+</root>

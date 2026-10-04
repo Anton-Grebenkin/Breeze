@@ -1,0 +1,77 @@
+<UserControl x:Class="CodeEditor.Modules.Diagrams.Wpf.Views.DiagramPreviewView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:CodeEditor.Modules.Diagrams.ViewModels;assembly=CodeEditor.Modules.Diagrams"
+             xmlns:res="clr-namespace:CodeEditor.Modules.Diagrams.Resources;assembly=CodeEditor.Modules.Diagrams"
+             xmlns:controls="clr-namespace:CodeEditor.UI.Controls;assembly=CodeEditor.UI"
+             xmlns:views="clr-namespace:CodeEditor.Modules.Diagrams.Wpf.Views"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:DiagramPreviewViewModel}"
+             AutomationProperties.AutomationId="DiagramPreview"
+             Loaded="OnLoaded"
+             Unloaded="OnUnloaded">
+  <UserControl.Resources>
+    <Style x:Key="Button.ToolbarIcon" TargetType="Button" BasedOn="{StaticResource Button.Subtle}">
+      <Setter Property="Padding" Value="4" />
+      <Setter Property="FontFamily" Value="{DynamicResource Font.Icons}" />
+      <Setter Property="FontSize" Value="{DynamicResource FontSize.Icon}" />
+    </Style>
+    <Style x:Key="Button.ToolbarText" TargetType="Button" BasedOn="{StaticResource Button.Subtle}">
+      <Setter Property="Padding" Value="8,4" />
+      <Setter Property="FontFamily" Value="{DynamicResource Font.Ui.Small}" />
+      <Setter Property="FontSize" Value="{DynamicResource FontSize.Small}" />
+    </Style>
+  </UserControl.Resources>
+
+  <!-- Preview tab: file name, zoom and export; diagram errors; the diagram page. -->
+  <DockPanel Background="{DynamicResource Brush.Editor.Background}">
+    <DockPanel DockPanel.Dock="Top" Margin="8,4">
+      <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+        <Button Style="{StaticResource Button.ToolbarIcon}" Content="{x:Static views:PreviewIcons.ZoomOut}"
+                Command="{Binding ZoomOutCommand}" ToolTip="{x:Static res:Strings.ZoomOut}"
+                AutomationProperties.AutomationId="DiagramPreview.ZoomOut" AutomationProperties.Name="{x:Static res:Strings.ZoomOut}" />
+        <Button Style="{StaticResource Button.ToolbarText}" Content="{Binding ZoomText}" MinWidth="56"
+                Command="{Binding ResetZoomCommand}" ToolTip="{x:Static res:Strings.ZoomReset}"
+                AutomationProperties.AutomationId="DiagramPreview.ZoomReset" AutomationProperties.Name="{x:Static res:Strings.ZoomReset}" />
+        <Button Style="{StaticResource Button.ToolbarIcon}" Content="{x:Static views:PreviewIcons.ZoomIn}"
+                Command="{Binding ZoomInCommand}" ToolTip="{x:Static res:Strings.ZoomIn}"
+                AutomationProperties.AutomationId="DiagramPreview.ZoomIn" AutomationProperties.Name="{x:Static res:Strings.ZoomIn}" />
+        <Button Style="{StaticResource Button.ToolbarIcon}" Content="{x:Static views:PreviewIcons.Fit}"
+                Command="{Binding FitCommand}" ToolTip="{x:Static res:Strings.ZoomToFit}"
+                AutomationProperties.AutomationId="DiagramPreview.Fit" AutomationProperties.Name="{x:Static res:Strings.ZoomToFit}" />
+        <Border Width="1" Margin="4" Background="{DynamicResource Brush.Border}" />
+        <Button Style="{StaticResource Button.ToolbarText}" Content="{x:Static res:Strings.FormatSvg}"
+                Command="{Binding ExportSvgCommand}" ToolTip="{x:Static res:Strings.ExportSvg}"
+                AutomationProperties.AutomationId="DiagramPreview.ExportSvg" AutomationProperties.Name="{x:Static res:Strings.ExportSvg}" />
+        <Button Style="{StaticResource Button.ToolbarText}" Content="{x:Static res:Strings.FormatPng}"
+                Command="{Binding ExportPngCommand}" ToolTip="{x:Static res:Strings.ExportPng}"
+                AutomationProperties.AutomationId="DiagramPreview.ExportPng" AutomationProperties.Name="{x:Static res:Strings.ExportPng}" />
+      </StackPanel>
+      <TextBlock VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                 FontFamily="{DynamicResource Font.Ui.Small}" FontSize="{DynamicResource FontSize.Small}"
+                 Foreground="{DynamicResource Brush.Text.Secondary}"
+                 Text="{Binding FileName}" ToolTip="{Binding FilePath}" />
+    </DockPanel>
+
+    <!-- Diagram errors: the text can be selected and copied; the button puts the caret on the first error line. -->
+    <Border DockPanel.Dock="Top" Padding="8,4" BorderBrush="{DynamicResource Brush.Border}" BorderThickness="0,1"
+            Visibility="{Binding Error, Converter={x:Static controls:NullToCollapsedConverter.Instance}}">
+      <DockPanel>
+        <Button DockPanel.Dock="Right" VerticalAlignment="Top" Style="{StaticResource Button.ToolbarText}"
+                Content="{x:Static res:Strings.GoToError}" Command="{Binding GoToErrorCommand}"
+                AutomationProperties.AutomationId="DiagramPreview.GoToError" AutomationProperties.Name="{x:Static res:Strings.GoToError}" />
+        <TextBox IsReadOnly="True" TextWrapping="Wrap" MaxHeight="160" VerticalScrollBarVisibility="Auto"
+                 Background="Transparent" BorderThickness="0" Padding="0"
+                 FontFamily="{DynamicResource Font.Code}" FontSize="{DynamicResource FontSize.Code.Small}"
+                 Foreground="{DynamicResource Brush.Error.Foreground}" CaretBrush="{DynamicResource Brush.Error.Foreground}"
+                 SelectionBrush="{DynamicResource Brush.Editor.Selection}"
+                 Text="{Binding Error, Mode=OneWay}"
+                 AutomationProperties.AutomationId="DiagramPreview.Error" />
+      </DockPanel>
+    </Border>
+
+    <ContentControl x:Name="Host" Focusable="False" AutomationProperties.AutomationId="DiagramPreview.Host" />
+  </DockPanel>
+</UserControl>

@@ -1,0 +1,93 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:search="clr-namespace:ICSharpCode.AvalonEdit.Search;assembly=ICSharpCode.AvalonEdit"
+                    xmlns:ui="clr-namespace:CodeEditor.UI.Themes;assembly=CodeEditor.UI"
+                    xmlns:res="clr-namespace:CodeEditor.Modules.Docker.Resources;assembly=CodeEditor.Modules.Docker">
+
+  <!--
+    Log and inspect tabs: a toolbar above the text and themed search (Ctrl+F, F3, Shift+F3, Esc), like the VS Code find
+    widget but without replace, since the text is read-only.
+  -->
+
+  <Style x:Key="Button.Toolbar" TargetType="Button" BasedOn="{StaticResource Button.Subtle}">
+    <Setter Property="Padding" Value="4" />
+    <Setter Property="FontFamily" Value="{DynamicResource Font.Icons}" />
+    <Setter Property="FontSize" Value="{DynamicResource FontSize.Icon}" />
+  </Style>
+
+  <!-- Toolbar toggle, also reachable from the keyboard (Tab, Space). -->
+  <Style x:Key="ToggleButton.Toolbar" TargetType="ToggleButton" BasedOn="{StaticResource ToggleButton.OptionIcon}">
+    <Setter Property="Focusable" Value="True" />
+    <Setter Property="Width" Value="24" />
+    <Setter Property="Height" Value="22" />
+    <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}" />
+  </Style>
+
+  <Style x:Key="Button.SearchPanel" TargetType="ButtonBase" BasedOn="{StaticResource Button.Subtle}">
+    <Setter Property="Padding" Value="4,2" />
+    <Setter Property="Focusable" Value="False" />
+    <Setter Property="FontFamily" Value="{DynamicResource Font.Icons}" />
+    <Setter Property="FontSize" Value="{DynamicResource FontSize.CaptionIcon}" />
+  </Style>
+
+  <Style x:Key="SearchPanel.ReadOnly" TargetType="search:SearchPanel">
+    <Setter Property="FontFamily" Value="{DynamicResource Font.Ui}" />
+    <Setter Property="FontSize" Value="{DynamicResource FontSize.Normal}" />
+    <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Primary}" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="search:SearchPanel">
+          <Border Margin="0,0,24,0"
+                  Padding="4"
+                  HorizontalAlignment="Right"
+                  VerticalAlignment="Top"
+                  Cursor="Arrow"
+                  Style="{DynamicResource Border.Widget}"
+                  AutomationProperties.AutomationId="Docker.Search">
+            <StackPanel Orientation="Horizontal">
+              <TextBox x:Name="PART_searchTextBox"
+                       Width="220"
+                       Style="{DynamicResource TextBox.Field}"
+                       Tag="{x:Static res:Strings.FindPlaceholder}"
+                       AutomationProperties.AutomationId="Docker.Search.Query"
+                       AutomationProperties.Name="{x:Static res:Strings.FindPlaceholder}">
+                <TextBox.Text>
+                  <Binding Path="SearchPattern" RelativeSource="{RelativeSource TemplatedParent}" UpdateSourceTrigger="PropertyChanged">
+                    <Binding.ValidationRules>
+                      <ExceptionValidationRule />
+                    </Binding.ValidationRules>
+                  </Binding>
+                </TextBox.Text>
+              </TextBox>
+              <ToggleButton Margin="4,0,0,0" Style="{DynamicResource ToggleButton.OptionIcon}" Content="{x:Static ui:IconGlyphs.CaseSensitive}"
+                            ToolTip="{x:Static res:Strings.MatchCase}"
+                            IsChecked="{Binding MatchCase, RelativeSource={RelativeSource TemplatedParent}}"
+                            AutomationProperties.AutomationId="Docker.Search.MatchCase" AutomationProperties.Name="{x:Static res:Strings.MatchCase}" />
+              <ToggleButton Style="{DynamicResource ToggleButton.OptionIcon}" Content="{x:Static ui:IconGlyphs.WholeWord}"
+                            ToolTip="{x:Static res:Strings.MatchWholeWord}"
+                            IsChecked="{Binding WholeWords, RelativeSource={RelativeSource TemplatedParent}}"
+                            AutomationProperties.AutomationId="Docker.Search.WholeWord" AutomationProperties.Name="{x:Static res:Strings.MatchWholeWord}" />
+              <ToggleButton Style="{DynamicResource ToggleButton.OptionIcon}" Content="{x:Static ui:IconGlyphs.Regex}"
+                            ToolTip="{x:Static res:Strings.UseRegex}"
+                            IsChecked="{Binding UseRegex, RelativeSource={RelativeSource TemplatedParent}}"
+                            AutomationProperties.AutomationId="Docker.Search.Regex" AutomationProperties.Name="{x:Static res:Strings.UseRegex}" />
+              <Button Margin="4,0,0,0" Style="{StaticResource Button.SearchPanel}"
+                      Content="{x:Static ui:IconGlyphs.ArrowUp}" ToolTip="{x:Static res:Strings.PreviousMatch}"
+                      Command="search:SearchCommands.FindPrevious"
+                      AutomationProperties.AutomationId="Docker.Search.Previous" AutomationProperties.Name="{x:Static res:Strings.PreviousMatch}" />
+              <Button Style="{StaticResource Button.SearchPanel}"
+                      Content="{x:Static ui:IconGlyphs.ArrowDown}" ToolTip="{x:Static res:Strings.NextMatch}"
+                      Command="search:SearchCommands.FindNext"
+                      AutomationProperties.AutomationId="Docker.Search.Next" AutomationProperties.Name="{x:Static res:Strings.NextMatch}" />
+              <Button Style="{StaticResource Button.SearchPanel}"
+                      Content="{x:Static ui:IconGlyphs.Close}" ToolTip="{x:Static res:Strings.CloseFind}"
+                      Command="search:SearchCommands.CloseSearchPanel"
+                      AutomationProperties.AutomationId="Docker.Search.Close" AutomationProperties.Name="{x:Static res:Strings.CloseFind}" />
+            </StackPanel>
+          </Border>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+</ResourceDictionary>
