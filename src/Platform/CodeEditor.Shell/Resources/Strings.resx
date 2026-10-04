@@ -196,4 +196,8 @@
   <data name="ReleaseNotesMenu" xml:space="preserve"><value>_Release Notes</value></data>
   <data name="ReportIssue" xml:space="preserve"><value>Report Issue</value></data>
   <data name="ReportIssueMenu" xml:space="preserve"><value>Report _Issue…</value></data>
+  <data name="NewWindow" xml:space="preserve"><value>New Window</value></data>
+  <data name="NewWindowMenu" xml:space="preserve"><value>New _Window</value></data>
+  <data name="OpenFolderInNewWindow" xml:space="preserve"><value>Open Folder in New Window…</value></data>
+  <data name="OpenFolderInNewWindowMenu" xml:space="preserve"><value>Open Folder in _New Window…</value></data>
 </root>

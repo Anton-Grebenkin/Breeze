@@ -1,47 +1,78 @@
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 using CodeEditor.Core.Files;
 using CodeEditor.Core.Storage;
 using Microsoft.Extensions.Logging;
 
 namespace CodeEditor.Shell.Session;
 
-/// <summary><c>state.json</c> in the user data folder; a corrupt file is treated as a first run.</summary>
+/// <summary>
+/// <c>state.json</c> in the user data folder, plus <c>sessions/&lt;key&gt;.json</c> with the tabs of each folder. A
+/// corrupt file is treated as a first run.
+/// </summary>
 public sealed partial class JsonSessionStore(IFileSystem fileSystem, UserDataPaths paths, ILogger<JsonSessionStore> logger) : ISessionStore
 {
     public const string FileName = "state.json";
+    public const string FoldersDirectory = "sessions";
 
-    private string FilePath => paths.File(FileName);
+    private const int FolderKeyLength = 16;
 
-    public SessionState? Load()
-    {
-        try
-        {
-            return fileSystem.FileExists(FilePath)
-                ? JsonSerializer.Deserialize(fileSystem.ReadAllBytes(FilePath), SessionJsonContext.Default.SessionState)
-                : null;
-        }
-        catch (Exception exception) when (exception is JsonException or IOException or UnauthorizedAccessException)
-        {
-            LogLoadFailed(logger, exception, FilePath);
-            return null;
-        }
-    }
+    public SessionState? Load() => Read(paths.File(FileName), SessionJsonContext.Default.SessionState);
 
     public void Save(SessionState state)
     {
         ArgumentNullException.ThrowIfNull(state);
+        Write(paths.File(FileName), state, SessionJsonContext.Default.SessionState);
+    }
+
+    public FolderSession? LoadFolder(string folder) => Read(FolderFile(folder), SessionJsonContext.Default.FolderSession);
+
+    public void SaveFolder(FolderSession session)
+    {
+        ArgumentNullException.ThrowIfNull(session);
+        Write(FolderFile(session.Folder), session, SessionJsonContext.Default.FolderSession);
+    }
+
+    /// <summary>The file name of a folder's session: a hash of the path, which compares case-insensitively.</summary>
+    public static string FolderKey(string folder)
+    {
+        var normalized = Path.TrimEndingDirectorySeparator(Path.GetFullPath(folder)).ToUpperInvariant();
+        return Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(normalized)))[..FolderKeyLength];
+    }
+
+    private string FolderFile(string folder) => Path.Combine(paths.File(FoldersDirectory), FolderKey(folder) + ".json");
+
+    private T? Read<T>(string path, JsonTypeInfo<T> type)
+        where T : class
+    {
         try
         {
-            if (!fileSystem.DirectoryExists(paths.Root))
+            return fileSystem.FileExists(path) ? JsonSerializer.Deserialize(fileSystem.ReadAllBytes(path), type) : null;
+        }
+        catch (Exception exception) when (exception is JsonException or IOException or UnauthorizedAccessException)
+        {
+            LogLoadFailed(logger, exception, path);
+            return null;
+        }
+    }
+
+    private void Write<T>(string path, T value, JsonTypeInfo<T> type)
+    {
+        try
+        {
+            var folder = Path.GetDirectoryName(path)!;
+            if (!fileSystem.DirectoryExists(folder))
             {
-                fileSystem.CreateDirectory(paths.Root);
+                fileSystem.CreateDirectory(folder);
             }
 
-            fileSystem.WriteAllBytesAtomic(FilePath, JsonSerializer.SerializeToUtf8Bytes(state, SessionJsonContext.Default.SessionState));
+            fileSystem.WriteAllBytesAtomic(path, JsonSerializer.SerializeToUtf8Bytes(value, type));
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
         {
-            LogSaveFailed(logger, exception, FilePath);
+            LogSaveFailed(logger, exception, path);
         }
     }
 

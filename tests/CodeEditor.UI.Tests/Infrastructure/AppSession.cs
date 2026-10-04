@@ -225,6 +225,23 @@ public sealed class AppSession : IDisposable
         }
     }
 
+    /// <summary>
+    /// Starts another launch of the app with the same data folder and language, without waiting for a window: it may
+    /// hand its request to a running window and exit (ADR 0044).
+    /// </summary>
+    public static Process Launch(string userDataFolder, params string[] arguments)
+    {
+        var startInfo = new ProcessStartInfo(AppExePath());
+        foreach (var argument in arguments)
+        {
+            startInfo.ArgumentList.Add(argument);
+        }
+
+        startInfo.Environment[UserDataVariable] = userDataFolder;
+        startInfo.Environment[LanguageVariable] = TestLanguage;
+        return Process.Start(startInfo) ?? throw new InvalidOperationException("Процесс не запустился.");
+    }
+
     /// <summary>Path of the built app the tests launch.</summary>
     public static string AppExePath()
     {

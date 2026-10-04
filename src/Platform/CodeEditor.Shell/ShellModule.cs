@@ -6,6 +6,7 @@ using CodeEditor.Core.Modules;
 using CodeEditor.Core.Settings;
 using CodeEditor.Shell.Commands;
 using CodeEditor.Shell.Editors;
+using CodeEditor.Shell.Instances;
 using CodeEditor.Shell.Services;
 using CodeEditor.Shell.Session;
 using CodeEditor.Shell.Layout;
@@ -73,6 +74,12 @@ public sealed class ShellModule : IModule
         services.AddSingleton<ZoomCommands>();
 
         services.AddSingleton<RecentFolders>();
+        services.AddSingleton<IProcessProbe, SystemProcessProbe>();
+        services.AddSingleton<WindowRegistry>();
+        services.AddSingleton<InstanceServer>();
+        services.AddSingleton<IAppWindows, AppWindows>();
+        services.AddSingleton<FolderTabs>();
+        services.AddSingleton<WorkspaceSwitcher>();
         services.AddSingleton<WorkspaceCommands>();
 
         services.AddSingleton<DocumentSaver>();

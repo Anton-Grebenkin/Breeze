@@ -14,6 +14,8 @@ namespace CodeEditor.Modules.Updates.Services;
 /// Updates as in VS Code: shortly after startup the installed app looks for a newer GitHub release and downloads it in
 /// the background; a status bar item then offers a restart, otherwise Velopack installs it at the next start.
 /// "Check for Updates…" does the same on demand and reports every outcome; background failures only go to the log.
+/// With several windows open only the first one checks, and installing waits until the others are closed: the updater
+/// replaces the files they run from (ADR 0044).
 /// </summary>
 public sealed partial class UpdateService : IDisposable
 {
@@ -32,6 +34,7 @@ public sealed partial class UpdateService : IDisposable
     private readonly IDialogService _dialogs;
     private readonly AppRestart _restart;
     private readonly ICommandService _commands;
+    private readonly IAppWindows _windows;
     private readonly TimeProvider _time;
     private readonly ILogger<UpdateService> _logger;
     private readonly CancellationTokenSource _stopping = new();
@@ -47,6 +50,7 @@ public sealed partial class UpdateService : IDisposable
         IDialogService dialogs,
         AppRestart restart,
         ICommandService commands,
+        IAppWindows windows,
         TimeProvider time,
         ILogger<UpdateService> logger)
     {
@@ -57,6 +61,7 @@ public sealed partial class UpdateService : IDisposable
         _dialogs = dialogs;
         _restart = restart;
         _commands = commands;
+        _windows = windows;
         _time = time;
         _logger = logger;
         _item.Command = new AsyncRelayCommand(RestartToUpdateAsync);
@@ -73,7 +78,7 @@ public sealed partial class UpdateService : IDisposable
     public void Start()
     {
         _registration = _statusBar.Add(_item);
-        if (_updater.IsInstalled && _settings.CurrentValue.Mode == UpdateMode.Default)
+        if (_updater.IsInstalled && _settings.CurrentValue.Mode == UpdateMode.Default && _windows.CountOthers() == 0)
         {
             BackgroundCheck = CheckAfterStartupAsync();
         }
@@ -124,6 +129,12 @@ public sealed partial class UpdateService : IDisposable
         if (State != UpdateState.Ready)
         {
             _statusBar.Message = Strings.NothingToApply;
+            return;
+        }
+
+        if (_windows.CountOthers() is var others and > 0)
+        {
+            _statusBar.Message = Format(Strings.CloseOtherWindows, others);
             return;
         }
 

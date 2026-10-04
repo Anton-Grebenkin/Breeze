@@ -1,6 +1,9 @@
 namespace CodeEditor.Shell.Session;
 
-/// <summary>State kept between runs in <c>state.json</c>: folder, tabs, recent commands and files.</summary>
+/// <summary>
+/// State kept between runs in <c>state.json</c>: the last folder, recent commands and files. Tabs live per folder
+/// (<see cref="FolderSession"/>); <see cref="Tabs"/> and <see cref="ActiveTab"/> are read once from older files.
+/// </summary>
 public sealed record SessionState
 {
     public string? Folder { get; init; }

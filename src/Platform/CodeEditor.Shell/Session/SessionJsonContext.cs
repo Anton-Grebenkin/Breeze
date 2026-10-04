@@ -4,4 +4,5 @@ namespace CodeEditor.Shell.Session;
 
 [JsonSourceGenerationOptions(WriteIndented = true, PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase)]
 [JsonSerializable(typeof(SessionState))]
+[JsonSerializable(typeof(FolderSession))]
 internal sealed partial class SessionJsonContext : JsonSerializerContext;
