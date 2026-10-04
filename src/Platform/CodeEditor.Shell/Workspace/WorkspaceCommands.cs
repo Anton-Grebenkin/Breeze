@@ -10,16 +10,20 @@ using CodeEditor.Shell.Services;
 namespace CodeEditor.Shell.Workspace;
 
 /// <summary>
-/// Workspace folder commands with File menu items: open (<c>Ctrl+K Ctrl+O</c>), close, open recent. Switching goes
-/// through <see cref="WorkspaceSwitcher"/>, which closes the old folder's tabs. The Open Recent submenu is rebuilt when
-/// the list changes.
+/// Window and folder commands with File menu items: new window (<c>Ctrl+Shift+N</c>), open folder here
+/// (<c>Ctrl+K Ctrl+O</c>) or in a new window, open recent, close. Switching goes through
+/// <see cref="WorkspaceSwitcher"/>, which closes the old folder's tabs. The Open Recent submenu is rebuilt when the
+/// list changes.
 /// </summary>
 public sealed class WorkspaceCommands(
     IWorkspace workspace,
     WorkspaceSwitcher switcher,
     RecentFolders recent,
-    IFileDialogs fileDialogs) : IDisposable
+    IFileDialogs fileDialogs,
+    IAppWindows windows) : IDisposable
 {
+    public const string NewWindowId = "workbench.newWindow";
+    public const string OpenFolderInNewWindowId = "workbench.folder.openInNewWindow";
     public const string OpenFolderId = "workbench.folder.open";
     public const string CloseFolderId = "workbench.folder.close";
     public const string OpenRecentId = "workbench.folder.openRecent";
@@ -40,15 +44,20 @@ public sealed class WorkspaceCommands(
         var workspaceOpen = ContextExpression.Parse(IWorkspace.OpenContextKey);
 
         var category = Strings.CategoryFile;
+        _registrations.Add(commands.Register(new CommandDefinition(NewWindowId, Strings.NewWindow, NewWindow, category)));
         _registrations.Add(commands.Register(new CommandDefinition(OpenFolderId, Strings.OpenFolder, OpenFolder, category)));
+        _registrations.Add(commands.Register(new CommandDefinition(OpenFolderInNewWindowId, Strings.OpenFolderInNewWindow, OpenFolderInNewWindow, category)));
         _registrations.Add(commands.Register(new CommandDefinition(CloseFolderId, Strings.CloseFolder, CloseFolder, category, workspaceOpen)));
         _registrations.Add(commands.Register(new CommandDefinition(OpenRecentId, Strings.OpenRecentFolder, OpenRecent, category)));
         _registrations.Add(commands.Register(new CommandDefinition(ClearRecentId, Strings.ClearRecentFolders, ClearRecent, category)));
         _registrations.Add(keybindings.Register(new KeybindingDefinition(KeySequence.Parse("Ctrl+K Ctrl+O"), OpenFolderId)));
+        _registrations.Add(keybindings.Register(new KeybindingDefinition(KeySequence.Parse("Ctrl+Shift+N"), NewWindowId)));
 
+        _registrations.Add(menus.Register(MenuItemDefinition.ForCommand(MenuIds.File, NewWindowId, OpenGroup, order: 0, title: Strings.NewWindowMenu)));
         _registrations.Add(menus.Register(MenuItemDefinition.ForCommand(MenuIds.File, OpenFolderId, OpenGroup, order: 1, title: Strings.OpenFolderMenu)));
-        _registrations.Add(menus.Register(MenuItemDefinition.ForSubmenu(MenuIds.File, RecentMenuId, Strings.OpenRecentMenu, OpenGroup, order: 2)));
-        _registrations.Add(menus.Register(MenuItemDefinition.ForCommand(MenuIds.File, CloseFolderId, OpenGroup, order: 3, title: Strings.CloseFolderMenu)));
+        _registrations.Add(menus.Register(MenuItemDefinition.ForCommand(MenuIds.File, OpenFolderInNewWindowId, OpenGroup, order: 2, title: Strings.OpenFolderInNewWindowMenu)));
+        _registrations.Add(menus.Register(MenuItemDefinition.ForSubmenu(MenuIds.File, RecentMenuId, Strings.OpenRecentMenu, OpenGroup, order: 3)));
+        _registrations.Add(menus.Register(MenuItemDefinition.ForCommand(MenuIds.File, CloseFolderId, OpenGroup, order: 4, title: Strings.CloseFolderMenu)));
 
         recent.Changed += OnRecentChanged;
         workspace.Changed += OnWorkspaceChanged;
@@ -73,6 +82,21 @@ public sealed class WorkspaceCommands(
         if ((argument as string ?? fileDialogs.PickFolder(Strings.OpenFolderDialogTitle)) is { } folder)
         {
             await switcher.OpenAsync(folder);
+        }
+    }
+
+    private ValueTask NewWindow(object? argument, CancellationToken cancellationToken)
+    {
+        windows.OpenNew(argument as string);
+        return ValueTask.CompletedTask;
+    }
+
+    // A folder already open in another window brings it to the front, as in VS Code.
+    private async ValueTask OpenFolderInNewWindow(object? argument, CancellationToken cancellationToken)
+    {
+        if ((argument as string ?? fileDialogs.PickFolder(Strings.OpenFolderDialogTitle)) is { } folder && !await windows.TryActivateAsync(folder))
+        {
+            windows.OpenNew(folder);
         }
     }
 

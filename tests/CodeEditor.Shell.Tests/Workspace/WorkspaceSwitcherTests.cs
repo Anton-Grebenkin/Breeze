@@ -4,6 +4,7 @@ using CodeEditor.Shell.Session;
 using CodeEditor.Shell.Tests.Editors;
 using CodeEditor.Shell.Tests.Session;
 using CodeEditor.Shell.Workspace;
+using CodeEditor.Testing;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace CodeEditor.Shell.Tests.Workspace;
@@ -15,6 +16,7 @@ public sealed class WorkspaceSwitcherTests : IDisposable
 
     private readonly EditorAreaFixture _fixture = new();
     private readonly MemorySessionStore _sessions = new();
+    private readonly FakeAppWindows _windows = new();
     private readonly UserDataPaths _paths = new(Path.Combine(Path.GetTempPath(), "CodeEditor.Tests", Guid.NewGuid().ToString("N")));
     private readonly RecentFolders _recent;
     private readonly WorkspaceSwitcher _switcher;
@@ -24,7 +26,7 @@ public sealed class WorkspaceSwitcherTests : IDisposable
         _fixture.FileSystem.AddFile(Path.Combine(Other, "x.cs"), "class X {}");
         _recent = new RecentFolders(_paths, NullLogger<RecentFolders>.Instance);
         _switcher = new WorkspaceSwitcher(
-            _fixture.Workspace, _fixture.FileSystem, _recent, _fixture.StatusBar, _fixture.Area, _sessions, new FolderTabs(_fixture.Area, _fixture.FileSystem));
+            _fixture.Workspace, _fixture.FileSystem, _recent, _fixture.StatusBar, _fixture.Area, _sessions, new FolderTabs(_fixture.Area, _fixture.FileSystem), _windows);
     }
 
     public void Dispose()
@@ -112,5 +114,19 @@ public sealed class WorkspaceSwitcherTests : IDisposable
         Assert.True(await _switcher.OpenAsync(EditorAreaFixture.Root));
         Assert.Equal(["a.cs", "b.cs"], _fixture.TabNames);
         Assert.Equal("b.cs", _fixture.Area.Active?.Title);
+    }
+
+    // As in VS Code: a folder open in another window brings that window to the front instead of a second copy.
+    [Fact]
+    public async Task Open_FolderOfAnotherWindow_ActivatesItAndKeepsThisWindow()
+    {
+        await _fixture.OpenAsync("a.cs");
+        _windows.OtherFolders.Add(Other);
+
+        Assert.True(await _switcher.OpenAsync(Other));
+
+        Assert.Equal([Other], _windows.Activated);
+        Assert.Equal(EditorAreaFixture.Root, _fixture.Workspace.Root);
+        Assert.Equal(["a.cs"], _fixture.TabNames);
     }
 }

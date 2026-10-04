@@ -196,4 +196,8 @@
   <data name="ReleaseNotesMenu" xml:space="preserve"><value>_Заметки о выпуске</value></data>
   <data name="ReportIssue" xml:space="preserve"><value>Сообщить о проблеме</value></data>
   <data name="ReportIssueMenu" xml:space="preserve"><value>Сообщить о _проблеме…</value></data>
+  <data name="NewWindow" xml:space="preserve"><value>Новое окно</value></data>
+  <data name="NewWindowMenu" xml:space="preserve"><value>Но_вое окно</value></data>
+  <data name="OpenFolderInNewWindow" xml:space="preserve"><value>Открыть папку в новом окне…</value></data>
+  <data name="OpenFolderInNewWindowMenu" xml:space="preserve"><value>Открыть папку в новом о_кне…</value></data>
 </root>

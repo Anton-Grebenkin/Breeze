@@ -23,4 +23,5 @@
   <data name="RestartDetail" xml:space="preserve"><value>The folder and tabs reopen after the restart. Otherwise the update installs at the next start.</value></data>
   <data name="RestartConfirm" xml:space="preserve"><value>Restart</value></data>
   <data name="NothingToApply" xml:space="preserve"><value>No update is downloaded yet: run "Check for Updates…".</value></data>
+  <data name="CloseOtherWindows" xml:space="preserve"><value>Close the other Breeze windows ({0}) to install the update: it replaces the files they run from.</value></data>
 </root>

@@ -1,5 +1,6 @@
 using System.Windows;
 using CodeEditor.App.Diagnostics;
+using CodeEditor.App.Instances;
 using CodeEditor.App.Startup;
 using CodeEditor.Core;
 using CodeEditor.Core.Keybindings;
@@ -66,6 +67,7 @@ internal static class AppHost
         services.AddSingleton<ILogFiles>(logging.File);
         services.AddSingleton(logging.Levels);
         services.AddSingleton<StartupReporter>();
+        services.AddSingleton<WindowInstance>();
         services.AddSingleton(ProductInfo.FromAssembly(typeof(AppHost).Assembly, MainWindowViewModel.ProductName));
         services.AddCodeEditorCore();
 

@@ -2,6 +2,7 @@ using System.Globalization;
 using CodeEditor.Core.Files;
 using CodeEditor.Shell.Editors;
 using CodeEditor.Shell.Resources;
+using CodeEditor.Shell.Services;
 using CodeEditor.Shell.Session;
 using CodeEditor.Shell.ViewModels;
 
@@ -9,7 +10,8 @@ namespace CodeEditor.Shell.Workspace;
 
 /// <summary>
 /// Opens and closes the window's folder, as VS Code does: tabs belong to the folder, so leaving it asks about unsaved
-/// files, saves its tabs and closes them, and the next folder reopens its own tabs.
+/// files, saves its tabs and closes them, and the next folder reopens its own tabs. A folder open in another window
+/// brings that window to the front instead (ADR 0044).
 /// </summary>
 public sealed class WorkspaceSwitcher(
     IWorkspace workspace,
@@ -18,7 +20,8 @@ public sealed class WorkspaceSwitcher(
     StatusBarViewModel statusBar,
     EditorAreaViewModel editors,
     ISessionStore sessions,
-    FolderTabs tabs)
+    FolderTabs tabs,
+    IAppWindows windows)
 {
     /// <summary>Opens a folder without touching tabs (startup); a missing folder is reported and leaves the recent list.</summary>
     public bool TryOpen(string folder)
@@ -47,6 +50,11 @@ public sealed class WorkspaceSwitcher(
         {
             ReportMissing(folder);
             return false;
+        }
+
+        if (await windows.TryActivateAsync(folder))
+        {
+            return true;
         }
 
         if (!await LeaveCurrentAsync() || !TryOpen(folder))

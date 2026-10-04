@@ -23,4 +23,5 @@
   <data name="RestartDetail" xml:space="preserve"><value>После перезапуска папка и вкладки откроются снова. Если отложить, обновление установится при следующем запуске.</value></data>
   <data name="RestartConfirm" xml:space="preserve"><value>Перезапустить</value></data>
   <data name="NothingToApply" xml:space="preserve"><value>Обновление ещё не загружено: выполните «Проверить наличие обновлений…».</value></data>
+  <data name="CloseOtherWindows" xml:space="preserve"><value>Закройте другие окна Breeze ({0}), чтобы установить обновление: оно заменяет файлы, из которых они запущены.</value></data>
 </root>

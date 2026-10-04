@@ -7,6 +7,7 @@ using CodeEditor.Shell.Tests.Infrastructure;
 using CodeEditor.Shell.Tests.Session;
 using CodeEditor.Shell.ViewModels;
 using CodeEditor.Shell.Workspace;
+using CodeEditor.Testing;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace CodeEditor.Shell.Tests.Workspace;
@@ -19,6 +20,7 @@ public sealed class WorkspaceCommandsTests : IDisposable
     private readonly ShellFixture _shell = new();
     private readonly EditorAreaFixture _editors = new();
     private readonly FakeFileDialogs _picker = new();
+    private readonly FakeAppWindows _windows = new();
     private readonly WorkspaceSwitcher _switcher;
     private readonly WorkspaceCommands _commands;
 
@@ -33,8 +35,9 @@ public sealed class WorkspaceCommandsTests : IDisposable
             _editors.StatusBar,
             _editors.Area,
             new MemorySessionStore(),
-            new FolderTabs(_editors.Area, _editors.FileSystem));
-        _commands = new WorkspaceCommands(_editors.Workspace, _switcher, _shell.RecentFolders, _picker);
+            new FolderTabs(_editors.Area, _editors.FileSystem),
+            _windows);
+        _commands = new WorkspaceCommands(_editors.Workspace, _switcher, _shell.RecentFolders, _picker, _windows);
         _commands.Register(_shell.Commands, _shell.Keybindings, _shell.Menus);
     }
 
@@ -157,6 +160,46 @@ public sealed class WorkspaceCommandsTests : IDisposable
         var item = Assert.Single(welcome.RecentFolders);
         Assert.Equal(new RecentFolderItem("repo", Repo), item);
         Assert.True(welcome.HasRecentFolders);
+    }
+
+    [Fact]
+    public async Task NewWindow_OpensEmptyWindow_CtrlShiftN()
+    {
+        await Execute(WorkspaceCommands.NewWindowId);
+
+        Assert.Equal([null], _windows.Opened);
+        Assert.Equal("Ctrl+Shift+N", _shell.Keybindings.FindForCommand(WorkspaceCommands.NewWindowId)?.Sequence.ToString());
+    }
+
+    [Fact]
+    public async Task OpenFolderInNewWindow_OpensItThere_ThisWindowUnchanged()
+    {
+        _picker.Result = Repo;
+
+        await Execute(WorkspaceCommands.OpenFolderInNewWindowId);
+
+        Assert.Equal([Repo], _windows.Opened);
+        Assert.Null(_editors.Workspace.Root);
+    }
+
+    [Fact]
+    public async Task OpenFolderInNewWindow_AlreadyOpen_ActivatesThatWindow()
+    {
+        _picker.Result = Repo;
+        _windows.OtherFolders.Add(Repo);
+
+        await Execute(WorkspaceCommands.OpenFolderInNewWindowId);
+
+        Assert.Equal([Repo], _windows.Activated);
+        Assert.Empty(_windows.Opened);
+    }
+
+    [Fact]
+    public void FileMenu_StartsWithNewWindowAndFolderCommands()
+    {
+        var file = _shell.MenuBuilder.Build(MenuIds.File).Select(item => item.ToString()).ToList();
+
+        Assert.Equal(["Но_вое окно", "_Открыть папку…", "Открыть папку в новом о_кне…"], file.Take(3));
     }
 
     private async Task Execute(string commandId)

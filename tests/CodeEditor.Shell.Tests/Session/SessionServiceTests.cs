@@ -4,6 +4,7 @@ using CodeEditor.Shell.Palette;
 using CodeEditor.Shell.Session;
 using CodeEditor.Shell.Tests.Editors;
 using CodeEditor.Shell.Workspace;
+using CodeEditor.Testing;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace CodeEditor.Shell.Tests.Session;
@@ -27,7 +28,8 @@ public sealed class SessionServiceTests : IDisposable
             _fixture.StatusBar,
             _fixture.Area,
             _store,
-            new FolderTabs(_fixture.Area, _fixture.FileSystem));
+            new FolderTabs(_fixture.Area, _fixture.FileSystem),
+            new FakeAppWindows());
         _session = new SessionService(_store, _fixture.FileSystem, _fixture.Workspace, switcher, _recentCommands, _recentFiles);
     }
 

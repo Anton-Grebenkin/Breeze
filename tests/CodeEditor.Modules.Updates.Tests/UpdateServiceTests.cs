@@ -18,6 +18,7 @@ public sealed class UpdateServiceTests : IDisposable
     private readonly AppRestart _restart = new();
     private readonly CommandRegistry _commands = new();
     private readonly ManualTimeProvider _time = new();
+    private readonly FakeAppWindows _windows = new();
     private readonly UpdateService _service;
     private int _restarts;
 
@@ -31,7 +32,7 @@ public sealed class UpdateServiceTests : IDisposable
         }));
         var commandService = new CommandService(_commands, new ContextKeyService(), NullLogger<CommandService>.Instance);
         var product = new ProductInfo("Breeze", "0.1.0-alpha.1", "abcdef1234", new Uri("https://github.com/owner/breeze"));
-        _service = new UpdateService(_updater, _settings, product, _statusBar, _dialogs, _restart, commandService, _time, NullLogger<UpdateService>.Instance);
+        _service = new UpdateService(_updater, _settings, product, _statusBar, _dialogs, _restart, commandService, _windows, _time, NullLogger<UpdateService>.Instance);
     }
 
     public void Dispose() => _service.Dispose();
@@ -185,5 +186,32 @@ public sealed class UpdateServiceTests : IDisposable
 
         Assert.Equal(1, _restarts);
         Assert.NotNull(_restart.Relaunch);
+    }
+
+    // The updater replaces the files every window runs from: one window checks, installing waits for the others.
+    [Fact]
+    public async Task OtherWindowsOpen_NoBackgroundCheck()
+    {
+        _windows.EmptyWindows = 1;
+        _service.Start();
+
+        _time.Advance(UpdateService.StartupDelay);
+        await _service.BackgroundCheck;
+
+        Assert.Equal(0, _updater.Checks);
+    }
+
+    [Fact]
+    public async Task RestartToUpdate_WithOtherWindows_AsksToCloseThem()
+    {
+        _updater.Release = "0.1.0-alpha.2";
+        await _service.CheckAsync(interactive: false);
+        _windows.EmptyWindows = 2;
+
+        await _service.RestartToUpdateAsync();
+
+        Assert.Equal(0, _restarts);
+        Assert.Null(_restart.Relaunch);
+        Assert.StartsWith("Закройте другие окна Breeze (2)", _statusBar.Message, StringComparison.Ordinal);
     }
 }
