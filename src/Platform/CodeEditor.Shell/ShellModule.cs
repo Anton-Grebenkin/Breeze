@@ -73,6 +73,8 @@ public sealed class ShellModule : IModule
         services.AddSingleton<ZoomCommands>();
 
         services.AddSingleton<RecentFolders>();
+        services.AddSingleton<FolderTabs>();
+        services.AddSingleton<WorkspaceSwitcher>();
         services.AddSingleton<WorkspaceCommands>();
 
         services.AddSingleton<DocumentSaver>();

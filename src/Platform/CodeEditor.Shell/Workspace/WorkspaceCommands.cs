@@ -1,4 +1,3 @@
-using System.Globalization;
 using CodeEditor.Core.Commands;
 using CodeEditor.Core.Context;
 using CodeEditor.Core.Files;
@@ -7,19 +6,19 @@ using CodeEditor.Core.Menus;
 using CodeEditor.Shell.Menus;
 using CodeEditor.Shell.Resources;
 using CodeEditor.Shell.Services;
-using CodeEditor.Shell.ViewModels;
 
 namespace CodeEditor.Shell.Workspace;
 
 /// <summary>
-/// Workspace folder commands with File menu items: open (<c>Ctrl+K Ctrl+O</c>), close, open recent. The Open Recent
-/// submenu is rebuilt when the list changes.
+/// Workspace folder commands with File menu items: open (<c>Ctrl+K Ctrl+O</c>), close, open recent. Switching goes
+/// through <see cref="WorkspaceSwitcher"/>, which closes the old folder's tabs. The Open Recent submenu is rebuilt when
+/// the list changes.
 /// </summary>
 public sealed class WorkspaceCommands(
     IWorkspace workspace,
+    WorkspaceSwitcher switcher,
     RecentFolders recent,
-    IFileDialogs fileDialogs,
-    StatusBarViewModel statusBar) : IDisposable
+    IFileDialogs fileDialogs) : IDisposable
 {
     public const string OpenFolderId = "workbench.folder.open";
     public const string CloseFolderId = "workbench.folder.close";
@@ -56,22 +55,6 @@ public sealed class WorkspaceCommands(
         RebuildRecentMenu();
     }
 
-    /// <summary>Opens a folder and records it as recent; a missing folder is removed from the list.</summary>
-    public bool TryOpen(string folder)
-    {
-        try
-        {
-            workspace.Open(folder);
-            return true;
-        }
-        catch (DirectoryNotFoundException)
-        {
-            recent.Remove(folder);
-            statusBar.Message = string.Format(CultureInfo.CurrentCulture, Strings.FolderNotFound, folder);
-            return false;
-        }
-    }
-
     public void Dispose()
     {
         recent.Changed -= OnRecentChanged;
@@ -85,32 +68,23 @@ public sealed class WorkspaceCommands(
         _recentItems.Clear();
     }
 
-    private ValueTask OpenFolder(object? argument, CancellationToken cancellationToken)
+    private async ValueTask OpenFolder(object? argument, CancellationToken cancellationToken)
     {
-        var folder = argument as string ?? fileDialogs.PickFolder(Strings.OpenFolderDialogTitle);
-        if (folder is not null)
+        if ((argument as string ?? fileDialogs.PickFolder(Strings.OpenFolderDialogTitle)) is { } folder)
         {
-            TryOpen(folder);
+            await switcher.OpenAsync(folder);
         }
-
-        return ValueTask.CompletedTask;
     }
 
-    private ValueTask OpenRecent(object? argument, CancellationToken cancellationToken)
+    private async ValueTask OpenRecent(object? argument, CancellationToken cancellationToken)
     {
         if (argument is string folder)
         {
-            TryOpen(folder);
+            await switcher.OpenAsync(folder);
         }
-
-        return ValueTask.CompletedTask;
     }
 
-    private ValueTask CloseFolder(object? argument, CancellationToken cancellationToken)
-    {
-        workspace.Close();
-        return ValueTask.CompletedTask;
-    }
+    private async ValueTask CloseFolder(object? argument, CancellationToken cancellationToken) => await switcher.CloseAsync();
 
     private ValueTask ClearRecent(object? argument, CancellationToken cancellationToken)
     {
