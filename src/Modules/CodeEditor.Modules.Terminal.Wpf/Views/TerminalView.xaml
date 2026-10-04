@@ -1,0 +1,62 @@
+<UserControl x:Class="CodeEditor.Modules.Terminal.Wpf.Views.TerminalView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:CodeEditor.Modules.Terminal.ViewModels;assembly=CodeEditor.Modules.Terminal"
+             xmlns:ui="clr-namespace:CodeEditor.UI.Themes;assembly=CodeEditor.UI"
+             xmlns:res="clr-namespace:CodeEditor.Modules.Terminal.Resources;assembly=CodeEditor.Modules.Terminal"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:TerminalPanelViewModel}"
+             AutomationProperties.AutomationId="Terminal"
+             Loaded="OnLoaded"
+             Unloaded="OnUnloaded">
+  <UserControl.Resources>
+    <Style x:Key="Button.TerminalIcon" TargetType="Button" BasedOn="{StaticResource Button.Subtle}">
+      <Setter Property="Padding" Value="4" />
+      <Setter Property="FontFamily" Value="{DynamicResource Font.Icons}" />
+      <Setter Property="FontSize" Value="{DynamicResource FontSize.CaptionIcon}" />
+    </Style>
+  </UserControl.Resources>
+
+  <DockPanel Background="{DynamicResource Brush.Editor.Background}">
+    <!-- Terminals and actions, as the channels of the Output panel. -->
+    <DockPanel DockPanel.Dock="Top" Margin="8,4">
+      <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+        <Button Style="{StaticResource Button.TerminalIcon}" Content="{x:Static ui:IconGlyphs.Add}"
+                Command="{Binding NewTerminalCommand}" ToolTip="{x:Static res:Strings.NewTerminal}"
+                AutomationProperties.AutomationId="Terminal.New" AutomationProperties.Name="{x:Static res:Strings.NewTerminal}" />
+        <Button Style="{StaticResource Button.TerminalIcon}" Content="{x:Static ui:IconGlyphs.ClearAll}"
+                Command="{Binding ClearActiveCommand}" ToolTip="{x:Static res:Strings.ClearTerminal}"
+                AutomationProperties.AutomationId="Terminal.Clear" AutomationProperties.Name="{x:Static res:Strings.ClearTerminal}" />
+        <Button Style="{StaticResource Button.TerminalIcon}" Content="{x:Static ui:IconGlyphs.Delete}"
+                Command="{Binding KillActiveCommand}" ToolTip="{x:Static res:Strings.KillTerminal}"
+                AutomationProperties.AutomationId="Terminal.Kill" AutomationProperties.Name="{x:Static res:Strings.KillTerminal}" />
+      </StackPanel>
+      <ListBox ItemsSource="{Binding Sessions}"
+               SelectedItem="{Binding Active}"
+               Style="{StaticResource ListBox.Results}"
+               ScrollViewer.VerticalScrollBarVisibility="Disabled"
+               AutomationProperties.AutomationId="Terminal.Sessions">
+        <ListBox.ItemsPanel>
+          <ItemsPanelTemplate>
+            <StackPanel Orientation="Horizontal" />
+          </ItemsPanelTemplate>
+        </ListBox.ItemsPanel>
+        <ListBox.ItemContainerStyle>
+          <Style TargetType="ListBoxItem" BasedOn="{StaticResource ListBoxItem.Result}">
+            <Setter Property="AutomationProperties.AutomationId" Value="{Binding AutomationId}" />
+            <Setter Property="AutomationProperties.Name" Value="{Binding Title}" />
+          </Style>
+        </ListBox.ItemContainerStyle>
+        <ListBox.ItemTemplate>
+          <DataTemplate DataType="{x:Type vm:TerminalSessionViewModel}">
+            <TextBlock Text="{Binding Title}" />
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+    </DockPanel>
+
+    <ContentControl x:Name="Host" Focusable="False" AutomationProperties.AutomationId="Terminal.Host" />
+  </DockPanel>
+</UserControl>

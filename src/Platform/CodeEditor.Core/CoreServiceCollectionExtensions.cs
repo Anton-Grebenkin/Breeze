@@ -23,6 +23,7 @@ public static class CoreServiceCollectionExtensions
         services.AddSingleton<ICommandRegistry, CommandRegistry>();
         services.AddSingleton<ICommandService, CommandService>();
         services.AddSingleton<IKeybindingRegistry, KeybindingRegistry>();
+        services.AddSingleton<KeyCaptures>();
         services.AddSingleton<KeybindingResolver>();
         services.AddSingleton<UserKeybindings>();
         services.AddSingleton<IMenuRegistry, MenuRegistry>();

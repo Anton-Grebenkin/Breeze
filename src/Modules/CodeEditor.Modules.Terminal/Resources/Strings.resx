@@ -75,4 +75,30 @@
   <data name="DetailExitCode" xml:space="preserve"><value>exit code {0}</value></data>
   <data name="TestsWithFilter" xml:space="preserve"><value>Tests '{0}'</value></data>
   <data name="CommandTitle" xml:space="preserve"><value>Command {0}</value></data>
+  <data name="ViewModuleName" xml:space="preserve"><value>Terminal: views</value></data>
+  <data name="Menu" xml:space="preserve"><value>_Terminal</value></data>
+  <data name="NewTerminal" xml:space="preserve"><value>New Terminal</value></data>
+  <data name="NewTerminalMenu" xml:space="preserve"><value>_New Terminal</value></data>
+  <data name="NewTerminalWithProfile" xml:space="preserve"><value>New Terminal With Shell…</value></data>
+  <data name="NewTerminalWithProfileMenu" xml:space="preserve"><value>New Terminal _With Shell…</value></data>
+  <data name="KillTerminal" xml:space="preserve"><value>Kill Terminal</value></data>
+  <data name="KillTerminalMenu" xml:space="preserve"><value>_Kill Terminal</value></data>
+  <data name="ClearTerminal" xml:space="preserve"><value>Clear Terminal</value></data>
+  <data name="ClearTerminalMenu" xml:space="preserve"><value>_Clear</value></data>
+  <data name="BuildMenu" xml:space="preserve"><value>_Build</value></data>
+  <data name="RunTestsMenu" xml:space="preserve"><value>Run _Tests</value></data>
+  <data name="SelectDefaultShell" xml:space="preserve"><value>Select Default Shell…</value></data>
+  <data name="SelectDefaultShellMenu" xml:space="preserve"><value>Default _Shell…</value></data>
+  <data name="PickShell" xml:space="preserve"><value>Pick a shell for the new terminal</value></data>
+  <data name="PickDefaultShell" xml:space="preserve"><value>Pick the shell for new terminals</value></data>
+  <data name="DefaultShellDetail" xml:space="preserve"><value>{0} — default</value></data>
+  <data name="DefaultShellChanged" xml:space="preserve"><value>Default shell: {0}</value></data>
+  <data name="NoShellFound" xml:space="preserve"><value>No shell found: install PowerShell or check the Windows system folder.</value></data>
+  <data name="TerminalStartFailed" xml:space="preserve"><value>Couldn't start {0}: {1}</value></data>
+  <data name="TerminalExited" xml:space="preserve"><value>The process exited with code {0}</value></data>
+  <data name="TerminalUnavailable" xml:space="preserve"><value>The terminal needs Microsoft Edge WebView2 Runtime: install it and reopen the panel.</value></data>
+  <data name="ProfilePowerShell" xml:space="preserve"><value>PowerShell</value></data>
+  <data name="ProfileWindowsPowerShell" xml:space="preserve"><value>Windows PowerShell</value></data>
+  <data name="ProfileCommandPrompt" xml:space="preserve"><value>Command Prompt</value></data>
+  <data name="ProfileGitBash" xml:space="preserve"><value>Git Bash</value></data>
 </root>

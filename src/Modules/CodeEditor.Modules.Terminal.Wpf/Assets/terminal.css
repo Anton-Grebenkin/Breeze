@@ -1,0 +1,22 @@
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--background, transparent);
+}
+
+/* The same left padding as the editor text; the fit addon fills the rest. */
+#terminals {
+  position: absolute;
+  inset: 4px 0 0 8px;
+}
+
+.terminal-host {
+  position: absolute;
+  inset: 0;
+  visibility: hidden;
+}
+
+.terminal-host.active {
+  visibility: visible;
+}

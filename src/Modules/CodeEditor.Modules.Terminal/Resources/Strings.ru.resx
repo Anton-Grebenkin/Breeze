@@ -75,4 +75,30 @@
   <data name="DetailExitCode" xml:space="preserve"><value>код {0}</value></data>
   <data name="TestsWithFilter" xml:space="preserve"><value>Тесты «{0}»</value></data>
   <data name="CommandTitle" xml:space="preserve"><value>Команда {0}</value></data>
+  <data name="ViewModuleName" xml:space="preserve"><value>Терминал: представления</value></data>
+  <data name="Menu" xml:space="preserve"><value>_Терминал</value></data>
+  <data name="NewTerminal" xml:space="preserve"><value>Новый терминал</value></data>
+  <data name="NewTerminalMenu" xml:space="preserve"><value>_Новый терминал</value></data>
+  <data name="NewTerminalWithProfile" xml:space="preserve"><value>Новый терминал с оболочкой…</value></data>
+  <data name="NewTerminalWithProfileMenu" xml:space="preserve"><value>Новый терминал с _оболочкой…</value></data>
+  <data name="KillTerminal" xml:space="preserve"><value>Закрыть терминал</value></data>
+  <data name="KillTerminalMenu" xml:space="preserve"><value>_Закрыть терминал</value></data>
+  <data name="ClearTerminal" xml:space="preserve"><value>Очистить терминал</value></data>
+  <data name="ClearTerminalMenu" xml:space="preserve"><value>О_чистить</value></data>
+  <data name="BuildMenu" xml:space="preserve"><value>_Сборка</value></data>
+  <data name="RunTestsMenu" xml:space="preserve"><value>Запустить _тесты</value></data>
+  <data name="SelectDefaultShell" xml:space="preserve"><value>Выбрать оболочку по умолчанию…</value></data>
+  <data name="SelectDefaultShellMenu" xml:space="preserve"><value>Оболочка по _умолчанию…</value></data>
+  <data name="PickShell" xml:space="preserve"><value>Выберите оболочку для нового терминала</value></data>
+  <data name="PickDefaultShell" xml:space="preserve"><value>Выберите оболочку для новых терминалов</value></data>
+  <data name="DefaultShellDetail" xml:space="preserve"><value>{0} — по умолчанию</value></data>
+  <data name="DefaultShellChanged" xml:space="preserve"><value>Оболочка по умолчанию: {0}</value></data>
+  <data name="NoShellFound" xml:space="preserve"><value>Не найдена ни одна оболочка: установите PowerShell или проверьте системную папку Windows.</value></data>
+  <data name="TerminalStartFailed" xml:space="preserve"><value>Не удалось запустить {0}: {1}</value></data>
+  <data name="TerminalExited" xml:space="preserve"><value>Процесс завершён с кодом {0}</value></data>
+  <data name="TerminalUnavailable" xml:space="preserve"><value>Терминалу нужен Microsoft Edge WebView2 Runtime: установите его и откройте панель снова.</value></data>
+  <data name="ProfilePowerShell" xml:space="preserve"><value>PowerShell</value></data>
+  <data name="ProfileWindowsPowerShell" xml:space="preserve"><value>Windows PowerShell</value></data>
+  <data name="ProfileCommandPrompt" xml:space="preserve"><value>Командная строка</value></data>
+  <data name="ProfileGitBash" xml:space="preserve"><value>Git Bash</value></data>
 </root>

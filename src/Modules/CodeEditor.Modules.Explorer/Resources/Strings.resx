@@ -79,4 +79,6 @@
   <data name="ReplaceHint" xml:space="preserve"><value>The replaced item goes to the Recycle Bin.</value></data>
   <data name="Replace" xml:space="preserve"><value>Replace</value></data>
   <data name="CannotReplaceParent" xml:space="preserve"><value>'{0}' can't be replaced: the item being moved is inside it.</value></data>
+  <data name="OpenInTerminal" xml:space="preserve"><value>Open in Terminal</value></data>
+  <data name="MenuOpenInTerminal" xml:space="preserve"><value>Open in _Terminal</value></data>
 </root>

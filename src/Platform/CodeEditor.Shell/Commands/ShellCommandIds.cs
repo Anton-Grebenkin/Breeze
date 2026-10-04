@@ -31,4 +31,7 @@ public static class ShellCommandIds
 
     /// <summary>Opens a file in the editor; the argument is a full path. Registered by the editor module.</summary>
     public const string OpenFile = "workbench.file.open";
+
+    /// <summary>Opens a new terminal; the optional argument is the folder to start in. Registered by the terminal module.</summary>
+    public const string NewTerminal = "terminal.new";
 }

@@ -3,14 +3,15 @@ using CodeEditor.Core.Context;
 namespace CodeEditor.Core.Keybindings;
 
 /// <summary>
-/// Turns pressed chords into commands, handling two-chord sequences and <c>when</c> conditions.
+/// Turns pressed chords into commands, handling two-chord sequences and <c>when</c> conditions. While a
+/// <see cref="KeyCapture"/> is active, only the commands it keeps resolve; other keys go to the focused element.
 /// Keeps the pending chord state; not thread-safe: used from the UI thread.
 /// </summary>
 /// <remarks>
 /// Candidate lookup is O(1) by first chord, then O(k) over that chord's bindings from last to first:
 /// later registrations take precedence.
 /// </remarks>
-public sealed class KeybindingResolver(IKeybindingRegistry registry)
+public sealed class KeybindingResolver(IKeybindingRegistry registry, KeyCaptures? captures = null)
 {
     private KeyChord? _pendingChord;
 
@@ -25,11 +26,12 @@ public sealed class KeybindingResolver(IKeybindingRegistry registry)
 
     private KeyResolution ResolveFirst(KeyChord chord, IContextKeyLookup context)
     {
+        var capture = captures?.Active(context);
         var candidates = registry.GetByFirstChord(chord);
         for (var i = candidates.Count - 1; i >= 0; i--)
         {
             var binding = candidates[i];
-            if (!IsEnabled(binding, context))
+            if (!IsEnabled(binding, context, capture))
             {
                 continue;
             }
@@ -50,11 +52,12 @@ public sealed class KeybindingResolver(IKeybindingRegistry registry)
     {
         _pendingChord = null;
 
+        var capture = captures?.Active(context);
         var candidates = registry.GetByFirstChord(first);
         for (var i = candidates.Count - 1; i >= 0; i--)
         {
             var binding = candidates[i];
-            if (binding.Sequence.Second == second && IsEnabled(binding, context))
+            if (binding.Sequence.Second == second && IsEnabled(binding, context, capture))
             {
                 return KeyResolution.Command(binding);
             }
@@ -63,6 +66,6 @@ public sealed class KeybindingResolver(IKeybindingRegistry registry)
         return KeyResolution.ChordNotFound(first);
     }
 
-    private static bool IsEnabled(KeybindingDefinition binding, IContextKeyLookup context) =>
-        !binding.DisplayOnly && (binding.When?.Evaluate(context) ?? true);
+    private static bool IsEnabled(KeybindingDefinition binding, IContextKeyLookup context, KeyCapture? capture) =>
+        !binding.DisplayOnly && (binding.When?.Evaluate(context) ?? true) && (capture?.KeepsKeys(binding.CommandId) ?? true);
 }

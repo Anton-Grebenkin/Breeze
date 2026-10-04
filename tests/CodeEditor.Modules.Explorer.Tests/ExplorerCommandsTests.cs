@@ -2,6 +2,7 @@ using CodeEditor.Core.Commands;
 using CodeEditor.Core.Keybindings;
 using CodeEditor.Core.Menus;
 using CodeEditor.Modules.Explorer.Commands;
+using CodeEditor.Shell.Commands;
 
 namespace CodeEditor.Modules.Explorer.Tests;
 
@@ -14,7 +15,7 @@ public sealed class ExplorerCommandsTests : IDisposable
 
     public ExplorerCommandsTests()
     {
-        _commands = new ExplorerCommands(_fixture.Explorer, _fixture.Editor);
+        _commands = new ExplorerCommands(_fixture.Explorer, _fixture.Editor, _fixture.CommandService);
         _commands.Register(_fixture.Commands, _keybindings, _menus);
     }
 
@@ -69,6 +70,23 @@ public sealed class ExplorerCommandsTests : IDisposable
     {
         var groups = _menus.GetItems(ExplorerCommands.ContextMenuId).GroupBy(item => item.Group).Select(group => group.Count());
 
-        Assert.Equal([2, 1, 1, 2, 2], groups);
+        Assert.Equal([2, 1, 2, 2, 2], groups);
+    }
+
+    [Fact]
+    public async Task OpenInTerminal_StartsATerminalInTheSelectedFolder()
+    {
+        string? folder = null;
+        _fixture.Commands.Register(new CommandDefinition(ShellCommandIds.NewTerminal, "Новый терминал", (argument, _) =>
+        {
+            folder = argument as string;
+            return ValueTask.CompletedTask;
+        }));
+        await _fixture.OpenAsync();
+        _fixture.Node("docs").IsSelected = true;
+
+        await _fixture.CommandService.ExecuteAsync(ExplorerCommands.OpenInTerminalId, cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.Equal(Path.Combine(ExplorerFixture.Root, "docs"), folder);
     }
 }
