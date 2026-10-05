@@ -1,6 +1,6 @@
-using CodeEditor.Shell.Instances;
+using CodeEditor.Shell.Integration;
 
-namespace CodeEditor.Shell.Tests.Instances;
+namespace CodeEditor.Shell.Tests.Integration;
 
 public sealed class OpenWithFileTypesTests
 {

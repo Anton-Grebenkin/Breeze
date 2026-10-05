@@ -15,6 +15,7 @@ public sealed class MainWindowViewModel(
     WelcomeViewModel welcome,
     EditorAreaHost editorArea,
     StatusBarViewModel statusBar,
+    NotificationsViewModel notifications,
     CommandPaletteViewModel palette,
     WindowZoom zoom)
 {
@@ -33,6 +34,8 @@ public sealed class MainWindowViewModel(
     public EditorAreaHost EditorArea { get; } = editorArea;
 
     public StatusBarViewModel StatusBar { get; } = statusBar;
+
+    public NotificationsViewModel Notifications { get; } = notifications;
 
     public CommandPaletteViewModel Palette { get; } = palette;
 

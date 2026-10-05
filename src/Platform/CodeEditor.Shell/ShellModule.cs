@@ -7,6 +7,7 @@ using CodeEditor.Core.Settings;
 using CodeEditor.Shell.Commands;
 using CodeEditor.Shell.Editors;
 using CodeEditor.Shell.Instances;
+using CodeEditor.Shell.Integration;
 using CodeEditor.Shell.Services;
 using CodeEditor.Shell.Session;
 using CodeEditor.Shell.Layout;
@@ -52,6 +53,8 @@ public sealed class ShellModule : IModule
         services.AddSingleton<WorkbenchLayout>();
 
         services.AddSingleton<StatusBarViewModel>();
+        services.AddSingleton<NotificationsViewModel>();
+        services.AddSingleton<INotificationService>(provider => provider.GetRequiredService<NotificationsViewModel>());
         services.AddSingleton<TitleBarViewModel>();
         services.AddSingleton<ActivityBarViewModel>();
         services.AddSingleton<WelcomeViewModel>();
@@ -77,6 +80,12 @@ public sealed class ShellModule : IModule
         services.AddSingleton<IProcessProbe, SystemProcessProbe>();
         services.AddSingleton<WindowRegistry>();
         services.AddSingleton<InstanceServer>();
+
+        // The app replaces it with the installed build's integration.
+        services.AddSingleton<IWindowsIntegration, NoWindowsIntegration>();
+        services.AddSettingsSection<WindowsIntegrationOptions>(WindowsIntegrationOptions.Section);
+        services.AddSingleton<FileTypesPrompt>();
+        services.AddSingleton<WindowsIntegrationCommands>();
         services.AddSingleton<IAppWindows, AppWindows>();
         services.AddSingleton<FolderTabs>();
         services.AddSingleton<WorkspaceSwitcher>();
@@ -116,6 +125,7 @@ public sealed class ShellModule : IModule
             commands, keybindings, menus, services.GetRequiredService<IToolWindowRegistry>());
         services.GetRequiredService<ZoomCommands>().Register(commands, keybindings, menus);
         services.GetRequiredService<WorkspaceCommands>().Register(commands, keybindings, menus);
+        services.GetRequiredService<WindowsIntegrationCommands>().Register(commands, menus);
         services.GetRequiredService<EditorCommands>().Register(commands, keybindings, menus);
         services.GetRequiredService<EditorGroupCommands>().Register(commands, keybindings, menus);
 

@@ -6,6 +6,7 @@ using CodeEditor.Core.Files;
 using CodeEditor.Core.Logging;
 using CodeEditor.Core.Storage;
 using CodeEditor.Shell.Instances;
+using CodeEditor.Shell.Integration;
 using CodeEditor.Shell.Services;
 using CodeEditor.Shell.Session;
 using CodeEditor.Shell.ViewModels;
@@ -30,11 +31,10 @@ internal static partial class Program
         var others = StartupRouting.OtherWindows(paths);
 
         // The installer starts the app with hook arguments (install, update, uninstall) and expects a quick exit. A
-        // downloaded update is applied at startup only when no other window runs from the installation.
+        // downloaded update is applied at startup only when no other window runs from the installation. Explorer
+        // entries follow the settings once the app runs (ExplorerRegistration.Start); uninstalling removes them.
         VelopackApp.Build()
             .SetAutoApplyOnStartup(others.Count == 0)
-            .OnAfterInstallFastCallback(_ => ExplorerRegistration.Register())
-            .OnAfterUpdateFastCallback(_ => ExplorerRegistration.Register())
             .OnBeforeUninstallFastCallback(_ => ExplorerRegistration.Unregister())
             .Run();
 
@@ -82,7 +82,8 @@ internal static partial class Program
         {
             await session.RestoreTabsAsync();
             await instance.StartAsync(window, plan.File);
-            await ExplorerRegistration.RepairAsync(bootstrapLogging.CreateLogger(typeof(ExplorerRegistration)));
+            host.Services.GetRequiredService<ExplorerRegistration>().Start();
+            host.Services.GetRequiredService<FileTypesPrompt>().ShowIfUndecided();
         };
 
         var exitCode = app.Run(window);
