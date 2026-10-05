@@ -18,6 +18,7 @@ public static class IconGlyphs
     public const string Discard = "\uEAE2";
     public const string Diff = "\uEAE1";
     public const string Close = "\uEA76";
+    public const string Info = "\uEA74";
     public const string Output = "\uEB9D";
     public const string Delete = "\uEA81";
     public const string NewFile = "\uEA7F";

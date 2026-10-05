@@ -33,6 +33,7 @@ using CodeEditor.Modules.Updates;
 using CodeEditor.Modules.Viewers;
 using CodeEditor.Modules.Viewers.Wpf;
 using CodeEditor.Shell;
+using CodeEditor.Shell.Integration;
 using CodeEditor.Shell.Services;
 using CodeEditor.Shell.ViewModels;
 using CodeEditor.Shell.Wpf;
@@ -77,6 +78,10 @@ internal static class AppHost
             ModuleCatalog.Create(Modules()),
             logging.Bootstrap.CreateLogger<ModuleLoader>());
         loader.ConfigureServices(services);
+
+        // After the modules, so it replaces the shell's default: a module's TryAdd doesn't see the app's services.
+        services.AddSingleton<ExplorerRegistration>();
+        services.AddSingleton<IWindowsIntegration>(provider => provider.GetRequiredService<ExplorerRegistration>());
 
         clock.Mark("modules-configured");
         var host = builder.Build();

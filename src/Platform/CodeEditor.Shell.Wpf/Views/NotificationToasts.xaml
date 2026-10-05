@@ -1,0 +1,98 @@
+<UserControl x:Class="CodeEditor.Shell.Wpf.Views.NotificationToasts"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:CodeEditor.Shell.ViewModels;assembly=CodeEditor.Shell"
+             xmlns:ui="clr-namespace:CodeEditor.UI.Themes;assembly=CodeEditor.UI"
+             xmlns:res="clr-namespace:CodeEditor.Shell.Resources;assembly=CodeEditor.Shell"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:NotificationsViewModel}">
+  <!--
+    A popup, not an overlay: WebView2 pages (terminal, browser) are native windows and would cover WPF content. The
+    control has no background, so clicks pass to the workbench under it; the popup sits on the anchor's top edge.
+  -->
+  <Grid>
+    <Border x:Name="Anchor" Width="0" Height="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" />
+    <Popup x:Name="Host"
+           PlacementTarget="{Binding ElementName=Anchor}"
+           Placement="Top"
+           AllowsTransparency="True"
+           StaysOpen="True"
+           Focusable="False">
+      <ItemsControl x:Name="Toasts"
+                    Width="420"
+                    Margin="8"
+                    ItemsSource="{Binding Items}"
+                    Focusable="False"
+                    AutomationProperties.AutomationId="Notifications">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate DataType="{x:Type vm:NotificationViewModel}">
+            <Border Margin="0,8,0,0"
+                    Padding="12,10,8,10"
+                    Style="{StaticResource Border.Widget}"
+                    AutomationProperties.AutomationId="{Binding AutomationId}">
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="Auto" />
+                  <ColumnDefinition Width="*" />
+                  <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <TextBlock Margin="0,1,8,0"
+                           FontFamily="{DynamicResource Font.Icons}"
+                           Foreground="{DynamicResource Brush.Accent}"
+                           Text="{x:Static ui:IconGlyphs.Info}" />
+                <TextBlock Grid.Column="1" TextWrapping="Wrap" Text="{Binding Message}" />
+                <Button Grid.Column="2"
+                        Margin="8,-2,0,0"
+                        Padding="4"
+                        VerticalAlignment="Top"
+                        Style="{StaticResource Button.Subtle}"
+                        FontFamily="{DynamicResource Font.Icons}"
+                        FontSize="{DynamicResource FontSize.CaptionIcon}"
+                        Content="{x:Static ui:IconGlyphs.Close}"
+                        ToolTip="{x:Static res:Strings.Close}"
+                        Command="{Binding CloseCommand}"
+                        AutomationProperties.AutomationId="{Binding CloseAutomationId}"
+                        AutomationProperties.Name="{x:Static res:Strings.Close}" />
+                <ItemsControl Grid.Row="1"
+                              Grid.Column="1"
+                              Grid.ColumnSpan="2"
+                              Margin="0,12,0,0"
+                              HorizontalAlignment="Right"
+                              ItemsSource="{Binding Buttons}"
+                              Focusable="False">
+                  <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                      <StackPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                  </ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type vm:NotificationButtonViewModel}">
+                      <Button x:Name="Action"
+                              Margin="8,0,0,0"
+                              Style="{StaticResource Button.Secondary}"
+                              Content="{Binding Title}"
+                              Command="{Binding Command}"
+                              AutomationProperties.AutomationId="{Binding AutomationId}"
+                              AutomationProperties.Name="{Binding Title}" />
+                      <DataTemplate.Triggers>
+                        <DataTrigger Binding="{Binding IsPrimary}" Value="True">
+                          <Setter TargetName="Action" Property="Style" Value="{StaticResource Button.Primary}" />
+                        </DataTrigger>
+                      </DataTemplate.Triggers>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </Grid>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </Popup>
+  </Grid>
+</UserControl>

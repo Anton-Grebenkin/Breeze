@@ -261,5 +261,8 @@
         <ContentControl Content="{Binding Active.Content}" Focusable="False" />
       </DockPanel>
     </controls:ClipBorder>
+
+    <!-- Notifications at the bottom left, next to the activity bar, over the side bar and documents. -->
+    <views:NotificationToasts Grid.Column="1" Grid.ColumnSpan="5" DataContext="{Binding Notifications}" />
   </Grid>
 </UserControl>

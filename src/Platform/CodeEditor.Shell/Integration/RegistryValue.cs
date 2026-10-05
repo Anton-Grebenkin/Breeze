@@ -1,4 +1,4 @@
-namespace CodeEditor.Shell.Instances;
+namespace CodeEditor.Shell.Integration;
 
 /// <summary>A string value under <c>HKEY_CURRENT_USER</c>.</summary>
 /// <param name="Key">The key path relative to <c>HKEY_CURRENT_USER</c>.</param>

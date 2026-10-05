@@ -200,4 +200,20 @@
   <data name="NewWindowMenu" xml:space="preserve"><value>Но_вое окно</value></data>
   <data name="OpenFolderInNewWindow" xml:space="preserve"><value>Открыть папку в новом окне…</value></data>
   <data name="OpenFolderInNewWindowMenu" xml:space="preserve"><value>Открыть папку в новом о_кне…</value></data>
+  <data name="FileTypesQuestion" xml:space="preserve"><value>Открывать файлы кода в Breeze? Он появится в «Открыть с помощью», а файлы кода без своей программы (.cs, .json, .md…) будут открываться в нём и получат его значок.</value></data>
+  <data name="FileTypesYes" xml:space="preserve"><value>Да</value></data>
+  <data name="FileTypesNo" xml:space="preserve"><value>Нет</value></data>
+  <data name="WindowsIntegrationCommand" xml:space="preserve"><value>Интеграция с Проводником Windows…</value></data>
+  <data name="WindowsIntegrationMenu" xml:space="preserve"><value>_Интеграция с Проводником Windows…</value></data>
+  <data name="WindowsIntegrationPlaceholder" xml:space="preserve"><value>Выберите пункт, чтобы включить или выключить его</value></data>
+  <data name="EnableFileTypesCommand" xml:space="preserve"><value>Открывать файлы кода в Breeze</value></data>
+  <data name="DisableFileTypesCommand" xml:space="preserve"><value>Не открывать файлы кода в Breeze</value></data>
+  <data name="FileTypesOption" xml:space="preserve"><value>Открывать файлы кода в Breeze («Открыть с помощью», «Приложения по умолчанию», значки файлов)</value></data>
+  <data name="ContextMenuOption" xml:space="preserve"><value>Пункт «Открыть в Breeze» в контекстном меню Проводника</value></data>
+  <data name="On" xml:space="preserve"><value>Включено</value></data>
+  <data name="Off" xml:space="preserve"><value>Выключено</value></data>
+  <data name="FileTypesOn" xml:space="preserve"><value>Файлы кода открываются в Breeze</value></data>
+  <data name="FileTypesOff" xml:space="preserve"><value>Файлы кода больше не открываются в Breeze</value></data>
+  <data name="ContextMenuOn" xml:space="preserve"><value>Пункт «Открыть в Breeze» добавлен в меню Проводника</value></data>
+  <data name="ContextMenuOff" xml:space="preserve"><value>Пункт «Открыть в Breeze» убран из меню Проводника</value></data>
 </root>

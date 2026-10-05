@@ -200,4 +200,20 @@
   <data name="NewWindowMenu" xml:space="preserve"><value>New _Window</value></data>
   <data name="OpenFolderInNewWindow" xml:space="preserve"><value>Open Folder in New Window…</value></data>
   <data name="OpenFolderInNewWindowMenu" xml:space="preserve"><value>Open Folder in _New Window…</value></data>
+  <data name="FileTypesQuestion" xml:space="preserve"><value>Open code files in Breeze? It will appear in "Open with", and code files without an app of their own (.cs, .json, .md…) will open in it and get its icon.</value></data>
+  <data name="FileTypesYes" xml:space="preserve"><value>Yes</value></data>
+  <data name="FileTypesNo" xml:space="preserve"><value>No</value></data>
+  <data name="WindowsIntegrationCommand" xml:space="preserve"><value>Windows Explorer Integration…</value></data>
+  <data name="WindowsIntegrationMenu" xml:space="preserve"><value>Windows Explorer _Integration…</value></data>
+  <data name="WindowsIntegrationPlaceholder" xml:space="preserve"><value>Select an item to turn it on or off</value></data>
+  <data name="EnableFileTypesCommand" xml:space="preserve"><value>Open Code Files in Breeze</value></data>
+  <data name="DisableFileTypesCommand" xml:space="preserve"><value>Stop Opening Code Files in Breeze</value></data>
+  <data name="FileTypesOption" xml:space="preserve"><value>Open code files in Breeze ("Open with", "Default apps", file icons)</value></data>
+  <data name="ContextMenuOption" xml:space="preserve"><value>"Open in Breeze" in the Explorer context menu</value></data>
+  <data name="On" xml:space="preserve"><value>On</value></data>
+  <data name="Off" xml:space="preserve"><value>Off</value></data>
+  <data name="FileTypesOn" xml:space="preserve"><value>Code files open in Breeze</value></data>
+  <data name="FileTypesOff" xml:space="preserve"><value>Code files no longer open in Breeze</value></data>
+  <data name="ContextMenuOn" xml:space="preserve"><value>"Open in Breeze" is in the Explorer context menu</value></data>
+  <data name="ContextMenuOff" xml:space="preserve"><value>"Open in Breeze" is removed from the Explorer context menu</value></data>
 </root>

@@ -1,6 +1,6 @@
 using System.Collections.Immutable;
 
-namespace CodeEditor.Shell.Instances;
+namespace CodeEditor.Shell.Integration;
 
 /// <summary>
 /// Text and code files for which Windows offers Breeze in "Open with" and "Default apps". Registering them changes
