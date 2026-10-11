@@ -88,6 +88,7 @@ public sealed class AgentModule : IModule
         services.AddSingleton<ModelSettingsViewModel>();
         services.AddSingleton<ActiveFileContextViewModel>();
         services.AddSingleton<AttachmentReader>();
+        services.AddSingleton<PastedAttachments>();
         services.AddSingleton<IAttachmentPicker, EmptyAttachmentPicker>();
         services.AddSingleton<ChatAttachmentsViewModel>();
         services.AddSingleton<QueuedMessagesViewModel>();

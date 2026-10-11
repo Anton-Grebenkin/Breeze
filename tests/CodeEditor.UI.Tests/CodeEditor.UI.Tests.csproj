@@ -5,6 +5,8 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0-windows</TargetFramework>
+    <!-- Only for the clipboard of paste scenarios (TestClipboard). -->
+    <UseWPF>true</UseWPF>
     <IsTestProject>true</IsTestProject>
     <AppExePath>$(MSBuildThisFileDirectory)..\..\src\Apps\CodeEditor.App\bin\$(Configuration)\net10.0-windows\Breeze.exe</AppExePath>
   </PropertyGroup>
@@ -18,6 +20,8 @@
 
   <ItemGroup>
     <Using Include="Xunit" />
+    <!-- UseWPF leaves System.IO out of the implicit usings (its Path clashes with WPF shapes). -->
+    <Using Include="System.IO" />
   </ItemGroup>
 
   <ItemGroup>

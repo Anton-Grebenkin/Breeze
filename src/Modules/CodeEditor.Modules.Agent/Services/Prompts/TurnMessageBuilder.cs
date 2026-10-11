@@ -32,7 +32,8 @@ public sealed partial class TurnMessageBuilder(
             lines.AddRange(await CollectAsync(provider, request, cancellationToken));
         }
 
-        List<AIContent> contents = [new TextContent(text), .. await attachments.ReadAsync(files, cancellationToken)];
+        var seesImages = ModelProfiles.For(options.CurrentValue.Model).SeesImages;
+        List<AIContent> contents = [new TextContent(text), .. await attachments.ReadAsync(files, seesImages, cancellationToken)];
         if (startsChat)
         {
             contents.AddRange((await start.BuildAsync(cancellationToken)).Select(block => new TextContent(block)));

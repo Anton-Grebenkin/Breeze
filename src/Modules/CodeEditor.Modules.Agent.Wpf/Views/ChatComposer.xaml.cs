@@ -1,19 +1,18 @@
 using System.ComponentModel;
-using System.IO;
 using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Threading;
+using CodeEditor.Modules.Agent.Services.Attachments;
 using CodeEditor.Modules.Agent.ViewModels.Chat;
 using CodeEditor.Modules.Agent.ViewModels.Models;
-using CodeEditor.Shell.Wpf.Input;
 
 namespace CodeEditor.Modules.Agent.Wpf.Views;
 
 /// <summary>
 /// The chat input. Visual logic only: <c>Enter</c> sends, <c>Shift+Enter</c> adds a line, <c>Esc</c> stops; the
-/// parameter menu and context details open above the box from a button or a palette command; files dropped on the box
-/// (from Windows, the explorer or an editor tab) are attached to the message.
+/// parameter menu and context details open above the box from a button or a palette command. Pasting a picture, copied
+/// files or a long text attaches them instead of typing (drops are handled by <see cref="ChatView"/>).
 /// </summary>
 public sealed partial class ChatComposer
 {
@@ -23,6 +22,10 @@ public sealed partial class ChatComposer
     {
         InitializeComponent();
         DataContextChanged += OnDataContextChanged;
+
+        // The text box cannot paste a picture or files, so its own Paste is disabled for them: enable and take it over.
+        CommandManager.AddPreviewCanExecuteHandler(InputBox, OnPreviewCanExecute);
+        CommandManager.AddPreviewExecutedHandler(InputBox, OnPreviewExecuted);
     }
 
     public void FocusInput() =>
@@ -42,27 +45,38 @@ public sealed partial class ChatComposer
         }
     }
 
-    // Dropped files become attachments, folders are skipped; dragged text is left to the text box.
-    private void OnPreviewDragOver(object sender, DragEventArgs e)
+    private void OnPreviewCanExecute(object sender, CanExecuteRoutedEventArgs e)
     {
-        if (!FileDragData.HasPaths(e.Data))
+        if (e.Command == ApplicationCommands.Paste && AttachmentData.Clipboard() is { } data && AttachmentData.HasAttachable(data))
         {
-            return;
+            e.CanExecute = true;
+            e.Handled = true;
         }
-
-        e.Effects = DragDropEffects.Copy;
-        e.Handled = true;
     }
 
-    private void OnPreviewDrop(object sender, DragEventArgs e)
+    private void OnPreviewExecuted(object sender, ExecutedRoutedEventArgs e)
     {
-        if (_viewModel is null || FileDragData.GetPaths(e.Data) is not { } files)
+        if (e.Command != ApplicationCommands.Paste || _viewModel is null || AttachmentData.Clipboard() is not { } data)
         {
             return;
         }
 
-        e.Handled = true;
-        _ = _viewModel.Attachments.AddAsync(files.Where(File.Exists));
+        var attachments = _viewModel.Attachments;
+        if (AttachmentData.Files(data) is { Count: > 0 } files)
+        {
+            e.Handled = true;
+            _ = attachments.AddAsync(files);
+        }
+        else if (AttachmentData.HasImage(data) && AttachmentData.Png(data) is { } png)
+        {
+            e.Handled = true;
+            _ = attachments.AddImageAsync(png);
+        }
+        else if (AttachmentData.Text(data) is { } text && PastedAttachments.IsLongText(text))
+        {
+            e.Handled = true;
+            _ = attachments.AddTextAsync(text);
+        }
     }
 
     private void OnInputPreviewKeyDown(object sender, KeyEventArgs e)

@@ -241,7 +241,7 @@ internal sealed class AgentFixture : IDisposable
             new ActiveFileContextViewModel(Editors, Workspace),
             new TodoPanelViewModel(Todos, new InlineUiDispatcher()),
             new ChangesPanelViewModel(Changes, FileState, Reverter, Documents, new InlineUiDispatcher(), Commands, StatusBar),
-            new ChatAttachmentsViewModel(AttachmentPicker, Attachments, StatusBar),
+            new ChatAttachmentsViewModel(AttachmentPicker, Attachments, new PastedAttachments(Workspace, FileSystem, UserData, TimeProvider.System), Options, StatusBar),
             new QueuedMessagesViewModel(Queue, new InlineUiDispatcher()));
         var services = new AgentTurnServices(Conversation, new ApprovalCards(Previewers, Policies, Rules), usage, new AgentActivityLog(ActivityLog), Budget, FileState, Todos, Questions, Checks, Compaction, HelperUsage, new ToolViews(Presenters, NullLogger<ToolViews>.Instance), Deep, MemoryExtractor, Queue, Images);
         var session = new ChatSession(services, history, Options, new TurnMessageBuilder(ContextProviders, Start, Attachments, Options, TimeProvider.System, NullLogger<TurnMessageBuilder>.Instance), new InlineUiDispatcher());

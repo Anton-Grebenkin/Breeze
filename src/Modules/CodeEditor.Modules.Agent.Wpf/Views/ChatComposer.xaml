@@ -16,7 +16,7 @@
 
   <!-- Input box: file context and attachments above; model, parameters and context below. Dropped files are
        attached to the message. -->
-  <Border x:Name="Frame" CornerRadius="6" BorderThickness="1" AllowDrop="True" PreviewDragOver="OnPreviewDragOver" PreviewDrop="OnPreviewDrop">
+  <Border x:Name="Frame" CornerRadius="6" BorderThickness="1">
     <Border.Style>
       <Style TargetType="Border">
         <Setter Property="Background" Value="{DynamicResource Brush.Input.Background}" />
