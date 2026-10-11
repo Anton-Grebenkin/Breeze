@@ -130,7 +130,7 @@ internal sealed partial class GuardedToolFunction(
     // A PreToolUse hook that exits with 2 stops the call; the model reads why and adjusts.
     private async Task<string?> BlockedByHookAsync(AIFunctionArguments arguments, CancellationToken cancellationToken) =>
         guards?.Hooks is { } hooks && hooks.Has(HookEvents.PreToolUse)
-        && await hooks.RunAsync(HookEvents.PreToolUse, Name, HookInputs.Tool(Name, arguments), cancellationToken) is { Blocked: true } outcome
+        && await hooks.RunAsync(HookEvents.PreToolUse, budget.Mode, Name, HookInputs.Tool(Name, arguments), cancellationToken) is { Blocked: true } outcome
             ? $"{ToolViews.ErrorPrefix} {string.Format(CultureInfo.CurrentCulture, Strings.HookBlockedTool, outcome.Message ?? Strings.HookNoReason)}"
             : null;
 
@@ -142,7 +142,7 @@ internal sealed partial class GuardedToolFunction(
             return result;
         }
 
-        var outcome = await hooks.RunAsync(HookEvents.PostToolUse, Name, HookInputs.ToolResult(Name, arguments, text, IsError(result)), cancellationToken);
+        var outcome = await hooks.RunAsync(HookEvents.PostToolUse, budget.Mode, Name, HookInputs.ToolResult(Name, arguments, text, IsError(result)), cancellationToken);
         return outcome.Blocked
             ? text + "\n\n" + PromptSections.EditorNote(string.Format(CultureInfo.CurrentCulture, Strings.HookFeedback, outcome.Message ?? Strings.HookNoReason))
             : result;

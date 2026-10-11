@@ -39,6 +39,7 @@ public sealed class HooksTests : IDisposable
         Assert.Equal(HookEvents.PreToolUse, request.Environment["BREEZE_HOOK_EVENT"]);
         using var input = JsonDocument.Parse(request.Input!);
         Assert.Equal("probe", input.RootElement.GetProperty("tool_name").GetString());
+        Assert.Equal("agent", input.RootElement.GetProperty("agent_mode").GetString());
         Assert.Equal("db/migrations", input.RootElement.GetProperty("tool_input").GetProperty("path").GetString());
     }
 

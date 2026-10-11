@@ -32,7 +32,8 @@ public sealed partial class HookRunner(IOptionsMonitor<AgentOptions> options, IP
     public bool Has(string hookEvent) => Hooks(hookEvent).Count > 0;
 
     /// <summary>Runs the event's hooks in order, those whose matcher fits <paramref name="tool"/>; a blocking one ends the run.</summary>
-    public async Task<HookOutcome> RunAsync(string hookEvent, string? tool, JsonObject input, CancellationToken cancellationToken)
+    /// <param name="mode">The turn's mode (<c>agent_mode</c>): a hook that runs tests has nothing to say about an answer in Ask mode.</param>
+    public async Task<HookOutcome> RunAsync(string hookEvent, AgentMode mode, string? tool, JsonObject input, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(input);
         var hooks = Hooks(hookEvent).Where(hook => hook.Command.Length > 0 && Matches(hook, tool)).ToList();
@@ -43,6 +44,7 @@ public sealed partial class HookRunner(IOptionsMonitor<AgentOptions> options, IP
 
         input["hook_event_name"] = hookEvent;
         input["cwd"] = workspace.Root;
+        input["agent_mode"] = mode.ToString().ToLowerInvariant();
         var json = input.ToJsonString();
         var said = new List<string>();
         foreach (var hook in hooks)

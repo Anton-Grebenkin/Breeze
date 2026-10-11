@@ -59,7 +59,7 @@ public sealed class TurnChecks(
             return null;
         }
 
-        var outcome = await hooks.RunAsync(HookEvents.Stop, tool: null, HookInputs.Stop(report, active: _stopHooks > 0), cancellationToken);
+        var outcome = await hooks.RunAsync(HookEvents.Stop, _mode, tool: null, HookInputs.Stop(report, active: _stopHooks > 0), cancellationToken);
         if (!outcome.Blocked)
         {
             return null;

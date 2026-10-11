@@ -23,7 +23,7 @@ public sealed class HookRunnerTests
         var hook = new AgentHook { Command = "$e = [Console]::In.ReadToEnd() | ConvertFrom-Json; " + reply + "; exit 2" };
         var runner = Runner(new AgentHookSettings { UserPromptSubmit = [hook] });
 
-        var outcome = await runner.RunAsync(HookEvents.UserPromptSubmit, tool: null, HookInputs.Prompt("удали миграции"), TestContext.Current.CancellationToken);
+        var outcome = await runner.RunAsync(HookEvents.UserPromptSubmit, AgentMode.Agent, tool: null, HookInputs.Prompt("удали миграции"), TestContext.Current.CancellationToken);
 
         Assert.True(outcome.Blocked);
         Assert.Equal("Нельзя: удали миграции", outcome.Message);
@@ -32,12 +32,13 @@ public sealed class HookRunnerTests
     [Fact]
     public async Task PowerShellHook_ExitCode0_OutputIsContext()
     {
-        var runner = Runner(new AgentHookSettings { UserPromptSubmit = [new AgentHook { Command = "Write-Output \"Событие: $env:BREEZE_HOOK_EVENT\"" }] });
+        var hook = new AgentHook { Command = "$e = [Console]::In.ReadToEnd() | ConvertFrom-Json; Write-Output \"$env:BREEZE_HOOK_EVENT в режиме $($e.agent_mode)\"" };
+        var runner = Runner(new AgentHookSettings { UserPromptSubmit = [hook] });
 
-        var outcome = await runner.RunAsync(HookEvents.UserPromptSubmit, tool: null, HookInputs.Prompt("привет"), TestContext.Current.CancellationToken);
+        var outcome = await runner.RunAsync(HookEvents.UserPromptSubmit, AgentMode.Ask, tool: null, HookInputs.Prompt("привет"), TestContext.Current.CancellationToken);
 
         Assert.False(outcome.Blocked);
-        Assert.Equal("Событие: UserPromptSubmit", outcome.Message);
+        Assert.Equal("UserPromptSubmit в режиме ask", outcome.Message);
     }
 
     // No folder is open: the hook runs in the temp folder.

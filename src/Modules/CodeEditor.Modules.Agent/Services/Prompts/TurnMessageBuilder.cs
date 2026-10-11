@@ -61,7 +61,7 @@ public sealed partial class TurnMessageBuilder(
             return null;
         }
 
-        var outcome = await hooks.RunAsync(HookEvents.UserPromptSubmit, tool: null, HookInputs.Prompt(text), cancellationToken);
+        var outcome = await hooks.RunAsync(HookEvents.UserPromptSubmit, options.CurrentValue.Mode, tool: null, HookInputs.Prompt(text), cancellationToken);
         return outcome.Blocked
             ? throw new HookBlockedException(string.Format(CultureInfo.CurrentCulture, Strings.HookBlockedPrompt, outcome.Message ?? Strings.HookNoReason))
             : outcome.Message;
