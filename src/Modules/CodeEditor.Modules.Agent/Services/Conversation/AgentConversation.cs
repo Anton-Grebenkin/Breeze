@@ -31,7 +31,7 @@ public sealed partial class AgentConversation : IDisposable
     private readonly PromptCacheKey _cacheKey;
     private readonly CacheWarmup _warmups;
     private readonly ToolGuards _guards;
-    private readonly ContextMeter _meter = new();
+    private readonly ContextMeter _meter;
     private readonly SemaphoreSlim _writeLock = new(1, 1);
     private IChatClient? _client;
     private IChatClient? _summaryClient;
@@ -52,6 +52,7 @@ public sealed partial class AgentConversation : IDisposable
         IEnumerable<IAgentToolProvider> toolProviders,
         TurnBudget budget,
         ContextCompaction compaction,
+        ContextMeter meter,
         ExploreAgent explore,
         ReadOnlyToolSet readTools,
         TranscriptRecorder transcript,
@@ -65,6 +66,7 @@ public sealed partial class AgentConversation : IDisposable
         _warmups = warmups;
         _budget = budget;
         _compaction = compaction;
+        _meter = meter;
         _explore = explore;
         _readTools = readTools;
         _transcript = transcript;
@@ -256,7 +258,7 @@ public sealed partial class AgentConversation : IDisposable
         var model = _clients.Create(options);
         _warmup = _warmups.Wrap(model, options);
         var summaries = new CompactionModels(model, () => _cache.LastOptions, _summaryClient);
-        return new DetachedMessagesChatClient(new ChatClientBuilder(new LoggingChatClient(_warmup ?? model, options.Model, _cache, _meter, _logger))
+        return new DetachedMessagesChatClient(new ChatClientBuilder(new ModelHistoryChatClient(new LoggingChatClient(_warmup ?? model, options.Model, _cache, _meter, _logger), options.Endpoint, options.Model))
             .UseAIContextProviders(_compaction.CreateProvider(options, summaries, _meter))
             .Build());
     }

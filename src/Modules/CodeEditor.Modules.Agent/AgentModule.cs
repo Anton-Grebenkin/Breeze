@@ -53,6 +53,7 @@ public sealed class AgentModule : IModule
         services.AddSingleton<CacheWarmup>();
         services.AddSingleton<UserMessageQueue>();
         services.AddSingleton<ContextCompaction>();
+        services.AddSingleton<ContextMeter>();
         services.AddSingleton<VerificationGate>();
         services.AddSingleton<IAgentVerificationLog>(provider => provider.GetRequiredService<VerificationGate>());
         services.AddSingleton<TurnChecks>();

@@ -4,9 +4,9 @@ namespace CodeEditor.Modules.Agent.Services.Conversation;
 
 /// <summary>
 /// Agent settings that the model client and the agent depend on: when they change, the conversation is rebuilt
-/// (<see cref="AgentConversation.Invalidate"/>). Mode, approvals, the menu model list, auto memory and readable sites
-/// apply per turn and do not rebuild the client; otherwise switching Ask → Agent cancelled a pending cache warm-up and
-/// the next Claude turn missed the cache.
+/// (<see cref="AgentConversation.Invalidate"/>). Mode, approvals, the menu model list, auto memory, readable sites and
+/// the step limit apply per turn and do not rebuild the client; otherwise switching Ask → Agent cancelled a pending
+/// cache warm-up and the next Claude turn missed the cache.
 /// </summary>
 public static class AgentClientSettings
 {
@@ -17,6 +17,7 @@ public static class AgentClientSettings
         nameof(AgentOptions.Models),
         nameof(AgentOptions.AutoMemory),
         nameof(AgentOptions.WebHosts),
+        nameof(AgentOptions.MaxSteps),
     ];
 
     /// <summary>Fingerprint of the client settings: if it matches, nothing needs rebuilding.</summary>

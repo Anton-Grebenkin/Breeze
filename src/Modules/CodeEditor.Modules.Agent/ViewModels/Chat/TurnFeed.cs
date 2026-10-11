@@ -76,11 +76,7 @@ internal sealed class TurnFeed(ObservableCollection<ChatMessageViewModel> messag
                 Finish(finished.Message, services.ToolViews.Describe(finished.Call, result));
                 break;
             case UsageContent usage:
-                if (response.Usage.Add(usage.Details) is { } previousRequest)
-                {
-                    RecordUsage(previousRequest);
-                }
-
+                RecordUsage(usage.Details, response.Usage.Revises(usage.Details));
                 break;
         }
     }
@@ -97,11 +93,6 @@ internal sealed class TurnFeed(ObservableCollection<ChatMessageViewModel> messag
         if (stopped)
         {
             response.Answer.Append(response.Answer.Text.Length == 0 ? Strings.Stopped : " …" + Strings.Stopped);
-        }
-
-        if (response.Usage.Flush() is { } last)
-        {
-            RecordUsage(last);
         }
 
         Route(response, response.Tags.Flush());
@@ -185,10 +176,10 @@ internal sealed class TurnFeed(ObservableCollection<ChatMessageViewModel> messag
         message.IsInProgress = false;
     }
 
-    private void RecordUsage(UsageDetails details)
+    private void RecordUsage(UsageDetails details, bool revises)
     {
         UsageReported = true;
-        services.Usage.Add(details.InputTokenCount, details.OutputTokenCount, details.CachedInputTokenCount);
+        services.Usage.Add(details.InputTokenCount, details.OutputTokenCount, details.CachedInputTokenCount, revises);
     }
 
     /// <summary>

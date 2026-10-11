@@ -16,17 +16,48 @@ public sealed class UsageAndCacheTests : IDisposable
     public void Dispose() => _fixture.Dispose();
 
     [Fact]
-    public void Accumulator_RepeatWithinRequest_CountsOnce_NewRequest_Commits()
+    public void Accumulator_RepeatWithinRequest_Revises_NewInputStartsTheNext()
     {
         var usage = new UsageAccumulator();
 
-        Assert.Null(usage.Add(Details(1_000, 2)));
-        Assert.Null(usage.Add(Details(1_000, 6)));
-        var first = usage.Add(Details(1_500, 3));
+        Assert.False(usage.Revises(Details(1_000, 2)));
+        Assert.True(usage.Revises(Details(1_000, 6)));
+        Assert.False(usage.Revises(Details(1_500, 3)));
+    }
 
-        Assert.Equal((1_000L, 6L), (first!.InputTokenCount, first.OutputTokenCount));
-        Assert.Equal(1_500, usage.Flush()!.InputTokenCount);
-        Assert.Null(usage.Flush());
+    // A revision replaces the request's first report at once; spend of side requests in between stays.
+    [Fact]
+    public void Ring_RevisionReplacesTheRequest_AndKeepsSideSpend()
+    {
+        var context = _fixture.Chat.Context;
+
+        context.Add(1_000, 2, 0);
+        context.AddAuxiliary(500, 10);
+        context.Add(1_000, 6, 0, revisesLast: true);
+
+        Assert.Equal((1_006L, 1_500L, 16L, 2), (context.Usage.ContextTokens, context.Usage.TotalInputTokens, context.Usage.TotalOutputTokens, context.Usage.Requests));
+    }
+
+    // Before a response the ring shows the request on its way: the last real input plus what the history gained or
+    // lost since (a tool result, a compaction), so it moves at once and doesn't dip in a young chat.
+    [Fact]
+    public void Ring_ShowsRequestEstimate_UntilItsUsageArrives()
+    {
+        var context = _fixture.Chat.Context;
+        _fixture.Meter.Sent(8_000);
+        _fixture.Meter.Observed(10_000);
+        context.Add(10_000, 500, 0);
+
+        _fixture.Meter.Sent(9_000);
+        var afterToolResult = (context.ContextTokens, context.PercentText[0]);
+        _fixture.Meter.Sent(4_000);
+        var afterCompaction = context.ContextTokens;
+        context.Add(5_100, 200, 0);
+
+        Assert.Equal((11_250L, '≈'), afterToolResult);
+        Assert.Equal(5_000, afterCompaction);
+        Assert.Equal(5_300, context.ContextTokens);
+        Assert.Null(context.PendingTokens);
     }
 
     [Fact]

@@ -446,4 +446,5 @@ description: Стили XAML
   <data name="MoveToBackgroundToolTip" xml:space="preserve"><value>Не ждать: процесс продолжит работу в фоне, а агент — задачу</value></data>
   <data name="CommandMoveToBackground" xml:space="preserve"><value>Перевести текущий шаг в фон</value></data>
   <data name="NothingToMoveToBackground" xml:space="preserve"><value>Нет шага, который можно перевести в фон.</value></data>
+  <data name="ImageNotForModel" xml:space="preserve"><value>(картинка не показана: текущая модель не принимает изображения)</value></data>
 </root>

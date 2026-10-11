@@ -65,7 +65,7 @@ internal sealed class AgentFixture : IDisposable
         Rules = new ProjectRuleGuard(Instructions, Workspace);
         RunningCalls = new RunningToolCalls(Time);
         Observers = new ToolCallObservers(new TurnWatchdog(Budget), []);
-        Conversation = new AgentConversation(new Factory(this), Options, ApiKey, new SystemPrompt(Workspace, Instructions), ToolProviders, Budget, Compaction, Explorer, ReadTools, Transcript, CacheKey, new CacheWarmup(HelperUsage, TimeProvider.System, NullLogger<CacheWarmup>.Instance), new ToolGuards(Deep, Queue, Rules, Observers, RunningCalls), ConversationLog);
+        Conversation = new AgentConversation(new Factory(this), Options, ApiKey, new SystemPrompt(Workspace, Instructions), ToolProviders, Budget, Compaction, Meter, Explorer, ReadTools, Transcript, CacheKey, new CacheWarmup(HelperUsage, TimeProvider.System, NullLogger<CacheWarmup>.Instance), new ToolGuards(Deep, Queue, Rules, Observers, RunningCalls), ConversationLog);
         Reverter = new FakeChangeReverter(FileSystem);
         Checks = new TurnChecks(Gate, Budget, Verifiers, Todos, Deep, [Jobs]);
         Editors = new EditorAreaViewModel(Documents, [], [], new DocumentSaver(Documents, new FakeDialogs(), StatusBar), new ContextKeyService(), StatusBar);
@@ -167,6 +167,9 @@ internal sealed class AgentFixture : IDisposable
 
     public ContextCompaction Compaction { get; }
 
+    /// <summary>Request size estimates for the context ring.</summary>
+    public ContextMeter Meter { get; } = new();
+
     public HelperUsage HelperUsage { get; } = new();
 
     /// <summary>User messages sent mid-turn.</summary>
@@ -245,7 +248,7 @@ internal sealed class AgentFixture : IDisposable
     /// <summary>Chat panel on this fixture; a separate history acts like an app restart.</summary>
     public ChatViewModel CreateChat(ChatHistory history)
     {
-        var usage = new ContextUsageViewModel(Options);
+        var usage = new ContextUsageViewModel(Options, Meter, new InlineUiDispatcher());
         var parts = new ChatPanelParts(
             new AgentModeViewModel(Options, Settings, QuickPick, StatusBar),
             new ModelSettingsViewModel(Options, Settings, QuickPick, Commands, StatusBar, CreateModelManager()),

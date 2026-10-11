@@ -52,6 +52,18 @@ internal sealed class ScriptedChatClient : IChatClient
         return this;
     }
 
+    /// <summary>Reasoning with its signature or encrypted content, then the answer.</summary>
+    public ScriptedChatClient ReplyWithReasoning(string reasoning, string signature, string text)
+    {
+        _responses.Enqueue(() =>
+        [
+            new ChatResponseUpdate(ChatRole.Assistant, [new TextReasoningContent(reasoning)]),
+            new ChatResponseUpdate(ChatRole.Assistant, [new TextReasoningContent(string.Empty) { ProtectedData = signature }]),
+            new ChatResponseUpdate(ChatRole.Assistant, text),
+        ]);
+        return this;
+    }
+
     public ScriptedChatClient CallTool(string callId, string name, IDictionary<string, object?> arguments)
     {
         _responses.Enqueue(() => [new ChatResponseUpdate(ChatRole.Assistant, [new FunctionCallContent(callId, name, arguments)])]);

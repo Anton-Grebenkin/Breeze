@@ -446,4 +446,5 @@ The agent gets the text when it reads or edits a matching file.
   <data name="MoveToBackgroundToolTip" xml:space="preserve"><value>Stop waiting: the process goes on in the background, the agent goes on with the task</value></data>
   <data name="CommandMoveToBackground" xml:space="preserve"><value>Move running step to background</value></data>
   <data name="NothingToMoveToBackground" xml:space="preserve"><value>No running step can go to the background.</value></data>
+  <data name="ImageNotForModel" xml:space="preserve"><value>(image not shown: the current model does not take images)</value></data>
 </root>

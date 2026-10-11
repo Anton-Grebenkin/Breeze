@@ -2,6 +2,7 @@ using System.Collections.Frozen;
 using System.Globalization;
 using CodeEditor.Core.Files;
 using CodeEditor.Modules.Agent.Contracts.Files;
+using CodeEditor.Modules.Agent.Resources;
 using Microsoft.Extensions.AI;
 
 namespace CodeEditor.Modules.Agent.Services.Attachments;
@@ -123,7 +124,7 @@ public sealed class AttachmentReader(IFileSystem fileSystem, IWorkspace workspac
         switch (Classify(path))
         {
             case AttachmentKind.Image when !seesImages:
-                yield return new TextContent($"<attachment path=\"{name}\" type=\"image\">(not shown: the current model does not take images)</attachment>");
+                yield return new TextContent($"<attachment path=\"{name}\" type=\"image\">{Strings.ImageNotForModel}</attachment>");
                 break;
             case AttachmentKind.Image:
                 yield return new TextContent($"<attachment path=\"{name}\" type=\"image\" />");
