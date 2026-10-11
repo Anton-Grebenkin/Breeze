@@ -102,7 +102,7 @@ public sealed class BrowserPanelTests
     private static BrowserApprovals Approvals(out FakeSettingsService settings)
     {
         settings = new FakeSettingsService();
-        return new BrowserApprovals(new TestOptionsMonitor<BrowserOptions>(new BrowserOptions()), settings, NullLogger<BrowserApprovals>.Instance);
+        return new BrowserApprovals(new TestOptionsMonitor<BrowserOptions>(new BrowserOptions()), new FakeBrowserEngine(), settings, NullLogger<BrowserApprovals>.Instance);
     }
 
     private static Dictionary<string, object?> Call(string action, string? url) => new() { ["action"] = action, ["url"] = url };

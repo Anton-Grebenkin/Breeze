@@ -18,6 +18,12 @@ public interface IBrowserEngine
 
     bool IsLoading { get; }
 
+    /// <summary>
+    /// HTTP status of the open page's document; <c>null</c> before the first response. A 4xx or 5xx page still loads:
+    /// the server's error page is what the user sees.
+    /// </summary>
+    int? StatusCode { get; }
+
     /// <summary>The address, title or loading state changed; raised on the UI thread.</summary>
     event EventHandler? StateChanged;
 
@@ -42,6 +48,12 @@ public interface IBrowserEngine
     /// <summary>Screenshot of the open page (<see cref="BrowserScreenshot"/>); the panel is shown without focus.</summary>
     /// <exception cref="BrowserException">The browser is unavailable, no page is open or the capture failed.</exception>
     Task<byte[]> CaptureAsync(BrowserImageFormat format, CancellationToken cancellationToken);
+
+    /// <summary>Calls a DevTools protocol method on the page (key presses, scripts that await, response bodies).</summary>
+    /// <param name="parameters">The method's parameters as a JSON object.</param>
+    /// <returns>The result as JSON.</returns>
+    /// <exception cref="BrowserException">The browser is unavailable or the call failed.</exception>
+    Task<string> DevToolsAsync(string method, string parameters, CancellationToken cancellationToken);
 
     /// <summary>Console messages and page errors since the last call.</summary>
     IReadOnlyList<BrowserConsoleMessage> TakeConsole();

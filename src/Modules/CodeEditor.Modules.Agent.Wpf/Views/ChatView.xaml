@@ -17,7 +17,12 @@
     <ResourceDictionary Source="ChatTemplates.xaml" />
   </UserControl.Resources>
 
-  <Grid>
+  <!-- Files and pictures dropped anywhere on the chat are attached to the message; dragged text goes to the box. -->
+  <Grid AllowDrop="True"
+        PreviewDragEnter="OnPreviewDragOver"
+        PreviewDragOver="OnPreviewDragOver"
+        PreviewDragLeave="OnPreviewDragLeave"
+        PreviewDrop="OnPreviewDrop">
   <DockPanel>
     <!-- Header: chat title, history, new chat, more. -->
     <DockPanel DockPanel.Dock="Top" Margin="12,0,4,4" MinHeight="24">
@@ -236,6 +241,20 @@
 
     </Grid>
   </DockPanel>
+
+  <Border x:Name="DropHint"
+          Margin="4"
+          Visibility="Collapsed"
+          IsHitTestVisible="False"
+          CornerRadius="6"
+          BorderThickness="2"
+          BorderBrush="{DynamicResource Brush.Accent}"
+          Background="{DynamicResource Brush.Widget.Background}">
+    <TextBlock HorizontalAlignment="Center"
+               VerticalAlignment="Center"
+               Foreground="{DynamicResource Brush.Text.Primary}"
+               Text="{x:Static res:Strings.DropToAttach}" />
+  </Border>
 
   <!-- The model manager over the chat; Esc or Back returns to the chat. -->
   <views:ModelManagerView DataContext="{Binding Model.Manager}"

@@ -16,6 +16,8 @@ public sealed class GitCommandsTests
         Assert.Equal(["diff", "--stat", "--patch", "--staged", "main", "--", "src/A.cs"], GitCommands.Read(new GitRead(GitCommands.Diff, "src/A.cs", "main", Staged: true)));
         Assert.Equal(["log", "-n", "100", "--date=short", "--format=%h %ad %an%d%n    %s", "--", "src"], GitCommands.Read(new GitRead(GitCommands.Log, "src", MaxCount: 500)));
         Assert.Equal(["show", "--stat", "--patch", "--date=short", "HEAD"], GitCommands.Read(new GitRead(GitCommands.Show)));
+        Assert.Equal("--all", GitCommands.Read(new GitRead(GitCommands.Log, Revision: "--all"))[^1]);
+        Assert.Throws<AgentToolException>(() => GitCommands.Read(new GitRead(GitCommands.Diff, Revision: "--all")));
         Assert.Equal(["blame", "--date=short", "-L", "10,20", "--", "src/A.cs"], GitCommands.Read(new GitRead(GitCommands.Blame, "src/A.cs") { StartLine = 10, EndLine = 20 }));
     }
 

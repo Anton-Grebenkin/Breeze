@@ -45,6 +45,9 @@
   <Style x:Key="TreeViewItem.Row" TargetType="TreeViewItem">
     <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Primary}" />
     <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+    <!-- Set here so the theme style's binding to the parent ItemsControl doesn't fail on a recycled, detached row. -->
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
     <!-- Nested levels are virtualized too: a folder with thousands of files doesn't create thousands of rows. -->
     <Setter Property="ItemsPanel">
       <Setter.Value>

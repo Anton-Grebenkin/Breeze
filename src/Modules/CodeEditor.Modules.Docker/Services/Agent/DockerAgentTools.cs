@@ -130,6 +130,12 @@ public sealed class DockerAgentTools(DockerRunner docker, IWorkspace workspace, 
         }
 
         var output = TerminalEscapes.Strip(result.Output).TrimEnd();
+        if (result.ExitCode != 0 && DockerErrors.IsEngineStopped(output))
+        {
+            // Docker Desktop stopped or still starting (its API answers 500 then): retrying at once fails the same way.
+            throw new AgentToolException(Strings.AgentEngineStopped);
+        }
+
         return result.ExitCode == 0 ? output : throw new AgentToolException(Format(Strings.DockerFailed, action, result.ExitCode, output));
     }
 

@@ -39,6 +39,39 @@ public sealed class ChatViewModelTests : IDisposable
         Assert.Equal(1, _fixture.ClientsCreated);
     }
 
+    // Switching models midway: the history reaches the new model, but not the old one's encrypted reasoning, which the
+    // new model's service would reject.
+    [Fact]
+    public async Task ModelSwitch_NextRequestCarriesHistory_WithoutTheOtherModelsReasoning()
+    {
+        _fixture.Options.Set(new AgentOptions { Model = "openai/gpt-6-luna" });
+        _fixture.Client.ReplyWithReasoning("думаю", "gAAAAAenc", "Первый ответ").Reply("Второй ответ");
+
+        await _fixture.SendAsync("первый вопрос");
+        _fixture.Options.Set(new AgentOptions { Model = "anthropic/claude-sonnet-5" });
+        await _fixture.SendAsync("второй вопрос");
+
+        var second = _fixture.Client.Requests[1];
+        Assert.Contains(second, message => message.Role == ChatRole.User && message.Question() == "первый вопрос");
+        Assert.Contains(second, message => message.Role == ChatRole.Assistant && message.Text == "Первый ответ");
+        Assert.DoesNotContain(second.SelectMany(message => message.Contents), content => content is TextReasoningContent);
+        Assert.Equal(2, _fixture.ClientsCreated);
+    }
+
+    // The same model gets its signed reasoning back: the stamp survives merging the streamed parts into history.
+    [Fact]
+    public async Task SameModel_GetsItsReasoningBack()
+    {
+        _fixture.Options.Set(new AgentOptions { Model = "anthropic/claude-sonnet-5" });
+        _fixture.Client.ReplyWithReasoning("думаю", "EqoBsig", "Первый ответ").Reply("Второй ответ");
+
+        await _fixture.SendAsync("первый вопрос");
+        await _fixture.SendAsync("второй вопрос");
+
+        var reasoning = Assert.Single(_fixture.Client.Requests[1].SelectMany(message => message.Contents).OfType<TextReasoningContent>());
+        Assert.Equal(("думаю", "EqoBsig"), (reasoning.Text, reasoning.ProtectedData));
+    }
+
     // Empty input isn't sent; during a turn sending stays enabled and the message is queued (ADR 0026).
     [Fact]
     public async Task Send_IsDisabledForEmptyInput_OpenWhileBusy()

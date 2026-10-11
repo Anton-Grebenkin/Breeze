@@ -8,16 +8,24 @@ namespace CodeEditor.Modules.Browser.Services;
 /// <summary>
 /// Approval for the <c>browser</c> tool (ADR 0027): pages on this machine (<c>localhost</c>, <c>127.0.0.1</c>,
 /// <c>*.localhost</c>) and sites in <c>browser.allowedHosts</c> open without asking; others need a card, since a URL can
-/// carry data away. Actions on an open page need no approval: the user sees the browser and can step in.
+/// carry data away. A script runs without asking only on a page of this machine: on a site where the user is logged in
+/// it could send the session elsewhere. Other actions on an open page need no approval: the user sees the browser and
+/// can step in.
 /// </summary>
-public sealed partial class BrowserApprovals(IOptionsMonitor<BrowserOptions> options, ISettingsService settings, ILogger<BrowserApprovals> logger) : IAgentApprovalPolicy
+public sealed partial class BrowserApprovals(IOptionsMonitor<BrowserOptions> options, IBrowserEngine browser, ISettingsService settings, ILogger<BrowserApprovals> logger)
+    : IAgentApprovalPolicy
 {
     public const string AllowedHostsKey = BrowserOptions.Section + ".allowedHosts";
 
     public bool CanDecide(string toolName) => toolName == BrowserAgentTools.ToolName;
 
     public bool IsPreapproved(string toolName, IDictionary<string, object?> arguments) =>
-        CanDecide(toolName) && (Action(arguments) != BrowserAgentTools.Navigate || Host(arguments) is { } host && IsAllowed(host));
+        CanDecide(toolName) && Action(arguments) switch
+        {
+            BrowserAgentTools.Navigate => Host(arguments) is { } host && IsAllowed(host),
+            BrowserAgentTools.Evaluate => browser.Url is { } page && IsLocal(page.IdnHost),
+            _ => true,
+        };
 
     public bool IsReadOnly(string toolName, IDictionary<string, object?> arguments) => false;
 

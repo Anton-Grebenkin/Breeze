@@ -1,4 +1,6 @@
+using System.ComponentModel;
 using System.Windows;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Threading;
 using CodeEditor.Modules.Browser.ViewModels;
@@ -9,7 +11,7 @@ namespace CodeEditor.Modules.Browser.Wpf.Views;
 /// <summary>
 /// The Browser panel hosts the browser control, which the engine owns for the app lifetime. When the panel leaves the
 /// screen (another bottom panel tab) it releases the control, and the next panel takes it with the same page. The show
-/// command puts the caret into the address bar.
+/// command puts the caret into the address bar; the history menu opens under its button.
 /// </summary>
 public sealed partial class BrowserView : System.Windows.Controls.UserControl
 {
@@ -32,12 +34,14 @@ public sealed partial class BrowserView : System.Windows.Controls.UserControl
         if (_viewModel is not null)
         {
             _viewModel.FocusRequested -= OnFocusRequested;
+            _viewModel.PropertyChanged -= OnViewModelPropertyChanged;
         }
 
         _viewModel = e.NewValue as BrowserViewModel;
         if (_viewModel is not null)
         {
             _viewModel.FocusRequested += OnFocusRequested;
+            _viewModel.PropertyChanged += OnViewModelPropertyChanged;
 
             // The view is created on first panel show, after focus was already requested.
             OnFocusRequested(this, EventArgs.Empty);
@@ -50,4 +54,24 @@ public sealed partial class BrowserView : System.Windows.Controls.UserControl
             Keyboard.Focus(AddressBox);
             AddressBox.SelectAll();
         });
+
+    private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(BrowserViewModel.IsHistoryOpen) || _viewModel is null)
+        {
+            return;
+        }
+
+        HistoryMenu.PlacementTarget = HistoryButton;
+        HistoryMenu.Placement = PlacementMode.Bottom;
+        HistoryMenu.IsOpen = _viewModel.IsHistoryOpen;
+    }
+
+    private void OnHistoryMenuClosed(object sender, RoutedEventArgs e)
+    {
+        if (_viewModel is not null)
+        {
+            _viewModel.IsHistoryOpen = false;
+        }
+    }
 }

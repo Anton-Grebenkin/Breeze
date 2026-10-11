@@ -1,4 +1,5 @@
 using System.Globalization;
+using CodeEditor.Modules.Agent.Contracts.Turn;
 using CodeEditor.Modules.Agent.Contracts.Verification;
 using CodeEditor.Modules.Agent.Resources;
 
@@ -8,15 +9,28 @@ namespace CodeEditor.Modules.Agent.Services.Turn;
 /// Checks before a turn ends (ADR 0010, 0012), when the model answered without tool calls: code edits must pass a
 /// build, in Deep mode also tests, and then an independent reviewer looks at the changes. These are external signals,
 /// not the model's self-assessment. An exhausted request limit does not extend the turn; a folder with nothing to
-/// build (<see cref="IAgentVerifier"/>) does not require a build.
+/// build (<see cref="IAgentVerifier"/>) does not require a build. Last, the user's <c>Stop</c> hooks may ask the agent
+/// to go on (<see cref="HookRunner"/>), at most <see cref="MaxStopHooks"/> times a turn.
 /// </summary>
-public sealed class TurnChecks(VerificationGate gate, TurnBudget budget, IEnumerable<IAgentVerifier> verifiers, TodoList todos, DeepSupervisor deep)
+public sealed class TurnChecks(
+    VerificationGate gate,
+    TurnBudget budget,
+    IEnumerable<IAgentVerifier> verifiers,
+    TodoList todos,
+    DeepSupervisor deep,
+    IEnumerable<IAgentRunningJobs> jobs,
+    HookRunner? hooks = null)
 {
+    /// <summary>Stop hooks that may extend one turn: a hook that always says "go on" must not loop forever.</summary>
+    public const int MaxStopHooks = 3;
+
     private AgentMode _mode;
     private bool _remindedOfPlan;
     private bool _remindedOfEmpty;
     private bool _auditDue;
     private bool _remindedOfTextCall;
+    private bool _remindedOfJobs;
+    private int _stopHooks;
 
     /// <param name="request">The user request without harness blocks; decides whether a requirements audit is due.</param>
     public void Begin(AgentMode mode, string? request = null)
@@ -26,13 +40,36 @@ public sealed class TurnChecks(VerificationGate gate, TurnBudget budget, IEnumer
         _remindedOfEmpty = false;
         _auditDue = TaskRequirements.AreSeveral(request);
         _remindedOfTextCall = false;
+        _remindedOfJobs = false;
+        _stopHooks = 0;
         gate.Begin();
     }
 
     /// <param name="report">The model's summary in this answer, for the Deep mode reviewer.</param>
     /// <param name="truncated">The answer hit the length limit and continuations did not help; an empty summary is expected.</param>
     /// <returns><c>null</c> if the turn ends without notes.</returns>
-    public async Task<TurnCheck?> NextAsync(string report, bool truncated, CancellationToken cancellationToken)
+    public async Task<TurnCheck?> NextAsync(string report, bool truncated, CancellationToken cancellationToken) =>
+        await NextCheckAsync(report, truncated, cancellationToken) ?? await StopHookAsync(report, cancellationToken);
+
+    // The turn would end: a Stop hook that exits with 2 sends the agent back to work with its output as the reason.
+    private async Task<TurnCheck?> StopHookAsync(string report, CancellationToken cancellationToken)
+    {
+        if (hooks is null || _stopHooks >= MaxStopHooks || budget.IsExhausted || !hooks.Has(HookEvents.Stop))
+        {
+            return null;
+        }
+
+        var outcome = await hooks.RunAsync(HookEvents.Stop, _mode, tool: null, HookInputs.Stop(report, active: _stopHooks > 0), cancellationToken);
+        if (!outcome.Blocked)
+        {
+            return null;
+        }
+
+        _stopHooks++;
+        return new TurnCheck(string.Format(CultureInfo.CurrentCulture, Strings.HookStopPrompt, outcome.Message ?? Strings.HookNoReason), Strings.HookStopStatus);
+    }
+
+    private async Task<TurnCheck?> NextCheckAsync(string report, bool truncated, CancellationToken cancellationToken)
     {
         if (TextCall(report) is { } textCall)
         {
@@ -42,6 +79,11 @@ public sealed class TurnChecks(VerificationGate gate, TurnBudget budget, IEnumer
         if (!truncated && EmptyAnswer(report) is { } empty)
         {
             return empty;
+        }
+
+        if (RunningJobs() is { } running)
+        {
+            return running;
         }
 
         if (!AgentModes.CanChange(_mode))
@@ -122,6 +164,27 @@ public sealed class TurnChecks(VerificationGate gate, TurnBudget budget, IEnumer
         _remindedOfPlan = true;
         var open = string.Join('\n', todos.Render().Split('\n').Where(static line => !line.StartsWith("[x]", StringComparison.Ordinal)));
         return new TurnCheck(string.Format(CultureInfo.CurrentCulture, Strings.OpenPlanItemsPrompt, open), Strings.OpenPlanItemsStatus);
+    }
+
+    /// <summary>
+    /// The summary would come before the result of a build or test run that went to the background (it outlived its
+    /// wait). Once per turn: the user may have moved the run to the background on purpose, the prompt allows not waiting.
+    /// </summary>
+    private TurnCheck? RunningJobs()
+    {
+        if (_remindedOfJobs || budget.IsExhausted)
+        {
+            return null;
+        }
+
+        var running = jobs.SelectMany(static source => source.Running()).ToList();
+        if (running.Count == 0)
+        {
+            return null;
+        }
+
+        _remindedOfJobs = true;
+        return new TurnCheck(string.Format(CultureInfo.CurrentCulture, Strings.RunningJobsPrompt, string.Join(", ", running)), Strings.RunningJobsStatus);
     }
 
     /// <summary>

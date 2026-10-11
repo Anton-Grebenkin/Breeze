@@ -41,4 +41,30 @@
   <data name="ScreenshotTooLarge" xml:space="preserve"><value>Снимок экрана больше 5 МБ даже в JPEG: читай страницу действием snapshot.</value></data>
   <data name="ScreenshotFailed" xml:space="preserve"><value>Браузер не вернул снимок экрана.</value></data>
   <data name="FeedScreenshot" xml:space="preserve"><value>снимок экрана</value></data>
+  <data name="UnknownKey" xml:space="preserve"><value>Неизвестная клавиша «{0}». Клавиши: {1}.</value></data>
+  <data name="ScriptFailed" xml:space="preserve"><value>Скрипт завершился ошибкой: {0}</value></data>
+  <data name="ScriptTimedOut" xml:space="preserve"><value>Страница не ответила за {0} с: возможно, в браузере открыт диалог (alert, confirm). Попроси пользователя закрыть его.</value></data>
+  <data name="NetworkEmpty" xml:space="preserve"><value>Запросов пока нет. Они записываются с открытия страницы: обнови её, чтобы увидеть первые запросы.</value></data>
+  <data name="NoSuchRequest" xml:space="preserve"><value>Запроса {0} нет: возьми id из network.</value></data>
+  <data name="NoResponseBody" xml:space="preserve"><value>У браузера нет тела ответа на запрос {0}: он не удался, был перенаправлением, или страница уже сменилась.</value></data>
+  <data name="BinaryBody" xml:space="preserve"><value>(двоичное содержимое, {0} байт)</value></data>
+  <data name="TextNotShown" xml:space="preserve"><value>Текст «{0}» не появился за {1} с. Страница сейчас:</value></data>
+  <data name="EvaluateApprovalTitle" xml:space="preserve"><value>Выполнить скрипт на странице</value></data>
+  <data name="DevToolsFailed" xml:space="preserve"><value>Браузер не выполнил {0}: {1}</value></data>
+  <data name="ServerNotReachable" xml:space="preserve"><value>сервер не отвечает ({0}). Приложение запущено?</value></data>
+  <data name="FeedPress" xml:space="preserve"><value>клавиша {0}</value></data>
+  <data name="FeedScroll" xml:space="preserve"><value>прокрутка</value></data>
+  <data name="FeedWaitFor" xml:space="preserve"><value>ожидание «{0}»</value></data>
+  <data name="FeedForward" xml:space="preserve"><value>вперёд</value></data>
+  <data name="FeedNetwork" xml:space="preserve"><value>сеть</value></data>
+  <data name="FeedResponse" xml:space="preserve"><value>ответ {0}</value></data>
+  <data name="FeedEvaluate" xml:space="preserve"><value>скрипт</value></data>
+  <data name="History" xml:space="preserve"><value>История</value></data>
+  <data name="HistoryEmpty" xml:space="preserve"><value>Страниц пока нет</value></data>
+  <data name="AllPages" xml:space="preserve"><value>Все страницы…</value></data>
+  <data name="ClearHistory" xml:space="preserve"><value>Очистить историю</value></data>
+  <data name="OpenRecentCommand" xml:space="preserve"><value>Недавние страницы</value></data>
+  <data name="ClearHistoryCommand" xml:space="preserve"><value>Очистить историю</value></data>
+  <data name="RecentPagesPlaceholder" xml:space="preserve"><value>Найти страницу по заголовку или адресу</value></data>
+  <data name="HistoryCleared" xml:space="preserve"><value>История браузера очищена</value></data>
 </root>

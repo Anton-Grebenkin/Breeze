@@ -17,12 +17,14 @@ using CodeEditor.Modules.Agent.Services.Context;
 using CodeEditor.Modules.Agent.Services.Conversation;
 using CodeEditor.Modules.Agent.Services.Deep;
 using CodeEditor.Modules.Agent.Services.History;
+using CodeEditor.Modules.Agent.Services.Hooks;
 using CodeEditor.Modules.Agent.Services.Memory;
 using CodeEditor.Modules.Agent.Services.Models;
 using CodeEditor.Modules.Agent.Services.Prompts;
 using CodeEditor.Modules.Agent.Services.Settings;
 using CodeEditor.Modules.Agent.Services.Tools;
 using CodeEditor.Modules.Agent.Services.Turn;
+using CodeEditor.Modules.Agent.Services.Watchdog;
 using CodeEditor.Modules.Agent.ViewModels.Chat;
 using CodeEditor.Modules.Agent.ViewModels.Composer;
 using CodeEditor.Modules.Agent.ViewModels.Models;
@@ -62,9 +64,12 @@ internal sealed class AgentFixture : IDisposable
         MemoryExtractor = new MemoryExtractor(new Factory(this), Options, Memory, Transcript, HelperUsage, Budget, NullLogger<MemoryExtractor>.Instance);
         Instructions = new ProjectInstructions(Workspace, FileSystem, new UserDataPaths(UserDataRoot));
         Rules = new ProjectRuleGuard(Instructions, Workspace);
-        Conversation = new AgentConversation(new Factory(this), Options, ApiKey, new SystemPrompt(Workspace, Instructions), ToolProviders, Budget, Compaction, Explorer, ReadTools, Transcript, Deep, CacheKey, new CacheWarmup(HelperUsage, TimeProvider.System, NullLogger<CacheWarmup>.Instance), Queue, ConversationLog, Rules);
+        RunningCalls = new RunningToolCalls(Time);
+        Hooks = new HookRunner(Options, Processes, Workspace, NullLogger<HookRunner>.Instance);
+        Observers = new ToolCallObservers(new TurnWatchdog(Budget), []);
+        Conversation = new AgentConversation(new Factory(this), Options, ApiKey, new SystemPrompt(Workspace, Instructions), ToolProviders, Budget, Compaction, Meter, Explorer, ReadTools, Transcript, CacheKey, new CacheWarmup(HelperUsage, TimeProvider.System, NullLogger<CacheWarmup>.Instance), new ToolGuards(Deep, Queue, Rules, Observers, RunningCalls, Hooks), ConversationLog);
         Reverter = new FakeChangeReverter(FileSystem);
-        Checks = new TurnChecks(Gate, Budget, Verifiers, Todos, Deep);
+        Checks = new TurnChecks(Gate, Budget, Verifiers, Todos, Deep, [Jobs], Hooks);
         Editors = new EditorAreaViewModel(Documents, [], [], new DocumentSaver(Documents, new FakeDialogs(), StatusBar), new ContextKeyService(), StatusBar);
         Settings.Changed += (_, _) => ApplyWrittenMode();
         History = CreateHistory();
@@ -147,6 +152,20 @@ internal sealed class AgentFixture : IDisposable
 
     public TurnChecks Checks { get; }
 
+    public FakeRunningJobs Jobs { get; } = new();
+
+    /// <summary>Turn timers (live tool rows) fire only when a test advances this time.</summary>
+    public ManualTimeProvider Time { get; } = new();
+
+    public RunningToolCalls RunningCalls { get; }
+
+    public ToolCallObservers Observers { get; }
+
+    /// <summary>Processes the user's hooks start; a test scripts their exit codes and output.</summary>
+    public FakeProcessRunner Processes { get; } = new();
+
+    public HookRunner Hooks { get; }
+
     /// <summary>Code verifiers; when empty there is nothing to build and the verification gate stays silent.</summary>
     public List<IAgentVerifier> Verifiers { get; } = [];
 
@@ -154,6 +173,9 @@ internal sealed class AgentFixture : IDisposable
     public ScriptedChatClient HelperClient { get; } = new();
 
     public ContextCompaction Compaction { get; }
+
+    /// <summary>Request size estimates for the context ring.</summary>
+    public ContextMeter Meter { get; } = new();
 
     public HelperUsage HelperUsage { get; } = new();
 
@@ -233,7 +255,7 @@ internal sealed class AgentFixture : IDisposable
     /// <summary>Chat panel on this fixture; a separate history acts like an app restart.</summary>
     public ChatViewModel CreateChat(ChatHistory history)
     {
-        var usage = new ContextUsageViewModel(Options);
+        var usage = new ContextUsageViewModel(Options, Meter, new InlineUiDispatcher());
         var parts = new ChatPanelParts(
             new AgentModeViewModel(Options, Settings, QuickPick, StatusBar),
             new ModelSettingsViewModel(Options, Settings, QuickPick, Commands, StatusBar, CreateModelManager()),
@@ -241,10 +263,10 @@ internal sealed class AgentFixture : IDisposable
             new ActiveFileContextViewModel(Editors, Workspace),
             new TodoPanelViewModel(Todos, new InlineUiDispatcher()),
             new ChangesPanelViewModel(Changes, FileState, Reverter, Documents, new InlineUiDispatcher(), Commands, StatusBar),
-            new ChatAttachmentsViewModel(AttachmentPicker, Attachments, StatusBar),
+            new ChatAttachmentsViewModel(AttachmentPicker, Attachments, new PastedAttachments(Workspace, FileSystem, UserData, TimeProvider.System), Options, StatusBar),
             new QueuedMessagesViewModel(Queue, new InlineUiDispatcher()));
-        var services = new AgentTurnServices(Conversation, new ApprovalCards(Previewers, Policies, Rules), usage, new AgentActivityLog(ActivityLog), Budget, FileState, Todos, Questions, Checks, Compaction, HelperUsage, new ToolViews(Presenters, NullLogger<ToolViews>.Instance), Deep, MemoryExtractor, Queue, Images);
-        var session = new ChatSession(services, history, Options, new TurnMessageBuilder(ContextProviders, Start, Attachments, Options, TimeProvider.System, NullLogger<TurnMessageBuilder>.Instance), new InlineUiDispatcher());
+        var services = new AgentTurnServices(Conversation, new ApprovalCards(Previewers, Policies, Rules), usage, new AgentActivityLog(ActivityLog), Budget, FileState, Todos, Questions, Checks, Compaction, HelperUsage, new ToolViews(Presenters, NullLogger<ToolViews>.Instance), Deep, MemoryExtractor, Queue, Images, Observers, RunningCalls, new InlineUiDispatcher(), Time);
+        var session = new ChatSession(services, history, Options, new TurnMessageBuilder(ContextProviders, Start, Attachments, Options, TimeProvider.System, NullLogger<TurnMessageBuilder>.Instance, Hooks), new InlineUiDispatcher());
         var links = new ChatLinkOpener(Workspace, FileSystem, Index, QuickPick, Commands, Shell, StatusBar);
         return new ChatViewModel(session, history, parts, links, QuickPick, Shell, Workspace, ApiKey, Commands, TimeProvider.System);
     }

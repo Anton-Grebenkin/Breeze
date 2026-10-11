@@ -64,6 +64,26 @@ public sealed class AgentAttachmentsTests : IDisposable
         Assert.Contains("Level up is a palindrome.", _model.Requests.Single(), StringComparison.Ordinal);
     }
 
+    // A file copied in Explorer and a screenshot paste as chips, not as text in the box.
+    [Fact]
+    public void Paste_CopiedFileAndScreenshot_BecomeAttachments()
+    {
+        using var session = AppSession.WithUserData(_userData, _folder);
+        session.FocusWindow();
+        Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.ALT, VirtualKeyShort.KEY_I);
+        session.WaitForFocus("Agent.Input");
+
+        TestClipboard.SetFiles(_notes);
+        Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_V);
+        session.WaitFor("Agent.Attachment.notes.txt");
+
+        TestClipboard.SetImage(64, 48);
+        Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_V);
+        Assert.True(Retry.WhileFalse(() => session.Find("Agent.Attachments").FindAllChildren().Length == 2, TimeSpan.FromSeconds(10)).Result, "картинка не прикрепилась");
+        Assert.Equal(string.Empty, session.ValueOf("Agent.Input"));
+        session.SaveScreenshot("agent-paste");
+    }
+
     // Paperclip → system dialog → path into "File name" (focused on open) → Enter → chip above the input.
     // The box id belongs to a combo box whose inner edit has focus, so wait for it to appear rather than for focus.
     private void Attach(AppSession session)

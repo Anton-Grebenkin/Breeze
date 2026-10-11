@@ -32,6 +32,18 @@
       <Button DockPanel.Dock="Left" Style="{StaticResource Button.Toolbar}" Content="{x:Static ui:IconGlyphs.Refresh}"
               ToolTip="{x:Static res:Strings.Reload}" Command="{Binding ReloadCommand}"
               AutomationProperties.AutomationId="Browser.Reload" AutomationProperties.Name="{x:Static res:Strings.Reload}" />
+      <!-- Recent pages: the menu opens under the button; "Browser: Recent Pages" in the palette is its keyboard twin. -->
+      <Button x:Name="HistoryButton" DockPanel.Dock="Right" Style="{StaticResource Button.Toolbar}" Content="{x:Static ui:IconGlyphs.History}"
+              ToolTip="{x:Static res:Strings.History}" Command="{Binding ShowHistoryCommand}"
+              AutomationProperties.AutomationId="Browser.History" AutomationProperties.Name="{x:Static res:Strings.History}">
+        <Button.ContextMenu>
+          <ContextMenu x:Name="HistoryMenu"
+                       ItemsSource="{Binding HistoryMenu}"
+                       ItemContainerStyle="{StaticResource MenuItem.Bound}"
+                       Closed="OnHistoryMenuClosed"
+                       AutomationProperties.AutomationId="Browser.HistoryMenu" />
+        </Button.ContextMenu>
+      </Button>
       <Button DockPanel.Dock="Right" Style="{StaticResource Button.Toolbar}" Content="{x:Static ui:IconGlyphs.ArrowRight}"
               ToolTip="{x:Static res:Strings.Go}" Command="{Binding GoCommand}"
               AutomationProperties.AutomationId="Browser.Go" AutomationProperties.Name="{x:Static res:Strings.Go}" />

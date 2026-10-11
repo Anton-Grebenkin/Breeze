@@ -41,4 +41,30 @@
   <data name="ScreenshotTooLarge" xml:space="preserve"><value>The screenshot is larger than 5 MB even as JPEG: read the page with snapshot.</value></data>
   <data name="ScreenshotFailed" xml:space="preserve"><value>The browser did not return a screenshot.</value></data>
   <data name="FeedScreenshot" xml:space="preserve"><value>screenshot</value></data>
+  <data name="UnknownKey" xml:space="preserve"><value>Unknown key '{0}'. Keys: {1}.</value></data>
+  <data name="ScriptFailed" xml:space="preserve"><value>The script failed: {0}</value></data>
+  <data name="ScriptTimedOut" xml:space="preserve"><value>The page did not answer in {0} s: a dialog (alert, confirm) may be open in the browser. Ask the user to close it.</value></data>
+  <data name="NetworkEmpty" xml:space="preserve"><value>No requests yet. They are recorded from when the page opened: reload it to see its first requests.</value></data>
+  <data name="NoSuchRequest" xml:space="preserve"><value>There is no request {0}: take an id from network.</value></data>
+  <data name="NoResponseBody" xml:space="preserve"><value>The browser has no body for request {0}: it failed, was a redirect, or the page has moved on.</value></data>
+  <data name="BinaryBody" xml:space="preserve"><value>(binary content, {0} bytes)</value></data>
+  <data name="TextNotShown" xml:space="preserve"><value>The text '{0}' did not appear in {1} s. The page as it is:</value></data>
+  <data name="EvaluateApprovalTitle" xml:space="preserve"><value>Run a script on the page</value></data>
+  <data name="DevToolsFailed" xml:space="preserve"><value>The browser did not complete {0}: {1}</value></data>
+  <data name="ServerNotReachable" xml:space="preserve"><value>the server does not answer ({0}). Is the app running?</value></data>
+  <data name="FeedPress" xml:space="preserve"><value>key {0}</value></data>
+  <data name="FeedScroll" xml:space="preserve"><value>scroll</value></data>
+  <data name="FeedWaitFor" xml:space="preserve"><value>waiting for '{0}'</value></data>
+  <data name="FeedForward" xml:space="preserve"><value>forward</value></data>
+  <data name="FeedNetwork" xml:space="preserve"><value>network</value></data>
+  <data name="FeedResponse" xml:space="preserve"><value>response {0}</value></data>
+  <data name="FeedEvaluate" xml:space="preserve"><value>script</value></data>
+  <data name="History" xml:space="preserve"><value>History</value></data>
+  <data name="HistoryEmpty" xml:space="preserve"><value>No pages yet</value></data>
+  <data name="AllPages" xml:space="preserve"><value>All Pages…</value></data>
+  <data name="ClearHistory" xml:space="preserve"><value>Clear History</value></data>
+  <data name="OpenRecentCommand" xml:space="preserve"><value>Recent Pages</value></data>
+  <data name="ClearHistoryCommand" xml:space="preserve"><value>Clear History</value></data>
+  <data name="RecentPagesPlaceholder" xml:space="preserve"><value>Find a page by title or address</value></data>
+  <data name="HistoryCleared" xml:space="preserve"><value>Browser history cleared</value></data>
 </root>

@@ -73,6 +73,15 @@ public sealed class AgentOptions
     /// </summary>
     public int? ContextLimit { get; set; }
 
+    /// <summary>
+    /// Model requests per turn before a summary and "Continue" (<c>agent.maxSteps</c>); <c>null</c> for
+    /// <see cref="AgentModes.RequestLimit"/>, bounded by <see cref="AgentModes.MinRequestLimit"/>–<see cref="AgentModes.MaxRequestLimit"/>.
+    /// </summary>
+    public int? MaxSteps { get; set; }
+
+    /// <summary>User hooks by event (<c>agent.hooks</c>, only from the user's settings).</summary>
+    public AgentHookSettings Hooks { get; set; } = new();
+
     /// <summary>Update folder memory after a turn with the helper model (ADR 0012); disable with <c>agent.autoMemory: false</c>.</summary>
     public bool AutoMemory { get; set; } = true;
 

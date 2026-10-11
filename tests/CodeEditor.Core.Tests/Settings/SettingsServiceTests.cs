@@ -35,6 +35,7 @@ public sealed class SettingsServiceTests : IDisposable
         services.AddSingleton<IUiDispatcher, InlineUiDispatcher>();
         services.AddSingleton<ISettingsService, SettingsService>();
         services.AddSettingsSection<SampleOptions>("sample");
+        services.AddUserOnlySetting("sample.size");
         _services = services.BuildServiceProvider();
     }
 
@@ -86,6 +87,28 @@ public sealed class SettingsServiceTests : IDisposable
 
         Assert.Equal("user", Sample.CurrentValue.Name);
     }
+
+    // A folder's file comes with someone else's repository: it cannot set what only the user may, such as the agent's
+    // permissions or the API address.
+    [Fact]
+    public void FolderSettings_CannotSetUserOnlyKeys()
+    {
+        _fileSystem.AddFile(FolderFile, "{ \"sample.size\": 99, \"sample\": { \"name\": \"folder\" } }");
+        var workspace = _services.GetRequiredService<IWorkspace>();
+        _ = Settings;
+
+        workspace.Open(Repo);
+
+        Assert.Equal((16, "folder"), (Sample.CurrentValue.Size, Sample.CurrentValue.Name));
+    }
+
+    [Theory]
+    [InlineData("terminal:allowedCommands", true)]
+    [InlineData("TERMINAL:ALLOWEDCOMMANDS:0", true)]
+    [InlineData("terminal:allowedCommandsExtra", false)]
+    [InlineData("terminal:fontSize", false)]
+    public void UserOnlySetting_CoversItsKeyAndItems(string key, bool covered) =>
+        Assert.Equal(covered, new UserOnlySetting("terminal.allowedCommands").Covers(key));
 
     [Fact]
     public void BrokenFile_KeepsLastGoodValues_AndReportsError()

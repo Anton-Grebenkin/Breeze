@@ -2,6 +2,7 @@ using System.Collections.Frozen;
 using System.Globalization;
 using CodeEditor.Core.Files;
 using CodeEditor.Modules.Agent.Contracts.Files;
+using CodeEditor.Modules.Agent.Resources;
 using Microsoft.Extensions.AI;
 
 namespace CodeEditor.Modules.Agent.Services.Attachments;
@@ -46,12 +47,18 @@ public sealed class AttachmentReader(IFileSystem fileSystem, IWorkspace workspac
         Task.Run(() => Classify(path), cancellationToken);
 
     /// <summary>Message content: a block per text file, a label and a picture per image.</summary>
-    public Task<IReadOnlyList<AIContent>> ReadAsync(IReadOnlyList<string> paths, CancellationToken cancellationToken)
+    public Task<IReadOnlyList<AIContent>> ReadAsync(IReadOnlyList<string> paths, CancellationToken cancellationToken) =>
+        ReadAsync(paths, seesImages: true, cancellationToken);
+
+    /// <param name="seesImages">
+    /// The model takes pictures; otherwise an image goes as a note only: a model without vision may reject the request.
+    /// </param>
+    public Task<IReadOnlyList<AIContent>> ReadAsync(IReadOnlyList<string> paths, bool seesImages, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(paths);
         return paths.Count == 0
             ? Task.FromResult<IReadOnlyList<AIContent>>([])
-            : Task.Run<IReadOnlyList<AIContent>>(() => [.. paths.SelectMany(ReadOrNote)], cancellationToken);
+            : Task.Run<IReadOnlyList<AIContent>>(() => [.. paths.SelectMany(path => ReadOrNote(path, seesImages))], cancellationToken);
     }
 
     /// <summary>Path for the model and the feed: workspace-relative, or full outside the workspace.</summary>
@@ -96,11 +103,11 @@ public sealed class AttachmentReader(IFileSystem fileSystem, IWorkspace workspac
     private static bool IsText(byte[] bytes) => bytes.AsSpan(0, Math.Min(bytes.Length, ProbeBytes)).IndexOf((byte)0) < 0;
 
     // The file may have been deleted or locked after attaching: the model learns it is missing and the turn goes on.
-    private List<AIContent> ReadOrNote(string path)
+    private List<AIContent> ReadOrNote(string path, bool seesImages)
     {
         try
         {
-            return [.. Read(path)];
+            return [.. Read(path, seesImages)];
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
         {
@@ -111,11 +118,14 @@ public sealed class AttachmentReader(IFileSystem fileSystem, IWorkspace workspac
     private static TextContent NotAttached(string name) =>
         new($"<attachment path=\"{name}\">(not attached: the file is missing, too large or not a text file)</attachment>");
 
-    private IEnumerable<AIContent> Read(string path)
+    private IEnumerable<AIContent> Read(string path, bool seesImages)
     {
         var name = Display(path).Replace('"', '\'');
         switch (Classify(path))
         {
+            case AttachmentKind.Image when !seesImages:
+                yield return new TextContent($"<attachment path=\"{name}\" type=\"image\">{Strings.ImageNotForModel}</attachment>");
+                break;
             case AttachmentKind.Image:
                 yield return new TextContent($"<attachment path=\"{name}\" type=\"image\" />");
                 yield return new DataContent(fileSystem.ReadAllBytes(path), ImageTypes[Path.GetExtension(path)]) { Name = name };

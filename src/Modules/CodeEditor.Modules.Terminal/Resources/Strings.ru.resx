@@ -39,7 +39,7 @@
   <data name="BackgroundRunning" xml:space="preserve"><value>Фоновая команда #{0} идёт ({1} с).</value></data>
   <data name="BackgroundExited" xml:space="preserve"><value>Фоновая команда #{0} завершилась с кодом {1} за {2} с.</value></data>
   <data name="BackgroundStopped" xml:space="preserve"><value>Фоновая команда #{0} остановлена через {1} с.</value></data>
-  <data name="BackgroundHowTo" xml:space="preserve"><value>Новый вывод — command_output(id: {0}), остановить — stop_command(id: {0}).</value></data>
+  <data name="BackgroundHowTo" xml:space="preserve"><value>Новый вывод — command_output(id: {0}), остановить — stop_command(id: {0}). Когда она завершится, придёт заметка.</value></data>
   <data name="BackgroundNoNewOutput" xml:space="preserve"><value>(нового вывода нет)</value></data>
   <data name="BackgroundDropped" xml:space="preserve"><value>(первые строки уже не хранятся: {0}; весь вывод — в канале «Команды»)</value></data>
   <data name="BackgroundLimit" xml:space="preserve"><value>Не запущено: уже идут {0} фоновые команды. Сначала останови одну через stop_command.</value></data>
@@ -101,4 +101,13 @@
   <data name="ProfileWindowsPowerShell" xml:space="preserve"><value>Windows PowerShell</value></data>
   <data name="ProfileCommandPrompt" xml:space="preserve"><value>Командная строка</value></data>
   <data name="ProfileGitBash" xml:space="preserve"><value>Git Bash</value></data>
+  <data name="BackgroundFinishedNote" xml:space="preserve"><value>{0} Команда: {1}. Вывод — command_output(id: {2}).</value></data>
+  <data name="BackgroundJobHowTo" xml:space="preserve"><value>Отчёт будет по завершении: command_output(id: {0}, timeoutSeconds: 300) дождётся его, остановить — stop_command(id: {0}). О завершении придёт заметка, так что пока можно заняться другим.</value></data>
+  <data name="BackgroundLastLine" xml:space="preserve"><value>Последняя строка вывода: {0}</value></data>
+  <data name="MovedToBackgroundByUser" xml:space="preserve"><value>Пользователь перевёл вызов в фон: не жди его, продолжай задачу; о завершении придёт заметка.</value></data>
+  <data name="TestsNoneMatched" xml:space="preserve"><value>Тесты ({0}): ни один тест не подошёл под фильтр за {1} с, ничего не проверено. Фильтр — часть имени класса или метода теста.</value></data>
+  <data name="DetailNoTests" xml:space="preserve"><value>нет подходящих тестов</value></data>
+  <data name="BuildLocked" xml:space="preserve"><value>Сборка не смогла перезаписать файлы, занятые {0}: видимо, приложение ещё запущено. Останови его (или попроси пользователя закрыть) и собери снова; без этого сборка упадёт так же.</value></data>
+  <data name="BuildLockedByBackground" xml:space="preserve"><value>Сборка не смогла перезаписать файлы, занятые {0}, — его запустила фоновая команда #{1} (`{2}`). Останови её через stop_command(id: {1}) и собери снова; после сборки запусти заново, если она ещё нужна.</value></data>
+  <data name="RunningBackgroundCommands" xml:space="preserve"><value>Идут фоновые команды: {0}.</value></data>
 </root>

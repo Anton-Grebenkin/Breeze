@@ -29,6 +29,9 @@ public static class GitCommands
     // Short hash, date, author, refs; the subject on the next line, indented.
     private const string LogFormat = "--format=%h %ad %an%d%n    %s";
 
+    /// <summary>log options that choose which branches to walk: safe, unlike other options.</summary>
+    private static readonly string[] LogRefs = ["--all", "--branches", "--remotes", "--tags"];
+
     public static IReadOnlyList<string> ReadActions { get; } = [Status, Diff, Log, Show, Blame];
 
     public static IReadOnlyList<string> ChangeActions { get; } = [Commit, CreateBranch, Switch, Stash, StashPop, Restore, Push];
@@ -47,7 +50,7 @@ public static class GitCommands
         {
             Status => ["status", "--short", "--branch"],
             Diff => ["diff", "--stat", "--patch", .. Flag(request.Staged, "--staged"), .. Revision(request.Revision), .. Paths(request.Path)],
-            Log => ["log", "-n", Count(request.MaxCount), "--date=short", LogFormat, .. Revision(request.Revision), .. Paths(request.Path)],
+            Log => ["log", "-n", Count(request.MaxCount), "--date=short", LogFormat, .. LogRevision(request.Revision), .. Paths(request.Path)],
             Show => ["show", "--stat", "--patch", "--date=short", .. Revision(request.Revision ?? "HEAD"), .. Paths(request.Path)],
             Blame => ["blame", "--date=short", .. Lines(request), "--", Required(request.Path, Blame, "path")],
             _ => throw Unknown(request.Action, ReadActions),
@@ -87,6 +90,9 @@ public static class GitCommands
     private static IReadOnlyList<string> Paths(string? path) => path is null ? [] : ["--", path];
 
     private static IReadOnlyList<string> Revision(string? revision) => revision is null ? [] : [Name(revision, "revision")];
+
+    private static IReadOnlyList<string> LogRevision(string? revision) =>
+        revision?.Trim() is { } value && LogRefs.Contains(value, StringComparer.Ordinal) ? [value] : Revision(revision);
 
     private static IReadOnlyList<string> Lines(GitRead request) => request.StartLine is { } start
         ? ["-L", request.EndLine is { } end ? Invariant($"{start},{end}") : Invariant($"{start},")]

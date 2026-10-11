@@ -25,4 +25,5 @@ public static class AgentCommandIds
     public const string OpenRules = "agent.openRules";
     public const string PickExplorerModel = "agent.pickExplorerModel";
     public const string PickAdvisorModel = "agent.pickAdvisorModel";
+    public const string MoveToBackground = "agent.moveToBackground";
 }

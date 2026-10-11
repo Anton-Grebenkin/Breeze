@@ -58,7 +58,7 @@
   <data name="FoundIgnoringIndent" xml:space="preserve"><value>{0}: фрагмент найден без учёта отступов (строки {1}–{2}), отступы приведены к стилю файла — проверьте результат.</value></data>
   <data name="FoundIgnoringTypography" xml:space="preserve"><value>{0}: фрагмент найден без учёта отступов и разницы тире, кавычек и особых пробелов (строки {1}–{2}); неизменённые строки сохранили знаки файла — проверьте результат.</value></data>
   <data name="AndMore" xml:space="preserve"><value> и дальше</value></data>
-  <data name="FragmentAmbiguous" xml:space="preserve"><value>{0}: фрагмент oldText встречается несколько раз (строки {1}{2}). Добавьте соседние строки, чтобы он стал единственным.</value></data>
+  <data name="FragmentAmbiguous" xml:space="preserve"><value>{0}: фрагмент oldText встречается несколько раз (строки {1}{2}). Сделайте его уникальным соседней строкой (часто — сигнатурой выше) или укажите line — строку, где начинается нужное вхождение (в apply_patch — сигнатуру в строке «@@»). Каждое вхождение со строками выше:</value></data>
   <data name="FragmentNotFound" xml:space="preserve"><value>{0}: фрагмент oldText не найден. Прочитайте файл заново (read_file) и скопируйте фрагмент точно, без номеров строк.</value></data>
   <data name="FragmentSimilarAt" xml:space="preserve"><value>{0}: фрагмент oldText не найден целиком. Похожее место начинается в строке {1}:</value></data>
   <data name="CopyFragmentExactly" xml:space="preserve"><value>Скопируйте фрагмент из файла точно, без номеров строк.</value></data>

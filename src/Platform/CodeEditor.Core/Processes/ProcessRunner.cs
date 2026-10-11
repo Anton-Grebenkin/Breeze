@@ -7,8 +7,8 @@ using CodeEditor.Core.Resources;
 namespace CodeEditor.Core.Processes;
 
 /// <summary>
-/// Windowless process with output redirected as UTF-8. Input is closed right away, so a command waiting for user
-/// input gets end-of-input instead of hanging. Cancellation and timeout kill the whole process tree (builds start
+/// Windowless process with output redirected as UTF-8. Input gets the request's text, if any, and is closed, so a
+/// command waiting for user input gets end-of-input instead of hanging. Cancellation and timeout kill the whole process tree (builds start
 /// MSBuild nodes, tests start hosts).
 /// </summary>
 public sealed class ProcessRunner : IProcessRunner
@@ -33,12 +33,31 @@ public sealed class ProcessRunner : IProcessRunner
             throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Strings.ProcessStartFailed, request.FileName, exception.Message), exception);
         }
 
-        process.StandardInput.Close();
+        // Output is read before input is written: a child that answers while reading would otherwise fill the pipe.
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
+        await WriteInputAsync(process, request.Input);
 
         var timedOut = await WaitAsync(process, request.Timeout, cancellationToken);
         return new ProcessResult(timedOut ? -1 : process.ExitCode, output.Text, timedOut, Stopwatch.GetElapsedTime(started));
+    }
+
+    // Bytes go to the pipe itself: a writer's buffer left after a broken pipe would throw again when disposed.
+    private static async Task WriteInputAsync(Process process, string? input)
+    {
+        try
+        {
+            if (input is not null)
+            {
+                await process.StandardInput.BaseStream.WriteAsync(Encoding.UTF8.GetBytes(input));
+            }
+
+            process.StandardInput.Close();
+        }
+        catch (IOException)
+        {
+            // The process exited without reading its input.
+        }
     }
 
     /// <returns><c>true</c> if the timeout expired and the process was killed.</returns>

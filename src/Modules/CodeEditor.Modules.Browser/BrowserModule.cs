@@ -1,8 +1,10 @@
+using CodeEditor.Core.Commands;
 using CodeEditor.Core.Modules;
 using CodeEditor.Core.Settings;
 using CodeEditor.Modules.Agent.Contracts;
 using CodeEditor.Modules.Agent.Contracts.Approvals;
 using CodeEditor.Modules.Agent.Contracts.Feed;
+using CodeEditor.Modules.Browser.Commands;
 using CodeEditor.Modules.Browser.Resources;
 using CodeEditor.Modules.Browser.Services;
 using CodeEditor.Modules.Browser.ViewModels;
@@ -31,6 +33,10 @@ public sealed class BrowserModule : IModule
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddSettingsSection<BrowserOptions>(BrowserOptions.Section);
+        services.AddUserOnlySetting(BrowserApprovals.AllowedHostsKey);
+        services.AddSingleton<BrowserHistory>();
+        services.AddSingleton<BrowserNetworkLog>();
+        services.AddSingleton<BrowserPageActions>();
         services.AddSingleton<BrowserViewModel>();
         services.AddSingleton<BrowserAgentTools>();
         services.AddSingleton<IAgentToolProvider>(provider => provider.GetRequiredService<BrowserAgentTools>());
@@ -40,10 +46,13 @@ public sealed class BrowserModule : IModule
         services.AddSingleton<IWebPageOpener, BrowserPageOpener>();
     }
 
-    public void Contribute(IServiceProvider services) =>
+    public void Contribute(IServiceProvider services)
+    {
         _registrations.Add(services.GetRequiredService<IToolWindowRegistry>().Register(new ToolWindowDefinition(
             ToolWindowId, Strings.ModuleName, IconNames.Browser, ToolWindowLocation.Editor, services.GetRequiredService<BrowserViewModel>)
         {
             Order = 10,
         }));
+        _registrations.AddRange(new BrowserCommands(services.GetRequiredService<BrowserViewModel>).Register(services.GetRequiredService<ICommandRegistry>()));
+    }
 }

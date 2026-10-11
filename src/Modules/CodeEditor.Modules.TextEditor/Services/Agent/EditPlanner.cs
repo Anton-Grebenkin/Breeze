@@ -11,9 +11,10 @@ namespace CodeEditor.Modules.TextEditor.Services.Agent;
 
 /// <summary>
 /// Plans agent edits against the current text (including unsaved changes). Guards first: the file is not a secret or
-/// in a service folder, the agent has read it and it hasn't changed since, and the size is reasonable. Fragments are
-/// located by <see cref="FragmentLocator"/>; line endings follow the file (models write <c>\n</c>, files may be CRLF).
-/// Both the preview and the edit itself are built from the plan.
+/// in a service folder, the agent has read it and it hasn't changed since (after a context compaction, fragments found
+/// exactly once are enough), and the size is reasonable. Fragments are located by <see cref="FragmentLocator"/>, a line
+/// hint picks among repeated ones; line endings follow the file (models write <c>\n</c>, files may be CRLF). Both the
+/// preview and the edit itself are built from the plan.
 /// </summary>
 public sealed class EditPlanner(IWorkspace workspace, IFileSystem fileSystem, IDocumentService documents, IUiDispatcher dispatcher, IAgentFileState fileState)
 {
@@ -52,12 +53,12 @@ public sealed class EditPlanner(IWorkspace workspace, IFileSystem fileSystem, ID
         var relative = workspace.RelativePath(path);
         SensitivePaths.EnsureWritable(relative);
         var text = await ReadTextAsync(path, relative);
-        if (fileState.CheckEditable(path, relative, text) is { } problem)
+        var crlf = text.Contains("\r\n", StringComparison.Ordinal);
+        if (fileState.CheckEditable(path, relative, text) is { } problem && !(fileState.WasForgotten(path) && AllFoundOnce(text, edits, crlf)))
         {
             throw new AgentToolException(problem);
         }
 
-        var crlf = text.Contains("\r\n", StringComparison.Ordinal);
         var located = edits.Select(edit => Locate(text, edit, relative, crlf)).OrderBy(fragment => fragment.Offset).ToList();
         var replacements = located.Select(fragment => new TextReplacement(fragment.Offset, fragment.Length, fragment.NewText)).ToList();
         EnsureNoOverlap(replacements, relative);
@@ -83,9 +84,15 @@ public sealed class EditPlanner(IWorkspace workspace, IFileSystem fileSystem, ID
             return new LocatedFragment(first, oldText.Length, newText, null);
         }
 
-        var fragment = FragmentLocator.Locate(start == 0 ? text : text[start..], oldText, newText, relative);
+        var fragment = start == 0 ? FragmentLocator.Locate(text, oldText, newText, relative, edit.Line) : FragmentLocator.Locate(text[start..], oldText, newText, relative);
         return fragment with { Offset = fragment.Offset + start };
     }
+
+    // Compaction took the file text out of the conversation, but fragments found exactly once show the model still
+    // knows it: reading the file again would only cost a step.
+    private static bool AllFoundOnce(string text, IReadOnlyList<FileEdit> edits, bool crlf) =>
+        edits.All(edit => edit.Anchors.Count == 0 && !string.IsNullOrEmpty(edit.OldText) && Normalize(edit.OldText, crlf) is var old
+            && text.IndexOf(old, StringComparison.Ordinal) is var first and >= 0 && text.IndexOf(old, first + 1, StringComparison.Ordinal) < 0);
 
     /// <summary>Search start: the line after the last anchor; anchors match in order, each below the previous.</summary>
     private static int BelowAnchors(string text, IReadOnlyList<string> anchors, string relative)

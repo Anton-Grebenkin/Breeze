@@ -7,6 +7,7 @@ using CodeEditor.Modules.Agent.Contracts;
 using CodeEditor.Modules.Agent.Contracts.Approvals;
 using CodeEditor.Modules.Agent.Contracts.Context;
 using CodeEditor.Modules.Agent.Contracts.Feed;
+using CodeEditor.Modules.Agent.Contracts.Turn;
 using CodeEditor.Modules.Agent.Contracts.Verification;
 using CodeEditor.Modules.Terminal.Commands;
 using CodeEditor.Modules.Terminal.Resources;
@@ -40,15 +41,19 @@ public sealed class TerminalModule : IModule
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddSettingsSection<TerminalOptions>(TerminalOptions.Section);
+        services.AddUserOnlySetting(CommandApprovals.AllowedCommandsKey);
         services.AddSingleton<IAgentApprovalPolicy, CommandApprovals>();
         services.TryAddSingleton(TimeProvider.System);
         services.AddSingleton<SaveBeforeRun>();
         services.AddSingleton<DotNetTarget>();
         services.AddSingleton<DotNetBuild>();
         services.AddSingleton<DotNetTests>();
+        services.AddSingleton<BuildLockHints>();
         services.AddSingleton<IAgentToolProvider, BuildAgentTools>();
         services.AddSingleton<IAgentVerifier, DotNetVerifier>();
         services.AddSingleton<BackgroundCommands>();
+        services.AddSingleton<IAgentTurnNotes, BackgroundCommandNotes>();
+        services.AddSingleton<IAgentRunningJobs, RunningJobs>();
         services.AddSingleton<IAgentToolProvider, BackgroundCommandTools>();
         services.AddSingleton<IAgentContextProvider, BackgroundCommandsContext>();
         services.AddSingleton<CommandAgentTools>();

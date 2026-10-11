@@ -13,7 +13,7 @@ public sealed class BuildAndTestsTests : IDisposable
     private readonly Dictionary<string, AIFunction> _tools;
 
     public BuildAndTestsTests() =>
-        _tools = new BuildAgentTools(_fixture.Build, _fixture.Tests, _fixture.Workspace, _verification).CreateTools().OfType<AIFunction>().ToDictionary(tool => tool.Name);
+        _tools = new BuildAgentTools(_fixture.Build, _fixture.Tests, _fixture.Workspace, _verification, _fixture.Background, new BuildLockHints(_fixture.Background), _fixture.Activity).CreateTools().OfType<AIFunction>().ToDictionary(tool => tool.Name);
 
     public void Dispose() => _fixture.Dispose();
 

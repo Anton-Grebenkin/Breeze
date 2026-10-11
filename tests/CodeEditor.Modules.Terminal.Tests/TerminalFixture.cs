@@ -40,6 +40,9 @@ internal sealed class TerminalFixture : IDisposable
 
     public BackgroundCommands Background { get; }
 
+    /// <summary>The feed side of tool calls: output lines and the "To background" click.</summary>
+    public FakeToolActivity Activity { get; } = new();
+
     public FakeFileSystem FileSystem { get; }
 
     public Workspace Workspace { get; }
@@ -68,6 +71,7 @@ internal sealed class TerminalFixture : IDisposable
     public void Dispose()
     {
         Background.Dispose();
+        Activity.Dispose();
         Build.Dispose();
         Documents.Dispose();
         Index.Dispose();

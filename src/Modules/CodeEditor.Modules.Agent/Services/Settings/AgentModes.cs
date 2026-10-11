@@ -9,8 +9,13 @@ namespace CodeEditor.Modules.Agent.Services.Settings;
 /// </summary>
 public static class AgentModes
 {
-    /// <summary>Model requests per turn; the last one is summary only, without tools.</summary>
-    public const int RequestLimit = 50;
+    /// <summary>Model requests per turn by default; the last one is summary only, without tools.</summary>
+    public const int RequestLimit = 100;
+
+    /// <summary>Bounds of <c>agent.maxSteps</c>.</summary>
+    public const int MinRequestLimit = 10;
+
+    public const int MaxRequestLimit = 500;
 
     public static IReadOnlyList<AgentMode> All { get; } = [AgentMode.Agent, AgentMode.Deep, AgentMode.Ask, AgentMode.Plan];
 
@@ -19,6 +24,13 @@ public static class AgentModes
     /// <c>agent.mode: deep</c> in settings or by the benchmark, but the UI does not offer it.
     /// </summary>
     public static IReadOnlyList<AgentMode> Selectable { get; } = [AgentMode.Agent, AgentMode.Ask, AgentMode.Plan];
+
+    /// <summary>The turn's request limit: <c>agent.maxSteps</c> within bounds, or <see cref="RequestLimit"/>.</summary>
+    public static int RequestLimitOf(AgentOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        return Math.Clamp(options.MaxSteps ?? RequestLimit, MinRequestLimit, MaxRequestLimit);
+    }
 
     /// <summary>The mode changes code: edits, commands, build and tests are allowed.</summary>
     public static bool CanChange(AgentMode mode) => mode is AgentMode.Agent or AgentMode.Deep;

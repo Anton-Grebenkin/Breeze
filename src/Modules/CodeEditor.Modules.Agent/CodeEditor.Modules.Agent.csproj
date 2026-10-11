@@ -30,6 +30,7 @@
     <Using Include="CodeEditor.Modules.Agent.Services.Conversation" />
     <Using Include="CodeEditor.Modules.Agent.Services.Deep" />
     <Using Include="CodeEditor.Modules.Agent.Services.History" />
+    <Using Include="CodeEditor.Modules.Agent.Services.Hooks" />
     <Using Include="CodeEditor.Modules.Agent.Services.Http" />
     <Using Include="CodeEditor.Modules.Agent.Services.Memory" />
     <Using Include="CodeEditor.Modules.Agent.Services.Models" />
@@ -37,6 +38,7 @@
     <Using Include="CodeEditor.Modules.Agent.Services.Settings" />
     <Using Include="CodeEditor.Modules.Agent.Services.Tools" />
     <Using Include="CodeEditor.Modules.Agent.Services.Turn" />
+    <Using Include="CodeEditor.Modules.Agent.Services.Watchdog" />
     <Using Include="CodeEditor.Modules.Agent.Services.Web" />
     <Using Include="CodeEditor.Modules.Agent.ViewModels.Activity" />
     <Using Include="CodeEditor.Modules.Agent.ViewModels.Approvals" />

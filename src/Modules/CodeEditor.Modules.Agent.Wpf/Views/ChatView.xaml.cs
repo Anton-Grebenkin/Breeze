@@ -68,6 +68,49 @@ public sealed partial class ChatView
         }
     }
 
+    // Files and pictures from Windows, the explorer, an editor tab or a browser; plain text is left to the input box.
+    private void OnPreviewDragOver(object sender, DragEventArgs e)
+    {
+        if (_viewModel is null || !AttachmentData.HasAttachable(e.Data))
+        {
+            return;
+        }
+
+        e.Effects = DragDropEffects.Copy;
+        e.Handled = true;
+        DropHint.Visibility = Visibility.Visible;
+    }
+
+    // Leave also fires when the pointer moves between children: hide only when it is outside the chat.
+    private void OnPreviewDragLeave(object sender, DragEventArgs e)
+    {
+        var point = e.GetPosition(this);
+        if (point.X <= 0 || point.Y <= 0 || point.X >= ActualWidth || point.Y >= ActualHeight)
+        {
+            DropHint.Visibility = Visibility.Collapsed;
+        }
+    }
+
+    private void OnPreviewDrop(object sender, DragEventArgs e)
+    {
+        DropHint.Visibility = Visibility.Collapsed;
+        if (_viewModel is null || !AttachmentData.HasAttachable(e.Data))
+        {
+            return;
+        }
+
+        e.Handled = true;
+        var attachments = _viewModel.Attachments;
+        if (AttachmentData.Files(e.Data) is { Count: > 0 } files)
+        {
+            _ = attachments.AddAsync(files);
+        }
+        else if (AttachmentData.Png(e.Data) is { } png)
+        {
+            _ = attachments.AddImageAsync(png);
+        }
+    }
+
     private void OnMoreClick(object sender, RoutedEventArgs e)
     {
         if (MoreButton.ContextMenu is not { } menu)

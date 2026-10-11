@@ -1,5 +1,6 @@
 using System.Globalization;
 using CodeEditor.Modules.Agent.Contracts.Context;
+using CodeEditor.Modules.Agent.Resources;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -10,7 +11,8 @@ namespace CodeEditor.Modules.Agent.Services.Prompts;
 /// The user message to the agent: text, a <c>&lt;context&gt;</c> block (date and module contributions such as the open
 /// file and selected lines) and a <c>&lt;reminder&gt;</c> (as in Copilot: it works better next to the request) with the
 /// current mode and the model family adjustment. Volatile data lives here in the last message, not in the system
-/// prompt, so the earlier conversation stays unchanged and cacheable by the provider.
+/// prompt, so the earlier conversation stays unchanged and cacheable by the provider. A <c>UserPromptSubmit</c> hook
+/// may stop the message or add a <c>&lt;hook_context&gt;</c> block (<see cref="HookRunner"/>).
 /// </summary>
 public sealed partial class TurnMessageBuilder(
     IEnumerable<IAgentContextProvider> providers,
@@ -18,13 +20,15 @@ public sealed partial class TurnMessageBuilder(
     AttachmentReader attachments,
     IOptionsMonitor<AgentOptions> options,
     TimeProvider time,
-    ILogger<TurnMessageBuilder> logger)
+    ILogger<TurnMessageBuilder> logger,
+    HookRunner? hooks = null)
 {
     /// <param name="startsChat">The chat's first message: it carries the folder snapshot and memory note list (ADR 0012).</param>
     /// <param name="previousMode">Mode of this chat's previous request; <c>null</c> if none or unknown.</param>
     /// <param name="files">Attached files, placed right after the request text (<see cref="AttachmentReader"/>).</param>
     public async Task<ChatMessage> BuildAsync(string text, bool includeActiveEditor, bool startsChat, AgentMode? previousMode, IReadOnlyList<string> files, CancellationToken cancellationToken)
     {
+        var hooked = await PromptHooksAsync(text, cancellationToken);
         var lines = new List<string> { string.Create(CultureInfo.InvariantCulture, $"Date: {time.GetLocalNow():yyyy-MM-dd}.") };
         var request = new AgentContextRequest(includeActiveEditor, text);
         foreach (var provider in providers)
@@ -32,15 +36,35 @@ public sealed partial class TurnMessageBuilder(
             lines.AddRange(await CollectAsync(provider, request, cancellationToken));
         }
 
-        List<AIContent> contents = [new TextContent(text), .. await attachments.ReadAsync(files, cancellationToken)];
+        var seesImages = ModelProfiles.For(options.CurrentValue.Model).SeesImages;
+        List<AIContent> contents = [new TextContent(text), .. await attachments.ReadAsync(files, seesImages, cancellationToken)];
         if (startsChat)
         {
             contents.AddRange((await start.BuildAsync(cancellationToken)).Select(block => new TextContent(block)));
         }
 
+        if (hooked is { Length: > 0 })
+        {
+            contents.Add(new TextContent($"<hook_context>\n{hooked}\n</hook_context>"));
+        }
+
         contents.Add(new TextContent($"<context>\n{string.Join('\n', lines)}\n</context>"));
         contents.Add(new TextContent($"<reminder>{Reminder(options.CurrentValue, text, previousMode)}</reminder>"));
         return new ChatMessage(ChatRole.User, contents);
+    }
+
+    /// <exception cref="HookBlockedException">A hook stopped the message.</exception>
+    private async Task<string?> PromptHooksAsync(string text, CancellationToken cancellationToken)
+    {
+        if (hooks is null || !hooks.Has(HookEvents.UserPromptSubmit))
+        {
+            return null;
+        }
+
+        var outcome = await hooks.RunAsync(HookEvents.UserPromptSubmit, options.CurrentValue.Mode, tool: null, HookInputs.Prompt(text), cancellationToken);
+        return outcome.Blocked
+            ? throw new HookBlockedException(string.Format(CultureInfo.CurrentCulture, Strings.HookBlockedPrompt, outcome.Message ?? Strings.HookNoReason))
+            : outcome.Message;
     }
 
     // Mode change, mode, item check for multi-requirement requests, family reminder, request language and, for

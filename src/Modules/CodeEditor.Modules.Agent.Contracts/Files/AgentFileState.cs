@@ -59,6 +59,8 @@ public sealed class AgentFileState : IAgentFileState
         return version == Version(currentText) ? null : Format(Strings.FileChangedSinceRead, relativePath);
     }
 
+    public bool WasForgotten(string path) => !_known.ContainsKey(path) && _forgotten.ContainsKey(path);
+
     private static string Format(string format, string relativePath) =>
         string.Format(CultureInfo.CurrentCulture, format, relativePath);
 

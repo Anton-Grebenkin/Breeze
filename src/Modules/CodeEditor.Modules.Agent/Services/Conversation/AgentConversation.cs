@@ -2,7 +2,6 @@ using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
 using System.Text.Json;
 using CodeEditor.Modules.Agent.Contracts;
-using CodeEditor.Modules.Agent.Rules;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -28,13 +27,11 @@ public sealed partial class AgentConversation : IDisposable
     private readonly ExploreAgent _explore;
     private readonly ReadOnlyToolSet _readTools;
     private readonly TranscriptRecorder _transcript;
-    private readonly DeepSupervisor _deep;
     private readonly PromptCacheMonitor _cache;
     private readonly PromptCacheKey _cacheKey;
     private readonly CacheWarmup _warmups;
-    private readonly UserMessageQueue _queue;
-    private readonly ProjectRuleGuard? _rules;
-    private readonly ContextMeter _meter = new();
+    private readonly ToolGuards _guards;
+    private readonly ContextMeter _meter;
     private readonly SemaphoreSlim _writeLock = new(1, 1);
     private IChatClient? _client;
     private IChatClient? _summaryClient;
@@ -55,26 +52,24 @@ public sealed partial class AgentConversation : IDisposable
         IEnumerable<IAgentToolProvider> toolProviders,
         TurnBudget budget,
         ContextCompaction compaction,
+        ContextMeter meter,
         ExploreAgent explore,
         ReadOnlyToolSet readTools,
         TranscriptRecorder transcript,
-        DeepSupervisor deep,
         PromptCacheKey cacheKey,
         CacheWarmup warmups,
-        UserMessageQueue queue,
-        ILogger<AgentConversation> logger,
-        ProjectRuleGuard? rules = null)
+        ToolGuards guards,
+        ILogger<AgentConversation> logger)
     {
-        _rules = rules;
+        _guards = guards;
         _cacheKey = cacheKey;
         _warmups = warmups;
-        _queue = queue;
         _budget = budget;
         _compaction = compaction;
+        _meter = meter;
         _explore = explore;
         _readTools = readTools;
         _transcript = transcript;
-        _deep = deep;
         _clients = clients;
         _options = options;
         _prompt = prompt;
@@ -263,7 +258,7 @@ public sealed partial class AgentConversation : IDisposable
         var model = _clients.Create(options);
         _warmup = _warmups.Wrap(model, options);
         var summaries = new CompactionModels(model, () => _cache.LastOptions, _summaryClient);
-        return new DetachedMessagesChatClient(new ChatClientBuilder(new LoggingChatClient(_warmup ?? model, options.Model, _cache, _meter, _logger))
+        return new DetachedMessagesChatClient(new ChatClientBuilder(new ModelHistoryChatClient(new LoggingChatClient(_warmup ?? model, options.Model, _cache, _meter, _logger), options.Endpoint, options.Model))
             .UseAIContextProviders(_compaction.CreateProvider(options, summaries, _meter))
             .Build());
     }
@@ -278,7 +273,7 @@ public sealed partial class AgentConversation : IDisposable
         if (agent.GetService<FunctionInvokingChatClient>() is { } invoker)
         {
             invoker.AllowConcurrentInvocation = true;
-            invoker.MaximumIterationsPerRequest = AgentModes.RequestLimit + 1;
+            invoker.MaximumIterationsPerRequest = AgentModes.MaxRequestLimit + 1;
         }
     }
 
@@ -290,7 +285,7 @@ public sealed partial class AgentConversation : IDisposable
         List<AITool> tools = [.. Tools.Concat(_toolProviders.SelectMany(provider => provider.CreateTools())).Where(tool => profile.Allows(tool.Name))];
         _readTools.Update(tools);
         tools.Add(_explore.CreateTool());
-        return [.. tools.Select(tool => tool is AIFunction function ? new GuardedToolFunction(function, _budget, _writeLock, _logger, _deep, _queue, _rules) : tool)];
+        return [.. tools.Select(tool => tool is AIFunction function ? new GuardedToolFunction(function, _budget, _writeLock, _logger, _guards) : tool)];
     }
 
     [LoggerMessage(Level = LogLevel.Information,

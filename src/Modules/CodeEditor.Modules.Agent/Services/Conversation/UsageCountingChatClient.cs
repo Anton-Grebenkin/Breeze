@@ -18,18 +18,25 @@ internal sealed class UsageCountingChatClient(IChatClient inner, HelperUsage usa
         ChatOptions? options = null,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
+        // Each request counts once, with its last report.
         var accumulator = new UsageAccumulator();
+        UsageDetails? pending = null;
         await foreach (var update in base.GetStreamingResponseAsync(messages, options, cancellationToken))
         {
             foreach (var content in update.Contents.OfType<UsageContent>())
             {
-                Count(accumulator.Add(content.Details));
+                if (!accumulator.Revises(content.Details))
+                {
+                    Count(pending);
+                }
+
+                pending = content.Details;
             }
 
             yield return update;
         }
 
-        Count(accumulator.Flush());
+        Count(pending);
     }
 
     private void Count(UsageDetails? details)

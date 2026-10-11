@@ -110,4 +110,40 @@ public static class BrowserScripts
           return { ok: true };
         })({{JsonSerializer.Serialize(reference)}}, {{JsonSerializer.Serialize(text)}}, {{(submit ? "true" : "false")}})
         """;
+
+    /// <summary>Focuses a snapshot element before a key press: <c>{ ok, error }</c>.</summary>
+    public static string Focus(string reference) => $$"""
+        (ref => {
+          const el = document.querySelector(`[data-agent-ref="${CSS.escape(ref)}"]`);
+          if (!el) return { ok: false, error: 'not found' };
+          el.scrollIntoView({ block: 'center' });
+          if (el.focus) el.focus();
+          return { ok: true };
+        })({{JsonSerializer.Serialize(reference)}})
+        """;
+
+    /// <summary>
+    /// Scrolls to a snapshot element, or the page by most of a screen (<c>down</c>, <c>up</c>) or to its <c>top</c> or
+    /// <c>bottom</c>: <c>{ ok, error }</c>.
+    /// </summary>
+    public static string Scroll(string? reference, string? direction) => $$"""
+        ((ref, direction) => {
+          if (ref) {
+            const el = document.querySelector(`[data-agent-ref="${CSS.escape(ref)}"]`);
+            if (!el) return { ok: false, error: 'not found' };
+            el.scrollIntoView({ block: 'center' });
+            return { ok: true };
+          }
+          const step = Math.round(innerHeight * 0.8);
+          if (direction === 'up') scrollBy(0, -step);
+          else if (direction === 'top') scrollTo(0, 0);
+          else if (direction === 'bottom') scrollTo(0, document.documentElement.scrollHeight);
+          else scrollBy(0, step);
+          return { ok: true };
+        })({{JsonSerializer.Serialize(reference)}}, {{JsonSerializer.Serialize(direction ?? "down")}})
+        """;
+
+    /// <summary>The page text contains the text: <c>true</c> or <c>false</c>.</summary>
+    public static string HasText(string text) =>
+        $"(text => !!document.body && document.body.innerText.includes(text))({JsonSerializer.Serialize(text)})";
 }

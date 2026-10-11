@@ -226,7 +226,7 @@ Notes from earlier chats; the agent sees this list at the start of every chat. T
   <data name="ThinkingFor" xml:space="preserve"><value>Thinking · {0}</value></data>
   <data name="ThoughtFor" xml:space="preserve"><value>Thought for {0}</value></data>
   <data name="PlanReady" xml:space="preserve"><value>The plan is ready. Run it in Agent mode; refine it with a message.</value></data>
-  <data name="StepLimitNotice" xml:space="preserve"><value>Reached the limit of {0} model requests per turn: above is the summary so far. Continue with the button or a message.</value></data>
+  <data name="StepLimitNotice" xml:space="preserve"><value>Reached the limit of {0} model requests per turn: above is the summary so far. Continue with the button or a message; the limit is set by agent.maxSteps.</value></data>
   <data name="QuestionWithdrawnNote" xml:space="preserve"><value>(question withdrawn)</value></data>
   <data name="QuestionWithdrawn" xml:space="preserve"><value>Question withdrawn</value></data>
   <data name="QuestionAnswered" xml:space="preserve"><value>Answer: {0}</value></data>
@@ -325,7 +325,7 @@ Notes from earlier chats; the agent sees this list at the start of every chat. T
   <data name="AllowForChat" xml:space="preserve"><value>Allow for this chat</value></data>
   <data name="AllowForChatToolTip" xml:space="preserve"><value>Use this tool without asking for the rest of this chat</value></data>
   <data name="AllowAlways" xml:space="preserve"><value>Always allow “{0}”</value></data>
-  <data name="AllowAlwaysToolTip" xml:space="preserve"><value>Run commands starting with these words without asking, in every chat. The rule is saved to terminal.allowedCommands in your settings.</value></data>
+  <data name="AllowAlwaysToolTip" xml:space="preserve"><value>Allow this without asking in every chat. The rule is saved to your settings.json, where you can remove it.</value></data>
   <data name="AttachmentToolTip" xml:space="preserve"><value>The agent saw which file was open</value></data>
   <data name="Waiting" xml:space="preserve"><value>Thinking…</value></data>
   <data name="Continue" xml:space="preserve"><value>Continue</value></data>
@@ -432,4 +432,26 @@ The agent gets the text when it reads or edits a matching file.
 </value></data>
   <data name="ApiKeyDialogPromptCustom" xml:space="preserve"><value>Paste the API key of {0} (the agent.endpoint setting). The service must support the OpenAI Chat Completions API with tool calls and streaming; the agent is tested with AITUNNEL.</value></data>
   <data name="PickLinkedFile" xml:space="preserve"><value>Several files match "{0}": pick one</value></data>
+  <data name="ModelDoesNotSeeImages" xml:space="preserve"><value>The model {0} does not take images: it gets only the file names. Pick a model with vision to show it a picture.</value></data>
+  <data name="DropToAttach" xml:space="preserve"><value>Drop to attach to the message</value></data>
+  <data name="WatchdogSameError" xml:space="preserve"><value>{0} failed on {1} with the same error as before. Don't repeat the call as is: read the error, check the input (path, exact text, arguments) and change the call; for an ambiguous edit, include unique neighbouring lines or edit one occurrence at a time.</value></data>
+  <data name="WatchdogStuck" xml:space="preserve"><value>{0} has failed on {1} {2} times with the same error. Stop repeating it: say in one line what blocks you, then take another way (another tool, a smaller step, rewriting the whole method or file) or ask the user with ask_user.</value></data>
+  <data name="WatchdogFailureStreak" xml:space="preserve"><value>The last {0} tool calls failed. Pause: sum up what you tried and why it failed, then choose a different approach or ask the user.</value></data>
+  <data name="WatchdogSlowRun" xml:space="preserve"><value>This run took {0}. Long runs keep the user waiting: try a narrow filter or unit tests first, start a long suite with a short waitSeconds and keep working while it runs, and ask the user before running the whole suite again.</value></data>
+  <data name="WatchdogCheckpoint" xml:space="preserve"><value>Checkpoint: {0} of {1} steps used in this turn. If the task is moving forward (plan items done, fewer errors), go on; if you keep repeating failing steps, change the approach or ask the user.</value></data>
+  <data name="WatchdogSeconds" xml:space="preserve"><value>{0} s</value></data>
+  <data name="RunningJobsPrompt" xml:space="preserve"><value>Before the summary: your background runs are still going: {0}. Wait for their reports with command_output(id, timeoutSeconds: 300) and act on them. If the user moved a run to the background or asked not to wait, don't wait: say in the summary that it is still running.</value></data>
+  <data name="RunningJobsStatus" xml:space="preserve"><value>Background runs are still going — the agent waits for their results</value></data>
+  <data name="MoveToBackground" xml:space="preserve"><value>To background</value></data>
+  <data name="MoveToBackgroundToolTip" xml:space="preserve"><value>Stop waiting: the process goes on in the background, the agent goes on with the task</value></data>
+  <data name="CommandMoveToBackground" xml:space="preserve"><value>Move running step to background</value></data>
+  <data name="NothingToMoveToBackground" xml:space="preserve"><value>No running step can go to the background.</value></data>
+  <data name="ImageNotForModel" xml:space="preserve"><value>(image not shown: the current model does not take images)</value></data>
+  <data name="RunWithoutAsking" xml:space="preserve"><value>Edits and commands without asking</value></data>
+  <data name="HookBlockedTool" xml:space="preserve"><value>A user hook blocked this call: {0}</value></data>
+  <data name="HookNoReason" xml:space="preserve"><value>(the hook gave no reason)</value></data>
+  <data name="HookFeedback" xml:space="preserve"><value>A user hook reports on this result: {0}</value></data>
+  <data name="HookBlockedPrompt" xml:space="preserve"><value>A hook stopped the message: {0}</value></data>
+  <data name="HookStopPrompt" xml:space="preserve"><value>A user hook asks you not to finish yet: {0}</value></data>
+  <data name="HookStopStatus" xml:space="preserve"><value>Stop hook: the agent goes on</value></data>
 </root>

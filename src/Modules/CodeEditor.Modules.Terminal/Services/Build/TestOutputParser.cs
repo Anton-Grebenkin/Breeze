@@ -31,6 +31,11 @@ public static partial class TestOutputParser
             {
                 (failed, passed, skipped, total, parsed) = (failed + Number(summary, "failed"), passed + Number(summary, "passed"), skipped + Number(summary, "skipped"), total + Number(summary, "total"), true);
             }
+            else if (NoTestsMatched().IsMatch(lines[i]))
+            {
+                // Nothing matched the filter in this project: zero tests, not "no totals" for the whole run.
+                parsed = true;
+            }
             else if (MtpCounter().Match(lines[i]) is { Success: true } counter)
             {
                 parsed = true;
@@ -77,6 +82,9 @@ public static partial class TestOutputParser
 
     [GeneratedRegex(@"^\s*(?<name>total|failed|succeeded|skipped):\s*(?<value>\d+)\s*$", RegexOptions.CultureInvariant)]
     private static partial Regex MtpCounter();
+
+    [GeneratedRegex(@"No test matches the given testcase filter|Zero tests ran|No test is available in", RegexOptions.CultureInvariant)]
+    private static partial Regex NoTestsMatched();
 
     [GeneratedRegex(@"Failed:\s*(?<failed>\d+),\s*Passed:\s*(?<passed>\d+),\s*Skipped:\s*(?<skipped>\d+),\s*Total:\s*(?<total>\d+)", RegexOptions.CultureInvariant)]
     private static partial Regex VsTestSummary();

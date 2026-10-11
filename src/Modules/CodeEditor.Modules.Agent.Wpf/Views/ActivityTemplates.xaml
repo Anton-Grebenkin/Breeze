@@ -4,7 +4,8 @@
                     xmlns:views="clr-namespace:CodeEditor.Modules.Agent.Wpf.Views"
                     xmlns:ui="clr-namespace:CodeEditor.UI.Themes;assembly=CodeEditor.UI"
                     xmlns:controls="clr-namespace:CodeEditor.UI.Controls;assembly=CodeEditor.UI"
-                    xmlns:markdown="clr-namespace:CodeEditor.UI.Markdown;assembly=CodeEditor.UI">
+                    xmlns:markdown="clr-namespace:CodeEditor.UI.Markdown;assembly=CodeEditor.UI"
+                    xmlns:res="clr-namespace:CodeEditor.Modules.Agent.Resources;assembly=CodeEditor.Modules.Agent">
 
   <!-- Agent work block as a chain (ADR 0010): reasoning, progress, tools, checks. The rail runs through the step
        icons; new steps fade in over 120 ms, expanding takes 120 ms. -->
@@ -166,22 +167,42 @@
            grid is left-aligned, so a short title does not push the result to the right edge. -->
       <controls:AutomationBorder Grid.Column="1" Grid.RowSpan="3" Margin="4,0,0,4"
                                  AutomationProperties.AutomationId="Agent.Tool" AutomationProperties.Name="{Binding Message.Text}">
-        <Grid HorizontalAlignment="Left">
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="Auto" />
-          </Grid.ColumnDefinitions>
-          <TextBlock x:Name="Plain" Style="{StaticResource Activity.Text}" Text="{Binding Message.Text, Mode=OneWay}" ToolTip="{Binding Message.Text}" />
-          <TextBlock x:Name="Linked" Style="{StaticResource Activity.Text}" Visibility="Collapsed">
-            <Hyperlink TextDecorations="{x:Null}" Foreground="{DynamicResource Brush.Text.Secondary}" ToolTip="{Binding Message.Tool.FilePath}"
-                       Tag="{Binding Message.Tool.FilePath}"
-                       AutomationProperties.AutomationId="Agent.Tool.File">
-              <Run Text="{Binding Message.Text, Mode=OneWay}" />
-            </Hyperlink>
-          </TextBlock>
-          <TextBlock Grid.Column="1" Margin="8,0,0,0" Style="{StaticResource Activity.Text}" TextTrimming="None"
-                     FontSize="{DynamicResource FontSize.Small}" Text="{Binding Message.Tool.Detail, Mode=OneWay}" />
-        </Grid>
+        <StackPanel>
+          <Grid HorizontalAlignment="Left">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock x:Name="Plain" Style="{StaticResource Activity.Text}" Text="{Binding Message.Text, Mode=OneWay}" ToolTip="{Binding Message.Text}" />
+            <TextBlock x:Name="Linked" Style="{StaticResource Activity.Text}" Visibility="Collapsed">
+              <Hyperlink TextDecorations="{x:Null}" Foreground="{DynamicResource Brush.Text.Secondary}" ToolTip="{Binding Message.Tool.FilePath}"
+                         Tag="{Binding Message.Tool.FilePath}"
+                         AutomationProperties.AutomationId="Agent.Tool.File">
+                <Run Text="{Binding Message.Text, Mode=OneWay}" />
+              </Hyperlink>
+            </TextBlock>
+            <TextBlock Grid.Column="1" Margin="8,0,0,0" Style="{StaticResource Activity.Text}" TextTrimming="None"
+                       FontSize="{DynamicResource FontSize.Small}" Text="{Binding Message.Tool.Detail, Mode=OneWay}" />
+          </Grid>
+          <!-- A slow call: "1 min 5 s", its last output line and "To background" for a tool waiting for a process. -->
+          <Grid x:Name="Progress" Visibility="Collapsed">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="Auto" />
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Style="{StaticResource Activity.Text}" FontSize="{DynamicResource FontSize.Small}"
+                       Text="{Binding Message.Tool.Elapsed, Mode=OneWay}" AutomationProperties.AutomationId="Agent.Tool.Elapsed" />
+            <TextBlock Grid.Column="1" Margin="8,0,0,0" Style="{StaticResource Activity.Text}" FontFamily="{DynamicResource Font.Code}"
+                       FontSize="{DynamicResource FontSize.Small}" Text="{Binding Message.Tool.Output, Mode=OneWay}" ToolTip="{Binding Message.Tool.Output}"
+                       AutomationProperties.AutomationId="Agent.Tool.Output" />
+            <Button Grid.Column="2" Margin="8,0,0,0" Padding="4,0" Style="{StaticResource Button.Subtle}" VerticalAlignment="Top"
+                    Content="{x:Static res:Strings.MoveToBackground}" ToolTip="{x:Static res:Strings.MoveToBackgroundToolTip}"
+                    Command="{Binding Message.Tool.MoveToBackgroundCommand}"
+                    Visibility="{Binding Message.Tool.CanMoveToBackground, Converter={StaticResource Activity.BoolToVisibility}}"
+                    AutomationProperties.AutomationId="Agent.Tool.MoveToBackground" />
+          </Grid>
+        </StackPanel>
       </controls:AutomationBorder>
     </Grid>
     <DataTemplate.Triggers>
@@ -194,6 +215,9 @@
       <DataTrigger Binding="{Binding Message.Tool.HasFile}" Value="True">
         <Setter TargetName="Plain" Property="Visibility" Value="Collapsed" />
         <Setter TargetName="Linked" Property="Visibility" Value="Visible" />
+      </DataTrigger>
+      <DataTrigger Binding="{Binding Message.Tool.HasProgress}" Value="True">
+        <Setter TargetName="Progress" Property="Visibility" Value="Visible" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Message.Tool.IsFailure}" Value="True">
         <Setter TargetName="Icon" Property="Text" Value="{x:Static ui:IconGlyphs.Error}" />

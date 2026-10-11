@@ -13,12 +13,14 @@ public sealed class AcceptEditsTests : IDisposable
 {
     private readonly AgentFixture _fixture = new();
     private readonly string _path = Path.Combine(AgentFixture.Root, "a.cs");
+    private readonly FileTools _tools;
 
     public AcceptEditsTests()
     {
         _fixture.Workspace.Open(AgentFixture.Root);
         _fixture.FileSystem.AddFile(_path, "void Run() { }\n");
-        _fixture.ToolProviders.Add(new FileTools(_fixture));
+        _tools = new FileTools(_fixture);
+        _fixture.ToolProviders.Add(_tools);
     }
 
     private ChatViewModel Chat => _fixture.Chat;
@@ -149,6 +151,23 @@ public sealed class AcceptEditsTests : IDisposable
         Assert.True(Chat.Changes.RevertAllCommand.CanExecute(null));
     }
 
+    // "Edits and commands without asking": a changing tool runs at once, but deletion still asks.
+    [Fact]
+    public async Task FullMode_RunsChangesWithoutCards_ButAsksBeforeDeleting()
+    {
+        _fixture.Options.Set(new AgentOptions { Model = AgentFixture.TestModel, Approvals = AgentApprovals.Full });
+        _fixture.Client.CallTool("c1", "run_script", Args("build.ps1")).CallTool("c2", "delete_file", Args("a.cs")).Reply("Готово.");
+
+        var sending = Send("собери и удали");
+        var card = await WaitForCardAsync();
+        card.RejectCommand.Execute(null);
+        await sending;
+
+        Assert.True(_tools.RanScript);
+        Assert.Equal("delete_file", card.ToolName);
+        Assert.True(_fixture.FileSystem.FileExists(_path));
+    }
+
     private async Task EditInAutoModeAsync()
     {
         AcceptEdits();
@@ -191,7 +210,16 @@ public sealed class AcceptEditsTests : IDisposable
             new ApprovalRequiredAIFunction(AIFunctionFactory.Create(Edit, "apply_edits")),
             new ApprovalRequiredAIFunction(AIFunctionFactory.Create(Create, "create_file")),
             new ApprovalRequiredAIFunction(AIFunctionFactory.Create(Delete, "delete_file")),
+            new ApprovalRequiredAIFunction(AIFunctionFactory.Create(RunScript, "run_script")),
         ];
+
+        public bool RanScript { get; private set; }
+
+        private string RunScript(string path)
+        {
+            RanScript = path.Length > 0;
+            return "ok";
+        }
 
         private string Edit(string path)
         {

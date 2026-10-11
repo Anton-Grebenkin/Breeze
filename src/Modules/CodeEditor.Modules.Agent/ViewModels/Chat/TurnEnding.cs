@@ -9,14 +9,12 @@ internal static class TurnEnding
 {
     public static string PlanReadyNotice => Strings.PlanReady;
 
-    private static string StepLimitNotice => string.Format(CultureInfo.CurrentCulture, Strings.StepLimitNotice, AgentModes.RequestLimit);
-
     /// <summary>Request limit → Continue; a plan in Plan mode → hand-off to Agent mode.</summary>
     public static void AddNotice(ObservableCollection<ChatMessageViewModel> messages, AgentTurn turn, AgentMode mode)
     {
         if (turn.ReachedStepLimit)
         {
-            messages.Add(new ChatMessageViewModel(ChatMessageKind.Notice, StepLimitNotice));
+            messages.Add(new ChatMessageViewModel(ChatMessageKind.Notice, string.Format(CultureInfo.CurrentCulture, Strings.StepLimitNotice, turn.StepLimit)));
         }
         else if (mode == AgentMode.Plan && messages.Count > 0 && messages[^1].Kind == ChatMessageKind.Assistant)
         {

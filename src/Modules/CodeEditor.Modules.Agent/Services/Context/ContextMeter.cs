@@ -18,14 +18,27 @@ public sealed class ContextMeter
     private readonly Lock _lock = new();
     private int _sent;
     private double _ratio = 1;
+    private long _lastInput;
+    private int _lastSent;
+
+    /// <summary>
+    /// A request is about to go to the model: its size in tokens, for the context ring. Counted from the last request's
+    /// real input plus what the history gained or lost since (a tool result, a compaction): the ratio alone is bounded
+    /// and would undercount a young chat, where the system prompt is most of the input. Raised on the request's thread.
+    /// </summary>
+    public event EventHandler<long>? Estimated;
 
     /// <summary>History estimate of the request being sent to the model (after compaction).</summary>
     public void Sent(int estimate)
     {
+        long tokens;
         lock (_lock)
         {
             _sent = estimate;
+            tokens = _lastInput > 0 ? Math.Max(0, _lastInput + (long)((estimate - _lastSent) * _ratio)) : (long)(estimate * _ratio);
         }
+
+        Estimated?.Invoke(this, tokens);
     }
 
     /// <summary>The request's input tokens as reported by the model.</summary>
@@ -36,6 +49,8 @@ public sealed class ContextMeter
             if (_sent > 0 && inputTokens > 0)
             {
                 _ratio = Math.Clamp(inputTokens / (double)_sent, MinRatio, MaxRatio);
+                _lastInput = inputTokens;
+                _lastSent = _sent;
             }
         }
     }
@@ -49,13 +64,18 @@ public sealed class ContextMeter
         }
     }
 
-    /// <summary>New or opened chat: the correction starts over.</summary>
+    /// <summary>
+    /// New or opened chat: the correction starts over. Another model keeps it: tokenizers differ by a tenth or two,
+    /// while starting over would drop the system prompt from the estimate.
+    /// </summary>
     public void Reset()
     {
         lock (_lock)
         {
             _sent = 0;
             _ratio = 1;
+            _lastInput = 0;
+            _lastSent = 0;
         }
     }
 }

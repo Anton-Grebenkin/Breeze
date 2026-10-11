@@ -76,7 +76,8 @@ public sealed partial class ChatSession : ObservableObject, IDisposable
     {
         _run?.Dispose();
         _run = new CancellationTokenSource();
-        var turn = new AgentTurn(Messages, _services, _approvedTools, _options.CurrentValue.Approvals == AgentApprovals.Auto);
+        var options = _options.CurrentValue;
+        var turn = new AgentTurn(Messages, _services, _approvedTools, options.Approvals, AgentModes.RequestLimitOf(options));
         var started = _services.Log.TurnStarted(CurrentId, length, attachment, files);
         IsBusy = true;
         var completed = false;

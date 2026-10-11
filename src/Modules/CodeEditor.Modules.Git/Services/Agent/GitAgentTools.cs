@@ -57,7 +57,7 @@ public sealed class GitAgentTools(GitRunner git, IWorkspace workspace, IAgentOut
     private async Task<string> ReadAsync(
         [Description("status, diff, log, show or blame.")] string action,
         [Description("File or folder relative to the workspace root: limits diff, log and show; required for blame.")] string? path = null,
-        [Description("diff: compare with this commit or branch (main, HEAD~1); log: a range such as main..HEAD; show: the commit (default HEAD).")] string? revision = null,
+        [Description("diff: compare with this commit or branch (main, HEAD~1); log: a range such as main..HEAD, or --all for every branch; show: the commit (default HEAD).")] string? revision = null,
         [Description("diff: staged changes instead of the working tree.")] bool staged = false,
         [Description("log: number of commits, up to 100; default 20.")] int maxCount = GitCommands.DefaultLogCount,
         [Description("blame: first line of the range.")] int? startLine = null,

@@ -5,6 +5,7 @@ using CodeEditor.Core.Output;
 using CodeEditor.Modules.Agent.Contracts;
 using CodeEditor.Modules.Agent.Contracts.Approvals;
 using CodeEditor.Modules.Agent.Contracts.Files;
+using CodeEditor.Modules.Agent.Contracts.Turn;
 using CodeEditor.Modules.Terminal.Resources;
 using Microsoft.Extensions.AI;
 
@@ -26,7 +27,8 @@ public sealed class CommandAgentTools(
     IOutputService output,
     SaveBeforeRun saveBeforeRun,
     IAgentOutputStore outputs,
-    BackgroundCommands background) : IAgentToolProvider, IAgentChangePreviewer
+    BackgroundCommands background,
+    IAgentToolActivity activity) : IAgentToolProvider, IAgentChangePreviewer
 {
     public const string RunCommandName = "run_command";
     public static string ChannelName => Strings.Commands;
@@ -42,7 +44,7 @@ public sealed class CommandAgentTools(
             "Runs a Windows PowerShell 5.1 command in the workspace (or the cwd folder). Waits up to waitSeconds (default 30) and returns the exit code and output; " +
             "a command still running then keeps running in the background: you get its id and the output so far — wait for more with command_output (it can wait for a line matching a regex), stop it with stop_command. " +
             "Use waitSeconds about 5 to start servers and watchers, up to 600 for long one-off jobs. " +
-            "Read-only commands (listing files, dotnet --info) run without asking; others need the user's approval, and the user can allow a command prefix permanently. " +
+            "Read-only commands (listings, reading files named outright, git, dotnet and docker reads, checks of localhost) run without asking; others need the user's approval, and the user can allow a command prefix permanently. " +
             "Use cwd instead of cd; && and || work. Prefer build and run_tests for building and testing, git for the repository, read_file and search_text for reading and searching files. " +
             "No interactive input: the command gets end of input. Long output is saved to a file: you get its start and end and the path.")),
     ];
@@ -68,10 +70,16 @@ public sealed class CommandAgentTools(
         await saveBeforeRun.SaveAsync(cancellationToken);
         var channel = output.GetOrCreate(ChannelName);
         channel.AppendLine($"> {command}");
-        var started = background.Start(PowerShellLauncher.Request(command, folder, Timeout.InfiniteTimeSpan), command, channel.AppendLine);
+        var call = activity.Current();
+        var release = call.OfferBackground();
+        var started = background.Start(PowerShellLauncher.Request(command, folder, Timeout.InfiniteTimeSpan), command, line =>
+        {
+            channel.AppendLine(line);
+            call.Report(line);
+        });
         try
         {
-            await started.WaitAsync(pattern: null, TimeSpan.FromSeconds(Math.Clamp(waitSeconds, 0, MaxWaitSeconds)), cancellationToken);
+            await started.WaitAsync(pattern: null, TimeSpan.FromSeconds(Math.Clamp(waitSeconds, 0, MaxWaitSeconds)), cancellationToken, release);
         }
         catch (OperationCanceledException)
         {
@@ -80,9 +88,9 @@ public sealed class CommandAgentTools(
             throw;
         }
 
-        if (started.IsRunning)
+        if (started.TryDetach())
         {
-            return outputs.Fit(background.Report(started, started.ReadNew()), RunCommandName);
+            return outputs.Fit(background.Report(started, started.ReadNew(), release.IsCancellationRequested), RunCommandName);
         }
 
         background.Forget(started.Id);

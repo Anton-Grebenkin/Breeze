@@ -23,6 +23,7 @@ public sealed class AgentCommands(
     ICommandService commandService,
     ProjectMemory memory,
     ProjectInstructions rules,
+    RunningToolCalls runningCalls,
     Func<ChatViewModel> chat) : IDisposable
 {
     private static string Category => Strings.AgentTitle;
@@ -51,6 +52,7 @@ public sealed class AgentCommands(
         AddPanel(commands, AgentCommandIds.ExecutePlan, Strings.ExecutePlan, panel => panel.ExecutePlanCommand.Execute(null));
         AddPanel(commands, AgentCommandIds.AcceptChanges, Strings.CommandAcceptChanges, panel => panel.Changes.AcceptCommand.Execute(null));
         AddPanel(commands, AgentCommandIds.RevertChanges, Strings.CommandRevertChanges, panel => panel.Changes.RevertAllCommand.Execute(null));
+        Add(commands, AgentCommandIds.MoveToBackground, Strings.CommandMoveToBackground, MoveToBackground);
         _registrations.Add(commands.Register(new CommandDefinition(AgentCommandIds.OpenMemory, Strings.CommandOpenMemory, (_, _) => OpenMemoryAsync(), Category)));
         _registrations.Add(commands.Register(new CommandDefinition(AgentCommandIds.OpenRules, Strings.CommandOpenRules, (_, _) => OpenRulesAsync(), Category)));
 
@@ -125,6 +127,15 @@ public sealed class AgentCommands(
 
         apiKey.Set(key);
         statusBar.Message = Strings.ApiKeySaved;
+    }
+
+    // The palette twin of the feed row's "To background" button.
+    private void MoveToBackground()
+    {
+        if (runningCalls.MoveAllToBackground() == 0)
+        {
+            statusBar.Message = Strings.NothingToMoveToBackground;
+        }
     }
 
     private void ClearApiKey()
