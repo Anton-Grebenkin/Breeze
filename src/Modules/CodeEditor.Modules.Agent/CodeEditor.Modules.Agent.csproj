@@ -37,6 +37,7 @@
     <Using Include="CodeEditor.Modules.Agent.Services.Settings" />
     <Using Include="CodeEditor.Modules.Agent.Services.Tools" />
     <Using Include="CodeEditor.Modules.Agent.Services.Turn" />
+    <Using Include="CodeEditor.Modules.Agent.Services.Watchdog" />
     <Using Include="CodeEditor.Modules.Agent.Services.Web" />
     <Using Include="CodeEditor.Modules.Agent.ViewModels.Activity" />
     <Using Include="CodeEditor.Modules.Agent.ViewModels.Approvals" />

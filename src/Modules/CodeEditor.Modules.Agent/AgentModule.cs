@@ -2,12 +2,14 @@ using CodeEditor.Core.Commands;
 using CodeEditor.Core.Menus;
 using CodeEditor.Core.Modules;
 using CodeEditor.Core.Settings;
+using CodeEditor.Core.Threading;
 using CodeEditor.Modules.Agent.Commands;
 using CodeEditor.Modules.Agent.Contracts;
 using CodeEditor.Modules.Agent.Contracts.Approvals;
 using CodeEditor.Modules.Agent.Contracts.Context;
 using CodeEditor.Modules.Agent.Contracts.Feed;
 using CodeEditor.Modules.Agent.Contracts.Files;
+using CodeEditor.Modules.Agent.Contracts.Turn;
 using CodeEditor.Modules.Agent.Contracts.Verification;
 using CodeEditor.Modules.Agent.Resources;
 using CodeEditor.Modules.Agent.Rules;
@@ -43,6 +45,10 @@ public sealed class AgentModule : IModule
         services.AddSingleton<PromptCacheKey>();
         services.AddSingleton<IChatClientFactory, OpenAIChatClientFactory>();
         services.AddSingleton<TurnBudget>();
+        services.AddSingleton<TurnWatchdog>();
+        services.AddSingleton<ToolCallObservers>();
+        services.AddSingleton<RunningToolCalls>();
+        services.AddSingleton<IAgentToolActivity>(provider => provider.GetRequiredService<RunningToolCalls>());
         services.AddSingleton<HelperUsage>();
         services.AddSingleton<CacheWarmup>();
         services.AddSingleton<UserMessageQueue>();
@@ -52,6 +58,7 @@ public sealed class AgentModule : IModule
         services.AddSingleton<TurnChecks>();
         services.AddSingleton<AgentFileState>();
         services.AddSingleton<IAgentFileState>(provider => provider.GetRequiredService<AgentFileState>());
+        services.AddSingleton<ToolGuards>();
         services.AddSingleton<AgentConversation>();
         services.AddSingleton<ApprovalCards>();
         services.AddSingleton<ChatHistoryStore>();
@@ -133,7 +140,11 @@ public sealed class AgentModule : IModule
             provider.GetRequiredService<DeepSupervisor>(),
             provider.GetRequiredService<MemoryExtractor>(),
             provider.GetRequiredService<UserMessageQueue>(),
-            provider.GetRequiredService<ToolImages>()));
+            provider.GetRequiredService<ToolImages>(),
+            provider.GetRequiredService<ToolCallObservers>(),
+            provider.GetRequiredService<RunningToolCalls>(),
+            provider.GetRequiredService<IUiDispatcher>(),
+            provider.GetRequiredService<TimeProvider>()));
         services.AddSingleton<ChatSession>();
         services.AddSingleton<ChatViewModel>();
         services.AddSingleton(provider => new AgentCommands(
@@ -143,6 +154,7 @@ public sealed class AgentModule : IModule
             provider.GetRequiredService<ICommandService>(),
             provider.GetRequiredService<ProjectMemory>(),
             provider.GetRequiredService<ProjectInstructions>(),
+            provider.GetRequiredService<RunningToolCalls>(),
             provider.GetRequiredService<ChatViewModel>));
     }
 

@@ -27,6 +27,11 @@ public static class TestReportText
             return Format(Strings.TestsNotStarted, report.Target, report.BuildErrors.Count);
         }
 
+        if (report.NoTests)
+        {
+            return Format(Strings.TestsNoneMatched, report.Target, seconds);
+        }
+
         return report.Parsed
             ? Format(Strings.TestsSummary, report.Target, report.Passed, report.Total, report.Failed, report.Skipped, seconds)
             : Format(Strings.TestsNoTotals, report.Target, seconds);

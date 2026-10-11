@@ -11,6 +11,7 @@ namespace CodeEditor.Modules.Agent.ViewModels.Chat;
 /// </summary>
 internal sealed class TurnFeed(ObservableCollection<ChatMessageViewModel> messages, AgentTurnServices services)
 {
+    private readonly Dictionary<string, ToolRowViewModel> _rows = new(StringComparer.Ordinal);
     private ResponseState? _round;
     private ChatMessageViewModel? _lastAnswer;
 
@@ -18,6 +19,9 @@ internal sealed class TurnFeed(ObservableCollection<ChatMessageViewModel> messag
 
     /// <summary>The service reported token usage; otherwise the session estimates it from the text.</summary>
     public bool UsageReported { get; private set; }
+
+    /// <summary>The row of a tool call in this turn, for its live progress (<see cref="LiveToolRows"/>).</summary>
+    public ToolRowViewModel? RowOf(string callId) => _rows.GetValueOrDefault(callId);
 
     /// <summary>
     /// Starts a model round with a placeholder answer at the end of the feed; continuing a cut-off answer reuses it.
@@ -65,6 +69,7 @@ internal sealed class TurnFeed(ObservableCollection<ChatMessageViewModel> messag
                 ToolCalls++;
                 CloseRound(response);
                 var row = new ToolRowViewModel(services.ToolViews.Describe(call));
+                _rows[call.CallId] = row;
                 response.Tools[call.CallId] = (InsertBefore(response.Answer, new ChatMessageViewModel(ChatMessageKind.Tool, row.Title) { Tool = row, IsInProgress = true }), call);
                 break;
             case FunctionResultContent result when response.Tools.TryGetValue(result.CallId, out var finished):
@@ -175,6 +180,7 @@ internal sealed class TurnFeed(ObservableCollection<ChatMessageViewModel> messag
     private static void Finish(ChatMessageViewModel message, Contracts.Feed.AgentToolView view)
     {
         message.Tool!.Update(view);
+        message.Tool.EndProgress();
         message.Text = view.Title;
         message.IsInProgress = false;
     }

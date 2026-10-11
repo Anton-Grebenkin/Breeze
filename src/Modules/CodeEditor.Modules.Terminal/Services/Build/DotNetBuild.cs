@@ -30,7 +30,11 @@ public sealed partial class DotNetBuild(
     /// <summary>Raised on a background thread when a build finishes.</summary>
     public event EventHandler? Completed;
 
-    public async Task<BuildReport> BuildAsync(string? project, CancellationToken cancellationToken)
+    public Task<BuildReport> BuildAsync(string? project, CancellationToken cancellationToken) =>
+        BuildAsync(project, onLine: null, cancellationToken);
+
+    /// <param name="onLine">Each output line, besides the Build channel (the agent feed row); on background threads.</param>
+    public async Task<BuildReport> BuildAsync(string? project, Action<string>? onLine, CancellationToken cancellationToken)
     {
         var path = target.Resolve(project);
         var relative = workspace.RelativePath(path);
@@ -46,7 +50,11 @@ public sealed partial class DotNetBuild(
                 {
                     Environment = DotNetEnvironment.Variables,
                 },
-                channel.AppendLine,
+                line =>
+                {
+                    channel.AppendLine(line);
+                    onLine?.Invoke(line);
+                },
                 cancellationToken);
 
             var report = new BuildReport(relative, result.ExitCode == 0, MsBuildOutputParser.Parse(result.Output), result.Elapsed, time.GetLocalNow())

@@ -34,7 +34,11 @@ public sealed partial class DotNetTests(
 
     /// <param name="project">Test project; <c>null</c> runs all except UI tests.</param>
     /// <param name="filter">Part of a test's full name (class or method).</param>
-    public async Task<TestReport> RunAsync(string? project, string? filter, CancellationToken cancellationToken)
+    public Task<TestReport> RunAsync(string? project, string? filter, CancellationToken cancellationToken) =>
+        RunAsync(project, filter, onLine: null, cancellationToken);
+
+    /// <param name="onLine">Each output line, besides the Tests channel (the agent feed row); on background threads.</param>
+    public async Task<TestReport> RunAsync(string? project, string? filter, Action<string>? onLine, CancellationToken cancellationToken)
     {
         var projects = Projects(project);
         await saveBeforeRun.SaveAsync(cancellationToken);
@@ -49,7 +53,11 @@ public sealed partial class DotNetTests(
             var result = await runner.RunAsync(new ProcessRequest(DotNetEnvironment.Executable, Arguments(path, filter), workspace.Root!)
             {
                 Environment = DotNetEnvironment.Variables,
-            }, channel.AppendLine, cancellationToken);
+            }, line =>
+            {
+                channel.AppendLine(line);
+                onLine?.Invoke(line);
+            }, cancellationToken);
             elapsed += result.Elapsed;
             reports.Add(TestOutputParser.Parse(relative, result.Output) with { TimedOut = result.TimedOut, OutputTail = result.Output });
         }
@@ -91,7 +99,7 @@ public sealed partial class DotNetTests(
         List<string> arguments = testingPlatform ? ["test", "--project", project] : ["test", project, "--nologo"];
         if (!string.IsNullOrWhiteSpace(filter))
         {
-            arguments.AddRange(testingPlatform ? ["--filter-method", $"*{filter}*"] : ["--filter", $"FullyQualifiedName~{filter}"]);
+            arguments.AddRange(TestFilter.Arguments(filter, testingPlatform));
         }
 
         return arguments;

@@ -18,5 +18,8 @@ public sealed record TestReport(
 
     public string OutputTail { get; init; } = string.Empty;
 
-    public bool Succeeded => Parsed && Failed == 0 && BuildErrors.Count == 0 && !TimedOut;
+    /// <summary>No test ran: the filter matched nothing. Not a success: nothing was checked.</summary>
+    public bool NoTests => Parsed && Total == 0 && BuildErrors.Count == 0 && !TimedOut;
+
+    public bool Succeeded => Parsed && Total > 0 && Failed == 0 && BuildErrors.Count == 0 && !TimedOut;
 }

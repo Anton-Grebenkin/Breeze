@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using CodeEditor.Modules.Agent.Contracts;
+using CodeEditor.Modules.Agent.Contracts.Turn;
 using CodeEditor.Modules.Terminal.Resources;
 using Microsoft.Extensions.AI;
 
@@ -12,7 +13,7 @@ namespace CodeEditor.Modules.Terminal.Services.Commands;
 /// shells: <c>command_output</c> returns new output, optionally waiting for a regex match or exit; <c>stop_command</c>
 /// stops a command with its child processes. A <c>run_command</c> that outlives its wait continues in the background.
 /// </summary>
-public sealed class BackgroundCommandTools(BackgroundCommands commands, IAgentOutputStore outputs) : IAgentToolProvider
+public sealed class BackgroundCommandTools(BackgroundCommands commands, IAgentOutputStore outputs, IAgentToolActivity activity) : IAgentToolProvider
 {
     public const string CommandOutputName = "command_output";
     public const string StopCommandName = "stop_command";
@@ -44,10 +45,10 @@ public sealed class BackgroundCommandTools(BackgroundCommands commands, IAgentOu
         var wait = Math.Clamp(timeoutSeconds ?? (pattern is null ? 0 : DefaultWaitSeconds), 0, MaxWaitSeconds);
         if (wait > 0)
         {
-            await command.WaitAsync(pattern, TimeSpan.FromSeconds(wait), cancellationToken);
+            await command.WaitAsync(pattern, TimeSpan.FromSeconds(wait), cancellationToken, activity.Current().OfferBackground());
         }
 
-        return outputs.Fit(commands.Report(command, command.ReadNew()), CommandOutputName);
+        return Read(command, CommandOutputName);
     }
 
     private async Task<string> StopCommandAsync([Description("Background command id from run_command.")] int id, CancellationToken cancellationToken = default)
@@ -55,7 +56,15 @@ public sealed class BackgroundCommandTools(BackgroundCommands commands, IAgentOu
         var command = commands.Get(id);
         commands.Stop(id);
         await command.WaitAsync(pattern: null, StopWait, cancellationToken);
-        return outputs.Fit(commands.Report(command, command.ReadNew()), StopCommandName);
+        return Read(command, StopCommandName);
+    }
+
+    // The final status read here needs no separate note (BackgroundCommandNotes).
+    private string Read(BackgroundCommand command, string tool)
+    {
+        var report = commands.Report(command, command.ReadNew());
+        command.IsReported |= !command.IsRunning;
+        return outputs.Fit(report, tool);
     }
 
     private static string Validate(string pattern)

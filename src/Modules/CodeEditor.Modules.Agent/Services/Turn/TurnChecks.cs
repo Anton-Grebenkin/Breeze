@@ -1,4 +1,5 @@
 using System.Globalization;
+using CodeEditor.Modules.Agent.Contracts.Turn;
 using CodeEditor.Modules.Agent.Contracts.Verification;
 using CodeEditor.Modules.Agent.Resources;
 
@@ -10,13 +11,15 @@ namespace CodeEditor.Modules.Agent.Services.Turn;
 /// not the model's self-assessment. An exhausted request limit does not extend the turn; a folder with nothing to
 /// build (<see cref="IAgentVerifier"/>) does not require a build.
 /// </summary>
-public sealed class TurnChecks(VerificationGate gate, TurnBudget budget, IEnumerable<IAgentVerifier> verifiers, TodoList todos, DeepSupervisor deep)
+public sealed class TurnChecks(
+    VerificationGate gate, TurnBudget budget, IEnumerable<IAgentVerifier> verifiers, TodoList todos, DeepSupervisor deep, IEnumerable<IAgentRunningJobs> jobs)
 {
     private AgentMode _mode;
     private bool _remindedOfPlan;
     private bool _remindedOfEmpty;
     private bool _auditDue;
     private bool _remindedOfTextCall;
+    private bool _remindedOfJobs;
 
     /// <param name="request">The user request without harness blocks; decides whether a requirements audit is due.</param>
     public void Begin(AgentMode mode, string? request = null)
@@ -26,6 +29,7 @@ public sealed class TurnChecks(VerificationGate gate, TurnBudget budget, IEnumer
         _remindedOfEmpty = false;
         _auditDue = TaskRequirements.AreSeveral(request);
         _remindedOfTextCall = false;
+        _remindedOfJobs = false;
         gate.Begin();
     }
 
@@ -42,6 +46,11 @@ public sealed class TurnChecks(VerificationGate gate, TurnBudget budget, IEnumer
         if (!truncated && EmptyAnswer(report) is { } empty)
         {
             return empty;
+        }
+
+        if (RunningJobs() is { } running)
+        {
+            return running;
         }
 
         if (!AgentModes.CanChange(_mode))
@@ -122,6 +131,27 @@ public sealed class TurnChecks(VerificationGate gate, TurnBudget budget, IEnumer
         _remindedOfPlan = true;
         var open = string.Join('\n', todos.Render().Split('\n').Where(static line => !line.StartsWith("[x]", StringComparison.Ordinal)));
         return new TurnCheck(string.Format(CultureInfo.CurrentCulture, Strings.OpenPlanItemsPrompt, open), Strings.OpenPlanItemsStatus);
+    }
+
+    /// <summary>
+    /// The summary would come before the result of a build or test run that went to the background (it outlived its
+    /// wait). Once per turn: the user may have moved the run to the background on purpose, the prompt allows not waiting.
+    /// </summary>
+    private TurnCheck? RunningJobs()
+    {
+        if (_remindedOfJobs || budget.IsExhausted)
+        {
+            return null;
+        }
+
+        var running = jobs.SelectMany(static source => source.Running()).ToList();
+        if (running.Count == 0)
+        {
+            return null;
+        }
+
+        _remindedOfJobs = true;
+        return new TurnCheck(string.Format(CultureInfo.CurrentCulture, Strings.RunningJobsPrompt, string.Join(", ", running)), Strings.RunningJobsStatus);
     }
 
     /// <summary>

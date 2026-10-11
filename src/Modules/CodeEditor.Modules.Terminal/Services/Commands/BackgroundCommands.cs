@@ -32,6 +32,9 @@ public sealed partial class BackgroundCommands : IDisposable
         _workspace.Changed += OnWorkspaceChanged;
     }
 
+    /// <summary>A command that went to the background finished; raised on a background thread.</summary>
+    public event EventHandler<BackgroundCommand>? DetachedFinished;
+
     /// <summary>The chat's commands by id, running and finished.</summary>
     public IReadOnlyList<BackgroundCommand> All => [.. _commands.Values.OrderBy(command => command.Id)];
 
@@ -40,15 +43,27 @@ public sealed partial class BackgroundCommands : IDisposable
     {
         ArgumentNullException.ThrowIfNull(request);
         ArgumentNullException.ThrowIfNull(onLine);
-        if (_commands.Values.Count(running => running.IsRunning) >= MaxRunning)
-        {
-            throw new AgentToolException(string.Format(CultureInfo.CurrentCulture, Strings.BackgroundLimit, MaxRunning));
-        }
-
+        EnsureCapacity();
         var started = new BackgroundCommand(Interlocked.Increment(ref _nextId), command, request.WorkingDirectory, _time.GetUtcNow());
         _commands[started.Id] = started;
         _ = RunAsync(started, request with { Timeout = Timeout.InfiniteTimeSpan }, onLine);
         return started;
+    }
+
+    /// <summary>
+    /// Runs a build or test run as a job: <paramref name="run"/> gets a line callback and returns the exit code and the
+    /// report for the model, which becomes the job's output when it finishes.
+    /// </summary>
+    /// <exception cref="AgentToolException"><see cref="MaxRunning"/> background commands are already running.</exception>
+    public BackgroundCommand StartJob(string title, Func<Action<string>, CancellationToken, Task<JobResult>> run, Action<string> onLine)
+    {
+        ArgumentNullException.ThrowIfNull(run);
+        ArgumentNullException.ThrowIfNull(onLine);
+        EnsureCapacity();
+        var job = new BackgroundCommand(Interlocked.Increment(ref _nextId), title, _workspace.Root ?? string.Empty, _time.GetUtcNow()) { IsJob = true };
+        _commands[job.Id] = job;
+        _ = RunJobAsync(job, run, onLine);
+        return job;
     }
 
     /// <exception cref="AgentToolException">No command with this id.</exception>
@@ -75,7 +90,9 @@ public sealed partial class BackgroundCommands : IDisposable
     }
 
     /// <summary>Report for the model: status line, how to continue, new output.</summary>
-    public string Report(BackgroundCommand command, string newOutput) => BackgroundCommandText.Report(command, Elapsed(command), newOutput);
+    /// <param name="movedByUser">The user moved the call to the background from the feed.</param>
+    public string Report(BackgroundCommand command, string newOutput, bool movedByUser = false) =>
+        BackgroundCommandText.Report(command, Elapsed(command), newOutput, movedByUser);
 
     public void StopAll()
     {
@@ -112,7 +129,59 @@ public sealed partial class BackgroundCommands : IDisposable
             command.Finish(null, stopped: false, _time.GetUtcNow());
         }
 
+        Completed(command);
+    }
+
+    private async Task RunJobAsync(BackgroundCommand job, Func<Action<string>, CancellationToken, Task<JobResult>> run, Action<string> onLine)
+    {
+        try
+        {
+            var result = await run(line =>
+            {
+                job.LastLine = line;
+                onLine(line);
+            }, job.Cancellation.Token);
+            foreach (var line in result.Report.Split('\n'))
+            {
+                job.Append(line.TrimEnd('\r'));
+            }
+
+            job.Finish(result.ExitCode, stopped: false, _time.GetUtcNow());
+        }
+        catch (OperationCanceledException)
+        {
+            job.Finish(null, stopped: true, _time.GetUtcNow());
+        }
+        catch (Exception exception) when (exception is not OperationCanceledException)
+        {
+            // Any failure ends the job: one left "running" would keep the model waiting and hold a slot.
+            if (exception is not AgentToolException)
+            {
+                LogJobFailed(_logger, exception, job.Id);
+            }
+
+            job.Append(exception.Message);
+            job.Finish(null, stopped: false, _time.GetUtcNow());
+        }
+
+        Completed(job);
+    }
+
+    private void Completed(BackgroundCommand command)
+    {
         LogFinished(_logger, command.Id, command.ExitCode, command.IsStopped);
+        if (command.IsDetached)
+        {
+            DetachedFinished?.Invoke(this, command);
+        }
+    }
+
+    private void EnsureCapacity()
+    {
+        if (_commands.Values.Count(running => running.IsRunning) >= MaxRunning)
+        {
+            throw new AgentToolException(string.Format(CultureInfo.CurrentCulture, Strings.BackgroundLimit, MaxRunning));
+        }
     }
 
     // Another folder is another project: the old background processes are no longer needed.
@@ -120,4 +189,7 @@ public sealed partial class BackgroundCommands : IDisposable
 
     [LoggerMessage(Level = LogLevel.Information, Message = "Background command #{Id} finished: exit code {ExitCode}, stopped {Stopped}")]
     private static partial void LogFinished(ILogger logger, int id, int? exitCode, bool stopped);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Background job #{Id} failed")]
+    private static partial void LogJobFailed(ILogger logger, Exception exception, int id);
 }

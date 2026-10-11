@@ -1,3 +1,4 @@
+using CodeEditor.Core.Threading;
 using CodeEditor.Modules.Agent.Contracts.Files;
 
 namespace CodeEditor.Modules.Agent.ViewModels.Chat;
@@ -19,4 +20,8 @@ public sealed record AgentTurnServices(
     DeepSupervisor Deep,
     MemoryExtractor MemoryExtractor,
     UserMessageQueue Queue,
-    ToolImages Images);
+    ToolImages Images,
+    ToolCallObservers Observers,
+    RunningToolCalls RunningCalls,
+    IUiDispatcher Dispatcher,
+    TimeProvider Time);

@@ -13,7 +13,7 @@ public sealed class CommandAgentToolsTests : IDisposable
 
     public CommandAgentToolsTests()
     {
-        _tools = new CommandAgentTools(_fixture.Workspace, _fixture.FileSystem, _fixture.Output, _fixture.SaveBeforeRun, _fixture.Outputs, _fixture.Background);
+        _tools = new CommandAgentTools(_fixture.Workspace, _fixture.FileSystem, _fixture.Output, _fixture.SaveBeforeRun, _fixture.Outputs, _fixture.Background, _fixture.Activity);
         _run = _tools.CreateTools().OfType<AIFunction>().Single();
     }
 

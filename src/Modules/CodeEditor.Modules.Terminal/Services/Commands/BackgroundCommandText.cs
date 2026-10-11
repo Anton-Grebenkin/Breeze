@@ -22,14 +22,26 @@ public static class BackgroundCommandText
         };
     }
 
-    public static string Report(BackgroundCommand command, TimeSpan elapsed, string newOutput)
+    /// <param name="movedByUser">The user moved the call to the background from the feed: the model shouldn't wait.</param>
+    public static string Report(BackgroundCommand command, TimeSpan elapsed, string newOutput, bool movedByUser = false)
     {
         ArgumentNullException.ThrowIfNull(command);
         ArgumentNullException.ThrowIfNull(newOutput);
         var text = new StringBuilder(Status(command, elapsed));
+        if (movedByUser)
+        {
+            text.Append('\n').Append(Strings.MovedToBackgroundByUser);
+        }
+
         if (command.IsRunning)
         {
-            text.Append('\n').Append(Format(Strings.BackgroundHowTo, command.Id));
+            text.Append('\n').Append(Format(command.IsJob ? Strings.BackgroundJobHowTo : Strings.BackgroundHowTo, command.Id));
+        }
+
+        // A running job keeps no output of its own, only the last line: its report comes at the end.
+        if (command is { IsJob: true, IsRunning: true })
+        {
+            return command.LastLine is { Length: > 0 } line ? text.Append('\n').Append(Format(Strings.BackgroundLastLine, line.Trim())).ToString() : text.ToString();
         }
 
         if (command.Dropped > 0)

@@ -226,7 +226,7 @@
   <data name="ThinkingFor" xml:space="preserve"><value>Размышляет · {0}</value></data>
   <data name="ThoughtFor" xml:space="preserve"><value>Размышлял {0}</value></data>
   <data name="PlanReady" xml:space="preserve"><value>План готов. Выполнить его — в режиме «Агент»; уточнить — сообщением.</value></data>
-  <data name="StepLimitNotice" xml:space="preserve"><value>Достигнут лимит в {0} запросов к модели за ход: выше — итог на этот момент. Продолжить можно кнопкой или сообщением.</value></data>
+  <data name="StepLimitNotice" xml:space="preserve"><value>Достигнут лимит в {0} запросов к модели за ход: выше — итог на этот момент. Продолжить можно кнопкой или сообщением; лимит задаётся в agent.maxSteps.</value></data>
   <data name="QuestionWithdrawnNote" xml:space="preserve"><value>(вопрос снят)</value></data>
   <data name="QuestionWithdrawn" xml:space="preserve"><value>Вопрос снят</value></data>
   <data name="QuestionAnswered" xml:space="preserve"><value>Ответ: {0}</value></data>
@@ -434,4 +434,16 @@ description: Стили XAML
   <data name="PickLinkedFile" xml:space="preserve"><value>Несколько файлов подходят под «{0}» — выберите нужный</value></data>
   <data name="ModelDoesNotSeeImages" xml:space="preserve"><value>Модель {0} не принимает изображения: она получит только имена файлов. Чтобы показать картинку, выберите модель со зрением.</value></data>
   <data name="DropToAttach" xml:space="preserve"><value>Отпустите, чтобы прикрепить к сообщению</value></data>
+  <data name="WatchdogSameError" xml:space="preserve"><value>{0} снова завершился той же ошибкой для {1}. Не повторяй вызов как есть: прочитай ошибку, проверь входные данные (путь, точный текст, аргументы) и измени вызов; для неоднозначной правки добавь уникальные соседние строки или правь вхождения по одному.</value></data>
+  <data name="WatchdogStuck" xml:space="preserve"><value>{0} уже {2}-й раз подряд завершается той же ошибкой для {1}. Хватит повторять: одной строкой скажи, что мешает, и выбери другой путь (другой инструмент, шаг поменьше, перепиши метод или файл целиком) или спроси пользователя через ask_user.</value></data>
+  <data name="WatchdogFailureStreak" xml:space="preserve"><value>Последние {0} вызовов инструментов завершились ошибкой. Остановись: подведи итог — что пробовал и почему не вышло, — затем выбери другой подход или спроси пользователя.</value></data>
+  <data name="WatchdogSlowRun" xml:space="preserve"><value>Этот прогон занял {0}. Долгие прогоны заставляют пользователя ждать: сначала узкий фильтр или модульные тесты, длинный набор запускай с коротким waitSeconds и продолжай работу, пока он идёт, а перед повторным полным прогоном спроси пользователя.</value></data>
+  <data name="WatchdogCheckpoint" xml:space="preserve"><value>Контрольная точка: в этом ходе сделано {0} шагов из {1}. Если задача продвигается (пункты плана выполнены, ошибок меньше), продолжай; если повторяешь одни и те же неудачные шаги, смени подход или спроси пользователя.</value></data>
+  <data name="WatchdogSeconds" xml:space="preserve"><value>{0} с</value></data>
+  <data name="RunningJobsPrompt" xml:space="preserve"><value>Перед итогом: твои фоновые прогоны ещё идут: {0}. Дождись их отчётов через command_output(id, timeoutSeconds: 300) и учти их. Если пользователь перевёл прогон в фон или просил не ждать — не жди, а напиши в итоге, что он ещё идёт.</value></data>
+  <data name="RunningJobsStatus" xml:space="preserve"><value>Фоновые прогоны ещё идут — агент ждёт их результатов</value></data>
+  <data name="MoveToBackground" xml:space="preserve"><value>В фон</value></data>
+  <data name="MoveToBackgroundToolTip" xml:space="preserve"><value>Не ждать: процесс продолжит работу в фоне, а агент — задачу</value></data>
+  <data name="CommandMoveToBackground" xml:space="preserve"><value>Перевести текущий шаг в фон</value></data>
+  <data name="NothingToMoveToBackground" xml:space="preserve"><value>Нет шага, который можно перевести в фон.</value></data>
 </root>

@@ -39,7 +39,7 @@
   <data name="BackgroundRunning" xml:space="preserve"><value>Background command #{0} is running ({1} s).</value></data>
   <data name="BackgroundExited" xml:space="preserve"><value>Background command #{0} exited with code {1} after {2} s.</value></data>
   <data name="BackgroundStopped" xml:space="preserve"><value>Background command #{0} was stopped after {1} s.</value></data>
-  <data name="BackgroundHowTo" xml:space="preserve"><value>New output: command_output(id: {0}); stop: stop_command(id: {0}).</value></data>
+  <data name="BackgroundHowTo" xml:space="preserve"><value>New output: command_output(id: {0}); stop: stop_command(id: {0}). When it exits, you will get a note.</value></data>
   <data name="BackgroundNoNewOutput" xml:space="preserve"><value>(no new output)</value></data>
   <data name="BackgroundDropped" xml:space="preserve"><value>({0} early lines are no longer kept; the full output is in the Commands channel)</value></data>
   <data name="BackgroundLimit" xml:space="preserve"><value>Not started: {0} background commands are already running. Stop one with stop_command first.</value></data>
@@ -101,4 +101,13 @@
   <data name="ProfileWindowsPowerShell" xml:space="preserve"><value>Windows PowerShell</value></data>
   <data name="ProfileCommandPrompt" xml:space="preserve"><value>Command Prompt</value></data>
   <data name="ProfileGitBash" xml:space="preserve"><value>Git Bash</value></data>
+  <data name="BackgroundFinishedNote" xml:space="preserve"><value>{0} Command: {1}. Its output: command_output(id: {2}).</value></data>
+  <data name="BackgroundJobHowTo" xml:space="preserve"><value>The report comes when it finishes: command_output(id: {0}, timeoutSeconds: 300) waits for it; stop: stop_command(id: {0}). You will also get a note when it finishes, so you can do other work meanwhile.</value></data>
+  <data name="BackgroundLastLine" xml:space="preserve"><value>Last output line: {0}</value></data>
+  <data name="MovedToBackgroundByUser" xml:space="preserve"><value>The user moved this call to the background: don't wait for it, go on with the task; you will get a note when it finishes.</value></data>
+  <data name="TestsNoneMatched" xml:space="preserve"><value>Tests ({0}): no test matched the filter in {1} s, nothing was checked. The filter is a part of a test class or method name.</value></data>
+  <data name="DetailNoTests" xml:space="preserve"><value>no tests matched</value></data>
+  <data name="BuildLocked" xml:space="preserve"><value>The build could not overwrite files locked by {0}: the app is probably still running. Stop it (or ask the user to close it) and build again; building as is fails the same way.</value></data>
+  <data name="BuildLockedByBackground" xml:space="preserve"><value>The build could not overwrite files locked by {0}, started by background command #{1} (`{2}`). Stop it with stop_command(id: {1}) and build again; start it after the build if it is still needed.</value></data>
+  <data name="RunningBackgroundCommands" xml:space="preserve"><value>Running background commands: {0}.</value></data>
 </root>

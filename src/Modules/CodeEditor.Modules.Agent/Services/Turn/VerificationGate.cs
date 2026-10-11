@@ -102,13 +102,26 @@ public sealed class VerificationGate : IAgentVerificationLog, IDisposable
         return true;
     }
 
-    public string? Record(VerificationKind kind, bool succeeded)
+    public int StartCheck()
+    {
+        lock (_lock)
+        {
+            return ++_sequence;
+        }
+    }
+
+    /// <summary>A check that started and finished just now.</summary>
+    public string? Record(VerificationKind kind, bool succeeded) => Record(kind, succeeded, StartCheck());
+
+    // The check counts from its start: an edit made while it ran stays unverified. A check that started earlier but
+    // finished later doesn't move the mark back.
+    public string? Record(VerificationKind kind, bool succeeded, int started)
     {
         int failures;
         lock (_lock)
         {
-            var number = ++_sequence;
-            (succeeded ? _passedAt : _failedAt)[kind] = number;
+            var results = succeeded ? _passedAt : _failedAt;
+            results[kind] = Math.Max(results.GetValueOrDefault(kind), started);
             failures = succeeded ? 0 : _failuresInRow.GetValueOrDefault(kind) + 1;
             _failuresInRow[kind] = failures;
         }

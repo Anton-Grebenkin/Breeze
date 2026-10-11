@@ -5,6 +5,7 @@ using CodeEditor.Core.Output;
 using CodeEditor.Modules.Agent.Contracts;
 using CodeEditor.Modules.Agent.Contracts.Approvals;
 using CodeEditor.Modules.Agent.Contracts.Files;
+using CodeEditor.Modules.Agent.Contracts.Turn;
 using CodeEditor.Modules.Terminal.Resources;
 using Microsoft.Extensions.AI;
 
@@ -26,7 +27,8 @@ public sealed class CommandAgentTools(
     IOutputService output,
     SaveBeforeRun saveBeforeRun,
     IAgentOutputStore outputs,
-    BackgroundCommands background) : IAgentToolProvider, IAgentChangePreviewer
+    BackgroundCommands background,
+    IAgentToolActivity activity) : IAgentToolProvider, IAgentChangePreviewer
 {
     public const string RunCommandName = "run_command";
     public static string ChannelName => Strings.Commands;
@@ -68,10 +70,16 @@ public sealed class CommandAgentTools(
         await saveBeforeRun.SaveAsync(cancellationToken);
         var channel = output.GetOrCreate(ChannelName);
         channel.AppendLine($"> {command}");
-        var started = background.Start(PowerShellLauncher.Request(command, folder, Timeout.InfiniteTimeSpan), command, channel.AppendLine);
+        var call = activity.Current();
+        var release = call.OfferBackground();
+        var started = background.Start(PowerShellLauncher.Request(command, folder, Timeout.InfiniteTimeSpan), command, line =>
+        {
+            channel.AppendLine(line);
+            call.Report(line);
+        });
         try
         {
-            await started.WaitAsync(pattern: null, TimeSpan.FromSeconds(Math.Clamp(waitSeconds, 0, MaxWaitSeconds)), cancellationToken);
+            await started.WaitAsync(pattern: null, TimeSpan.FromSeconds(Math.Clamp(waitSeconds, 0, MaxWaitSeconds)), cancellationToken, release);
         }
         catch (OperationCanceledException)
         {
@@ -80,9 +88,9 @@ public sealed class CommandAgentTools(
             throw;
         }
 
-        if (started.IsRunning)
+        if (started.TryDetach())
         {
-            return outputs.Fit(background.Report(started, started.ReadNew()), RunCommandName);
+            return outputs.Fit(background.Report(started, started.ReadNew(), release.IsCancellationRequested), RunCommandName);
         }
 
         background.Forget(started.Id);

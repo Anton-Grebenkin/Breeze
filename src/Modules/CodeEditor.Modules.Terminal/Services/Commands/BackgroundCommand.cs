@@ -42,6 +42,31 @@ public sealed class BackgroundCommand(int id, string command, string folder, Dat
     /// <summary>Finish time; <c>null</c> while running.</summary>
     public DateTimeOffset? Finished { get; private set; }
 
+    /// <summary>
+    /// A build or test run rather than a shell command: its raw output goes to the Output channel only, and the model
+    /// reads the report appended when it finishes.
+    /// </summary>
+    public bool IsJob { get; init; }
+
+    /// <summary>The latest output line of a job, shown while it runs; its output is not kept line by line.</summary>
+    public string? LastLine { get; set; }
+
+    /// <summary>Its tool returned while it ran, so the model learns about the finish from a note.</summary>
+    public bool IsDetached { get; private set; }
+
+    /// <summary>The model has seen the final status (<c>command_output</c>, <c>stop_command</c> or a note).</summary>
+    public bool IsReported { get; set; }
+
+    /// <summary>Hands the command over to the background; <c>false</c> if it has already finished.</summary>
+    public bool TryDetach()
+    {
+        lock (_gate)
+        {
+            IsDetached = IsRunning;
+            return IsDetached;
+        }
+    }
+
     public void Append(string line)
     {
         lock (_gate)
@@ -60,10 +85,14 @@ public sealed class BackgroundCommand(int id, string command, string folder, Dat
 
     public void Finish(int? exitCode, bool stopped, DateTimeOffset at)
     {
-        ExitCode = exitCode;
-        IsStopped = stopped;
-        Finished = at;
-        IsRunning = false;
+        lock (_gate)
+        {
+            ExitCode = exitCode;
+            IsStopped = stopped;
+            Finished = at;
+            IsRunning = false;
+        }
+
         Signal();
     }
 
@@ -99,11 +128,12 @@ public sealed class BackgroundCommand(int id, string command, string folder, Dat
     /// Waits for an unread line matching <paramref name="pattern"/> (if given), the command's exit, or the timeout.
     /// Doesn't advance the read position: <see cref="ReadNew"/> builds the reply.
     /// </summary>
+    /// <param name="release">Ends the wait early, like the timeout: the user moved the call to the background.</param>
     /// <returns><c>true</c> if a line matched the pattern.</returns>
-    public async Task<bool> WaitAsync(string? pattern, TimeSpan timeout, CancellationToken cancellationToken)
+    public async Task<bool> WaitAsync(string? pattern, TimeSpan timeout, CancellationToken cancellationToken, CancellationToken release = default)
     {
         var regex = pattern is null ? null : new Regex(pattern, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant, MatchTimeout);
-        using var limit = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        using var limit = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, release);
         limit.CancelAfter(timeout);
         var scanned = 0;
         while (true)

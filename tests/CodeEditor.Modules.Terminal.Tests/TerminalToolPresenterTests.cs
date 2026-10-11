@@ -15,6 +15,7 @@ public sealed class TerminalToolPresenterTests
     [InlineData("Сборка App.slnx успешна за 3 с, предупреждений: 2.", "успешно, предупреждений: 2", false)]
     [InlineData("Сборка App.slnx не удалась за 4 с: ошибок 3, предупреждений 0.\na.cs(1,1): error CS1: x", "ошибок: 3", true)]
     [InlineData("Сборка App.slnx прервана по тайм-ауту через 600 с.", "тайм-аут", true)]
+    [InlineData("Фоновая команда #3 идёт (120 с).\nОтчёт будет по завершении", "в фоне #3", false)]
     public void Build_DetailFromReport(string result, string detail, bool failure)
     {
         var view = Present(BuildAgentTools.BuildName, result);
@@ -26,6 +27,8 @@ public sealed class TerminalToolPresenterTests
     [InlineData("Тесты (App.Tests): успешно 12 из 12, не прошло 0, пропущено 0 за 2 с.", "прошло 12 из 12", false)]
     [InlineData("Тесты (App.Tests): успешно 10 из 12, не прошло 2, пропущено 0 за 2 с.\nfail", "не прошло 2 из 12", true)]
     [InlineData("Тесты (App.Tests) не запустились: ошибок сборки 1.", "не собрались", true)]
+    [InlineData("Тесты (App.Tests): ни один тест не подошёл под фильтр за 2 с, ничего не проверено. Фильтр — часть имени класса или метода теста.", "нет подходящих тестов", true)]
+    [InlineData("Фоновая команда #4 идёт (120 с).", "в фоне #4", false)]
     public void Tests_DetailFromReport(string result, string detail, bool failure)
     {
         var view = _presenter.Present(new AgentToolCall(BuildAgentTools.RunTestsName, new Dictionary<string, object?> { ["filter"] = "Order" }, result))!;

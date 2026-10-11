@@ -65,6 +65,11 @@ public sealed class TerminalToolPresenter : IAgentToolPresenter
             return view;
         }
 
+        if (InBackground(line) is { } background)
+        {
+            return view with { Detail = background };
+        }
+
         if (ResourcePattern.Match(Strings.BuildSucceededWithWarnings, line) is { } warned)
         {
             return view with { Detail = Format(Strings.DetailSucceededWithWarnings, warned[2]) };
@@ -90,10 +95,16 @@ public sealed class TerminalToolPresenter : IAgentToolPresenter
             return view;
         }
 
+        if (InBackground(line) is { } background)
+        {
+            return view with { Detail = background };
+        }
+
         if (ResourcePattern.Match(Strings.TestsSummary, line) is not { } totals)
         {
             var reason = ResourcePattern.Match(Strings.TestsTimedOut, line) is not null ? Strings.DetailTimedOut
                 : ResourcePattern.Match(Strings.TestsNotStarted, line) is not null ? Strings.DetailNotBuilt
+                : ResourcePattern.Match(Strings.TestsNoneMatched, line) is not null ? Strings.DetailNoTests
                 : Strings.DetailNoTotals;
             return view with { Detail = reason, IsFailure = true };
         }
@@ -115,9 +126,9 @@ public sealed class TerminalToolPresenter : IAgentToolPresenter
         }
 
         // Background start: "background #2" while running; the exit code if it failed right away.
-        if (ResourcePattern.Match(Strings.BackgroundRunning, line) is { } running)
+        if (InBackground(line) is { } background)
         {
-            return view with { Detail = Format(Strings.DetailBackground, running[0]) };
+            return view with { Detail = background };
         }
 
         if (BackgroundState(line) is { } finished)
@@ -133,6 +144,10 @@ public sealed class TerminalToolPresenter : IAgentToolPresenter
 
         return view with { Detail = Format(Strings.DetailExitCode, code), IsFailure = code != 0 };
     }
+
+    // A run that outlived its wait or was moved there by the user: "in background #2".
+    private static string? InBackground(string line) =>
+        ResourcePattern.Match(Strings.BackgroundRunning, line) is { } running ? Format(Strings.DetailBackground, running[0]) : null;
 
     // Slices instead of Split: Split would also copy the whole remainder of a long output.
     private static string? FirstLine(string? result)

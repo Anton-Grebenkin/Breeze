@@ -21,10 +21,16 @@ namespace CodeEditor.Modules.Agent.Services.Turn;
 /// - in Deep mode, appends the advisor's advice when the model looks stuck (<see cref="DeepSupervisor"/>);
 /// - if the user wrote while the agent worked (<see cref="UserMessageQueue"/>), ends the tool loop after the current
 ///   calls so the message reaches the model;
-/// - the first read of a file with a rule in .breeze/rules brings the rule text (<see cref="ProjectRuleGuard"/>).
+/// - the first read of a file with a rule in .breeze/rules brings the rule text (<see cref="ProjectRuleGuard"/>);
+/// - registers the call with its feed row (<see cref="RunningToolCalls"/>) and appends the editor's notes to the result
+///   (<see cref="ToolCallObservers"/>: the watchdog, a finished background command).
 /// </summary>
 internal sealed partial class GuardedToolFunction(
-    AIFunction inner, TurnBudget budget, SemaphoreSlim writeLock, ILogger logger, DeepSupervisor? deep = null, UserMessageQueue? queue = null, ProjectRuleGuard? rules = null)
+    AIFunction inner,
+    TurnBudget budget,
+    SemaphoreSlim writeLock,
+    ILogger logger,
+    ToolGuards? guards = null)
     : DelegatingAIFunction(inner)
 {
     public static string ExhaustedResult => Strings.ToolBudgetExhausted;
@@ -66,7 +72,14 @@ internal sealed partial class GuardedToolFunction(
             return BlockedResult;
         }
 
-        var result = await InvokeInOrderAsync(arguments, cancellationToken);
+        var started = Stopwatch.GetTimestamp();
+        object? result;
+        using (BeginActivity())
+        {
+            result = await InvokeInOrderAsync(arguments, cancellationToken);
+        }
+
+        result = WithObserverNotes(arguments, result, Stopwatch.GetElapsedTime(started));
         if (ExternalContent.Has(this))
         {
             budget.RegisterExternalContent();
@@ -79,7 +92,7 @@ internal sealed partial class GuardedToolFunction(
         }
 
         result = WithFileRules(arguments, result);
-        if (deep is not null && AsText(result) is { } output && await deep.AfterToolAsync(Name, output, cancellationToken) is { } advice)
+        if (guards?.Deep is { } deep && AsText(result) is { } output && await deep.AfterToolAsync(Name, output, cancellationToken) is { } advice)
         {
             result = output + "\n\n" + advice;
         }
@@ -93,17 +106,31 @@ internal sealed partial class GuardedToolFunction(
         return AfterExploration(result);
     }
 
+    private IDisposable? BeginActivity() =>
+        guards?.RunningCalls is { } calls && FunctionInvokingChatClient.CurrentContext?.CallContent.CallId is { } callId ? calls.Begin(callId) : null;
+
+    private object? WithObserverNotes(AIFunctionArguments arguments, object? result, TimeSpan elapsed)
+    {
+        if (guards?.Observers is not { } observers || AsText(result) is not { } text)
+        {
+            return result;
+        }
+
+        var notes = observers.After(new ToolCallRecord(Name, arguments, text, IsError(result), elapsed));
+        return notes.Length == 0 ? result : text + notes;
+    }
+
     // A user message is waiting: these results go to history, and the next model request carries the message.
     private void YieldToUser()
     {
-        if (queue?.HasPending == true && FunctionInvokingChatClient.CurrentContext is { } current)
+        if (guards?.Queue.HasPending == true && FunctionInvokingChatClient.CurrentContext is { } current)
         {
             current.Terminate = true;
         }
     }
 
     private object? WithFileRules(AIFunctionArguments arguments, object? result) =>
-        rules is not null && Name == ProjectRuleGuard.ReadFileTool && !IsError(result) && AsText(result) is { } text
+        guards?.Rules is { } rules && Name == ProjectRuleGuard.ReadFileTool && !IsError(result) && AsText(result) is { } text
             && arguments.TryGetValue("path", out var path) && path?.ToString() is { Length: > 0 } file && rules.RulesForRead(file) is { } note
             ? text + note
             : result;
