@@ -31,6 +31,7 @@ public sealed class BrowserModule : IModule
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddSettingsSection<BrowserOptions>(BrowserOptions.Section);
+        services.AddUserOnlySetting(BrowserApprovals.AllowedHostsKey);
         services.AddSingleton<BrowserViewModel>();
         services.AddSingleton<BrowserAgentTools>();
         services.AddSingleton<IAgentToolProvider>(provider => provider.GetRequiredService<BrowserAgentTools>());

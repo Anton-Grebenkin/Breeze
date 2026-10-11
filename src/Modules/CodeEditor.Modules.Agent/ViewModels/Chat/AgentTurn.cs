@@ -13,10 +13,10 @@ namespace CodeEditor.Modules.Agent.ViewModels.Chat;
 /// the feed (<see cref="TurnFeed"/>) handles its events on the UI thread. Approval cards are a graph port request:
 /// the turn waits for all user decisions, then answers the port.
 /// </summary>
-/// <param name="acceptEdits">Auto-approve edits, file creation and moves (<see cref="AgentApprovals.Auto"/>).</param>
+/// <param name="approvals">What runs without asking (<see cref="AgentApprovals"/>).</param>
 /// <param name="stepLimit">Model requests in this turn (<see cref="AgentModes.RequestLimitOf"/>).</param>
 public sealed class AgentTurn(
-    ObservableCollection<ChatMessageViewModel> messages, AgentTurnServices services, ISet<string> approvedTools, bool acceptEdits, int stepLimit = AgentModes.RequestLimit)
+    ObservableCollection<ChatMessageViewModel> messages, AgentTurnServices services, ISet<string> approvedTools, AgentApprovals approvals, int stepLimit = AgentModes.RequestLimit)
 {
     private readonly TurnFeed _feed = new(messages, services);
     private ApprovalExecutor? _approvals;
@@ -48,7 +48,7 @@ public sealed class AgentTurn(
         services.Images.Clear();
         services.Checks.Begin(mode, message.Contents.OfType<TextContent>().FirstOrDefault()?.Text);
         services.Deep.Begin(mode);
-        _approvals = new ApprovalExecutor(services.ApprovalCards, services.Deep, services.Log, approvedTools, acceptEdits, mode, cancellationToken);
+        _approvals = new ApprovalExecutor(services.ApprovalCards, services.Deep, services.Log, approvedTools, approvals, mode, cancellationToken);
         _model = new ModelExecutor(services.Conversation, cancellationToken);
         var workflow = AgentTurnWorkflow.Build(_model, _approvals, new ChecksExecutor(services.Checks, services.Budget, services.Deep, services.Queue, services.Images, cancellationToken));
         using var progress = new LiveToolRows(services.RunningCalls, _feed.RowOf, services.Time, services.Dispatcher);

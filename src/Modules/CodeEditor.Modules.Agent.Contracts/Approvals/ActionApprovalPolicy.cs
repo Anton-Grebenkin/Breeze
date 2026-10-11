@@ -51,6 +51,7 @@ public sealed partial class ActionApprovalPolicy(ActionApprovalRules rules, Func
         where TOptions : class
     {
         ArgumentNullException.ThrowIfNull(services);
+        services.AddUserOnlySetting(rules.SettingsKey);
         services.AddSingleton<IAgentApprovalPolicy>(provider => new ActionApprovalPolicy(
             rules,
             () => allowed(provider.GetRequiredService<IOptionsMonitor<TOptions>>().CurrentValue),

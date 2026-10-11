@@ -23,4 +23,11 @@ public static class SettingsServiceCollectionExtensions
             provider.GetRequiredService<ILogger<SettingsSectionBinder<T>>>()));
         return services;
     }
+
+    /// <summary>A folder's <c>.breeze/settings.json</c> cannot set this key (<see cref="UserOnlySetting"/>).</summary>
+    public static IServiceCollection AddUserOnlySetting(this IServiceCollection services, string key)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(key);
+        return services.AddSingleton(new UserOnlySetting(key));
+    }
 }

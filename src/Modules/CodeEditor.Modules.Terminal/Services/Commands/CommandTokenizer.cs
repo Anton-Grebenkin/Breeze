@@ -74,8 +74,11 @@ public static class CommandTokenizer
                 case '`':
                     _escapes = true;
                     break;
+                // "$x=1" reads as "$x = 1": the variable, "=", then what is assigned, checked like a command.
                 case '=' when _words.Count == 0 && _word.Length > 0 && _word[0] == '$':
                     _assignment = true;
+                    EndWord();
+                    _words.Add("=");
                     break;
                 default:
                     _word.Append(current);

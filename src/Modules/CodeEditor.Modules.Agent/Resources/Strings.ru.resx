@@ -325,7 +325,7 @@
   <data name="AllowForChat" xml:space="preserve"><value>Разрешить для этого чата</value></data>
   <data name="AllowForChatToolTip" xml:space="preserve"><value>Этот инструмент дальше в этом чате — без вопросов</value></data>
   <data name="AllowAlways" xml:space="preserve"><value>Всегда разрешать «{0}»</value></data>
-  <data name="AllowAlwaysToolTip" xml:space="preserve"><value>Команды, которые начинаются с этих слов, — без вопросов во всех чатах. Правило сохраняется в настройке terminal.allowedCommands.</value></data>
+  <data name="AllowAlwaysToolTip" xml:space="preserve"><value>Разрешать это без вопросов во всех чатах. Правило сохраняется в вашем settings.json, там его можно удалить.</value></data>
   <data name="AttachmentToolTip" xml:space="preserve"><value>Агент видел, какой файл открыт</value></data>
   <data name="Waiting" xml:space="preserve"><value>Думает…</value></data>
   <data name="Continue" xml:space="preserve"><value>Продолжить</value></data>
@@ -447,4 +447,5 @@ description: Стили XAML
   <data name="CommandMoveToBackground" xml:space="preserve"><value>Перевести текущий шаг в фон</value></data>
   <data name="NothingToMoveToBackground" xml:space="preserve"><value>Нет шага, который можно перевести в фон.</value></data>
   <data name="ImageNotForModel" xml:space="preserve"><value>(картинка не показана: текущая модель не принимает изображения)</value></data>
+  <data name="RunWithoutAsking" xml:space="preserve"><value>Правки и команды без вопросов</value></data>
 </root>

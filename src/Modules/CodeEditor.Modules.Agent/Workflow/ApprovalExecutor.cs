@@ -13,13 +13,13 @@ namespace CodeEditor.Modules.Agent.Workflow;
 /// a module policy, and tools allowed for the chat or by the accept-edits mode. The rest become cards sent to the
 /// <c>approve</c> port; the user decides, and the responses go back to the model in one message.
 /// </summary>
-/// <param name="acceptEdits">Edits, file creation and moves approve themselves (<see cref="AgentApprovals.Auto"/>).</param>
+/// <param name="approvals">What approves itself: edits (<see cref="AgentApprovals.Auto"/>), everything (<see cref="AgentApprovals.Full"/>).</param>
 public sealed class ApprovalExecutor(
     ApprovalCards cards,
     DeepSupervisor deep,
     AgentActivityLog log,
     ISet<string> approvedTools,
-    bool acceptEdits,
+    AgentApprovals approvals,
     AgentMode mode,
     CancellationToken turn) : Executor(NodeId)
 {
@@ -27,6 +27,9 @@ public sealed class ApprovalExecutor(
 
     /// <summary>Tools that accept-edits mode approves itself: <c>Ctrl+Z</c> or a revert in the changes panel undoes them.</summary>
     private static readonly FrozenSet<string> EditTools = FrozenSet.ToFrozenSet(["apply_edits", "apply_patch", "create_file", "move_file"], StringComparer.Ordinal);
+
+    /// <summary>Asks even in <see cref="AgentApprovals.Full"/>: <c>Ctrl+Z</c> doesn't bring a file back.</summary>
+    private const string DeleteTool = "delete_file";
 
     private readonly List<(ToolApprovalRequestContent Request, AIContent? Response, ApprovalCardViewModel? Card)> _pending = [];
 
@@ -96,14 +99,21 @@ public sealed class ApprovalExecutor(
         }
 
         // An edit accepted without asking shows as a tool line ("Changed A.cs +1 −1"). A call the module always confirms
-        // (git push) or that agent.md requires still asks after "Allow for this chat".
-        if (!card.HasReason && !cards.AlwaysAsks(request) && (approvedTools.Contains(card.ToolName) || (acceptEdits && EditTools.Contains(card.ToolName))))
+        // (git push) or that agent.md requires still asks after "Allow for this chat" and in any mode.
+        if (!card.HasReason && !cards.AlwaysAsks(request) && ApprovesItself(card.ToolName))
         {
             card.ResolveAutomatically();
         }
 
         return (request, null, card);
     }
+
+    private bool ApprovesItself(string tool) => approvedTools.Contains(tool) || approvals switch
+    {
+        AgentApprovals.Full => tool != DeleteTool,
+        AgentApprovals.Auto => EditTools.Contains(tool),
+        _ => false,
+    };
 
     private async ValueTask RespondAsync(IWorkflowContext context, CancellationToken cancellationToken)
     {

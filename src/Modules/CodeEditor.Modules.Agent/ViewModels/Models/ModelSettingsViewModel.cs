@@ -214,6 +214,7 @@ public sealed partial class ModelSettingsViewModel : ObservableObject, IDisposab
             [
                 (Strings.ApproveEachEdit, (object?)"edits", options.Approvals == AgentApprovals.Edits),
                 (Strings.AcceptEditsImmediately, (object?)"auto", options.Approvals == AgentApprovals.Auto),
+                (Strings.RunWithoutAsking, (object?)"full", options.Approvals == AgentApprovals.Full),
             ]),
             .. _services.Build(),
             Roles(options),

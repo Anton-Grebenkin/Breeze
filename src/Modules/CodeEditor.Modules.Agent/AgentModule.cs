@@ -36,6 +36,9 @@ public sealed class AgentModule : IModule
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddSettingsSection<AgentOptions>(AgentOptions.Section);
+        services.AddUserOnlySetting(ModelSettingsViewModel.ApprovalsKey);
+        services.AddUserOnlySetting(WebApprovals.HostsKey);
+        services.AddUserOnlySetting(ServiceMenu.EndpointKey);
         services.AddSingleton<ApiKeyState>();
         services.AddSingleton<RulesProblemReporter>();
         services.AddSingleton<ProjectInstructions>();

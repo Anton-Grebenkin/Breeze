@@ -30,12 +30,16 @@ public sealed partial class SettingsService : ISettingsService, IDisposable
     private readonly SettingsProvider _folder = new();
     private readonly ConfigurationRoot _configuration;
     private readonly IFileWatcher? _userWatcher;
+    private readonly UserOnlySetting[] _userOnly;
     private string? _userError;
     private string? _folderError;
 
-    public SettingsService(IFileSystem fileSystem, UserDataPaths paths, IWorkspace workspace, IUiDispatcher dispatcher, ILogger<SettingsService> logger)
+    /// <param name="userOnly">Keys a folder's file cannot set (<see cref="UserOnlySetting"/>).</param>
+    public SettingsService(
+        IFileSystem fileSystem, UserDataPaths paths, IWorkspace workspace, IUiDispatcher dispatcher, ILogger<SettingsService> logger, IEnumerable<UserOnlySetting>? userOnly = null)
     {
         _fileSystem = fileSystem;
+        _userOnly = [.. userOnly ?? []];
         _workspace = workspace;
         _dispatcher = dispatcher;
         _logger = logger;
@@ -156,7 +160,7 @@ public sealed partial class SettingsService : ISettingsService, IDisposable
 
     private void ReloadFolder()
     {
-        _folderError = Load(_folder, WorkspaceSettingsPath);
+        _folderError = Load(_folder, WorkspaceSettingsPath, isFolder: true);
         Changed?.Invoke(this, EventArgs.Empty);
     }
 
@@ -177,11 +181,17 @@ public sealed partial class SettingsService : ISettingsService, IDisposable
     }
 
     /// <summary>Loads a layer; a parse error keeps the previous values and returns a user-facing message.</summary>
-    private string? Load(SettingsProvider provider, string? path)
+    private string? Load(SettingsProvider provider, string? path, bool isFolder = false)
     {
         try
         {
-            provider.Replace(path is not null && _fileSystem.FileExists(path) ? SettingsJson.Parse(_fileSystem.ReadAllText(path)) : []);
+            var data = path is not null && _fileSystem.FileExists(path) ? SettingsJson.Parse(_fileSystem.ReadAllText(path)) : [];
+            if (isFolder)
+            {
+                DropUserOnly(data, path!);
+            }
+
+            provider.Replace(data);
             return null;
         }
         catch (JsonException exception)
@@ -194,6 +204,15 @@ public sealed partial class SettingsService : ISettingsService, IDisposable
             // Another process is writing the file; it is read again on the next change.
             LogInvalidSettings(_logger, path!, exception.Message);
             return null;
+        }
+    }
+
+    private void DropUserOnly(Dictionary<string, string?> data, string path)
+    {
+        foreach (var key in data.Keys.Where(key => _userOnly.Any(setting => setting.Covers(key))).ToList())
+        {
+            data.Remove(key);
+            LogUserOnlyIgnored(_logger, key, path);
         }
     }
 
@@ -211,6 +230,9 @@ public sealed partial class SettingsService : ISettingsService, IDisposable
 
     [LoggerMessage(Level = LogLevel.Warning, Message = "Settings {Path} could not be read: {Reason}")]
     private static partial void LogInvalidSettings(ILogger logger, string path, string reason);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Setting {Key} in {Path} is ignored: only the user's settings may set it")]
+    private static partial void LogUserOnlyIgnored(ILogger logger, string key, string path);
 
     [LoggerMessage(Level = LogLevel.Warning, Message = "Settings watching in {Folder} is unavailable")]
     private static partial void LogWatchFailed(ILogger logger, string folder, Exception exception);

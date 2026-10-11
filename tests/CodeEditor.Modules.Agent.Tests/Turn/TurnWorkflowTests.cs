@@ -17,7 +17,7 @@ public sealed class TurnWorkflowTests : IDisposable
     [Fact]
     public void Graph_HasModelApprovalsChecks_AndUserPort()
     {
-        var approvals = new ApprovalExecutor(new ApprovalCards([], []), _fixture.Deep, new AgentActivityLog(_fixture.ActivityLog), new HashSet<string>(StringComparer.Ordinal), acceptEdits: false, AgentMode.Agent, CancellationToken.None);
+        var approvals = new ApprovalExecutor(new ApprovalCards([], []), _fixture.Deep, new AgentActivityLog(_fixture.ActivityLog), new HashSet<string>(StringComparer.Ordinal), AgentApprovals.Edits, AgentMode.Agent, CancellationToken.None);
         var workflow = AgentTurnWorkflow.Build(
             new ModelExecutor(_fixture.Conversation, CancellationToken.None),
             approvals,
