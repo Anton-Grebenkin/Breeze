@@ -1,4 +1,3 @@
-using System.Collections.Concurrent;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Windows.Automation;
@@ -17,23 +16,25 @@ namespace CodeEditor.Modules.Browser.Wpf.Services;
 /// WebView2 browser (ADR 0027). One control for the app lifetime (<see cref="Control"/>): the panel only hosts it, so
 /// switching bottom panel tabs keeps the page. An agent call before the first panel show shows it and waits until ready;
 /// the panel is shown without focus so the chat box keeps it. WebView2 is used only on the UI thread, so calls are
-/// marshaled there. Console messages and page errors arrive as DevTools events and queue until read, at most 200.
-/// Browser data lives in the editor's data folder.
+/// marshaled there. Console messages, page errors and network requests arrive as DevTools events
+/// (<see cref="BrowserConsoleLog"/>, <see cref="BrowserNetworkLog"/>). Browser data — cookies, cache, site storage —
+/// lives in the editor's data folder and survives restarts.
 /// </summary>
-public sealed partial class WebViewBrowserEngine(IUiDispatcher dispatcher, WorkbenchLayout layout, UserDataPaths paths, ILogger<WebViewBrowserEngine> logger)
+public sealed partial class WebViewBrowserEngine(IUiDispatcher dispatcher, WorkbenchLayout layout, UserDataPaths paths, BrowserNetworkLog network, ILogger<WebViewBrowserEngine> logger)
     : IBrowserEngine, IDisposable
 {
     public const string DataFolderName = "WebView2";
 
-    private const int MaxConsole = 200;
-
     private static readonly TimeSpan ReadyTimeout = TimeSpan.FromSeconds(30);
     private static readonly TimeSpan LoadTimeout = TimeSpan.FromSeconds(30);
+
+    // A page script never takes this long unless a dialog (alert, confirm) holds the page.
+    private static readonly TimeSpan ScriptTimeout = TimeSpan.FromSeconds(20);
 
     // Navigation after a click does not start at once; this is how long we wait for it to begin.
     private static readonly TimeSpan SettleDelay = TimeSpan.FromMilliseconds(400);
 
-    private readonly ConcurrentQueue<BrowserConsoleMessage> _console = new();
+    private readonly BrowserConsoleLog _console = new();
     private readonly TaskCompletionSource<CoreWebView2> _ready = new(TaskCreationOptions.RunContinuationsAsynchronously);
     private WebView2? _control;
 
@@ -49,6 +50,8 @@ public sealed partial class WebViewBrowserEngine(IUiDispatcher dispatcher, Workb
     public bool CanGoForward { get; private set; }
 
     public bool IsLoading { get; private set; }
+
+    public int? StatusCode { get; private set; }
 
     public event EventHandler? StateChanged;
 
@@ -80,27 +83,31 @@ public sealed partial class WebViewBrowserEngine(IUiDispatcher dispatcher, Workb
 
     public async Task<string> EvaluateAsync(string script, CancellationToken cancellationToken)
     {
-        var core = await ReadyAsync(show: false, cancellationToken);
-        if (Url is null || Url.Scheme is not ("http" or "https"))
-        {
-            throw new BrowserException(Strings.NoPage);
-        }
-
+        var core = await PageAsync(show: false, cancellationToken);
         Task<string>? pending = null;
         await dispatcher.InvokeAsync(() => pending = core.ExecuteScriptAsync(script));
-        return await pending!.WaitAsync(cancellationToken);
+        return await WithinScriptTimeoutAsync(pending!, cancellationToken);
     }
 
-    public IReadOnlyList<BrowserConsoleMessage> TakeConsole()
+    // Only a visible browser renders a screenshot: the panel is shown without focus, as on navigation.
+    public async Task<byte[]> CaptureAsync(BrowserImageFormat format, CancellationToken cancellationToken)
     {
-        var messages = new List<BrowserConsoleMessage>();
-        while (_console.TryDequeue(out var message))
+        var core = await PageAsync(show: true, cancellationToken);
+        try
         {
-            messages.Add(message);
+            var metrics = await CallAsync(core, "Page.getLayoutMetrics", "{}", cancellationToken);
+            return BrowserScreenshot.Data(await CallAsync(core, "Page.captureScreenshot", BrowserScreenshot.Request(metrics, format), cancellationToken));
         }
-
-        return messages;
+        catch (BrowserException exception)
+        {
+            throw new BrowserException(Strings.ScreenshotFailed, exception);
+        }
     }
+
+    public async Task<string> DevToolsAsync(string method, string parameters, CancellationToken cancellationToken) =>
+        await CallAsync(await PageAsync(show: false, cancellationToken), method, parameters, cancellationToken);
+
+    public IReadOnlyList<BrowserConsoleMessage> TakeConsole() => _console.Take();
 
     public void Dispose() => _control?.Dispose();
 
@@ -140,31 +147,37 @@ public sealed partial class WebViewBrowserEngine(IUiDispatcher dispatcher, Workb
         }
     }
 
-    // Only a visible browser renders a screenshot: the panel is shown without focus, as on navigation.
-    public async Task<byte[]> CaptureAsync(BrowserImageFormat format, CancellationToken cancellationToken)
-    {
-        var core = await ReadyAsync(show: true, cancellationToken);
-        if (Url is null || Url.Scheme is not ("http" or "https"))
-        {
-            throw new BrowserException(Strings.NoPage);
-        }
-
-        var metrics = await DevToolsAsync(core, "Page.getLayoutMetrics", "{}", cancellationToken);
-        return BrowserScreenshot.Data(await DevToolsAsync(core, "Page.captureScreenshot", BrowserScreenshot.Request(metrics, format), cancellationToken));
-    }
-
-    private async Task<string> DevToolsAsync(CoreWebView2 core, string method, string parameters, CancellationToken cancellationToken)
+    private async Task<string> CallAsync(CoreWebView2 core, string method, string parameters, CancellationToken cancellationToken)
     {
         Task<string>? pending = null;
         await dispatcher.InvokeAsync(() => pending = core.CallDevToolsProtocolMethodAsync(method, parameters));
         try
         {
-            return await pending!.WaitAsync(cancellationToken);
+            return await WithinScriptTimeoutAsync(pending!, cancellationToken);
         }
         catch (Exception exception) when (exception is COMException or ArgumentException)
         {
-            throw new BrowserException(Strings.ScreenshotFailed, exception);
+            throw new BrowserException(Format(Strings.DevToolsFailed, method, exception.Message), exception);
         }
+    }
+
+    // A dialog (alert, confirm) holds every script until it closes: the agent is told why instead of waiting forever.
+    private static async Task<string> WithinScriptTimeoutAsync(Task<string> pending, CancellationToken cancellationToken)
+    {
+        try
+        {
+            return await pending.WaitAsync(ScriptTimeout, cancellationToken);
+        }
+        catch (TimeoutException)
+        {
+            throw new BrowserException(Format(Strings.ScriptTimedOut, (int)ScriptTimeout.TotalSeconds));
+        }
+    }
+
+    private async Task<CoreWebView2> PageAsync(bool show, CancellationToken cancellationToken)
+    {
+        var core = await ReadyAsync(show, cancellationToken);
+        return Url is { Scheme: "http" or "https" } ? core : throw new BrowserException(Strings.NoPage);
     }
 
     private async Task<CoreWebView2> ReadyAsync(bool show, CancellationToken cancellationToken)
@@ -200,8 +213,11 @@ public sealed partial class WebViewBrowserEngine(IUiDispatcher dispatcher, Workb
             await control.EnsureCoreWebView2Async(environment);
             var core = control.CoreWebView2;
             Subscribe(core);
-            await core.CallDevToolsProtocolMethodAsync("Runtime.enable", "{}");
-            await core.CallDevToolsProtocolMethodAsync("Log.enable", "{}");
+            foreach (var domain in (string[])["Runtime.enable", "Log.enable", "Network.enable"])
+            {
+                await core.CallDevToolsProtocolMethodAsync(domain, "{}");
+            }
+
             _ready.TrySetResult(core);
         }
         catch (Exception exception) when (exception is not OperationCanceledException)
@@ -219,7 +235,13 @@ public sealed partial class WebViewBrowserEngine(IUiDispatcher dispatcher, Workb
             IsLoading = true;
             Update(core);
         };
-        core.NavigationCompleted += (_, e) => Finish(core, e.IsSuccess ? null : e.WebErrorStatus.ToString());
+
+        // A server's error page (404, 500) loads like any page: the agent reads it, with its status.
+        core.NavigationCompleted += (_, e) =>
+        {
+            StatusCode = e.HttpStatusCode > 0 ? e.HttpStatusCode : null;
+            Finish(core, e.IsSuccess || e.HttpStatusCode > 0 ? null : BrowserErrors.Describe(e.WebErrorStatus.ToString()));
+        };
 
         // In-page navigation (anchor, history.pushState) starts no load, so nothing needs to wait for one.
         core.SourceChanged += (_, e) =>
@@ -242,7 +264,12 @@ public sealed partial class WebViewBrowserEngine(IUiDispatcher dispatcher, Workb
         };
         foreach (var method in BrowserConsoleEvents.Methods)
         {
-            core.GetDevToolsProtocolEventReceiver(method).DevToolsProtocolEventReceived += (_, e) => AddConsole(BrowserConsoleEvents.Parse(method, e.ParameterObjectAsJson));
+            core.GetDevToolsProtocolEventReceiver(method).DevToolsProtocolEventReceived += (_, e) => _console.Record(method, e.ParameterObjectAsJson);
+        }
+
+        foreach (var method in BrowserNetworkLog.Methods)
+        {
+            core.GetDevToolsProtocolEventReceiver(method).DevToolsProtocolEventReceived += (_, e) => network.Record(method, e.ParameterObjectAsJson);
         }
     }
 
@@ -262,19 +289,6 @@ public sealed partial class WebViewBrowserEngine(IUiDispatcher dispatcher, Workb
         CanGoBack = core.CanGoBack;
         CanGoForward = core.CanGoForward;
         StateChanged?.Invoke(this, EventArgs.Empty);
-    }
-
-    private void AddConsole(BrowserConsoleMessage? message)
-    {
-        if (message is null)
-        {
-            return;
-        }
-
-        _console.Enqueue(message);
-        while (_console.Count > MaxConsole && _console.TryDequeue(out _))
-        {
-        }
     }
 
     private static string Format(string format, params object[] arguments) => string.Format(CultureInfo.CurrentCulture, format, arguments);

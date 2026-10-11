@@ -35,6 +35,17 @@ internal sealed class FakeBrowserEngine : IBrowserEngine
 
     public bool IsLoading { get; set; }
 
+    public int? StatusCode { get; set; }
+
+    /// <summary>DevTools calls: method and parameters, in order.</summary>
+    public List<(string Method, string Parameters)> DevTools { get; } = [];
+
+    /// <summary>DevTools replies by method; <c>{}</c> otherwise.</summary>
+    public Dictionary<string, string> DevToolsReplies { get; } = [];
+
+    /// <summary>Replies to scripts other than the snapshot, by script; <see cref="ActionResult"/> otherwise.</summary>
+    public Dictionary<string, Queue<string>> ScriptReplies { get; } = [];
+
     public event EventHandler? StateChanged;
 
     public Task NavigateAsync(Uri url, CancellationToken cancellationToken)
@@ -66,7 +77,27 @@ internal sealed class FakeBrowserEngine : IBrowserEngine
     public Task<string> EvaluateAsync(string script, CancellationToken cancellationToken)
     {
         Scripts.Add(script);
-        return Task.FromResult(script == BrowserScripts.Snapshot ? SnapshotResult : ActionResult);
+        if (script == BrowserScripts.Snapshot)
+        {
+            return Task.FromResult(SnapshotResult);
+        }
+
+        return Task.FromResult(ScriptReplies.TryGetValue(script, out var replies) && replies.Count > 0 ? replies.Dequeue() : ActionResult);
+    }
+
+    public Task<string> DevToolsAsync(string method, string parameters, CancellationToken cancellationToken)
+    {
+        DevTools.Add((method, parameters));
+        return Task.FromResult(DevToolsReplies.GetValueOrDefault(method, "{}"));
+    }
+
+    /// <summary>A page load as the engine reports it: the address, title, then the end of loading.</summary>
+    public void Load(string url, string title)
+    {
+        Url = new Uri(url);
+        Title = title;
+        IsLoading = false;
+        StateChanged?.Invoke(this, EventArgs.Empty);
     }
 
     public Task<byte[]> CaptureAsync(BrowserImageFormat format, CancellationToken cancellationToken)
