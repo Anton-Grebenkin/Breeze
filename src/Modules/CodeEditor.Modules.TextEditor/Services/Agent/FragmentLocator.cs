@@ -9,13 +9,24 @@ namespace CodeEditor.Modules.TextEditor.Services.Agent;
 /// quotes → line by line ignoring trailing spaces → ignoring indentation (new text is re-indented to the file's
 /// style) → also ignoring dash, quote and special-space differences (<see cref="Typography"/>) → with over-escaped
 /// quotes unescaped in both fragments. The last three stages attach a "check the result" warning. Ambiguity and
-/// misses are errors with line numbers and a similar spot, so the model fixes the call on the first retry.
+/// misses are errors with line numbers and a similar spot, so the model fixes the call on the first retry. A line hint
+/// (the line where the fragment starts, from read_file) picks among occurrences; the ambiguity error shows each one with
+/// the lines above it, usually the signature that makes the fragment unique.
 /// </summary>
 /// <remarks>Each stage is O(n·m) in file and fragment lines at worst; fragments are usually a few lines.</remarks>
 public static class FragmentLocator
 {
     private const int HintContextLines = 3;
     private const int MaxListedOccurrences = 5;
+
+    /// <summary>Occurrences shown with context in the ambiguity error.</summary>
+    private const int MaxShownOccurrences = 3;
+
+    /// <summary>Lines above an occurrence in the ambiguity error.</summary>
+    private const int LinesAbove = 2;
+
+    /// <summary>A line hint picks an occurrence only this close: an earlier edit may have shifted the lines a little.</summary>
+    private const int LineTolerance = 10;
     private const string EscapedQuote = "\\\"";
 
     private enum LineMatch
@@ -25,23 +36,24 @@ public static class FragmentLocator
         Typography,
     }
 
-    public static LocatedFragment Locate(string text, string oldText, string newText, string relative)
+    /// <param name="line">The line where the fragment starts, from read_file; picks among several occurrences.</param>
+    public static LocatedFragment Locate(string text, string oldText, string newText, string relative, int? line = null)
     {
         ArgumentNullException.ThrowIfNull(text);
         ArgumentNullException.ThrowIfNull(oldText);
         ArgumentNullException.ThrowIfNull(newText);
-        return Exact(text, oldText, newText, relative)
-            ?? Exact(text, StraightQuotes(oldText), StraightQuotes(newText), relative)
-            ?? ByLines(text, oldText, newText, relative, LineMatch.TrailingSpace)
-            ?? ByLines(text, oldText, newText, relative, LineMatch.Indent)
-            ?? ByLines(text, oldText, newText, relative, LineMatch.Typography)
-            ?? Unescaped(text, oldText, newText, relative)
+        return Exact(text, oldText, newText, relative, line)
+            ?? Exact(text, StraightQuotes(oldText), StraightQuotes(newText), relative, line)
+            ?? ByLines(text, oldText, newText, relative, LineMatch.TrailingSpace, line)
+            ?? ByLines(text, oldText, newText, relative, LineMatch.Indent, line)
+            ?? ByLines(text, oldText, newText, relative, LineMatch.Typography, line)
+            ?? Unescaped(text, oldText, newText, relative, line)
             ?? throw NotFound(text, oldText, relative);
     }
 
     // The model over-escaped quotes (cref=\"X\" with a literal backslash) and no exact match exists:
     // unescape both fragments and warn.
-    private static LocatedFragment? Unescaped(string text, string oldText, string newText, string relative)
+    private static LocatedFragment? Unescaped(string text, string oldText, string newText, string relative, int? line)
     {
         if (!oldText.Contains(EscapedQuote, StringComparison.Ordinal))
         {
@@ -49,25 +61,39 @@ public static class FragmentLocator
         }
 
         var (old, replacement) = (oldText.Replace(EscapedQuote, "\"", StringComparison.Ordinal), newText.Replace(EscapedQuote, "\"", StringComparison.Ordinal));
-        var fragment = Exact(text, old, replacement, relative) ?? ByLines(text, old, replacement, relative, LineMatch.Indent);
+        var fragment = Exact(text, old, replacement, relative, line) ?? ByLines(text, old, replacement, relative, LineMatch.Indent, line);
         return fragment is null ? null : fragment with
         {
             Warning = Format(Strings.QuotesUnescaped, relative),
         };
     }
 
-    private static LocatedFragment? Exact(string text, string oldText, string newText, string relative)
+    private static LocatedFragment? Exact(string text, string oldText, string newText, string relative, int? line)
     {
         var offsets = Occurrences(text, oldText);
-        return offsets.Count switch
+        if (offsets.Count == 0)
         {
-            0 => null,
-            1 => new LocatedFragment(offsets[0], oldText.Length, newText, null),
-            _ => throw Ambiguous(relative, offsets.Select(offset => LineOf(text, offset))),
-        };
+            return null;
+        }
+
+        var lines = offsets.Select(offset => LineOf(text, offset)).ToList();
+        var index = offsets.Count == 1 ? 0 : Pick(lines, line) ?? throw Ambiguous(text, relative, lines);
+        return new LocatedFragment(offsets[index], oldText.Length, newText, null);
     }
 
-    private static LocatedFragment? ByLines(string text, string oldText, string newText, string relative, LineMatch match)
+    // The occurrence nearest the hinted line, if it is close enough and no other is as near.
+    private static int? Pick(List<int> lines, int? hint)
+    {
+        if (hint is not { } wanted)
+        {
+            return null;
+        }
+
+        var ordered = lines.Select((line, index) => (Distance: Math.Abs(line - wanted), Index: index)).OrderBy(static item => item.Distance).ToList();
+        return ordered[0].Distance <= LineTolerance && ordered[1].Distance > ordered[0].Distance ? ordered[0].Index : null;
+    }
+
+    private static LocatedFragment? ByLines(string text, string oldText, string newText, string relative, LineMatch match, int? hint)
     {
         var lines = TextLines.Split(text);
         var wanted = TextLines.Split(oldText);
@@ -83,7 +109,8 @@ public static class FragmentLocator
 
         if (starts.Count > 1)
         {
-            throw Ambiguous(relative, starts.Select(start => start + 1));
+            var numbers = starts.Select(start => start + 1).ToList();
+            starts = [starts[Pick(numbers, hint) ?? throw Ambiguous(text, relative, numbers)]];
         }
 
         var first = lines[starts[0]];
@@ -154,11 +181,14 @@ public static class FragmentLocator
         return string.Empty;
     }
 
-    private static AgentToolException Ambiguous(string relative, IEnumerable<int> lines)
+    // Each occurrence with the lines above it, numbered like read_file: the model sees what makes them differ.
+    private static AgentToolException Ambiguous(string text, string relative, IReadOnlyList<int> lines)
     {
-        var listed = lines.Take(MaxListedOccurrences + 1).ToList();
-        var more = listed.Count > MaxListedOccurrences ? Strings.AndMore : string.Empty;
-        return new AgentToolException(Format(Strings.FragmentAmbiguous, relative, string.Join(", ", listed.Take(MaxListedOccurrences)), more));
+        var more = lines.Count > MaxListedOccurrences ? Strings.AndMore : string.Empty;
+        var fileLines = TextLines.Split(text);
+        var shown = lines.Take(MaxShownOccurrences).Select(line => string.Join('\n', Enumerable.Range(Math.Max(1, line - LinesAbove), Math.Min(line, LinesAbove + 1))
+            .Select(number => string.Create(CultureInfo.InvariantCulture, $"{number}\t{text.AsSpan(fileLines[number - 1].Start, fileLines[number - 1].End - fileLines[number - 1].Start)}"))));
+        return new AgentToolException(Format(Strings.FragmentAmbiguous, relative, string.Join(", ", lines.Take(MaxListedOccurrences)), more) + "\n" + string.Join("\n…\n", shown));
     }
 
     private static AgentToolException NotFound(string text, string oldText, string relative)

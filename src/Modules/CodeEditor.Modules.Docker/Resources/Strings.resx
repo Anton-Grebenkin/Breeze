@@ -194,4 +194,5 @@
   <data name="CommandLogsWordWrap" xml:space="preserve"><value>Container Logs: Toggle Word Wrap</value></data>
   <data name="CommandInspectRefresh" xml:space="preserve"><value>Inspect: Refresh</value></data>
   <data name="CommandInspectCopy" xml:space="preserve"><value>Inspect: Copy All</value></data>
+  <data name="AgentEngineStopped" xml:space="preserve"><value>The Docker engine is not running or is still starting (Docker Desktop). Start Docker Desktop or ask the user to, wait until it reports the engine is running (about a minute), then retry once; don't repeat the call in a loop.</value></data>
 </root>

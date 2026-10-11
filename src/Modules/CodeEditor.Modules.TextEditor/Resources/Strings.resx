@@ -58,7 +58,7 @@
   <data name="FoundIgnoringIndent" xml:space="preserve"><value>{0}: the fragment was found ignoring indentation (lines {1}–{2}); the indentation was adapted to the file style — check the result.</value></data>
   <data name="FoundIgnoringTypography" xml:space="preserve"><value>{0}: the fragment was found ignoring indentation and the difference between dashes, quotes and special spaces (lines {1}–{2}); unchanged lines kept the file characters — check the result.</value></data>
   <data name="AndMore" xml:space="preserve"><value> and more</value></data>
-  <data name="FragmentAmbiguous" xml:space="preserve"><value>{0}: oldText occurs more than once (lines {1}{2}). Add neighboring lines to make it unique.</value></data>
+  <data name="FragmentAmbiguous" xml:space="preserve"><value>{0}: oldText occurs more than once (lines {1}{2}). Make it unique with a neighboring line (often the signature above), or set line to where the wanted one starts (in apply_patch, put the signature in an &apos;@@&apos; line). Each occurrence with the lines above it:</value></data>
   <data name="FragmentNotFound" xml:space="preserve"><value>{0}: oldText was not found. Read the file again (read_file) and copy the fragment exactly, without line numbers.</value></data>
   <data name="FragmentSimilarAt" xml:space="preserve"><value>{0}: oldText was not found as a whole. A similar place starts on line {1}:</value></data>
   <data name="CopyFragmentExactly" xml:space="preserve"><value>Copy the fragment from the file exactly, without line numbers.</value></data>

@@ -190,6 +190,31 @@ public sealed class EditingAgentToolsTests : IDisposable
         Assert.Equal("src/B.cs", preview.RelativePath);
     }
 
+    // After a compaction the model no longer has the text: an exact fragment found once shows it still knows it, a
+    // fuzzy or repeated one sends it back to read the file.
+    [Fact]
+    public async Task AfterCompaction_ExactUniqueFragment_NeedsNoReread()
+    {
+        _fileState.ForgetReads();
+
+        var refused = await Assert.ThrowsAsync<AgentToolException>(() => Invoke(EditingAgentTools.ApplyEditsName, Edits(("src/A.cs", "void  Run() { }", "void Go() { }"))));
+        await Invoke(EditingAgentTools.ApplyEditsName, Edits(("src/A.cs", "void Run() { }", "void Go() { }")));
+
+        Assert.Contains("после сжатия контекста", refused.Message, StringComparison.Ordinal);
+        Assert.Contains("void Go() { }", Tab("A.cs").Document.Buffer.GetText(), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task RepeatedFragment_LineHintPicksTheOccurrence()
+    {
+        _fixture.FileSystem.AddFile(EditorFixture.PathOf("src/C.cs"), "class C\n{\n    int x;\n}\nclass D\n{\n    int x;\n}\n");
+        MarkRead("src/C.cs");
+
+        await Invoke(EditingAgentTools.ApplyEditsName, new() { ["edits"] = new[] { new FileEdit("src/C.cs", "    int x;", "    long x;", Line: 7) } });
+
+        Assert.Equal("class C\n{\n    int x;\n}\nclass D\n{\n    long x;\n}\n", Tab("C.cs").Document.Buffer.GetText());
+    }
+
     private static Dictionary<string, object?> Edits(params (string Path, string OldText, string NewText)[] edits) =>
         new() { ["edits"] = edits.Select(edit => new FileEdit(edit.Path, edit.OldText, edit.NewText)).ToArray() };
 

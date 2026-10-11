@@ -123,6 +123,17 @@ public sealed class DockerAgentToolsTests : IDisposable
         Assert.Equal(DockerRunner.Timeout, _runner.Requests[0].Timeout);
     }
 
+    // Docker Desktop stopped or still starting (its API answers 500): the model is told so instead of the raw error.
+    [Fact]
+    public async Task EngineNotRunning_IsExplained()
+    {
+        _runner.Returns(1, "request returned 500 Internal Server Error for API route and version http://%2F%2F.%2Fpipe%2FdockerDesktopLinuxEngine/v1.49/containers/json");
+
+        var error = await Assert.ThrowsAsync<AgentToolException>(() => InvokeAsync(DockerAgentTools.ChangeName, new() { ["action"] = "stop", ["name"] = "api" }));
+
+        Assert.StartsWith("Docker не запущен", error.Message, StringComparison.Ordinal);
+    }
+
     [Fact]
     public async Task PathOutsideTheFolder_IsRefused() =>
         await Assert.ThrowsAsync<AgentToolException>(() => InvokeAsync(DockerAgentTools.ChangeName, new() { ["action"] = "build", ["context"] = @"..\other" }));

@@ -110,4 +110,36 @@ public sealed class FragmentLocatorTests
 
         Assert.Contains("встречается несколько раз (строки 1, 3)", error.Message, StringComparison.Ordinal);
     }
+
+    // A line hint picks among occurrences; too far from all of them, or halfway between two, it does not guess.
+    [Theory]
+    [InlineData(3, 2)]
+    [InlineData(8, 6)]
+    [InlineData(40, -1)]
+    public void Ambiguous_LineHint_PicksTheNearest(int hint, int expectedLine)
+    {
+        const string text = "class A\n{\n    Save();\n}\nclass B\n{\n    Save();\n}\n";
+
+        if (expectedLine < 0)
+        {
+            Assert.Throws<AgentToolException>(() => FragmentLocator.Locate(text, "    Save();", "    Store();", "A.cs", hint));
+            return;
+        }
+
+        var found = FragmentLocator.Locate(text, "    Save();", "    Store();", "A.cs", hint);
+        Assert.Equal(expectedLine, text.AsSpan(0, found.Offset).Count('\n'));
+    }
+
+    // Each occurrence comes with the lines above it: the class or method that makes it unique.
+    [Fact]
+    public void Ambiguous_ShowsEachOccurrenceWithLinesAbove()
+    {
+        const string text = "class A\n{\n    Save();\n}\nclass B\n{\n    Save();\n}\n";
+
+        var error = Assert.Throws<AgentToolException>(() => FragmentLocator.Locate(text, "    Save();", "x", "A.cs"));
+
+        Assert.Contains("1\tclass A\n2\t{\n3\t    Save();", error.Message, StringComparison.Ordinal);
+        Assert.Contains("5\tclass B\n6\t{\n7\t    Save();", error.Message, StringComparison.Ordinal);
+        Assert.Contains("line", error.Message, StringComparison.Ordinal);
+    }
 }

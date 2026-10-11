@@ -194,4 +194,5 @@
   <data name="CommandLogsWordWrap" xml:space="preserve"><value>Журнал контейнера: перенос строк</value></data>
   <data name="CommandInspectRefresh" xml:space="preserve"><value>Сведения: обновить</value></data>
   <data name="CommandInspectCopy" xml:space="preserve"><value>Сведения: копировать всё</value></data>
+  <data name="AgentEngineStopped" xml:space="preserve"><value>Docker не запущен или ещё запускается (Docker Desktop). Запусти Docker Desktop или попроси пользователя, дождись, пока движок запустится (около минуты), и повтори один раз; не повторяй вызов в цикле.</value></data>
 </root>

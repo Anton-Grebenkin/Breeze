@@ -18,6 +18,12 @@ public interface IAgentFileState
     /// <returns><c>null</c> if the edit may proceed; otherwise an explanation for the model of what to do.</returns>
     string? CheckEditable(string path, string relativePath, string currentText);
 
+    /// <summary>
+    /// The agent read the file earlier in this chat and only a context compaction took the text away: an edit whose
+    /// fragments are each found exactly once shows the model still knows the text.
+    /// </summary>
+    bool WasForgotten(string path);
+
     /// <summary>The agent changed, created or deleted a file: it knows this version; the original is kept for the diff.</summary>
     /// <param name="text">New text; <c>null</c> if the file was deleted.</param>
     /// <param name="previousText">Text before the edit; <c>null</c> if the file did not exist.</param>
