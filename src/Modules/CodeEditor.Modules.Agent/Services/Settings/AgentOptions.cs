@@ -79,6 +79,9 @@ public sealed class AgentOptions
     /// </summary>
     public int? MaxSteps { get; set; }
 
+    /// <summary>User hooks by event (<c>agent.hooks</c>, only from the user's settings).</summary>
+    public AgentHookSettings Hooks { get; set; } = new();
+
     /// <summary>Update folder memory after a turn with the helper model (ADR 0012); disable with <c>agent.autoMemory: false</c>.</summary>
     public bool AutoMemory { get; set; } = true;
 

@@ -17,4 +17,7 @@ public sealed record ProcessRequest(string FileName, IReadOnlyList<string> Argum
     /// would then reach the model in its output.
     /// </summary>
     public bool HideSecretVariables { get; init; }
+
+    /// <summary>Text for standard input (UTF-8), such as a hook's JSON; <c>null</c> closes input at once.</summary>
+    public string? Input { get; init; }
 }

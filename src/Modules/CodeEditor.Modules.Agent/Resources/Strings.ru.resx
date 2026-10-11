@@ -448,4 +448,10 @@ description: Стили XAML
   <data name="NothingToMoveToBackground" xml:space="preserve"><value>Нет шага, который можно перевести в фон.</value></data>
   <data name="ImageNotForModel" xml:space="preserve"><value>(картинка не показана: текущая модель не принимает изображения)</value></data>
   <data name="RunWithoutAsking" xml:space="preserve"><value>Правки и команды без вопросов</value></data>
+  <data name="HookBlockedTool" xml:space="preserve"><value>Хук пользователя запретил этот вызов: {0}</value></data>
+  <data name="HookNoReason" xml:space="preserve"><value>(хук не объяснил причину)</value></data>
+  <data name="HookFeedback" xml:space="preserve"><value>Хук пользователя сообщает о результате: {0}</value></data>
+  <data name="HookBlockedPrompt" xml:space="preserve"><value>Хук не пропустил сообщение: {0}</value></data>
+  <data name="HookStopPrompt" xml:space="preserve"><value>Хук пользователя просит пока не заканчивать: {0}</value></data>
+  <data name="HookStopStatus" xml:space="preserve"><value>Хук остановки: агент продолжает</value></data>
 </root>

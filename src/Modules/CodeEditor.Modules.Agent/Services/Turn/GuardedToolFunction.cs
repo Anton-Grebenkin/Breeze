@@ -23,7 +23,8 @@ namespace CodeEditor.Modules.Agent.Services.Turn;
 ///   calls so the message reaches the model;
 /// - the first read of a file with a rule in .breeze/rules brings the rule text (<see cref="ProjectRuleGuard"/>);
 /// - registers the call with its feed row (<see cref="RunningToolCalls"/>) and appends the editor's notes to the result
-///   (<see cref="ToolCallObservers"/>: the watchdog, a finished background command).
+///   (<see cref="ToolCallObservers"/>: the watchdog, a finished background command);
+/// - runs the user's hooks around the call (<see cref="HookRunner"/>): one may block it or comment on its result.
 /// </summary>
 internal sealed partial class GuardedToolFunction(
     AIFunction inner,
@@ -72,6 +73,11 @@ internal sealed partial class GuardedToolFunction(
             return BlockedResult;
         }
 
+        if (await BlockedByHookAsync(arguments, cancellationToken) is { } blocked)
+        {
+            return blocked;
+        }
+
         var started = Stopwatch.GetTimestamp();
         object? result;
         using (BeginActivity())
@@ -80,6 +86,7 @@ internal sealed partial class GuardedToolFunction(
         }
 
         result = WithObserverNotes(arguments, result, Stopwatch.GetElapsedTime(started));
+        result = await WithHookFeedbackAsync(arguments, result, cancellationToken);
         if (ExternalContent.Has(this))
         {
             budget.RegisterExternalContent();
@@ -118,6 +125,27 @@ internal sealed partial class GuardedToolFunction(
 
         var notes = observers.After(new ToolCallRecord(Name, arguments, text, IsError(result), elapsed));
         return notes.Length == 0 ? result : text + notes;
+    }
+
+    // A PreToolUse hook that exits with 2 stops the call; the model reads why and adjusts.
+    private async Task<string?> BlockedByHookAsync(AIFunctionArguments arguments, CancellationToken cancellationToken) =>
+        guards?.Hooks is { } hooks && hooks.Has(HookEvents.PreToolUse)
+        && await hooks.RunAsync(HookEvents.PreToolUse, Name, HookInputs.Tool(Name, arguments), cancellationToken) is { Blocked: true } outcome
+            ? $"{ToolViews.ErrorPrefix} {string.Format(CultureInfo.CurrentCulture, Strings.HookBlockedTool, outcome.Message ?? Strings.HookNoReason)}"
+            : null;
+
+    // A PostToolUse hook that exits with 2 has something to say about the result: a failed lint, a broken test.
+    private async Task<object?> WithHookFeedbackAsync(AIFunctionArguments arguments, object? result, CancellationToken cancellationToken)
+    {
+        if (guards?.Hooks is not { } hooks || !hooks.Has(HookEvents.PostToolUse) || AsText(result) is not { } text)
+        {
+            return result;
+        }
+
+        var outcome = await hooks.RunAsync(HookEvents.PostToolUse, Name, HookInputs.ToolResult(Name, arguments, text, IsError(result)), cancellationToken);
+        return outcome.Blocked
+            ? text + "\n\n" + PromptSections.EditorNote(string.Format(CultureInfo.CurrentCulture, Strings.HookFeedback, outcome.Message ?? Strings.HookNoReason))
+            : result;
     }
 
     // A user message is waiting: these results go to history, and the next model request carries the message.

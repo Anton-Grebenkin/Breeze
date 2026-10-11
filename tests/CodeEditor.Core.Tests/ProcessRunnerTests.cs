@@ -49,6 +49,16 @@ public sealed class ProcessRunnerTests
         Assert.Contains("done", result.Output, StringComparison.Ordinal);
     }
 
+    // A hook reads its event from standard input, then input closes as usual.
+    [Fact]
+    public async Task Input_ReachesTheProcess_ThenCloses()
+    {
+        var result = await _runner.RunAsync(Cmd("more") with { Input = "{\"hook_event_name\":\"Stop\"}\n", Timeout = TimeSpan.FromSeconds(10) }, null, TestContext.Current.CancellationToken);
+
+        Assert.False(result.TimedOut);
+        Assert.Contains("{\"hook_event_name\":\"Stop\"}", result.Output, StringComparison.Ordinal);
+    }
+
     [Fact]
     public async Task MissingProgram_IsExplained() =>
         Assert.Contains("Не удалось запустить", (await Assert.ThrowsAsync<InvalidOperationException>(() =>

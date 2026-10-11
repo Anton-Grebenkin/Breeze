@@ -39,6 +39,7 @@ public sealed class AgentModule : IModule
         services.AddUserOnlySetting(ModelSettingsViewModel.ApprovalsKey);
         services.AddUserOnlySetting(WebApprovals.HostsKey);
         services.AddUserOnlySetting(ServiceMenu.EndpointKey);
+        services.AddUserOnlySetting(AgentOptions.Section + ".hooks");
         services.AddSingleton<ApiKeyState>();
         services.AddSingleton<RulesProblemReporter>();
         services.AddSingleton<ProjectInstructions>();
@@ -62,6 +63,7 @@ public sealed class AgentModule : IModule
         services.AddSingleton<TurnChecks>();
         services.AddSingleton<AgentFileState>();
         services.AddSingleton<IAgentFileState>(provider => provider.GetRequiredService<AgentFileState>());
+        services.AddSingleton<HookRunner>();
         services.AddSingleton<ToolGuards>();
         services.AddSingleton<AgentConversation>();
         services.AddSingleton<ApprovalCards>();

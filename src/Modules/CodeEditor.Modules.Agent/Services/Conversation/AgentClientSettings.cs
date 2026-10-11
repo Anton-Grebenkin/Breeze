@@ -18,6 +18,7 @@ public static class AgentClientSettings
         nameof(AgentOptions.AutoMemory),
         nameof(AgentOptions.WebHosts),
         nameof(AgentOptions.MaxSteps),
+        nameof(AgentOptions.Hooks),
     ];
 
     /// <summary>Fingerprint of the client settings: if it matches, nothing needs rebuilding.</summary>

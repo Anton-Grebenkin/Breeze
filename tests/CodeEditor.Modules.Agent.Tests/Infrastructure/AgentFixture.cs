@@ -17,6 +17,7 @@ using CodeEditor.Modules.Agent.Services.Context;
 using CodeEditor.Modules.Agent.Services.Conversation;
 using CodeEditor.Modules.Agent.Services.Deep;
 using CodeEditor.Modules.Agent.Services.History;
+using CodeEditor.Modules.Agent.Services.Hooks;
 using CodeEditor.Modules.Agent.Services.Memory;
 using CodeEditor.Modules.Agent.Services.Models;
 using CodeEditor.Modules.Agent.Services.Prompts;
@@ -64,10 +65,11 @@ internal sealed class AgentFixture : IDisposable
         Instructions = new ProjectInstructions(Workspace, FileSystem, new UserDataPaths(UserDataRoot));
         Rules = new ProjectRuleGuard(Instructions, Workspace);
         RunningCalls = new RunningToolCalls(Time);
+        Hooks = new HookRunner(Options, Processes, Workspace, NullLogger<HookRunner>.Instance);
         Observers = new ToolCallObservers(new TurnWatchdog(Budget), []);
-        Conversation = new AgentConversation(new Factory(this), Options, ApiKey, new SystemPrompt(Workspace, Instructions), ToolProviders, Budget, Compaction, Meter, Explorer, ReadTools, Transcript, CacheKey, new CacheWarmup(HelperUsage, TimeProvider.System, NullLogger<CacheWarmup>.Instance), new ToolGuards(Deep, Queue, Rules, Observers, RunningCalls), ConversationLog);
+        Conversation = new AgentConversation(new Factory(this), Options, ApiKey, new SystemPrompt(Workspace, Instructions), ToolProviders, Budget, Compaction, Meter, Explorer, ReadTools, Transcript, CacheKey, new CacheWarmup(HelperUsage, TimeProvider.System, NullLogger<CacheWarmup>.Instance), new ToolGuards(Deep, Queue, Rules, Observers, RunningCalls, Hooks), ConversationLog);
         Reverter = new FakeChangeReverter(FileSystem);
-        Checks = new TurnChecks(Gate, Budget, Verifiers, Todos, Deep, [Jobs]);
+        Checks = new TurnChecks(Gate, Budget, Verifiers, Todos, Deep, [Jobs], Hooks);
         Editors = new EditorAreaViewModel(Documents, [], [], new DocumentSaver(Documents, new FakeDialogs(), StatusBar), new ContextKeyService(), StatusBar);
         Settings.Changed += (_, _) => ApplyWrittenMode();
         History = CreateHistory();
@@ -158,6 +160,11 @@ internal sealed class AgentFixture : IDisposable
     public RunningToolCalls RunningCalls { get; }
 
     public ToolCallObservers Observers { get; }
+
+    /// <summary>Processes the user's hooks start; a test scripts their exit codes and output.</summary>
+    public FakeProcessRunner Processes { get; } = new();
+
+    public HookRunner Hooks { get; }
 
     /// <summary>Code verifiers; when empty there is nothing to build and the verification gate stays silent.</summary>
     public List<IAgentVerifier> Verifiers { get; } = [];
@@ -259,7 +266,7 @@ internal sealed class AgentFixture : IDisposable
             new ChatAttachmentsViewModel(AttachmentPicker, Attachments, new PastedAttachments(Workspace, FileSystem, UserData, TimeProvider.System), Options, StatusBar),
             new QueuedMessagesViewModel(Queue, new InlineUiDispatcher()));
         var services = new AgentTurnServices(Conversation, new ApprovalCards(Previewers, Policies, Rules), usage, new AgentActivityLog(ActivityLog), Budget, FileState, Todos, Questions, Checks, Compaction, HelperUsage, new ToolViews(Presenters, NullLogger<ToolViews>.Instance), Deep, MemoryExtractor, Queue, Images, Observers, RunningCalls, new InlineUiDispatcher(), Time);
-        var session = new ChatSession(services, history, Options, new TurnMessageBuilder(ContextProviders, Start, Attachments, Options, TimeProvider.System, NullLogger<TurnMessageBuilder>.Instance), new InlineUiDispatcher());
+        var session = new ChatSession(services, history, Options, new TurnMessageBuilder(ContextProviders, Start, Attachments, Options, TimeProvider.System, NullLogger<TurnMessageBuilder>.Instance, Hooks), new InlineUiDispatcher());
         var links = new ChatLinkOpener(Workspace, FileSystem, Index, QuickPick, Commands, Shell, StatusBar);
         return new ChatViewModel(session, history, parts, links, QuickPick, Shell, Workspace, ApiKey, Commands, TimeProvider.System);
     }

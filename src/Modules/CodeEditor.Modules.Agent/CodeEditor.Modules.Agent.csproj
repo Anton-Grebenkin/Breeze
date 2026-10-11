@@ -30,6 +30,7 @@
     <Using Include="CodeEditor.Modules.Agent.Services.Conversation" />
     <Using Include="CodeEditor.Modules.Agent.Services.Deep" />
     <Using Include="CodeEditor.Modules.Agent.Services.History" />
+    <Using Include="CodeEditor.Modules.Agent.Services.Hooks" />
     <Using Include="CodeEditor.Modules.Agent.Services.Http" />
     <Using Include="CodeEditor.Modules.Agent.Services.Memory" />
     <Using Include="CodeEditor.Modules.Agent.Services.Models" />
