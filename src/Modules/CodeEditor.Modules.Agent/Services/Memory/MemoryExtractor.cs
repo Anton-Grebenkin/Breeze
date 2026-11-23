@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 using CodeEditor.Modules.Agent.Contracts;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Logging;
@@ -106,6 +107,13 @@ public sealed partial class MemoryExtractor(
 
             try
             {
+                // The helper model sees the list of notes and tends to hand one back reworded after every turn:
+                // saving it would only renew its date and repeat "Remembered" in the feed.
+                if (memory.Read(proposal.Name.Trim()) is { } existing && !AddsFacts(existing.Content, proposal.Content))
+                {
+                    continue;
+                }
+
                 var type = (proposal.Type ?? "project").Trim().ToLowerInvariant();
                 memory.Save(proposal.Name.Trim(), type, proposal.Description ?? string.Empty, proposal.Content, automatic: true);
                 saved.Add(memory.Read(proposal.Name.Trim())!);
@@ -118,6 +126,25 @@ public sealed partial class MemoryExtractor(
 
         return saved;
     }
+
+    /// <summary>
+    /// Whether a proposed text says something the note does not: it has a word (a name, a number, a path part) the
+    /// note lacks. A rewording or a shorter retelling of the same words does not. O(text length).
+    /// </summary>
+    internal static bool AddsFacts(string existing, string proposed)
+    {
+        var known = Words(existing).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        return Words(proposed).Any(word => !known.Contains(word));
+    }
+
+    // Short words are grammar, not facts; digits count at any length.
+    private static IEnumerable<string> Words(string text) =>
+        Word().Matches(text).Select(static match => match.Value).Where(static word => word.Length >= MinWordLength || char.IsDigit(word[0]));
+
+    private const int MinWordLength = 4;
+
+    [GeneratedRegex(@"[\p{L}\p{Nd}_]+", RegexOptions.CultureInvariant)]
+    private static partial Regex Word();
 
     /// <summary>A note as the model proposes it.</summary>
     public sealed record Proposal(

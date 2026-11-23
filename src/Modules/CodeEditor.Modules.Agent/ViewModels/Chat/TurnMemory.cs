@@ -11,6 +11,8 @@ namespace CodeEditor.Modules.Agent.ViewModels.Chat;
 /// </summary>
 internal sealed class TurnMemory(AgentTurnServices services, ChatHistory history, ObservableCollection<ChatMessageViewModel> messages, IUiDispatcher dispatcher)
 {
+    private readonly HashSet<(string? Chat, string Note)> _shown = [];
+
     public async Task RememberAsync(AgentTurn turn, CancellationToken cancellationToken)
     {
         var chatId = history.CurrentId;
@@ -35,7 +37,8 @@ internal sealed class TurnMemory(AgentTurnServices services, ChatHistory history
                 return;
             }
 
-            foreach (var note in notes)
+            // One "Remembered" row per note in a chat: a note extended on a later turn does not repeat it.
+            foreach (var note in notes.Where(note => _shown.Add((chatId, note.Name))))
             {
                 messages.Add(new ChatMessageViewModel(ChatMessageKind.Status, string.Format(CultureInfo.CurrentCulture, Strings.MemoryAutoSaved, note.Name, note.Description)));
             }

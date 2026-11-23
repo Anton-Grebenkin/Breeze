@@ -37,11 +37,11 @@ internal sealed partial class GuardedToolFunction(
 {
     public static string ExhaustedResult => Strings.ToolBudgetExhausted;
 
-    public static string RepeatNote => "\n\n" + Strings.ToolRepeatNote;
+    public static string RepeatNote => HarnessNotes.After(Strings.ToolRepeatNote);
 
     public static string BlockedResult => Strings.ToolRepeatBlocked;
 
-    public static string ExplorationNote => "\n\n" + string.Format(CultureInfo.CurrentCulture, Strings.ExplorationStallNote, TurnBudget.ReadsBeforeReflection);
+    public static string ExplorationNote => HarnessNotes.After(string.Format(CultureInfo.CurrentCulture, Strings.ExplorationStallNote, TurnBudget.ReadsBeforeReflection));
 
     private readonly bool _mutating = inner.GetService<ApprovalRequiredAIFunction>() is not null;
 
@@ -107,7 +107,7 @@ internal sealed partial class GuardedToolFunction(
         result = WithFileRules(arguments, result);
         if (guards?.Deep is { } deep && AsText(result) is { } output && await deep.AfterToolAsync(Name, output, cancellationToken) is { } advice)
         {
-            result = output + "\n\n" + advice;
+            result = output + HarnessNotes.After(advice);
         }
 
         if (repeat > 1 && AsText(result) is { } text)
@@ -238,7 +238,7 @@ internal sealed partial class GuardedToolFunction(
         var end = reason.IndexOfAny('\r', '\n');
         budget.SwitchOff(Name, (end < 0 ? reason : reason[..end]).ToString());
         LogSwitchedOff(logger, Name);
-        return $"{ToolViews.ErrorPrefix} {message}\n\n{string.Format(CultureInfo.CurrentCulture, Strings.ToolSwitchedOffNote, Name)}";
+        return $"{ToolViews.ErrorPrefix} {message}{HarnessNotes.After(string.Format(CultureInfo.CurrentCulture, Strings.ToolSwitchedOffNote, Name))}";
     }
 
     private string SwitchedOff(string reason) =>

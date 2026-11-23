@@ -1,6 +1,8 @@
 using CodeEditor.Modules.Agent.Contracts;
+using CodeEditor.Modules.Agent.Services.Deep;
 using CodeEditor.Modules.Agent.Services.Memory;
 using CodeEditor.Modules.Agent.Services.Settings;
+using CodeEditor.Modules.Agent.Services.Turn;
 using CodeEditor.Modules.Agent.Tests.Infrastructure;
 using CodeEditor.Modules.Agent.ViewModels.Chat;
 using Microsoft.Extensions.AI;
@@ -122,5 +124,46 @@ public sealed class MemoryExtractorTests : IDisposable
         await _fixture.Chat.Session.Remembering;
 
         Assert.Equal(["user-role"], _fixture.Memory.Notes().Select(note => note.Name));
+    }
+
+    // The helper sees the list of notes and tends to hand one back reworded after every turn: it is saved and shown
+    // again only when it says something new, and "Remembered" appears once per note in a chat.
+    [Fact]
+    public async Task NoteWithoutNewFacts_IsNotRewritten_AndRememberedIsShownOncePerNote()
+    {
+        const string first = """[{"name": "order-flow", "type": "project", "description": "Где создаётся заказ", "content": "Заказ создаётся в `src/Order.cs:1`."}]""";
+        const string reworded = """[{"name": "order-flow", "type": "project", "description": "Создание заказа", "content": "В `src/Order.cs:1` создаётся заказ."}]""";
+        const string extended = """[{"name": "order-flow", "type": "project", "description": "Где создаётся заказ", "content": "Заказ создаётся в `src/Order.cs:1`, проверяется в OrderValidator."}]""";
+        _fixture.HelperClient.Reply(first).Reply(reworded).Reply(extended);
+        foreach (var call in new[] { "c1", "c2", "c3" })
+        {
+            _fixture.Client.CallTool(call, "read_small", new Dictionary<string, object?> { ["path"] = $"src/Order.cs#{call}" }).Reply("Ответ.");
+            await _fixture.SendAsync("вопрос " + call);
+            await _fixture.Chat.Session.Remembering;
+        }
+
+        var note = _fixture.Memory.Read("order-flow")!;
+        Assert.Equal(("Где создаётся заказ", "Заказ создаётся в `src/Order.cs:1`, проверяется в OrderValidator."), (note.Description, note.Content));
+        Assert.Single(_fixture.Chat.Messages, message => message.Kind == ChatMessageKind.Status && message.Text.StartsWith("Запомнено", StringComparison.Ordinal));
+    }
+
+    [Theory]
+    [InlineData("Заказ создаётся в `src/Order.cs:1`.", "В `src/Order.cs:1` создаётся заказ.", false)]
+    [InlineData("Заказ создаётся в `src/Order.cs:1`.", "Заказ создаётся в Order.", false)]
+    [InlineData("Заказ создаётся в `src/Order.cs:1`.", "Заказ создаётся в `src/Order.cs:12`.", true)]
+    [InlineData("Заказ создаётся в Order.", "Заказ создаётся в Order и проверяется в OrderValidator.", true)]
+    public void AddsFacts_IsAboutNewWords_NotWording(string existing, string proposed, bool adds) =>
+        Assert.Equal(adds, MemoryExtractor.AddsFacts(existing, proposed));
+
+    // The harness's own hints at the end of a tool result (a repeat, twenty reads in a row) are not the turn's facts:
+    // the digest the helper reads leaves them out, or they were remembered as the user's requirements.
+    [Fact]
+    public void Digest_LeavesOutHarnessHintsInToolResults()
+    {
+        var result = new FunctionResultContent("c1", "class Order { }" + GuardedToolFunction.ExplorationNote + GuardedToolFunction.RepeatNote);
+
+        var digest = TranscriptDigest.Render([new ChatMessage(ChatRole.User, "вопрос"), new ChatMessage(ChatRole.Tool, [result])]);
+
+        Assert.Equal("USER: вопрос\n\nRESULT: class Order { }", digest);
     }
 }

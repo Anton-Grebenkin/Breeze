@@ -171,7 +171,7 @@ public sealed class AgentLoopTests : IDisposable
         await run.InvokeAsync(Arguments("echo 3"), token);
 
         Assert.StartsWith("Ошибка: Антивирус блокирует команды.", first, StringComparison.Ordinal);
-        Assert.EndsWith("Инструмент run_command отключён до конца хода: не вызывай его снова.", first, StringComparison.Ordinal);
+        Assert.EndsWith("<reminder>Инструмент run_command отключён до конца хода: не вызывай его снова.</reminder>", first, StringComparison.Ordinal);
         Assert.Equal("Ошибка: Не выполнено: инструмент run_command отключён до конца хода, потому что в этой среде он не работает. Антивирус блокирует команды.", second);
         Assert.Equal(2, runs);
 
