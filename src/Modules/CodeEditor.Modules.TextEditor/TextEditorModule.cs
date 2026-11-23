@@ -31,7 +31,7 @@ public sealed class TextEditorModule : IModule
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddSingleton<EditorSettings>();
-        services.AddSettingsSection<EditorOptions>(EditorOptions.Section);
+        services.AddSettingsSection<EditorOptions>(EditorOptions.Section, SettingScope.Folder);
         services.AddSingleton<EditorFontZoom>();
         services.AddSingleton<EditorFocus>();
         services.AddSingleton<IEditorProvider, TextEditorProvider>();

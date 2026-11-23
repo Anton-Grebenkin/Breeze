@@ -31,7 +31,7 @@ public sealed class SearchModule : IModule
     public void ConfigureServices(IServiceCollection services)
     {
         services.TryAddSingleton(TimeProvider.System);
-        services.AddSettingsSection<SearchSettings>(SearchSettings.Section);
+        services.AddSettingsSection<SearchSettings>(SearchSettings.Section, SettingScope.Folder);
         services.AddSingleton<TextSearchService>();
         services.AddSingleton<SearchViewModel>();
         services.AddSingleton<IAgentToolProvider, SearchAgentTools>();

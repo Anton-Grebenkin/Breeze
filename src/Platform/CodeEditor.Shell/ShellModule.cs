@@ -70,9 +70,9 @@ public sealed class ShellModule : IModule
         services.AddSingleton<HelpCommands>();
         services.TryAddSingleton(_ => ProductInfo.FromAssembly(Assembly.GetEntryAssembly() ?? typeof(ShellModule).Assembly, MainWindowViewModel.ProductName));
         services.AddSingleton<ThemeSettings>();
-        services.AddSettingsSection<WorkbenchOptions>(WorkbenchOptions.Section);
+        services.AddSettingsSection<WorkbenchOptions>(WorkbenchOptions.Section, SettingScope.Folder);
         services.AddSingleton<LayoutCommands>();
-        services.AddSettingsSection<WindowOptions>(WindowOptions.Section);
+        services.AddSettingsSection<WindowOptions>(WindowOptions.Section, SettingScope.Folder);
         services.AddSingleton<WindowZoom>();
         services.AddSingleton<ZoomCommands>();
 
@@ -83,7 +83,7 @@ public sealed class ShellModule : IModule
 
         // The app replaces it with the installed build's integration.
         services.AddSingleton<IWindowsIntegration, NoWindowsIntegration>();
-        services.AddSettingsSection<WindowsIntegrationOptions>(WindowsIntegrationOptions.Section);
+        services.AddSettingsSection<WindowsIntegrationOptions>(WindowsIntegrationOptions.Section, SettingScope.User);
         services.AddSingleton<FileTypesPrompt>();
         services.AddSingleton<WindowsIntegrationCommands>();
         services.AddSingleton<IAppWindows, AppWindows>();

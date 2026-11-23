@@ -105,7 +105,7 @@ public sealed class GitPanelViewModelTests : IDisposable
 
         await _panel.RunCommand.ExecuteAsync(GitCommandIds.Init);
 
-        Assert.Equal(["--no-pager", "-c", "core.quotepath=false", "-c", "color.ui=false", "init"], _git.Runner.Requests[0].Arguments);
+        Assert.Equal(["--no-pager", "-c", "core.quotepath=false", "-c", "color.ui=false", "-c", "core.fsmonitor=false", "init"], _git.Runner.Requests[0].Arguments);
         Assert.True(_panel.IsReady || _panel.IsNotRepository);
     }
 

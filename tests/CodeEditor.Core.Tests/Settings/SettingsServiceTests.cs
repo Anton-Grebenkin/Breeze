@@ -34,7 +34,8 @@ public sealed class SettingsServiceTests : IDisposable
         services.AddSingleton<IWorkspace, Workspace>();
         services.AddSingleton<IUiDispatcher, InlineUiDispatcher>();
         services.AddSingleton<ISettingsService, SettingsService>();
-        services.AddSettingsSection<SampleOptions>("sample");
+        services.AddSettingsSection<SampleOptions>("sample", SettingScope.Folder);
+        services.AddSingleton(new SettingsSectionScope("machine", SettingScope.User));
         services.AddUserOnlySetting("sample.size");
         _services = services.BuildServiceProvider();
     }
@@ -101,6 +102,31 @@ public sealed class SettingsServiceTests : IDisposable
 
         Assert.Equal((16, "folder"), (Sample.CurrentValue.Size, Sample.CurrentValue.Name));
     }
+
+    // The folder's file is read by allow-list: a user-scoped section and a section nobody registered are ignored,
+    // while the user's own file sets them as before.
+    [Fact]
+    public void FolderSettings_SetOnlyFolderScopedSections()
+    {
+        _fileSystem.AddFile(UserFile, "{ \"machine.registry\": false }");
+        _fileSystem.AddFile(FolderFile, "{ \"machine.registry\": true, \"unknown.key\": 1, \"sample.name\": \"folder\" }");
+        var workspace = _services.GetRequiredService<IWorkspace>();
+        _ = Settings;
+
+        workspace.Open(Repo);
+
+        Assert.Equal("False", Settings.Configuration["machine:registry"], ignoreCase: true);
+        Assert.Null(Settings.Configuration["unknown:key"]);
+        Assert.Equal("folder", Sample.CurrentValue.Name);
+    }
+
+    [Theory]
+    [InlineData("editor:tabSize", true)]
+    [InlineData("EDITOR", true)]
+    [InlineData("editorExtra:tabSize", false)]
+    [InlineData("files:exclude", false)]
+    public void SectionScope_CoversItsKeys(string key, bool covered) =>
+        Assert.Equal(covered, new SettingsSectionScope("editor", SettingScope.Folder).Covers(key));
 
     [Theory]
     [InlineData("terminal:allowedCommands", true)]

@@ -35,11 +35,15 @@ public sealed class AgentModule : IModule
 
     public void ConfigureServices(IServiceCollection services)
     {
-        services.AddSettingsSection<AgentOptions>(AgentOptions.Section);
+        services.AddSettingsSection<AgentOptions>(AgentOptions.Section, SettingScope.Folder);
         services.AddUserOnlySetting(ModelSettingsViewModel.ApprovalsKey);
         services.AddUserOnlySetting(WebApprovals.HostsKey);
         services.AddUserOnlySetting(ServiceMenu.EndpointKey);
         services.AddUserOnlySetting(AgentOptions.Section + ".hooks");
+
+        // Writing every request to disk and paid cache warm-up are the user's call, not a repository's.
+        services.AddUserOnlySetting(AgentOptions.Section + ".trafficLog");
+        services.AddUserOnlySetting(AgentOptions.Section + ".cacheWarmup");
         services.AddSingleton<ApiKeyState>();
         services.AddSingleton<RulesProblemReporter>();
         services.AddSingleton<ProjectInstructions>();

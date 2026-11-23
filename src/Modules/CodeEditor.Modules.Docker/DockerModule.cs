@@ -42,7 +42,7 @@ public sealed class DockerModule : IModule
 
     public void ConfigureServices(IServiceCollection services)
     {
-        services.AddSettingsSection<DockerOptions>(DockerOptions.Section);
+        services.AddSettingsSection<DockerOptions>(DockerOptions.Section, SettingScope.User);
         services.AddSingleton<DockerRunner>();
         services.AddSingleton<DockerAgentTools>();
         services.AddSingleton<IAgentToolProvider>(provider => provider.GetRequiredService<DockerAgentTools>());

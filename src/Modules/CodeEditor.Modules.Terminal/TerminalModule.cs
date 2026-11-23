@@ -40,7 +40,7 @@ public sealed class TerminalModule : IModule
 
     public void ConfigureServices(IServiceCollection services)
     {
-        services.AddSettingsSection<TerminalOptions>(TerminalOptions.Section);
+        services.AddSettingsSection<TerminalOptions>(TerminalOptions.Section, SettingScope.Folder);
         services.AddUserOnlySetting(CommandApprovals.AllowedCommandsKey);
         services.AddSingleton<IAgentApprovalPolicy, CommandApprovals>();
         services.TryAddSingleton(TimeProvider.System);

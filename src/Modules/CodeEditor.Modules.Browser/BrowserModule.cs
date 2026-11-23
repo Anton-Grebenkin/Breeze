@@ -32,7 +32,7 @@ public sealed class BrowserModule : IModule
 
     public void ConfigureServices(IServiceCollection services)
     {
-        services.AddSettingsSection<BrowserOptions>(BrowserOptions.Section);
+        services.AddSettingsSection<BrowserOptions>(BrowserOptions.Section, SettingScope.User);
         services.AddUserOnlySetting(BrowserApprovals.AllowedHostsKey);
         services.AddSingleton<BrowserHistory>();
         services.AddSingleton<BrowserNetworkLog>();

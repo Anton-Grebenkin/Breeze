@@ -31,15 +31,24 @@ public sealed partial class SettingsService : ISettingsService, IDisposable
     private readonly ConfigurationRoot _configuration;
     private readonly IFileWatcher? _userWatcher;
     private readonly UserOnlySetting[] _userOnly;
+    private readonly SettingsSectionScope[] _folderSections;
     private string? _userError;
     private string? _folderError;
 
     /// <param name="userOnly">Keys a folder's file cannot set (<see cref="UserOnlySetting"/>).</param>
+    /// <param name="sections">Registered sections; a folder's file may set only those with <see cref="SettingScope.Folder"/>.</param>
     public SettingsService(
-        IFileSystem fileSystem, UserDataPaths paths, IWorkspace workspace, IUiDispatcher dispatcher, ILogger<SettingsService> logger, IEnumerable<UserOnlySetting>? userOnly = null)
+        IFileSystem fileSystem,
+        UserDataPaths paths,
+        IWorkspace workspace,
+        IUiDispatcher dispatcher,
+        ILogger<SettingsService> logger,
+        IEnumerable<UserOnlySetting>? userOnly = null,
+        IEnumerable<SettingsSectionScope>? sections = null)
     {
         _fileSystem = fileSystem;
         _userOnly = [.. userOnly ?? []];
+        _folderSections = [.. (sections ?? []).Where(static section => section.Scope == SettingScope.Folder)];
         _workspace = workspace;
         _dispatcher = dispatcher;
         _logger = logger;
@@ -207,14 +216,19 @@ public sealed partial class SettingsService : ISettingsService, IDisposable
         }
     }
 
+    // A folder's file comes with someone else's repository: it is read by allow-list, so a section added later is
+    // closed to it until its scope says otherwise.
     private void DropUserOnly(Dictionary<string, string?> data, string path)
     {
-        foreach (var key in data.Keys.Where(key => _userOnly.Any(setting => setting.Covers(key))).ToList())
+        foreach (var key in data.Keys.Where(key => !MayComeFromFolder(key)).ToList())
         {
             data.Remove(key);
             LogUserOnlyIgnored(_logger, key, path);
         }
     }
+
+    private bool MayComeFromFolder(string key) =>
+        _folderSections.Any(section => section.Covers(key)) && !_userOnly.Any(setting => setting.Covers(key));
 
     private static bool IsSame(string left, string right) =>
         string.Equals(Path.GetFullPath(left), Path.GetFullPath(right), StringComparison.OrdinalIgnoreCase);

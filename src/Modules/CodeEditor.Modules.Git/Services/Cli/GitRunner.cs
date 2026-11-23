@@ -20,7 +20,9 @@ public sealed class GitRunner(IProcessRunner runner, IWorkspace workspace)
     /// <summary>Push goes over the network and may wait for sign-in.</summary>
     public static readonly TimeSpan NetworkTimeout = TimeSpan.FromMinutes(3);
 
-    private static readonly string[] Options = ["--no-pager", "-c", "core.quotepath=false", "-c", "color.ui=false"];
+    // core.fsmonitor in a repository's own .git/config names a command git runs on every status: a folder from an
+    // archive would execute code just by being opened.
+    private static readonly string[] Options = ["--no-pager", "-c", "core.quotepath=false", "-c", "color.ui=false", "-c", "core.fsmonitor=false"];
 
     private static readonly Dictionary<string, string> Environment = new(StringComparer.Ordinal) { ["GIT_TERMINAL_PROMPT"] = "0" };
 

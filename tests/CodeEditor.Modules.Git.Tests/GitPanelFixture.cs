@@ -28,7 +28,7 @@ internal sealed class GitPanelFixture : IDisposable
     public static readonly string Root = Path.GetFullPath(@"C:\repo");
 
     // Options GitRunner puts before every command, and the repository scope added by GitCli.
-    private const int RunnerOptions = 5;
+    private const int RunnerOptions = 7;
     private const int RepositoryScope = 3;
     private const string ReadOnly = "--no-optional-locks";
 

@@ -27,10 +27,10 @@ public sealed class GitRepositoryStateTests : IDisposable
         Assert.Equal(new GitLocation(GitPanelFixture.Root, Path.Combine(GitPanelFixture.Root, ".git")), _git.Repository.Location);
         Assert.Equal("main", _git.Repository.Status.Head.Branch);
         Assert.Equal([new GitFileChange(GitChangeGroup.Changes, GitFileStatus.Modified, "src/A.cs")], _git.Repository.Status.Changes);
-        Assert.Equal(["--no-optional-locks", "rev-parse", "--show-toplevel", "--absolute-git-dir"], _git.Runner.Requests[0].Arguments.Skip(5));
+        Assert.Equal(["--no-optional-locks", "rev-parse", "--show-toplevel", "--absolute-git-dir"], _git.Runner.Requests[0].Arguments.Skip(7));
         Assert.Equal(
             ["--literal-pathspecs", "-C", GitPanelFixture.Root, "--no-optional-locks", "status", "--porcelain=v2", "-z", "--branch", "--untracked-files=all"],
-            _git.Runner.Requests[1].Arguments.Skip(5));
+            _git.Runner.Requests[1].Arguments.Skip(7));
         Assert.Equal(GitContextKeys.Ready, _git.Context.GetValue(GitContextKeys.State));
     }
 
