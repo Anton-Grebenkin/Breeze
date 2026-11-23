@@ -1,5 +1,4 @@
 using System.Collections.ObjectModel;
-using System.Globalization;
 using CodeEditor.Core.Threading;
 using CodeEditor.Modules.Agent.Resources;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -20,10 +19,14 @@ public sealed partial class ChatSession : ObservableObject, IDisposable
     private readonly ChatHistory _history;
     private readonly IOptionsMonitor<AgentOptions> _options;
     private readonly TurnMessageBuilder _turnMessages;
-    private readonly IUiDispatcher _dispatcher;
     private readonly HashSet<string> _approvedTools = new(StringComparer.Ordinal);
     private readonly TurnResume _resume;
+    private readonly TurnMemory _memory;
     private CancellationTokenSource? _run;
+    private Task _turn = Task.CompletedTask;
+
+    // The folder changed under a running turn: its chat belongs to the previous folder and can no longer be saved.
+    private bool _orphaned;
 
     // The previous turn's mode in this chat, so the model is told about mode changes (TurnMessageBuilder).
     private AgentMode? _lastMode;
@@ -34,8 +37,8 @@ public sealed partial class ChatSession : ObservableObject, IDisposable
         _history = history;
         _options = options;
         _turnMessages = turnMessages;
-        _dispatcher = dispatcher;
         _resume = new TurnResume(Messages);
+        _memory = new TurnMemory(services, history, Messages, dispatcher);
         _services.Questions.Asked += OnQuestionAsked;
     }
 
@@ -72,7 +75,8 @@ public sealed partial class ChatSession : ObservableObject, IDisposable
         _resume.Retire();
         var startsChat = !Messages.Any(message => message.Kind == ChatMessageKind.User);
         Messages.Add(new ChatMessageViewModel(ChatMessageKind.User, text) { Attachment = attachment, Files = names.Count > 0 ? names : null });
-        await RunTurnAsync(token => BuildAsync(text, includeActiveEditor, startsChat, files, token), text.Length, attachment, files.Count);
+        _turn = RunTurnAsync(token => BuildAsync(text, includeActiveEditor, startsChat, files, token), text.Length, attachment, files.Count);
+        await _turn;
     }
 
     private async Task RunTurnAsync(Func<CancellationToken, Task<ChatMessage>> message, int length, string? attachment, int files)
@@ -107,15 +111,18 @@ public sealed partial class ChatSession : ObservableObject, IDisposable
         finally
         {
             IsBusy = false;
-            TurnEnding.EstimateUsage(Messages, turn, _services.Usage);
-            await _history.SaveAsync([.. Messages], _services.Usage.Usage, CancellationToken.None);
-            OnPropertyChanged(nameof(Title));
+            if (!_orphaned)
+            {
+                TurnEnding.EstimateUsage(Messages, turn, _services.Usage);
+                await _history.SaveAsync([.. Messages], _services.Usage.Usage, CancellationToken.None);
+                OnPropertyChanged(nameof(Title));
+            }
         }
 
         // After saving: a new chat gets its id on the first save, and the stop notice stays out of the history.
         if (completed)
         {
-            Remembering = RememberAsync(turn, _run.Token);
+            Remembering = _memory.RememberAsync(turn, _run.Token);
         }
         else if (stopped)
         {
@@ -159,55 +166,19 @@ public sealed partial class ChatSession : ObservableObject, IDisposable
     /// <summary>The memory update after the last turn; tests await it.</summary>
     public Task Remembering { get; private set; } = Task.CompletedTask;
 
-    // A helper model reads the turn and decides what to remember (ADR 0012); runs in the background with input unlocked.
-    private async Task RememberAsync(AgentTurn turn, CancellationToken cancellationToken)
+    /// <summary>Opens the latest chat of the folder (on startup and folder change).</summary>
+    public async Task LoadLatestAsync()
     {
-        var chatId = CurrentId;
-        if (!_services.MemoryExtractor.ShouldRun(turn.ToolCalls, Messages.Count(message => message.Kind == ChatMessageKind.User)))
-        {
-            return;
-        }
-
-        var answer = Messages.LastOrDefault(message => message.Kind == ChatMessageKind.Assistant)?.Text ?? string.Empty;
-        var notes = await _services.MemoryExtractor.ExtractAsync(answer, cancellationToken).ConfigureAwait(false);
-        if (notes.Count == 0 || cancellationToken.IsCancellationRequested)
-        {
-            return;
-        }
-
-        ChatMessageViewModel[]? snapshot = null;
-        await _dispatcher.InvokeAsync(() =>
-        {
-            // The user may have opened another chat; the "Remembered" row belongs to the turn that produced the notes.
-            if (CurrentId != chatId)
-            {
-                return;
-            }
-
-            foreach (var note in notes)
-            {
-                Messages.Add(new ChatMessageViewModel(ChatMessageKind.Status, string.Format(CultureInfo.CurrentCulture, Strings.MemoryAutoSaved, note.Name, note.Description)));
-            }
-
-            snapshot = [.. Messages];
-        }).ConfigureAwait(false);
-        if (snapshot is not null)
-        {
-            await _history.SaveAsync(snapshot, _services.Usage.Usage, CancellationToken.None).ConfigureAwait(false);
-        }
-    }
-
-    /// <summary>Opens the folder's latest chat (on startup and folder change).</summary>
-    public void LoadLatest()
-    {
-        Stop();
+        _orphaned = IsBusy;
+        await StopTurnAsync();
+        _orphaned = false;
         Show(_history.RestoreLatest());
     }
 
     /// <returns><c>false</c> if the chat no longer exists (its file was deleted).</returns>
-    public bool Open(string id)
+    public async Task<bool> OpenAsync(string id)
     {
-        Stop();
+        await StopTurnAsync();
         if (_history.Restore(id) is not { } transcript)
         {
             return false;
@@ -218,22 +189,29 @@ public sealed partial class ChatSession : ObservableObject, IDisposable
         return true;
     }
 
-    public void StartNew()
+    public async Task StartNewAsync()
     {
-        Stop();
+        await StopTurnAsync();
         _history.StartNew();
         _services.Log.ChatStarted();
         Show(null);
     }
 
-    public void DeleteCurrent()
+    public async Task DeleteCurrentAsync()
     {
-        Stop();
+        await StopTurnAsync();
         _services.Log.ChatDeleted(CurrentId);
         _history.DeleteCurrent();
         Show(null);
     }
 
+    // Another chat opens only after the running turn has wound down: the stopped turn is saved into its own chat,
+    // and nothing of it (the stop mark, an error) lands in the feed and the file of the next one.
+    private async Task StopTurnAsync()
+    {
+        Stop();
+        await _turn.ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing | ConfigureAwaitOptions.ContinueOnCapturedContext);
+    }
     public void Dispose()
     {
         _services.Questions.Asked -= OnQuestionAsked;

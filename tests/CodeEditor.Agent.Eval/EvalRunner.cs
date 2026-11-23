@@ -58,7 +58,7 @@ internal sealed class EvalRunner(EvalOptions options, string apiKey, string root
         TimeSpan? followUpElapsed = null;
         await dispatcher.RunAsync(async () =>
         {
-            session.StartNew();
+            await session.StartNewAsync();
             if (task.FollowUp is not { } followUp)
             {
                 await session.SendAsync(task.Prompt, includeActiveEditor: false, attachment: null);

@@ -127,7 +127,12 @@ public sealed partial class AgentConversation : IDisposable
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {
                 // The agent does not record a stopped turn; we do, or the model forgets the question and the calls.
-                StoppedTurnHistory.Keep(_session, _transcript.LastRequest, message);
+                // No session: the chat was reset while the request was being cancelled, and there is nothing to keep.
+                if (_session is { } session)
+                {
+                    StoppedTurnHistory.Keep(session, _transcript.LastRequest, message);
+                }
+
                 throw;
             }
             catch (Exception exception) when (exception is not OperationCanceledException && KeepFailedTurn(message))
