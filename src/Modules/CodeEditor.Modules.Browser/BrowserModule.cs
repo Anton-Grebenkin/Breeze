@@ -48,6 +48,7 @@ public sealed class BrowserModule : IModule
         services.AddSingleton<BrowserHistory>();
         services.AddSingleton<BrowserTabStore>();
         services.AddSingleton<BrowserTabs>();
+        services.AddSingleton<BrowserKnownSites>();
         services.AddSingleton<BrowserViewModel>();
         services.AddSingleton(provider => new BrowserAgentTabs(provider.GetRequiredService<BrowserTabs>(), ShowPanel(provider)));
         services.AddSingleton<IWebBrowserAccess>(provider => new BrowserWebAccess(
@@ -74,6 +75,8 @@ public sealed class BrowserModule : IModule
         {
             Order = 10,
         }));
+        // Made now, not on first use: it remembers the sites the user opens whether or not the agent was ever called.
+        services.GetRequiredService<BrowserKnownSites>();
         _registrations.AddRange(new BrowserCommands(services.GetRequiredService<BrowserViewModel>, services.GetRequiredService<BrowserTabsSwitch>(), services.GetRequiredService<WorkbenchLayout>())
             .Register(services.GetRequiredService<ICommandRegistry>(), services.GetRequiredService<IKeybindingRegistry>()));
     }

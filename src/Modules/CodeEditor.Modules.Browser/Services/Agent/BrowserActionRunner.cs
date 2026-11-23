@@ -13,7 +13,7 @@ namespace CodeEditor.Modules.Browser.Services.Agent;
 /// the model reads — a fresh snapshot after an action that changes the page, the tab the action opened, or the dialog
 /// the page now waits on.
 /// </summary>
-public sealed class BrowserActionRunner(BrowserAgentTabs tabs, IAgentImages images, IWorkspace? workspace = null, IFileSystem? files = null)
+public sealed class BrowserActionRunner(BrowserAgentTabs tabs, IAgentImages images, IWorkspace? workspace = null, IFileSystem? files = null, BrowserKnownSites? sites = null)
 {
     /// <exception cref="AgentToolException">The call is wrong or the page refused it; the message is for the model.</exception>
     public async Task<string> RunAsync(BrowserCall call, CancellationToken cancellationToken)
@@ -63,7 +63,10 @@ public sealed class BrowserActionRunner(BrowserAgentTabs tabs, IAgentImages imag
         switch (call.Action)
         {
             case BrowserAgentTools.Navigate or BrowserAgentTools.OpenTab:
-                await browser.NavigateAsync(BrowserAgentTools.Address(call.Url), cancellationToken);
+                // The call got here, so the site is known or the user has just allowed it: it is known from now on.
+                var address = BrowserAgentTools.Address(call.Url);
+                sites?.Remember(address);
+                await browser.NavigateAsync(address, cancellationToken);
                 break;
             case BrowserAgentTools.Snapshot:
                 return await SnapshotAsync(target, call.Part, cancellationToken);

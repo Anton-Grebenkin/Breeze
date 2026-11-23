@@ -95,7 +95,7 @@ public sealed class BrowserAgentTabsTests
         // No tab named: a navigation opens the agent's tab, so only the site matters.
         Assert.True(_approvals.IsPreapproved(BrowserAgentTools.ToolName, Call("navigate", url: "http://localhost:5000/")));
         Assert.False(_approvals.IsPreapproved(BrowserAgentTools.ToolName, Call("navigate", url: "https://example.org/")));
-        Assert.Equal("example.org", _approvals.SuggestRule(BrowserAgentTools.ToolName, Call("navigate", url: "https://example.org/")));
+        Assert.Null(_approvals.SuggestRule(BrowserAgentTools.ToolName, Call("navigate", url: "https://example.org/")));
 
         var own = _agent.Open();
         Assert.True(_approvals.IsPreapproved(BrowserAgentTools.ToolName, Call("click", reference: "e1")));

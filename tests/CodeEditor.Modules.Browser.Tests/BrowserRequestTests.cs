@@ -82,12 +82,11 @@ public sealed class BrowserRequestTests
     }
 
     [Fact]
-    public void Reading_AnUnknownSiteAsks_AndOffersToAllowIt_ThisMachineNeverAsks()
+    public void Reading_AnUnknownSiteAsks_ThisMachineNeverAsks()
     {
         _gitlab.Load("https://argocd.example.com/applications", "Argo CD");
 
         Assert.False(_approvals.IsPreapproved(BrowserAgentTools.ToolName, Call("GET", "/api/v1/applications")));
-        Assert.Equal("argocd.example.com", _approvals.SuggestRule(BrowserAgentTools.ToolName, Call("GET", "/api/v1/applications")));
         Assert.Null(_approvals.SuggestRule(BrowserAgentTools.ToolName, Call("POST", "/api/v1/applications/shop/sync")));
 
         _gitlab.Load("http://localhost:5000/", "Приложение");

@@ -5,7 +5,10 @@ public sealed class BrowserOptions
 {
     public const string Section = "browser";
 
-    /// <summary>Sites beyond this machine that the agent opens without asking; "Always allow" adds a site here.</summary>
+    /// <summary>
+    /// Sites the agent opens without asking, besides this machine and the sites the browser remembers by itself (the
+    /// ones the user opened or let the agent open once): a list to fill in by hand.
+    /// </summary>
     public List<string> AllowedHosts { get; set; } = [];
 
     /// <summary>

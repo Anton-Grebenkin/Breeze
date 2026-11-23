@@ -3,6 +3,7 @@ using CodeEditor.Core.Settings;
 using CodeEditor.Modules.Agent.Contracts.Approvals;
 using CodeEditor.Modules.Browser.Resources;
 using CodeEditor.Modules.Browser.Services.Agent;
+using CodeEditor.Modules.Browser.Services.Tabs;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -10,8 +11,9 @@ namespace CodeEditor.Modules.Browser.Services;
 
 /// <summary>
 /// Approval for the <c>browser</c> tool (ADR 0027, 0054): pages on this machine (<c>localhost</c>, <c>127.0.0.1</c>,
-/// <c>*.localhost</c>) and sites in <c>browser.allowedHosts</c> open without asking; others need a card, since a URL can
-/// carry data away. A script runs without asking only on a page of this machine: on a site where the user is logged in
+/// <c>*.localhost</c>), sites the browser knows (<see cref="BrowserKnownSites"/>: the user opened them or let the agent
+/// open them once) and sites in <c>browser.allowedHosts</c> open without asking; a new site needs a card once, since a
+/// URL can carry data away. A script runs without asking only on a page of this machine: on a site where the user is logged in
 /// it could send the session elsewhere. In its own tab the agent reads and follows links freely, and presses buttons
 /// and fills in fields on a page of this machine or a site from <c>browser.actHosts</c>; elsewhere such an action needs
 /// a card that names the button, with "always allow for this site". The user's tabs it reads freely, but going elsewhere, closing, or clicking and typing on a page that is
@@ -19,7 +21,8 @@ namespace CodeEditor.Modules.Browser.Services;
 /// only reads a site the agent may open; one that changes something always asks. A file goes into a form without asking only on a page of
 /// this machine.
 /// </summary>
-public sealed partial class BrowserApprovals(IOptionsMonitor<BrowserOptions> options, BrowserAgentTabs tabs, ISettingsService settings, ILogger<BrowserApprovals> logger)
+public sealed partial class BrowserApprovals(
+    IOptionsMonitor<BrowserOptions> options, BrowserAgentTabs tabs, ISettingsService settings, ILogger<BrowserApprovals> logger, BrowserKnownSites? known = null)
     : IAgentApprovalPolicy
 {
     public const string AllowedHostsKey = BrowserOptions.Section + ".allowedHosts";
@@ -73,8 +76,8 @@ public sealed partial class BrowserApprovals(IOptionsMonitor<BrowserOptions> opt
         && (Action(arguments) == BrowserAgentTools.Upload || (Action(arguments) == BrowserAgentTools.Request && !BrowserPageActions.IsReading(Text(arguments, "method"))))
         && !IsPreapproved(toolName, arguments);
 
-    // "Always allow" is about the site: opening it, or acting on it in the agent's own tab. A card about a tab of the
-    // user's offers none.
+    // "Always allow" is about acting on a site in the agent's own tab. Opening a site needs none: a site allowed once
+    // is remembered (BrowserKnownSites). A card about a tab of the user's offers none.
     public string? SuggestRule(string toolName, IDictionary<string, object?> arguments)
     {
         if (!CanDecide(toolName))
@@ -84,21 +87,9 @@ public sealed partial class BrowserApprovals(IOptionsMonitor<BrowserOptions> opt
 
         var action = Action(arguments);
         var tab = tabs.Peek(Text(arguments, "tab"), opens: action is BrowserAgentTools.Navigate or BrowserAgentTools.OpenTab);
-
-        // Reading a site's API, in any tab: allowing the site once covers its pages and its API alike.
-        if (action == BrowserAgentTools.Request)
-        {
-            return BrowserPageActions.IsReading(Text(arguments, "method")) && tab?.Page.Url is { Scheme: "http" or "https" } api && !IsLocal(api.IdnHost) ? api.IdnHost : null;
-        }
-
         if (tab is { IsAgent: false })
         {
             return null;
-        }
-
-        if (action is BrowserAgentTools.Navigate or BrowserAgentTools.OpenTab)
-        {
-            return Host(arguments) is { } host && !IsLocal(host) ? host : null;
         }
 
         if (action is not (BrowserAgentTools.Click or BrowserAgentTools.Type or BrowserAgentTools.Press or BrowserAgentTools.Drag or BrowserAgentTools.Dialog)
@@ -119,21 +110,19 @@ public sealed partial class BrowserApprovals(IOptionsMonitor<BrowserOptions> opt
     public void AllowAlways(string toolName, string rule)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(rule);
-        string? acting;
+        string? host;
         lock (_actRules)
         {
-            acting = _actRules.GetValueOrDefault(rule);
+            host = _actRules.GetValueOrDefault(rule);
         }
 
-        var (key, hosts, host) = acting is null
-            ? (AllowedHostsKey, options.CurrentValue.AllowedHosts, rule)
-            : (ActHostsKey, options.CurrentValue.ActHosts, acting);
-        if (!CanDecide(toolName) || hosts.Contains(host, StringComparer.OrdinalIgnoreCase))
+        var hosts = options.CurrentValue.ActHosts;
+        if (!CanDecide(toolName) || host is null || hosts.Contains(host, StringComparer.OrdinalIgnoreCase))
         {
             return;
         }
 
-        if (!settings.TrySetUserValue(key, (string[])[.. hosts, host], out var error))
+        if (!settings.TrySetUserValue(ActHostsKey, (string[])[.. hosts, host], out var error))
         {
             LogRuleNotSaved(logger, rule, error);
         }
@@ -148,7 +137,8 @@ public sealed partial class BrowserApprovals(IOptionsMonitor<BrowserOptions> opt
 
     private bool MayRead(string host) => IsAllowed(host) || options.CurrentValue.ActHosts.Contains(host, StringComparer.OrdinalIgnoreCase);
 
-    private bool IsAllowed(string host) => IsLocal(host) || options.CurrentValue.AllowedHosts.Contains(host, StringComparer.OrdinalIgnoreCase);
+    private bool IsAllowed(string host) =>
+        IsLocal(host) || known?.IsKnown(host) == true || options.CurrentValue.AllowedHosts.Contains(host, StringComparer.OrdinalIgnoreCase);
 
     private static string? Action(IDictionary<string, object?> arguments) => Text(arguments, "action");
 

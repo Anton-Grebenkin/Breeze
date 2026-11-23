@@ -64,15 +64,16 @@ public sealed class BrowserPanelTests
         Assert.Equal(preapproved, Approvals(out _).IsPreapproved(BrowserAgentTools.ToolName, Call("navigate", url)));
 
     [Fact]
-    public void PageActions_AtOnce_AllowAlwaysAddsTheSite()
+    public void PageActions_AtOnce_OpeningASiteOffersNoRule_AListedSiteOpensAtOnce()
     {
         var approvals = Approvals(out var settings);
 
         Assert.True(approvals.IsPreapproved(BrowserAgentTools.ToolName, Call("click", null)));
         Assert.Null(approvals.SuggestRule(BrowserAgentTools.ToolName, Call("navigate", "http://localhost:5000")));
-        Assert.Equal("example.org", approvals.SuggestRule(BrowserAgentTools.ToolName, Call("navigate", "https://example.org/x")));
-        approvals.AllowAlways(BrowserAgentTools.ToolName, "example.org");
-        Assert.Equal(new[] { "example.org" }, settings.Written[BrowserApprovals.AllowedHostsKey]);
+
+        // A site allowed once is remembered by itself, so the card needs no "always allow".
+        Assert.Null(approvals.SuggestRule(BrowserAgentTools.ToolName, Call("navigate", "https://example.org/x")));
+        Assert.Empty(settings.Written);
     }
 
     [Fact]

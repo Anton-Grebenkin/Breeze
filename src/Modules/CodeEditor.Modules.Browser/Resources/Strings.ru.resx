@@ -158,4 +158,6 @@
   <data name="RequestBadMethod" xml:space="preserve"><value>Неизвестный метод «{0}». Допустимы: {1}.</value></data>
   <data name="RequestApprovalTitle" xml:space="preserve"><value>Агент хочет отправить запрос на сайт под вашим входом</value></data>
   <data name="FeedRequest" xml:space="preserve"><value>запрос {0}</value></data>
+  <!-- Known sites. -->
+  <data name="ContextKnownSites" xml:space="preserve"><value>Сайты, которые пользователь уже открывал в браузере; они открываются без вопроса: {0}.</value></data>
 </root>
