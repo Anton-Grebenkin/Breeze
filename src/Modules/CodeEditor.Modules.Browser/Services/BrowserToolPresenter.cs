@@ -35,6 +35,7 @@ public sealed class BrowserToolPresenter : IAgentToolPresenter
             BrowserAgentTools.Network => Strings.FeedNetwork,
             BrowserAgentTools.Response => Format(Strings.FeedResponse, call.Text("id") ?? "?"),
             BrowserAgentTools.Evaluate => Strings.FeedEvaluate,
+            BrowserAgentTools.Request => Format(Strings.FeedRequest, (call.Text("method") ?? "GET").ToUpperInvariant() + " " + (call.Text("url") ?? "?")),
             BrowserAgentTools.Screenshot => Strings.FeedScreenshot,
             BrowserAgentTools.Read => Strings.FeedRead,
             BrowserAgentTools.Find => Format(Strings.FeedFind, call.Text("text") ?? "?"),

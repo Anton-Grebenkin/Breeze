@@ -26,6 +26,9 @@ public sealed class BrowserPreviews(BrowserAgentTabs tabs)
             case BrowserAgentTools.Navigate or BrowserAgentTools.OpenTab:
                 var url = BrowserAgentTools.Address(Text(arguments, "url"));
                 return Card(tab is { IsAgent: false } && action == BrowserAgentTools.Navigate ? Strings.UserTabNavigateTitle : Strings.ApprovalTitle, url.IdnHost, "GET " + url.AbsoluteUri);
+            case BrowserAgentTools.Request:
+                var request = BrowserPageActions.Verb(Text(arguments, "method")) + " " + BrowserAgentTools.Required(Text(arguments, "url"), "url");
+                return Card(Strings.RequestApprovalTitle, site, Text(arguments, "body") is { Length: > 0 } body ? request + "\n" + body : request);
             case BrowserAgentTools.Upload:
                 return Card(Strings.UploadApprovalTitle, site, BrowserAgentTools.Required(Text(arguments, "path"), "path") + " → " + await ElementAsync(tab, Text(arguments, "ref"), cancellationToken));
             default:

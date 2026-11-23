@@ -146,6 +146,21 @@ public sealed class PageScriptsTests(PageScriptsFixture fixture) : IClassFixture
         Assert.Equal("\"orders.csv\"", await EvaluateAsync("document.getElementById('upload').files[0].name"));
     }
 
+    // A request on behalf of the tab: the site's own API answers, another site is refused.
+    [Fact]
+    public async Task Request_CallsTheSitesApi_AndRefusesAnotherSite()
+    {
+        await fixture.OpenAsync("/");
+
+        var items = await fixture.UseAsync(new() { ["action"] = "request", ["url"] = "/api/items" });
+        var missing = await fixture.UseAsync(new() { ["action"] = "request", ["url"] = "/api/none", ["method"] = "post", ["body"] = "{\"a\":1}" });
+        var other = await Assert.ThrowsAsync<CodeEditor.Modules.Agent.Contracts.AgentToolException>(() => fixture.UseAsync(new() { ["action"] = "request", ["url"] = "https://example.org/api" }));
+
+        Assert.Equal($"<browser_response tab=\"t1\" method=\"GET\" status=\"200\" type=\"text/html; charset=utf-8\" url=\"http://localhost:{fixture.Site.Port}/api/items\">\n{{\"items\":[1,2,3]}}\n</browser_response>", items);
+        Assert.Contains("method=\"POST\" status=\"404\"", missing, StringComparison.Ordinal);
+        Assert.Contains("только к сайту самой вкладки", other.Message, StringComparison.Ordinal);
+    }
+
     // A results page is read by its shape, not its markup: heading links to other sites, redirects unwrapped.
     [Fact]
     public async Task Search_ReadsAnEnginesResults_TitleAddressAndExcerpt()

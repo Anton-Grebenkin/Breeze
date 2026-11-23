@@ -22,6 +22,12 @@ public sealed record BrowserCall(string Action)
 
     public string? Script { get; init; }
 
+    /// <summary>The HTTP method of a request; GET when empty.</summary>
+    public string? Method { get; init; }
+
+    /// <summary>The body of a request, usually JSON.</summary>
+    public string? Body { get; init; }
+
     public string? Id { get; init; }
 
     /// <summary>The file for a file field, relative to the folder.</summary>

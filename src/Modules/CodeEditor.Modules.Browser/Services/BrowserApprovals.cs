@@ -15,7 +15,8 @@ namespace CodeEditor.Modules.Browser.Services;
 /// it could send the session elsewhere. In its own tab the agent reads and follows links freely, and presses buttons
 /// and fills in fields on a page of this machine or a site from <c>browser.actHosts</c>; elsewhere such an action needs
 /// a card that names the button, with "always allow for this site". The user's tabs it reads freely, but going elsewhere, closing, or clicking and typing on a page that is
-/// not of this machine needs a card that names the element. A file goes into a form without asking only on a page of
+/// not of this machine needs a card that names the element. A request to a site's API (<c>request</c>) is free when it
+/// only reads a site the agent may open; one that changes something always asks. A file goes into a form without asking only on a page of
 /// this machine.
 /// </summary>
 public sealed partial class BrowserApprovals(IOptionsMonitor<BrowserOptions> options, BrowserAgentTabs tabs, ISettingsService settings, ILogger<BrowserApprovals> logger)
@@ -47,6 +48,10 @@ public sealed partial class BrowserApprovals(IOptionsMonitor<BrowserOptions> opt
             BrowserAgentTools.Navigate => !isUsers && Host(arguments) is { } host && IsAllowed(host),
             BrowserAgentTools.OpenTab => Text(arguments, "url") is not { Length: > 0 } || (Host(arguments) is { } host && IsAllowed(host)),
             BrowserAgentTools.Evaluate => isLocal,
+
+            // Reading the API of a site the agent may open is like reading its pages; a request that changes
+            // something is asked about every time.
+            BrowserAgentTools.Request => isLocal || (site is not null && BrowserPageActions.IsReading(Text(arguments, "method")) && MayRead(site)),
             // Following a link is reading on; a button or a field acts on the site.
             BrowserAgentTools.Click => mayAct || (!isUsers && tabs.IsLink(tab!, Text(arguments, "ref"))),
             BrowserAgentTools.Type or BrowserAgentTools.Press or BrowserAgentTools.Drag or BrowserAgentTools.Dialog => mayAct,
@@ -61,6 +66,13 @@ public sealed partial class BrowserApprovals(IOptionsMonitor<BrowserOptions> opt
 
     public bool IsReadOnly(string toolName, IDictionary<string, object?> arguments) => false;
 
+    // A request that changes something on a site and a file sent to one cannot be taken back: "allow for this chat"
+    // does not cover them.
+    public bool AlwaysAsks(string toolName, IDictionary<string, object?> arguments) =>
+        CanDecide(toolName)
+        && (Action(arguments) == BrowserAgentTools.Upload || (Action(arguments) == BrowserAgentTools.Request && !BrowserPageActions.IsReading(Text(arguments, "method"))))
+        && !IsPreapproved(toolName, arguments);
+
     // "Always allow" is about the site: opening it, or acting on it in the agent's own tab. A card about a tab of the
     // user's offers none.
     public string? SuggestRule(string toolName, IDictionary<string, object?> arguments)
@@ -72,6 +84,13 @@ public sealed partial class BrowserApprovals(IOptionsMonitor<BrowserOptions> opt
 
         var action = Action(arguments);
         var tab = tabs.Peek(Text(arguments, "tab"), opens: action is BrowserAgentTools.Navigate or BrowserAgentTools.OpenTab);
+
+        // Reading a site's API, in any tab: allowing the site once covers its pages and its API alike.
+        if (action == BrowserAgentTools.Request)
+        {
+            return BrowserPageActions.IsReading(Text(arguments, "method")) && tab?.Page.Url is { Scheme: "http" or "https" } api && !IsLocal(api.IdnHost) ? api.IdnHost : null;
+        }
+
         if (tab is { IsAgent: false })
         {
             return null;
@@ -126,6 +145,8 @@ public sealed partial class BrowserApprovals(IOptionsMonitor<BrowserOptions> opt
         ArgumentNullException.ThrowIfNull(host);
         return host is "localhost" or "127.0.0.1" or "[::1]" or "::1" || host.EndsWith(".localhost", StringComparison.OrdinalIgnoreCase);
     }
+
+    private bool MayRead(string host) => IsAllowed(host) || options.CurrentValue.ActHosts.Contains(host, StringComparer.OrdinalIgnoreCase);
 
     private bool IsAllowed(string host) => IsLocal(host) || options.CurrentValue.AllowedHosts.Contains(host, StringComparer.OrdinalIgnoreCase);
 

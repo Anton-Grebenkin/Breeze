@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Net;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -23,7 +24,11 @@ public sealed class BrowserPageActions(IBrowserPage browser)
 
     /// <summary>How long to wait for navigation after a click or typing.</summary>
     public static readonly TimeSpan SettleTimeout = TimeSpan.FromSeconds(10);
+    /// <summary>A response body longer than this is cut: the output store keeps the rest of what fits.</summary>
+    public const int MaxResponseCharacters = 400_000;
+
     private static readonly TimeSpan PollInterval = TimeSpan.FromMilliseconds(300);
+    private static readonly string[] RequestMethods = ["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE"];
     private static readonly string[] StaticTypes = ["Image", "Font", "Stylesheet", "Media", "Manifest", "Other"];
 
     /// <summary>
@@ -115,6 +120,38 @@ public sealed class BrowserPageActions(IBrowserPage browser)
         var files = new JsonObject { ["files"] = new JsonArray(fullPath), ["objectId"] = id.GetString() }.ToJsonString();
         await browser.DevToolsAsync("DOM.setFileInputFiles", files, cancellationToken);
     }
+
+    /// <summary>
+    /// A request to the page's own site with its sign-in (cookies), like the page's own scripts make: the site's API
+    /// is read or called without clicking through its pages. The reply comes framed, with the status and the type.
+    /// </summary>
+    /// <exception cref="AgentToolException">The method is unknown, the address is of another site, or the request failed.</exception>
+    public async Task<string> RequestAsync(string tabId, string? method, string address, string? body, CancellationToken cancellationToken)
+    {
+        var verb = Verb(method);
+        using var reply = JsonDocument.Parse(await EvaluateAsync(BrowserScripts.Request(verb, address, body, MaxResponseCharacters), cancellationToken));
+        var answer = reply.RootElement;
+        if (answer.ValueKind != JsonValueKind.Object || !answer.TryGetProperty("ok", out var ok) || !ok.GetBoolean())
+        {
+            var error = answer.ValueKind == JsonValueKind.Object && answer.TryGetProperty("error", out var reason) ? reason.GetString() : null;
+            throw new AgentToolException(error == "other site" ? Strings.RequestOtherSite : Format(Strings.RequestFailed, error ?? "?"));
+        }
+
+        var cut = answer.TryGetProperty("cut", out var isCut) && isCut.GetBoolean() ? "\n" + Strings.SnapshotTruncated : string.Empty;
+        return string.Create(CultureInfo.InvariantCulture,
+            $"<browser_response tab=\"{tabId}\" method=\"{verb}\" status=\"{answer.GetProperty("status").GetInt32()}\" type=\"{WebUtility.HtmlEncode(answer.GetProperty("type").GetString())}\" url=\"{WebUtility.HtmlEncode(answer.GetProperty("url").GetString())}\">\n{answer.GetProperty("body").GetString()}{cut}\n</browser_response>");
+    }
+
+    /// <summary>The HTTP method of a request, upper case; GET when none is given.</summary>
+    /// <exception cref="AgentToolException">Not one of the methods a request may use.</exception>
+    public static string Verb(string? method)
+    {
+        var verb = string.IsNullOrWhiteSpace(method) ? "GET" : method.Trim().ToUpperInvariant();
+        return RequestMethods.Contains(verb) ? verb : throw new AgentToolException(Format(Strings.RequestBadMethod, method!, string.Join(", ", RequestMethods)));
+    }
+
+    /// <summary>The request only reads: it changes nothing on the site.</summary>
+    public static bool IsReading(string? method) => string.IsNullOrWhiteSpace(method) || method.Trim().ToUpperInvariant() is "GET" or "HEAD";
 
     /// <summary>Presses a key on the focused element, or on <paramref name="reference"/> after focusing it.</summary>
     public async Task PressAsync(string key, string? reference, CancellationToken cancellationToken)

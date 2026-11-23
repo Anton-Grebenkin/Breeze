@@ -116,6 +116,8 @@ public sealed class BrowserActionRunner(BrowserAgentTabs tabs, IAgentImages imag
                 return await page.ResponseAsync(Required(call.Id, "id"), cancellationToken);
             case BrowserAgentTools.Evaluate:
                 return await page.EvaluateAsync(Required(call.Script, "script"), cancellationToken);
+            case BrowserAgentTools.Request:
+                return await page.RequestAsync(target.Id, call.Method, Required(call.Url, "url"), call.Body, cancellationToken);
             case BrowserAgentTools.Screenshot:
                 return await ScreenshotAsync(target, call.Ref, cancellationToken);
             default:

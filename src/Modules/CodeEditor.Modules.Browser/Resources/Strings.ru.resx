@@ -152,4 +152,10 @@
   <!-- Acting on a site. -->
   <data name="SiteActionApprovalTitle" xml:space="preserve"><value>Агент хочет действовать на сайте</value></data>
   <data name="ActRule" xml:space="preserve"><value>действия на {0}</value></data>
+  <!-- A request on behalf of a tab. -->
+  <data name="RequestOtherSite" xml:space="preserve"><value>Запрос идёт только к сайту самой вкладки: открой другой сайт во вкладке и отправь запрос из неё.</value></data>
+  <data name="RequestFailed" xml:space="preserve"><value>Запрос не выполнен: {0}</value></data>
+  <data name="RequestBadMethod" xml:space="preserve"><value>Неизвестный метод «{0}». Допустимы: {1}.</value></data>
+  <data name="RequestApprovalTitle" xml:space="preserve"><value>Агент хочет отправить запрос на сайт под вашим входом</value></data>
+  <data name="FeedRequest" xml:space="preserve"><value>запрос {0}</value></data>
 </root>

@@ -44,6 +44,7 @@ public sealed class BrowserAgentTools(BrowserAgentTabs tabs, IAgentOutputStore o
     public const string Network = "network";
     public const string Response = "response";
     public const string Evaluate = "evaluate";
+    public const string Request = "request";
     public const string Screenshot = "screenshot";
     public const string Tabs = "tabs";
     public const string OpenTab = "open_tab";
@@ -53,7 +54,7 @@ public sealed class BrowserAgentTools(BrowserAgentTabs tabs, IAgentOutputStore o
     public static IReadOnlyList<string> Actions { get; } =
     [
         Navigate, Snapshot, Read, Find, Click, Hover, Drag, Type, Upload, Press, Scroll, Dialog, WaitFor, Back, Forward, Reload,
-        Console, Network, Response, Evaluate, Screenshot, Tabs, OpenTab, SelectTab, CloseTab,
+        Console, Network, Response, Evaluate, Request, Screenshot, Tabs, OpenTab, SelectTab, CloseTab,
     ];
 
     private readonly BrowserPreviews _previews = new(tabs);
@@ -75,6 +76,8 @@ public sealed class BrowserAgentTools(BrowserAgentTabs tabs, IAgentOutputStore o
             "wait_for (text: until it appears on the page, timeoutSeconds up to 60; for content loaded after the page), back, forward, reload, " +
             "console (console messages and page errors since the last call), network (the page's recent requests: [id] method status type url), response (id: the response body of a request), " +
             "evaluate (script: a JavaScript expression run in the page, a promise is awaited, the value comes back as JSON), " +
+            "request (url: a path or address on the tab's own site, method: GET by default, body: JSON — calls the site's API with the tab's sign-in, e.g. GitLab /api/v4/..., Grafana /api/..., Argo CD /api/v1/...; " +
+            "reading an allowed site is free, a request that changes something needs the user's approval), " +
             "screenshot (an image of the page from where it is scrolled, or of one element with ref — a chart, a canvas — in the next message: check layout, colors and overlaps when the look matters), " +
             "tabs (every tab: id, address, title), open_tab (a new tab of yours; url optional), select_tab (tab: show it to the user), close_tab (tab; your current tab by default). " +
             "Actions that change the page return the new snapshot. " +
@@ -95,8 +98,8 @@ public sealed class BrowserAgentTools(BrowserAgentTabs tabs, IAgentOutputStore o
         string.IsNullOrWhiteSpace(value) ? throw new AgentToolException(string.Format(CultureInfo.CurrentCulture, Strings.ArgumentRequired, argument)) : value.Trim();
 
     private async Task<string> UseAsync(
-        [Description("navigate, snapshot, read, find, click, hover, drag, type, upload, press, scroll, dialog, wait_for, back, forward, reload, console, network, response, evaluate, screenshot, tabs, open_tab, select_tab or close_tab.")] string action,
-        [Description("navigate, open_tab: the http(s) URL.")] string? url = null,
+        [Description("navigate, snapshot, read, find, click, hover, drag, type, upload, press, scroll, dialog, wait_for, back, forward, reload, console, network, response, evaluate, request, screenshot, tabs, open_tab, select_tab or close_tab.")] string action,
+        [Description("navigate, open_tab: the http(s) URL; request: a path like /api/v4/projects or an address on the tab's own site.")] string? url = null,
         [Description("The tab to work in, like t2 (ids are in the context block and in tabs). Default: your own tab; without one, the tab shown to the user.")] string? tab = null,
         [Description("click, hover, drag, type, upload, press, scroll, screenshot: the element ref from the snapshot, like e12.")] string? @ref = null,
         [Description("drag: the ref of the element to drop onto.")] string? to = null,
@@ -106,6 +109,8 @@ public sealed class BrowserAgentTools(BrowserAgentTabs tabs, IAgentOutputStore o
         [Description("scroll without ref: down (default), up, top or bottom.")] string? direction = null,
         [Description("evaluate: a JavaScript expression, e.g. document.title or fetch('/api/me').then(r => r.json()).")] string? script = null,
         [Description("response: the request id from network.")] string? id = null,
+        [Description("request: GET (default), HEAD, POST, PUT, PATCH or DELETE.")] string? method = null,
+        [Description("request: the body, usually JSON.")] string? body = null,
         [Description("upload: the file to put into the field, a path in the folder.")] string? path = null,
         [Description("dialog: true (default) accepts the dialog, false dismisses it.")] bool? accept = null,
         [Description("wait_for: how long to wait, 1–60 seconds; default 10.")] int? timeoutSeconds = null,
@@ -115,7 +120,7 @@ public sealed class BrowserAgentTools(BrowserAgentTabs tabs, IAgentOutputStore o
         var call = new BrowserCall(action)
         {
             Url = url, Tab = tab, Ref = @ref, To = to, Text = text, Submit = submit, Key = key, Direction = direction,
-            Script = script, Id = id, Path = path, Accept = accept, TimeoutSeconds = timeoutSeconds, Part = part,
+            Script = script, Id = id, Method = method, Body = body, Path = path, Accept = accept, TimeoutSeconds = timeoutSeconds, Part = part,
         };
         return outputs.Fit(await _runner.RunAsync(call, cancellationToken), ToolName);
     }

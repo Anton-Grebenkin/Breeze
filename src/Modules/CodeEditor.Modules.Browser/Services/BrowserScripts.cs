@@ -160,6 +160,31 @@ public static class BrowserScripts
         })({{JsonSerializer.Serialize(reference)}})
         """;
 
+    /// <summary>
+    /// A request to the page's own site with the page's sign-in, as its scripts make them:
+    /// <c>{ ok, status, type, url, body }</c> or <c>{ ok: false, error }</c>. An address of another site is refused
+    /// (<c>error: 'other site'</c>). A request that changes something carries the site's CSRF token if the page has one,
+    /// as GitLab needs. The body is cut at <paramref name="maxBody"/> characters (<c>cut: true</c>).
+    /// </summary>
+    public static string Request(string method, string address, string? body, int maxBody) => $$"""
+        (async (method, address, body, max) => {
+          let url;
+          try { url = new URL(address, location.href); } catch { return { ok: false, error: 'bad address' }; }
+          if (url.origin !== location.origin) return { ok: false, error: 'other site' };
+          const headers = { 'Accept': 'application/json, text/plain, */*' };
+          if (body !== null) headers['Content-Type'] = 'application/json';
+          const token = document.querySelector('meta[name="csrf-token"]');
+          if (token && token.content && !['GET', 'HEAD'].includes(method)) headers['X-CSRF-Token'] = token.content;
+          try {
+            const reply = await fetch(url.href, { method, headers, body: body === null ? undefined : body, credentials: 'include' });
+            const text = await reply.text();
+            return { ok: true, status: reply.status, type: reply.headers.get('content-type') || '', url: reply.url, body: text.slice(0, max), cut: text.length > max };
+          } catch (error) {
+            return { ok: false, error: String(error && error.message || error) };
+          }
+        })({{JsonSerializer.Serialize(method)}}, {{JsonSerializer.Serialize(address)}}, {{JsonSerializer.Serialize(body)}}, {{maxBody}})
+        """;
+
     /// <summary>Focuses a snapshot element before a key press: <c>{ ok, error }</c>.</summary>
     public static string Focus(string reference) => $$"""
         (ref => {

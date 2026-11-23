@@ -152,4 +152,10 @@
   <!-- Acting on a site. -->
   <data name="SiteActionApprovalTitle" xml:space="preserve"><value>The agent wants to act on a site</value></data>
   <data name="ActRule" xml:space="preserve"><value>actions on {0}</value></data>
+  <!-- A request on behalf of a tab. -->
+  <data name="RequestOtherSite" xml:space="preserve"><value>A request goes only to the tab's own site: open the other site in a tab and send the request from it.</value></data>
+  <data name="RequestFailed" xml:space="preserve"><value>The request failed: {0}</value></data>
+  <data name="RequestBadMethod" xml:space="preserve"><value>Unknown method '{0}'. Use one of: {1}.</value></data>
+  <data name="RequestApprovalTitle" xml:space="preserve"><value>The agent wants to send a request to a site with your sign-in</value></data>
+  <data name="FeedRequest" xml:space="preserve"><value>request {0}</value></data>
 </root>
