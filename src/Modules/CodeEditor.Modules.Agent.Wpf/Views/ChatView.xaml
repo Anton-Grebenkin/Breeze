@@ -190,6 +190,13 @@
                 Content="{x:Static res:Strings.CommandSetApiKey}"
                 Command="{Binding SetApiKeyCommand}"
                 AutomationProperties.AutomationId="Agent.SetApiKey" />
+        <!-- A gateway at work or a local server instead of the built-in service. -->
+        <Button Margin="0,8,0,0"
+                HorizontalAlignment="Stretch"
+                Style="{StaticResource Button.CommandCenter}"
+                Content="{x:Static res:Strings.MenuConnections}"
+                Command="{Binding Model.ShowConnectionsCommand}"
+                AutomationProperties.AutomationId="Agent.AddConnection" />
       </StackPanel>
 
       <ScrollViewer x:Name="MessagesScroll"
@@ -259,5 +266,9 @@
   <!-- The model manager over the chat; Esc or Back returns to the chat. -->
   <views:ModelManagerView DataContext="{Binding Model.Manager}"
                           Visibility="{Binding IsOpen, Converter={StaticResource BoolToVisibility}}" />
+
+  <!-- The user's own connections over the chat; Esc or Back returns to the chat. -->
+  <views:ConnectionsView x:Name="ConnectionsPanel" DataContext="{Binding Model.Connections}"
+                         Visibility="{Binding IsOpen, Converter={StaticResource BoolToVisibility}, FallbackValue=Collapsed}" />
   </Grid>
 </UserControl>

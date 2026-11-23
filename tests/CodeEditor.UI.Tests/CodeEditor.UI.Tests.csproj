@@ -41,6 +41,9 @@
     <ProjectReference Include="..\..\src\Modules\CodeEditor.Modules.Browser\CodeEditor.Modules.Browser.csproj" />
     <!-- The product's browser engine, run in a window off the screen (OffScreenBrowser). -->
     <ProjectReference Include="..\..\src\Modules\CodeEditor.Modules.Browser.Wpf\CodeEditor.Modules.Browser.Wpf.csproj" />
+    <!-- Views of the product shown in a window off the screen (OffScreenView), with test doubles for their services. -->
+    <ProjectReference Include="..\..\src\Modules\CodeEditor.Modules.Agent.Wpf\CodeEditor.Modules.Agent.Wpf.csproj" />
+    <ProjectReference Include="..\CodeEditor.Testing\CodeEditor.Testing.csproj" />
   </ItemGroup>
 
   <ItemGroup>

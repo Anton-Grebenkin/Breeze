@@ -55,6 +55,18 @@ public sealed class SettingsJsonTests
         Assert.Equal("2", SettingsJson.Parse(updated)["editor:tabSize"]);
     }
 
+    // A list of objects (the agent's connections) is laid out by lines and reads back as nested keys.
+    [Fact]
+    public void SetValue_WritesAStructuredValue_Indented()
+    {
+        var value = new System.Text.Json.Nodes.JsonArray(new System.Text.Json.Nodes.JsonObject { ["id"] = "work", ["name"] = "Шлюз" });
+
+        var updated = SettingsJson.SetValue("{\n    \"a\": 1\n}\n", "agent.connections", value);
+
+        Assert.Equal("{\n    \"a\": 1,\n    \"agent.connections\": [\n        {\n            \"id\": \"work\",\n            \"name\": \"Шлюз\"\n        }\n    ]\n}\n", updated);
+        Assert.Equal("Шлюз", SettingsJson.Parse(updated)["agent:connections:0:name"]);
+    }
+
     [Fact]
     public void SetValue_IntoEmptyObjectOrFile()
     {

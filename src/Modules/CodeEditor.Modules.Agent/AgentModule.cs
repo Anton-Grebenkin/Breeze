@@ -104,6 +104,10 @@ public sealed class AgentModule : IModule
         services.AddSingleton<IModelListClient, OpenAIModelListClient>();
         services.AddSingleton<ModelDirectory>();
         services.AddSingleton<ModelManagerViewModel>();
+        services.AddSingleton<IConnectionProbe>(_ => new ConnectionProbe());
+        services.AddSingleton<ConnectionStore>();
+        services.AddSingleton<ConnectionServices>();
+        services.AddSingleton<ConnectionsViewModel>();
         services.AddSingleton<ModelSettingsViewModel>();
         services.AddSingleton<ActiveFileContextViewModel>();
         services.AddSingleton<AttachmentReader>();

@@ -1,6 +1,8 @@
 using System.Globalization;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using CodeEditor.Core.Resources;
 
 namespace CodeEditor.Core.Settings;
@@ -22,6 +24,16 @@ public static class SettingsJson
     {
         CommentHandling = JsonCommentHandling.Skip,
         AllowTrailingCommas = true,
+    };
+
+    private const string Indent = "    ";
+
+    // A structured value is written the way a person would lay it out by hand.
+    private static readonly JsonSerializerOptions NodeOptions = new()
+    {
+        WriteIndented = true,
+        IndentSize = Indent.Length,
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
     };
 
     /// <summary>Configuration keys: <c>"editor.fontSize"</c> → <c>editor:fontSize</c>, arrays <c>key:0</c>.</summary>
@@ -48,11 +60,13 @@ public static class SettingsJson
     /// Sets a top-level key (<c>"workbench.colorTheme"</c>) without touching the rest of the text: replaces the
     /// existing value or appends the property at the end of the object.
     /// </summary>
-    /// <param name="value">A JSON-serializable value: string, number or bool.</param>
+    /// <param name="value">A string, number, bool or string array; or a <see cref="JsonNode"/> for a structured value.</param>
     /// <exception cref="JsonException">The file text is corrupt and cannot be written.</exception>
     public static string SetValue(string json, string key, object value)
     {
-        var valueJson = JsonSerializer.Serialize(value, value.GetType(), SettingsJsonContext.Readable);
+        var valueJson = value is JsonNode node
+            ? node.ToJsonString(NodeOptions).ReplaceLineEndings("\n" + Indent)
+            : JsonSerializer.Serialize(value, value.GetType(), SettingsJsonContext.Readable);
         if (string.IsNullOrWhiteSpace(json))
         {
             return $"{{\n    {Quote(key)}: {valueJson}\n}}\n";

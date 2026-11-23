@@ -33,6 +33,7 @@ public sealed partial class ChatView
         _ticker.Tick += (_, _) => _viewModel?.Feed.Tick();
         _follower = new ScrollFollower(MessagesScroll);
         DataContextChanged += OnDataContextChanged;
+        ConnectionsPanel.IsVisibleChanged += OnOverlayVisibleChanged;
         Unloaded += (_, _) => _ticker.Stop();
     }
 
@@ -54,6 +55,15 @@ public sealed partial class ChatView
     }
 
     private void OnFocusRequested(object? sender, EventArgs e) => Composer.FocusInput();
+
+    // A panel over the chat closed: the caret goes back to the input.
+    private void OnOverlayVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+    {
+        if (e.NewValue is false && IsLoaded)
+        {
+            Composer.FocusInput();
+        }
+    }
 
     private void OnLinkClicked(object? sender, MarkdownLinkClickedEventArgs e) =>
         _viewModel?.OpenLinkCommand.Execute(e.Target);

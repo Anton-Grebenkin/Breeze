@@ -62,6 +62,9 @@ public sealed class ApiKeyState : IDisposable
         Changed?.Invoke(this, EventArgs.Empty);
     }
 
+    /// <summary>A key was set or removed elsewhere (the connections panel): the chat checks again.</summary>
+    public void Refresh() => Changed?.Invoke(this, EventArgs.Empty);
+
     public void Dispose() => _subscription?.Dispose();
 
     private void OnOptionsChanged(AgentOptions options, string? name)

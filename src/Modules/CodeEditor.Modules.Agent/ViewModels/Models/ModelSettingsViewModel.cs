@@ -73,9 +73,11 @@ public sealed partial class ModelSettingsViewModel : ObservableObject, IDisposab
         IQuickPick quickPick,
         ICommandService commands,
         StatusBarViewModel statusBar,
-        ModelManagerViewModel manager)
+        ModelManagerViewModel manager,
+        ConnectionsViewModel? connections = null)
     {
         Manager = manager;
+        Connections = connections;
         _options = options;
         _settings = settings;
         _quickPick = quickPick;
@@ -93,6 +95,9 @@ public sealed partial class ModelSettingsViewModel : ObservableObject, IDisposab
 
     /// <summary>Chooses which models appear in the picker.</summary>
     public ModelManagerViewModel Manager { get; }
+
+    /// <summary>The user's own connections and their models; <c>null</c> in tests that do not need the panel.</summary>
+    public ConnectionsViewModel? Connections { get; }
 
     /// <summary>The parameter menu is open, via the button or the palette command; navigated with arrow keys.</summary>
     [ObservableProperty]
@@ -187,6 +192,13 @@ public sealed partial class ModelSettingsViewModel : ObservableObject, IDisposab
     private void ShowParameters() => IsParametersOpen = true;
 
     [RelayCommand]
+    private void ShowConnections()
+    {
+        IsParametersOpen = false;
+        Connections?.OpenCommand.Execute(null);
+    }
+
+    [RelayCommand]
     private async Task OpenSettingsAsync()
     {
         IsParametersOpen = false;
@@ -223,6 +235,7 @@ public sealed partial class ModelSettingsViewModel : ObservableObject, IDisposab
             Roles(options),
             MenuItemViewModel.CreateSeparator(),
             MenuItemViewModel.ForAction(Strings.PickModelAction, "Agent.Parameters.PickModel", new AsyncRelayCommand(() => Run(PickModel))),
+            MenuItemViewModel.ForAction(Strings.ConnectionsAction, "Agent.Parameters.Connections", new AsyncRelayCommand(() => Run(ShowConnections))),
             MenuItemViewModel.ForAction(Strings.AllSettingsAction, "Agent.Parameters.OpenSettings", OpenSettingsCommand),
         ];
     }

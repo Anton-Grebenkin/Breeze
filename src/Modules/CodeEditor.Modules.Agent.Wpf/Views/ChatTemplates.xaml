@@ -29,6 +29,39 @@
   </Style>
 
   <!-- Message text is selectable and copyable, not editable. -->
+  <!-- "Show in picker" switch: track and thumb, no animation. -->
+  <Style x:Key="ToggleButton.Switch" TargetType="ToggleButton">
+    <Setter Property="Width" Value="28" />
+    <Setter Property="Height" Value="16" />
+    <Setter Property="Focusable" Value="True" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="ToggleButton">
+          <Border x:Name="Track" CornerRadius="8" BorderThickness="1"
+                  BorderBrush="{DynamicResource Brush.Input.Border}" Background="{DynamicResource Brush.Input.Background}">
+            <Ellipse x:Name="Thumb" Width="10" Height="10" Margin="3,0" HorizontalAlignment="Left"
+                     Fill="{DynamicResource Brush.Text.Secondary}" />
+          </Border>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsChecked" Value="True">
+              <Setter TargetName="Track" Property="Background" Value="{DynamicResource Brush.Accent}" />
+              <Setter TargetName="Track" Property="BorderBrush" Value="{DynamicResource Brush.Accent}" />
+              <Setter TargetName="Thumb" Property="HorizontalAlignment" Value="Right" />
+              <Setter TargetName="Thumb" Property="Fill" Value="{DynamicResource Brush.Accent.Foreground}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+              <Setter TargetName="Track" Property="Opacity" Value="0.6" />
+            </Trigger>
+            <Trigger Property="IsKeyboardFocused" Value="True">
+              <Setter TargetName="Track" Property="BorderBrush" Value="{DynamicResource Brush.Focus.Border}" />
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
   <Style x:Key="TextBox.Message" TargetType="TextBox">
     <Setter Property="IsReadOnly" Value="True" />
     <Setter Property="TextWrapping" Value="Wrap" />
