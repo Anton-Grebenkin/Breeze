@@ -144,4 +144,8 @@
   <data name="FeedDialog" xml:space="preserve"><value>диалог</value></data>
   <data name="UploadNeedsFolder" xml:space="preserve"><value>Файл можно отправить только из открытой папки.</value></data>
   <data name="UploadNoFile" xml:space="preserve"><value>Файла {0} нет.</value></data>
+  <!-- Search through the browser. -->
+  <data name="SearchEngineInvalid" xml:space="preserve"><value>Поисковик «{0}» (browser.searchEngine) — не известное имя ({1}) и не адрес http(s) с {{query}}.</value></data>
+  <data name="SearchNeedsUser" xml:space="preserve"><value>Страница поиска требует человека (капча или окно согласия), и никто не ответил. Она открыта в браузере: попроси пользователя пройти проверку и повтори поиск.</value></data>
+  <data name="SearchNeedsUserNotification" xml:space="preserve"><value>Поисковик просит подтвердить, что вы человек. Пройдите проверку во вкладке браузера: агент ждёт.</value></data>
 </root>

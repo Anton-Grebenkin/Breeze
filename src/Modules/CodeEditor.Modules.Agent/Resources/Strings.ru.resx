@@ -466,4 +466,7 @@ description: Стили XAML
   <data name="HookBlockedPrompt" xml:space="preserve"><value>Хук не пропустил сообщение: {0}</value></data>
   <data name="HookStopPrompt" xml:space="preserve"><value>Хук пользователя просит пока не заканчивать: {0}</value></data>
   <data name="HookStopStatus" xml:space="preserve"><value>Хук остановки: агент продолжает</value></data>
+  <!-- Web through the browser. -->
+  <data name="WebSearchThroughBrowser" xml:space="preserve"><value>Выдача поисковика, открытая в браузере редактора (без пересказа: источник читай через web_fetch):</value></data>
+  <data name="WebFetchBothFailed" xml:space="preserve"><value>{0} Через браузер страница тоже не открылась: {1}</value></data>
 </root>

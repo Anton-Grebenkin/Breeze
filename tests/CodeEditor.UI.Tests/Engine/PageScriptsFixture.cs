@@ -72,12 +72,25 @@ public sealed class PageScriptsFixture : IDisposable
         </body></html>
         """;
 
+    // A results page as engines make them: a heading link per result, some wrapped in a redirect, plus the engine's own links.
+    private const string Results = """
+        <html><head><title>kafka lag — поиск</title></head><body>
+        <header><a href="/settings">Настройки</a></header>
+        <ol>
+          <li><h3><a href="/l/?uddg=https%3A%2F%2Fkafka.apache.org%2Fdocumentation%2F%23monitoring&rut=1">Apache Kafka: мониторинг</a></h3><p>Метрики отставания потребителей.</p></li>
+          <li><a href="https://www.confluent.io/blog/lag"><h3>Consumer lag explained</h3></a><span>Что такое lag и как его мерить.</span></li>
+          <li><h3><a href="/images?q=kafka">Картинки</a></h3></li>
+          <li><h3><a href="https://kafka.apache.org/documentation/#monitoring">Apache Kafka: мониторинг</a></h3></li>
+        </ol>
+        </body></html>
+        """;
+
     private readonly HeadlessEngine _engine = new();
     private readonly AIFunction _tool;
 
     public PageScriptsFixture()
     {
-        Site = LocalSite.Start(new Dictionary<string, string> { ["/"] = Home, ["/frame"] = Frame, ["/docs"] = Docs, ["/api/items"] = """{"items":[1,2,3]}""" });
+        Site = LocalSite.Start(new Dictionary<string, string> { ["/"] = Home, ["/frame"] = Frame, ["/docs"] = Docs, ["/search"] = Results, ["/api/items"] = """{"items":[1,2,3]}""" });
         Tabs = new BrowserTabs(_engine);
         var agent = new BrowserAgentTabs(Tabs);
         Tab = agent.Open();

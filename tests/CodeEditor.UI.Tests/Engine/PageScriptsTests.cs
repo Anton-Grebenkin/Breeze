@@ -1,5 +1,7 @@
 using CodeEditor.Modules.Browser.Services;
 using CodeEditor.Modules.Browser.Services.Reading;
+using CodeEditor.Modules.Browser.Services.Web;
+using Microsoft.Extensions.Options;
 
 namespace CodeEditor.UI.Tests.Engine;
 
@@ -142,6 +144,32 @@ public sealed class PageScriptsTests(PageScriptsFixture fixture) : IClassFixture
 
         Assert.StartsWith("Файл orders.csv выбран в поле.", result, StringComparison.Ordinal);
         Assert.Equal("\"orders.csv\"", await EvaluateAsync("document.getElementById('upload').files[0].name"));
+    }
+
+    // A results page is read by its shape, not its markup: heading links to other sites, redirects unwrapped.
+    [Fact]
+    public async Task Search_ReadsAnEnginesResults_TitleAddressAndExcerpt()
+    {
+        var engine = new BrowserOptions { SearchEngine = $"http://localhost:{fixture.Site.Port}/search?q={{query}}" };
+        var web = new BrowserWebAccess(fixture.Tabs, new StaticOptions(engine));
+
+        var hits = await web.SearchAsync("kafka lag", TestContext.Current.CancellationToken);
+
+        Assert.Equal(
+            [
+                ("Apache Kafka: мониторинг", "https://kafka.apache.org/documentation/#monitoring", "Метрики отставания потребителей."),
+                ("Consumer lag explained", "https://www.confluent.io/blog/lag", "Что такое lag и как его мерить."),
+            ],
+            hits.Select(hit => (hit.Title, hit.Url, hit.Snippet)));
+    }
+
+    private sealed class StaticOptions(BrowserOptions value) : IOptionsMonitor<BrowserOptions>
+    {
+        public BrowserOptions CurrentValue => value;
+
+        public BrowserOptions Get(string? name) => value;
+
+        public IDisposable? OnChange(Action<BrowserOptions, string?> listener) => null;
     }
 
     private Task<string> EvaluateAsync(string script) => fixture.Tab.Page.EvaluateAsync(script, TestContext.Current.CancellationToken);

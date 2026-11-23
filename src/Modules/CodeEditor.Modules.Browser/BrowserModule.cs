@@ -7,17 +7,20 @@ using CodeEditor.Modules.Agent.Contracts;
 using CodeEditor.Modules.Agent.Contracts.Approvals;
 using CodeEditor.Modules.Agent.Contracts.Context;
 using CodeEditor.Modules.Agent.Contracts.Feed;
+using CodeEditor.Modules.Agent.Contracts.Web;
 using CodeEditor.Modules.Browser.Commands;
 using CodeEditor.Modules.Browser.Resources;
 using CodeEditor.Modules.Browser.Services;
 using CodeEditor.Modules.Browser.Services.Agent;
 using CodeEditor.Modules.Browser.Services.Tabs;
+using CodeEditor.Modules.Browser.Services.Web;
 using CodeEditor.Modules.Browser.ViewModels;
 using CodeEditor.Shell;
 using CodeEditor.Shell.Layout;
 using CodeEditor.Shell.Services;
 using CodeEditor.Shell.ToolWindows;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace CodeEditor.Modules.Browser;
 
@@ -45,8 +48,9 @@ public sealed class BrowserModule : IModule
         services.AddSingleton<BrowserTabStore>();
         services.AddSingleton<BrowserTabs>();
         services.AddSingleton<BrowserViewModel>();
-        services.AddSingleton(provider => new BrowserAgentTabs(provider.GetRequiredService<BrowserTabs>(), () =>
-            provider.GetRequiredService<IUiDispatcher>().InvokeAsync(() => provider.GetRequiredService<WorkbenchLayout>().Show(ToolWindowId, focus: false))));
+        services.AddSingleton(provider => new BrowserAgentTabs(provider.GetRequiredService<BrowserTabs>(), ShowPanel(provider)));
+        services.AddSingleton<IWebBrowserAccess>(provider => new BrowserWebAccess(
+            provider.GetRequiredService<BrowserTabs>(), provider.GetRequiredService<IOptionsMonitor<BrowserOptions>>(), provider.GetService<INotificationService>(), ShowPanel(provider)));
         services.AddSingleton<BrowserAgentTools>();
         services.AddSingleton<IAgentToolProvider>(provider => provider.GetRequiredService<BrowserAgentTools>());
         services.AddSingleton<IAgentChangePreviewer>(provider => provider.GetRequiredService<BrowserAgentTools>());
@@ -57,6 +61,10 @@ public sealed class BrowserModule : IModule
         services.AddSingleton<IAgentContextSwitch>(provider => provider.GetRequiredService<BrowserTabsSwitch>());
         services.AddSingleton<IAgentContextProvider, BrowserAgentContext>();
     }
+
+    // The panel comes to the front without focus: the chat box keeps it.
+    private static Func<Task> ShowPanel(IServiceProvider provider) => () =>
+        provider.GetRequiredService<IUiDispatcher>().InvokeAsync(() => provider.GetRequiredService<WorkbenchLayout>().Show(ToolWindowId, focus: false));
 
     public void Contribute(IServiceProvider services)
     {

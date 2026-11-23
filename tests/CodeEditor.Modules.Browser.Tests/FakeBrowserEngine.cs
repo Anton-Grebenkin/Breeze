@@ -9,9 +9,13 @@ internal sealed class FakeBrowserEngine : IBrowserEngine
 {
     public List<FakeBrowserPage> Pages { get; } = [];
 
+    /// <summary>Sets up every page as it is made (preset script replies).</summary>
+    public Action<FakeBrowserPage>? Configure { get; set; }
+
     public IBrowserPage CreatePage(BrowserPageState? restored = null, bool forAgent = false)
     {
         var page = new FakeBrowserPage(restored) { IsForAgent = forAgent };
+        Configure?.Invoke(page);
         Pages.Add(page);
         return page;
     }
