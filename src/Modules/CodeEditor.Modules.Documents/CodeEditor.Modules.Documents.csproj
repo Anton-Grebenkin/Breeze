@@ -9,6 +9,8 @@
     <PackageReference Include="DocumentFormat.OpenXml" />
     <PackageReference Include="PdfPig" />
     <PackageReference Include="PDFsharp-MigraDoc" />
+    <!-- Not used directly: raises the vulnerable version PDFsharp depends on (see Directory.Packages.props). -->
+    <PackageReference Include="System.Security.Cryptography.Pkcs" />
     <PackageReference Include="Markdig" />
   </ItemGroup>
 
