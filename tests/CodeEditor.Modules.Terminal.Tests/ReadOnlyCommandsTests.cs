@@ -44,6 +44,12 @@ public sealed class ReadOnlyCommandsTests
     [InlineData("Invoke-WebRequest -Uri http://localhost:5000/health -UseBasicParsing -TimeoutSec 10")]
     [InlineData("irm http://127.0.0.1:5000/api/items -Method Get")]
     [InlineData("node --version")]
+    [InlineData("gci src | % Name")]
+    [InlineData("Get-ChildItem src | ForEach-Object FullName")]
+    [InlineData("gci src | foreach -MemberName:Length")]
+    [InlineData("gci src | % { $_.Name }")]
+    [InlineData("git ls-files *.cs")]
+    [InlineData("git grep -n TODO -- src/*.cs")]
     public void ReadCommands_RunWithoutAsking(string command) =>
         Assert.True(ReadOnlyCommands.IsReadOnly(CommandTokenizer.Parse(command)), command);
 
@@ -94,6 +100,19 @@ public sealed class ReadOnlyCommandsTests
     [InlineData("curl -o out.html http://localhost:5000")]
     [InlineData("Test-NetConnection example.com -Port 443")]
     [InlineData("tnc -ComputerName:example.com")]
+    [InlineData("gci x | % Delete")]
+    [InlineData("Get-Process | % Kill")]
+    [InlineData("gci x | ForEach-Object -MemberName Delete")]
+    [InlineData("gci x | foreach -MemberName:Delete")]
+    [InlineData("gci x | % MoveTo other")]
+    [InlineData("git grep --no-index -e . -- .en*")]
+    [InlineData("git grep --no-index -e .")]
+    [InlineData("git grep --untracked password")]
+    [InlineData("git grep -e . -- .en*")]
+    [InlineData("git show HEAD:*.pem")]
+    [InlineData("git diff -- *")]
+    [InlineData("git log --oneline -- src/App/*")]
+    [InlineData("git grep key -- conf/[a-z]*")]
     public void OtherCommands_AskTheUser(string command) =>
         Assert.False(ReadOnlyCommands.IsReadOnly(CommandTokenizer.Parse(command)), command);
 

@@ -1,5 +1,6 @@
 using System.Collections.Frozen;
 using System.Globalization;
+using System.IO.Enumeration;
 using CodeEditor.Modules.Agent.Contracts.Resources;
 
 namespace CodeEditor.Modules.Agent.Contracts.Files;
@@ -76,6 +77,22 @@ public static class SensitivePaths
             || SecretNames.Contains(name)
             || SecretExtensions.Contains(Path.GetExtension(name));
     }
+
+    /// <summary>
+    /// A mask with wildcards (<c>.en*</c>, <c>conf/*.p?m</c>, <c>*</c>) may match a secrets file. A character class is
+    /// taken as a match: it is not worth a glob engine here, and such a mask then just asks the user.
+    /// </summary>
+    public static bool MayMatchSecret(string mask)
+    {
+        ArgumentNullException.ThrowIfNull(mask);
+        // The file name part: after a folder and after git's "HEAD:".
+        var name = mask[(mask.AsSpan().LastIndexOfAny('/', '\\', ':') + 1)..];
+        return name.Contains('[', StringComparison.Ordinal)
+            || SecretSamples.Any(sample => FileSystemName.MatchesSimpleExpression(name, sample, ignoreCase: true));
+    }
+
+    /// <summary>One file name of every kind <see cref="IsSecret"/> knows.</summary>
+    private static readonly string[] SecretSamples = [".env", ".env.local", .. SecretNames, .. SecretExtensions.Select(static extension => "secret" + extension)];
 
     public static bool IsProtected(string relativePath)
     {
