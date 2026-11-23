@@ -75,6 +75,19 @@ public sealed class BrowserSiteActionsTests
         Assert.True(_approvals.IsPreapproved(BrowserAgentTools.ToolName, Call("type", "e5")));
     }
 
+    // "Allow for this chat" on a browser card covers pressing and typing on sites and opening new ones for the rest
+    // of the chat; a file sent to a site and a request that changes something still ask every time.
+    [Fact]
+    public void AllowForThisChat_CoversActionsOnSites_ButNotFilesAndChangingRequests()
+    {
+        Assert.False(_approvals.AlwaysAsks(BrowserAgentTools.ToolName, Call("click", "e2")));
+        Assert.False(_approvals.AlwaysAsks(BrowserAgentTools.ToolName, Call("type", "e5")));
+        Assert.False(_approvals.AlwaysAsks(BrowserAgentTools.ToolName, new Dictionary<string, object?> { ["action"] = "navigate", ["url"] = "https://new.example.org/" }));
+
+        Assert.True(_approvals.AlwaysAsks(BrowserAgentTools.ToolName, new Dictionary<string, object?> { ["action"] = "upload", ["ref"] = "e5", ["path"] = "a.csv" }));
+        Assert.True(_approvals.AlwaysAsks(BrowserAgentTools.ToolName, new Dictionary<string, object?> { ["action"] = "request", ["method"] = "POST", ["url"] = "/api/v1/applications/shop/sync" }));
+    }
+
     // The app the user develops: nothing to ask.
     [Fact]
     public void PageOfThisMachine_ActsAtOnce()
