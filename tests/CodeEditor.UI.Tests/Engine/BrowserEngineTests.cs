@@ -2,6 +2,7 @@ using CodeEditor.Modules.Agent.Contracts;
 using CodeEditor.Modules.Browser.Services;
 using CodeEditor.Modules.Browser.Services.Agent;
 using CodeEditor.Modules.Browser.Services.Tabs;
+using CodeEditor.Shell.Services;
 using CodeEditor.UI.Tests.Infrastructure;
 using FlaUI.Core.Tools;
 using Microsoft.Extensions.AI;
@@ -26,6 +27,7 @@ public sealed class BrowserEngineTests : IDisposable
             </body></html>
             """,
         ["/report"] = "<html><head><title>Отчёт</title></head><body><h1>Отчёт за месяц</h1></body></html>",
+        ["/secure"] = LocalSite.SignInRequired,
     });
 
     private readonly BrowserTabs _tabs;
@@ -101,6 +103,25 @@ public sealed class BrowserEngineTests : IDisposable
         Assert.Equal((2, false, true), (_tabs.Tabs.Length, _tabs.Tabs[0].IsAgent, _tabs.Tabs[1].IsAgent));
     }
 
+    // A site behind the browser's own sign-in window, opened in the agent's background tab: the agent is told at once
+    // instead of waiting for the load to time out, and the tab is shown to the user.
+    [Fact]
+    public async Task SignInWindowOfTheBrowser_IsReportedAtOnce_AndTheTabIsShownToTheUser()
+    {
+        var notifications = new Notifications();
+        using var attention = new BrowserAttention(_tabs, notifications);
+        var mine = _tabs.Open();
+        await mine.Page.NavigateAsync(new Uri(Address("/")), TestContext.Current.CancellationToken);
+
+        var started = DateTime.UtcNow;
+        var error = await Assert.ThrowsAsync<AgentToolException>(() => UseAsync(new() { ["action"] = "navigate", ["url"] = Address("/secure") }));
+
+        Assert.Contains("сайт просит логин и пароль в окне самого браузера", error.Message, StringComparison.Ordinal);
+        Assert.True(DateTime.UtcNow - started < TimeSpan.FromSeconds(15), "Окно входа должно вернуть управление сразу, а не по истечении ожидания загрузки.");
+        Assert.True(_tabs.Active!.IsAgent);
+        Assert.Contains("просит логин и пароль", Assert.Single(notifications.Shown), StringComparison.Ordinal);
+    }
+
     [Fact]
     public async Task RestoredPage_ShowsItsAddressAtOnce_AndLoadsWhenFirstCalled()
     {
@@ -118,6 +139,24 @@ public sealed class BrowserEngineTests : IDisposable
 
     private async Task<string> UseAsync(Dictionary<string, object?> arguments) =>
         (await _tool.InvokeAsync(new AIFunctionArguments(arguments), TestContext.Current.CancellationToken))?.ToString() ?? string.Empty;
+
+    private sealed class Notifications : INotificationService
+    {
+        public List<string> Shown { get; } = [];
+
+        public IDisposable Show(Notification notification)
+        {
+            Shown.Add(notification.Message);
+            return new Closed();
+        }
+
+        private sealed class Closed : IDisposable
+        {
+            public void Dispose()
+            {
+            }
+        }
+    }
 
     private sealed class PassThroughOutputStore : IAgentOutputStore
     {

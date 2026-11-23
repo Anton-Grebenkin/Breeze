@@ -21,6 +21,15 @@ internal sealed class FakeBrowserPage : IBrowserPage
 
     public BrowserDialog? Dialog { get; set; }
 
+    public bool NeedsUser { get; private set; }
+
+    /// <summary>The browser shows (or closes) its own sign-in window over the page.</summary>
+    public void ShowSignInWindow(bool shown = true)
+    {
+        NeedsUser = shown;
+        StateChanged?.Invoke(this, EventArgs.Empty);
+    }
+
     /// <summary>Answers given to dialogs: accepted or not, and the text.</summary>
     public List<(bool Accept, string? Text)> DialogAnswers { get; } = [];
 

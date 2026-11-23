@@ -99,6 +99,7 @@ public sealed partial class WebViewPage
         core.NavigationCompleted += (_, e) =>
         {
             StatusCode = e.HttpStatusCode > 0 ? e.HttpStatusCode : null;
+            NeedsUser = false;
             var failed = !e.IsSuccess && e.HttpStatusCode <= 0;
             _unreached = failed && e.WebErrorStatus != CoreWebView2WebErrorStatus.OperationCanceled ? opening : null;
             Finish(core, failed ? BrowserErrors.Describe(e.WebErrorStatus.ToString(), opening ?? core.Source) : null);
@@ -119,6 +120,15 @@ public sealed partial class WebViewPage
         core.FaviconChanged += (_, _) => _ = UpdateFaviconAsync(core);
         core.NewWindowRequested += OnNewWindowRequested;
         core.WindowCloseRequested += (_, _) => CloseRequested?.Invoke(this, EventArgs.Empty);
+
+        // The browser's own sign-in window: a call waiting for the load is told at once instead of timing out, and the
+        // tab is shown to the user (BrowserAttention).
+        core.BasicAuthenticationRequested += (_, _) =>
+        {
+            NeedsUser = true;
+            EndLoading(Strings.SignInWindowShown);
+            StateChanged?.Invoke(this, EventArgs.Empty);
+        };
         core.ProcessFailed += (_, e) => OnProcessFailed(core, e.ProcessFailedKind);
         foreach (var method in BrowserConsoleEvents.Methods)
         {

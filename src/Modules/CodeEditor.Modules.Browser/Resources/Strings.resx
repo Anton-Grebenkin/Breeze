@@ -160,4 +160,7 @@
   <data name="FeedRequest" xml:space="preserve"><value>request {0}</value></data>
   <!-- Known sites. -->
   <data name="ContextKnownSites" xml:space="preserve"><value>Sites the user has opened in the browser before; they open without asking: {0}.</value></data>
+  <!-- A page needs the user. -->
+  <data name="SignInWindowShown" xml:space="preserve"><value>the site asks for a login and password in the browser's own window. The tab is shown to the user: ask them to sign in there, then go on</value></data>
+  <data name="SignInWindowNotification" xml:space="preserve"><value>The site {0} in the agent's tab asks for a login and password. Enter them in the browser: the agent is waiting.</value></data>
 </root>

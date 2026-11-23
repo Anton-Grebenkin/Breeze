@@ -160,4 +160,7 @@
   <data name="FeedRequest" xml:space="preserve"><value>запрос {0}</value></data>
   <!-- Known sites. -->
   <data name="ContextKnownSites" xml:space="preserve"><value>Сайты, которые пользователь уже открывал в браузере; они открываются без вопроса: {0}.</value></data>
+  <!-- A page needs the user. -->
+  <data name="SignInWindowShown" xml:space="preserve"><value>сайт просит логин и пароль в окне самого браузера. Вкладка показана пользователю: попроси его войти там и продолжай</value></data>
+  <data name="SignInWindowNotification" xml:space="preserve"><value>Сайт {0} во вкладке агента просит логин и пароль. Введите их в браузере: агент ждёт.</value></data>
 </root>

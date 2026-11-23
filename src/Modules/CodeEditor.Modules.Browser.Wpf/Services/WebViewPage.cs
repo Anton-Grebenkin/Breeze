@@ -64,6 +64,8 @@ public sealed partial class WebViewPage : IBrowserPage
 
     public ReadOnlyMemory<byte> Favicon { get; private set; }
 
+    public bool NeedsUser { get; private set; }
+
     public BrowserNetworkLog Network { get; } = new();
 
     public event EventHandler? StateChanged;

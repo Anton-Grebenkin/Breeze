@@ -37,6 +37,12 @@ public interface IBrowserPage : IDisposable
     /// </summary>
     BrowserDialog? Dialog { get; }
 
+    /// <summary>
+    /// The browser shows its own sign-in window over the page (a site that asks for a login and password before any
+    /// page): only a person can answer it. Cleared when the page loads or the window is dismissed.
+    /// </summary>
+    bool NeedsUser { get; }
+
     /// <summary>The address, title, icon or loading state changed; raised on the UI thread.</summary>
     event EventHandler? StateChanged;
 

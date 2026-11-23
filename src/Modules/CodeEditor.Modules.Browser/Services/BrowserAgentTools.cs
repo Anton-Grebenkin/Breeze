@@ -69,6 +69,7 @@ public sealed class BrowserAgentTools(
             "Tabs: the context block lists the open tabs by id (t1, t2…). You work in a tab of your own: navigate opens it and later calls reuse it, so the user's pages stay as they are. " +
             "To read a page the user has open, pass its id as tab: reading is free; navigating, clicking or typing in a user's tab needs their approval, so do that in your own tab. " +
             "On a site that is not this machine you read and follow links freely, but pressing a button or filling in a field asks the user until they allow the site. " +
+            "When a page needs the user — a sign-in you have no data for, a code from their phone, a captcha — do not guess: show the tab with select_tab, say what to do there and continue after they reply. " +
             "Actions: navigate (url), snapshot (title, address, HTTP status if it is an error, and page content: headings, text, links, fields and buttons, each interactive element with [ref=eN]; " +
             "tables come as rows, frames and web components are included, a canvas or chart is named as a graphic; a long page comes in parts: ask the next with part), " +
             "read (the page's main text as Markdown, without menus: for articles and docs; parts as in snapshot), find (text: where it occurs on the page, with the heading above and the nearest ref), " +

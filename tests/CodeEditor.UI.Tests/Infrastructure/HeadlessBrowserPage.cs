@@ -65,6 +65,8 @@ internal sealed class HeadlessBrowserPage : IBrowserPage
 
     public BrowserDialog? Dialog => null;
 
+    public bool NeedsUser => false;
+
     public Task AnswerDialogAsync(bool accept, string? text, CancellationToken cancellationToken) => Task.CompletedTask;
 
     public event EventHandler? StateChanged;
