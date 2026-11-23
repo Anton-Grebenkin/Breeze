@@ -111,6 +111,39 @@ public sealed class PageScriptsTests(PageScriptsFixture fixture) : IClassFixture
         Assert.Equal((400, 200), (png[16] << 24 | png[17] << 16 | png[18] << 8 | png[19], png[20] << 24 | png[21] << 16 | png[22] << 8 | png[23]));
     }
 
+    // A real mouse click: the page sees a trusted event, as from a person.
+    [Fact]
+    public async Task Click_IsTrusted_HoverAndDragMoveTheMouse()
+    {
+        await fixture.OpenAsync("/");
+        var snapshot = await BrowserPageReader.SnapshotAsync(fixture.Tab, part: null, TestContext.Current.CancellationToken);
+
+        var clicked = await fixture.UseAsync(new() { ["action"] = "click", ["ref"] = Ref(snapshot, "| shop | Synced | button \"Sync\"") });
+        Assert.Contains("title=\"sync shop true\"", clicked, StringComparison.Ordinal);
+
+        var hovered = await fixture.UseAsync(new() { ["action"] = "hover", ["ref"] = Ref(clicked, "button \"Наведи\"") });
+        Assert.Contains("title=\"hover\"", hovered, StringComparison.Ordinal);
+
+        var dragged = await fixture.UseAsync(new() { ["action"] = "drag", ["ref"] = Ref(hovered, "button \"Ручка\""), ["to"] = Ref(hovered, "button \"Гнездо\"") });
+        Assert.Contains("title=\"dragged\"", dragged, StringComparison.Ordinal);
+
+        var dropped = await fixture.UseAsync(new() { ["action"] = "drag", ["ref"] = Ref(dragged, "button \"Карточка\""), ["to"] = Ref(dragged, "button \"Корзина\"") });
+        Assert.Contains("title=\"dropped card\"", dropped, StringComparison.Ordinal);
+    }
+
+    // The file goes into the field without the system dialog, and the page sees it.
+    [Fact]
+    public async Task Upload_PutsTheFileIntoTheField()
+    {
+        await fixture.OpenAsync("/");
+        var snapshot = await BrowserPageReader.SnapshotAsync(fixture.Tab, part: null, TestContext.Current.CancellationToken);
+
+        var result = await fixture.UseAsync(new() { ["action"] = "upload", ["ref"] = Ref(snapshot, "file \"Файл\""), ["path"] = "orders.csv" });
+
+        Assert.StartsWith("Файл orders.csv выбран в поле.", result, StringComparison.Ordinal);
+        Assert.Equal("\"orders.csv\"", await EvaluateAsync("document.getElementById('upload').files[0].name"));
+    }
+
     private Task<string> EvaluateAsync(string script) => fixture.Tab.Page.EvaluateAsync(script, TestContext.Current.CancellationToken);
 
     /// <summary>The ref of the first snapshot element after <paramref name="marker"/>.</summary>

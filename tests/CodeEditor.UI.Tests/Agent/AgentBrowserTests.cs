@@ -8,7 +8,8 @@ namespace CodeEditor.UI.Tests.Agent;
 
 /// <summary>
 /// The agent and browser tabs on real WebView2 and a fake model (ADR 0054): the agent is told which tabs are open,
-/// opens its page in a tab of its own behind the user's one, and reads the user's tab by id without touching it.
+/// opens its page in a tab of its own behind the user's one, answers a dialog its click opened, and reads the user's
+/// tab by id without touching it.
 /// </summary>
 public sealed class AgentBrowserTests : IDisposable
 {
@@ -22,7 +23,7 @@ public sealed class AgentBrowserTests : IDisposable
     private readonly LocalSite _site = LocalSite.Start(new Dictionary<string, string>
     {
         ["/mine"] = "<html><head><title>Моя</title></head><body><h1>Моя страница</h1></body></html>",
-        ["/orders"] = "<html><head><title>Заказы</title></head><body><h1>Список заказов</h1></body></html>",
+        ["/orders"] = "<html><head><title>Заказы</title></head><body><h1>Список заказов</h1><button onclick=\"if (confirm('Удалить заказ?')) document.title = 'Удалён'\">Удалить</button></body></html>",
     });
 
     public AgentBrowserTests()
@@ -44,10 +45,12 @@ public sealed class AgentBrowserTests : IDisposable
     }
 
     [Fact]
-    public void Agent_SeesTheTabs_WorksInItsOwn_AndReadsTheUsers()
+    public void Agent_SeesTheTabs_WorksInItsOwn_AnswersADialog_AndReadsTheUsers()
     {
         _model
             .CallTool("browser", new { action = "navigate", url = $"http://localhost:{_site.Port}/orders" })
+            .CallTool("browser", new { action = "click", @ref = "e1" })
+            .CallTool("browser", new { action = "dialog", accept = true })
             .CallTool("browser", new { action = "snapshot", tab = "t1" })
             .Reply("Готово.");
 
@@ -65,14 +68,19 @@ public sealed class AgentBrowserTests : IDisposable
         session.TypeInto("Agent.Input", "Проверь заказы");
         Keyboard.Type(VirtualKeyShort.ENTER);
 
-        Assert.True(Retry.WhileFalse(() => _model.Requests.Count == 3, PageTimeout).Result, $"Запросов к модели: {_model.Requests.Count}");
+        Assert.True(Retry.WhileFalse(() => _model.Requests.Count == 5, PageTimeout).Result, $"Запросов к модели: {_model.Requests.Count}");
         var requests = _model.Requests.ToArray();
         Assert.Contains($"t1: localhost:{_site.Port}/mine (активная)", requests[0], StringComparison.Ordinal);
         Assert.Contains("Список заказов", requests[1], StringComparison.Ordinal);
-        Assert.Contains("Моя страница", requests[2], StringComparison.Ordinal);
+
+        // The click opened a confirm: the agent is told at once, answers, and the page goes on.
+        Assert.Contains("Страница показала диалог и ждёт ответа: confirm", requests[2], StringComparison.Ordinal);
+        Assert.Contains("Удалить заказ?", requests[2], StringComparison.Ordinal);
+        Assert.Contains("Удалён", requests[3], StringComparison.Ordinal);
+        Assert.Contains("Моя страница", requests[4], StringComparison.Ordinal);
 
         // The agent's page is a tab of its own behind the user's one, which stays where it was.
-        WaitForTab(session, "Browser.Tab.t2", "Заказы");
+        WaitForTab(session, "Browser.Tab.t2", "Удалён");
         Assert.Equal($"http://localhost:{_site.Port}/mine", session.ValueOf("Browser.Address"));
         session.SaveScreenshot("browser-agent-tab");
     }

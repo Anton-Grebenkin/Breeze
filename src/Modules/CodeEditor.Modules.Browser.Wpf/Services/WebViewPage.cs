@@ -26,6 +26,7 @@ public sealed partial class WebViewPage : IBrowserPage
 
     private readonly WebViewHost _host;
     private readonly Action<WebViewPage> _closed;
+    private readonly bool _forAgent;
     private readonly BrowserConsoleLog _console = new();
     private TaskCompletionSource<CoreWebView2> _ready = NewReady();
     private WebView2? _control;
@@ -38,10 +39,11 @@ public sealed partial class WebViewPage : IBrowserPage
     private volatile Task? _restoring;
     private volatile bool _disposed;
 
-    internal WebViewPage(WebViewHost host, BrowserPageState? restored, Action<WebViewPage> closed)
+    internal WebViewPage(WebViewHost host, BrowserPageState? restored, bool forAgent, Action<WebViewPage> closed)
     {
         _host = host;
         _closed = closed;
+        _forAgent = forAgent;
         if (restored is not null)
         {
             (Url, Title, _pending) = (restored.Url, restored.Title, restored.Url);
@@ -182,11 +184,11 @@ public sealed partial class WebViewPage : IBrowserPage
     }
 
     // A dialog (alert, confirm) holds every script until it closes: the agent is told why instead of waiting forever.
-    private static async Task<string> WithinScriptTimeoutAsync(Task<string> pending, CancellationToken cancellationToken)
+    private async Task<string> WithinScriptTimeoutAsync(Task<string> pending, CancellationToken cancellationToken)
     {
         try
         {
-            return await pending.WaitAsync(ScriptTimeout, cancellationToken);
+            return await UnlessDialogAsync(pending, cancellationToken);
         }
         catch (TimeoutException)
         {

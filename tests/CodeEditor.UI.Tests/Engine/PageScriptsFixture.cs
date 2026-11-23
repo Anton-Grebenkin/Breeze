@@ -1,8 +1,11 @@
+using CodeEditor.Core.Context;
+using CodeEditor.Core.Files;
 using CodeEditor.Modules.Agent.Contracts;
 using CodeEditor.Modules.Browser.Services;
 using CodeEditor.Modules.Browser.Services.Agent;
 using CodeEditor.Modules.Browser.Services.Tabs;
 using Microsoft.Extensions.AI;
+using Microsoft.Extensions.Logging.Abstractions;
 using CodeEditor.UI.Tests.Infrastructure;
 
 namespace CodeEditor.UI.Tests.Engine;
@@ -21,7 +24,7 @@ public sealed class PageScriptsFixture : IDisposable
         <p>Всего <b>два</b> приложения, см. <a href="/docs">описание</a> ниже.</p>
         <table id="apps">
           <tr><th>Имя</th><th>Состояние</th><th></th></tr>
-          <tr><td>shop</td><td>Synced</td><td><button onclick="document.title = 'sync shop'">Sync</button></td></tr>
+          <tr><td>shop</td><td>Synced</td><td><button onclick="document.title = 'sync shop ' + event.isTrusted">Sync</button></td></tr>
           <tr><td>blog</td><td>OutOfSync</td><td><button onclick="document.title = 'sync blog'">Sync</button></td></tr>
         </table>
         <my-card></my-card>
@@ -31,7 +34,11 @@ public sealed class PageScriptsFixture : IDisposable
         <input type="text" id="name" aria-label="Имя">
         <input type="file" id="upload" aria-label="Файл">
         <div style="display:none">скрытый текст</div>
-        <div id="zone" style="width:200px;height:40px" onmouseenter="document.title = 'hover'">Наведи</div>
+        <button id="zone" onmouseenter="document.title = 'hover'">Наведи</button>
+        <button id="grip" onmousedown="window.held = true">Ручка</button>
+        <button id="slot" style="margin-left:200px" onmouseup="if (window.held) document.title = 'dragged'">Гнездо</button>
+        <button id="card" draggable="true" ondragstart="event.dataTransfer.setData('text/plain', 'card')">Карточка</button>
+        <button id="bin" ondragover="event.preventDefault()" ondrop="document.title = 'dropped ' + event.dataTransfer.getData('text/plain')">Корзина</button>
         <script>
           class MyCard extends HTMLElement {
             constructor() {
@@ -74,10 +81,18 @@ public sealed class PageScriptsFixture : IDisposable
         Tabs = new BrowserTabs(_engine);
         var agent = new BrowserAgentTabs(Tabs);
         Tab = agent.Open();
-        _tool = new BrowserAgentTools(agent, new PassThroughOutputStore(), Images).CreateTools().OfType<AIFunction>().Single();
+        Folder = Directory.CreateDirectory(Path.Combine(Path.GetTempPath(), "CodeEditor.UI.Tests", Guid.NewGuid().ToString("N"), "project")).FullName;
+        File.WriteAllText(Path.Combine(Folder, "orders.csv"), "id;sum");
+        var files = new PhysicalFileSystem();
+        var workspace = new Workspace(files, new ContextKeyService(), NullLogger<Workspace>.Instance);
+        workspace.Open(Folder);
+        _tool = new BrowserAgentTools(agent, new PassThroughOutputStore(), Images, workspace, files).CreateTools().OfType<AIFunction>().Single();
     }
 
     public LocalSite Site { get; }
+
+    /// <summary>The folder the tool works in; it has <c>orders.csv</c>.</summary>
+    public string Folder { get; }
 
     public BrowserTabs Tabs { get; }
 
@@ -98,6 +113,7 @@ public sealed class PageScriptsFixture : IDisposable
     {
         Tabs.Dispose();
         Site.Dispose();
+        AppSession.DeleteQuietly(Path.GetDirectoryName(Folder)!);
     }
 
     internal sealed class ShownImages : IAgentImages
@@ -120,6 +136,6 @@ public sealed class PageScriptsFixture : IDisposable
 
     private sealed class HeadlessEngine : IBrowserEngine
     {
-        public IBrowserPage CreatePage(BrowserPageState? restored = null) => new HeadlessBrowserPage();
+        public IBrowserPage CreatePage(BrowserPageState? restored = null, bool forAgent = false) => new HeadlessBrowserPage();
     }
 }

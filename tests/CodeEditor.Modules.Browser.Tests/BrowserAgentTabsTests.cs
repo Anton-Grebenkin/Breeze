@@ -152,7 +152,7 @@ public sealed class BrowserAgentTabsTests
         var own = (FakeBrowserPage)_agent.Open().Page;
         own.Load("http://localhost:5000/", "Главная");
         FakeBrowserPage? popup = null;
-        own.OnScript = script => popup ??= script == BrowserScripts.Click("e3") ? own.OpenWindow("http://localhost:5000/report") : null;
+        own.OnScript = script => popup ??= script == BrowserScripts.Point("e3") ? own.OpenWindow("http://localhost:5000/report") : null;
 
         var result = await InvokeAsync(new() { ["action"] = "click", ["ref"] = "e3" });
         await InvokeAsync(new() { ["action"] = "snapshot" });

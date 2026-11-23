@@ -26,6 +26,8 @@ public sealed class BrowserPreviews(BrowserAgentTabs tabs)
             case BrowserAgentTools.Navigate or BrowserAgentTools.OpenTab:
                 var url = BrowserAgentTools.Address(Text(arguments, "url"));
                 return Card(tab is { IsAgent: false } && action == BrowserAgentTools.Navigate ? Strings.UserTabNavigateTitle : Strings.ApprovalTitle, url.IdnHost, "GET " + url.AbsoluteUri);
+            case BrowserAgentTools.Upload:
+                return Card(Strings.UploadApprovalTitle, site, BrowserAgentTools.Required(Text(arguments, "path"), "path") + " → " + await ElementAsync(tab, Text(arguments, "ref"), cancellationToken));
             default:
                 return Card(Strings.UserTabApprovalTitle, site, await DescribeAsync(action, arguments, tab, cancellationToken));
         }
@@ -35,6 +37,9 @@ public sealed class BrowserPreviews(BrowserAgentTabs tabs)
     {
         BrowserAgentTools.Click => Format(Strings.CardClick, await ElementAsync(tab, Text(arguments, "ref"), cancellationToken)),
         BrowserAgentTools.Type => Format(Strings.CardType, await ElementAsync(tab, Text(arguments, "ref"), cancellationToken), Text(arguments, "text") ?? string.Empty),
+        BrowserAgentTools.Hover => Format(Strings.CardHover, await ElementAsync(tab, Text(arguments, "ref"), cancellationToken)),
+        BrowserAgentTools.Drag => Format(Strings.CardDrag, await ElementAsync(tab, Text(arguments, "ref"), cancellationToken), await ElementAsync(tab, Text(arguments, "to"), cancellationToken)),
+        BrowserAgentTools.Dialog => Format(Strings.CardDialog, ToolArguments.GetOptional<bool?>(arguments, "accept") == false ? Strings.DialogDismiss : Strings.DialogAccept),
         BrowserAgentTools.Press => Format(Strings.CardPress, Text(arguments, "key") ?? "?"),
         BrowserAgentTools.Back => Strings.Back,
         BrowserAgentTools.Forward => Strings.Forward,

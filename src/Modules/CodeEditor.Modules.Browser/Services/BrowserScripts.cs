@@ -107,6 +107,59 @@ public static class BrowserScripts
         })({{JsonSerializer.Serialize(reference)}})
         """;
 
+    /// <summary>
+    /// Scrolls a snapshot element into view and returns the point a mouse would click, in the viewport of the top page:
+    /// <c>{ ok, x, y, kind, draggable }</c>. <c>kind</c> is <c>file</c> for a file field and <c>select</c> for a native
+    /// list, which real clicks would answer with a system window. Arms a probe that tells whether the next real click
+    /// reached the element (<see cref="WasClicked"/>).
+    /// </summary>
+    public static string Point(string reference) => $$"""
+        (ref => {
+          {{Locate}}
+          const el = locate(ref);
+          if (!el) return { ok: false, error: 'not found' };
+          el.scrollIntoView({ block: 'center', inline: 'center' });
+          const box = el.getBoundingClientRect();
+          let x = box.x + box.width / 2, y = box.y + box.height / 2;
+          for (let view = el.ownerDocument.defaultView; view && view !== window && view.frameElement; view = view.parent) {
+            const frame = view.frameElement.getBoundingClientRect();
+            x += frame.x; y += frame.y;
+          }
+          window.__agentClick = null;
+          el.addEventListener('click', () => { window.__agentClick = ref; }, { capture: true, once: true });
+          const kind = el.tagName === 'INPUT' && el.type === 'file' ? 'file' : el.tagName === 'SELECT' || el.tagName === 'OPTION' ? 'select' : 'element';
+          return { ok: true, x, y, kind, draggable: !!el.closest('[draggable=true]') };
+        })({{JsonSerializer.Serialize(reference)}})
+        """;
+
+    /// <summary>Whether the real click after <see cref="Point"/> reached the element: <c>true</c> or <c>false</c>.</summary>
+    public static string WasClicked(string reference) => $"window.__agentClick === {JsonSerializer.Serialize(reference)}";
+
+    /// <summary>
+    /// Drags one snapshot element onto another with the page's own drag-and-drop events, for elements marked
+    /// <c>draggable</c>: <c>{ ok, error }</c>.
+    /// </summary>
+    public static string DragDrop(string reference, string target) => $$"""
+        ((from, to) => {
+          {{Locate}}
+          const source = locate(from), goal = locate(to);
+          if (!source || !goal) return { ok: false, error: 'not found' };
+          const data = new DataTransfer();
+          const fire = (el, type) => el.dispatchEvent(new DragEvent(type, { bubbles: true, cancelable: true, dataTransfer: data }));
+          fire(source, 'dragstart'); fire(goal, 'dragenter'); fire(goal, 'dragover'); fire(goal, 'drop'); fire(source, 'dragend');
+          return { ok: true };
+        })({{JsonSerializer.Serialize(reference)}}, {{JsonSerializer.Serialize(target)}})
+        """;
+
+    /// <summary>The snapshot element if it is a file field, else <c>null</c>: the file is set on it through DevTools.</summary>
+    public static string FileInput(string reference) => $$"""
+        (ref => {
+          {{Locate}}
+          const el = locate(ref);
+          return el && el.tagName === 'INPUT' && el.type === 'file' ? el : null;
+        })({{JsonSerializer.Serialize(reference)}})
+        """;
+
     /// <summary>Focuses a snapshot element before a key press: <c>{ ok, error }</c>.</summary>
     public static string Focus(string reference) => $$"""
         (ref => {

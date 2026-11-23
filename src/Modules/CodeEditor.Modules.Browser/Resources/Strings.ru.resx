@@ -126,4 +126,22 @@
   <data name="FindMore" xml:space="preserve"><value>…мест больше: уточни текст.</value></data>
   <data name="FeedRead" xml:space="preserve"><value>текст страницы</value></data>
   <data name="FeedFind" xml:space="preserve"><value>поиск «{0}»</value></data>
+  <!-- Acting like a person. -->
+  <data name="UseUpload" xml:space="preserve"><value>Это поле выбора файла: файл в него кладёт действие upload (ref, path).</value></data>
+  <data name="NotFileField" xml:space="preserve"><value>Элемент — не поле выбора файла: возьми из снимка ref поля с типом file.</value></data>
+  <data name="UploadDone" xml:space="preserve"><value>Файл {0} выбран в поле.</value></data>
+  <data name="UploadApprovalTitle" xml:space="preserve"><value>Агент хочет отправить файл на сайт</value></data>
+  <data name="DialogOpen" xml:space="preserve"><value>Страница показала диалог и ждёт ответа: {0} «{1}». Ответь действием dialog (accept=true или false; text — для prompt); до ответа страница не реагирует.</value></data>
+  <data name="NoDialog" xml:space="preserve"><value>Диалога на странице нет.</value></data>
+  <data name="CardHover" xml:space="preserve"><value>Навести мышь: {0}</value></data>
+  <data name="CardDrag" xml:space="preserve"><value>Перетащить {0} на {1}</value></data>
+  <data name="CardDialog" xml:space="preserve"><value>Ответить на диалог страницы: {0}</value></data>
+  <data name="DialogAccept" xml:space="preserve"><value>принять</value></data>
+  <data name="DialogDismiss" xml:space="preserve"><value>отклонить</value></data>
+  <data name="FeedHover" xml:space="preserve"><value>наведение на {0}</value></data>
+  <data name="FeedDrag" xml:space="preserve"><value>перетаскивание {0}</value></data>
+  <data name="FeedUpload" xml:space="preserve"><value>файл {0}</value></data>
+  <data name="FeedDialog" xml:space="preserve"><value>диалог</value></data>
+  <data name="UploadNeedsFolder" xml:space="preserve"><value>Файл можно отправить только из открытой папки.</value></data>
+  <data name="UploadNoFile" xml:space="preserve"><value>Файла {0} нет.</value></data>
 </root>

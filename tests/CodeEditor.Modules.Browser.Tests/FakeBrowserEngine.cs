@@ -9,9 +9,9 @@ internal sealed class FakeBrowserEngine : IBrowserEngine
 {
     public List<FakeBrowserPage> Pages { get; } = [];
 
-    public IBrowserPage CreatePage(BrowserPageState? restored = null)
+    public IBrowserPage CreatePage(BrowserPageState? restored = null, bool forAgent = false)
     {
-        var page = new FakeBrowserPage(restored);
+        var page = new FakeBrowserPage(restored) { IsForAgent = forAgent };
         Pages.Add(page);
         return page;
     }

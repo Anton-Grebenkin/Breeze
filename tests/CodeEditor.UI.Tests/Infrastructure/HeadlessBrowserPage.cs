@@ -63,6 +63,10 @@ internal sealed class HeadlessBrowserPage : IBrowserPage
     /// <summary>Dialogs the page opened (<c>Page.javascriptDialogOpening</c> parameters), oldest first.</summary>
     public List<string> Dialogs { get; } = [];
 
+    public BrowserDialog? Dialog => null;
+
+    public Task AnswerDialogAsync(bool accept, string? text, CancellationToken cancellationToken) => Task.CompletedTask;
+
     public event EventHandler? StateChanged;
 
 #pragma warning disable CS0067 // The headless page opens no windows and never closes itself.

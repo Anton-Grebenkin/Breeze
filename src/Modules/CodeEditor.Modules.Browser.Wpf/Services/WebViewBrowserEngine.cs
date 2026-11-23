@@ -20,8 +20,14 @@ public sealed class WebViewBrowserEngine : IBrowserEngine, IDisposable
     private readonly List<WebViewPage> _pages = [];
 
     public WebViewBrowserEngine(IUiDispatcher dispatcher, WorkbenchLayout layout, UserDataPaths paths, ILogger<WebViewBrowserEngine> logger)
+        : this(dispatcher, () => layout.Show(BrowserModule.ToolWindowId, focus: false), paths, logger)
     {
-        _host = new WebViewHost(dispatcher, layout, paths, logger);
+    }
+
+    /// <param name="showPanel">Brings the panel that hosts the pages to the front without focus; called on the UI thread.</param>
+    public WebViewBrowserEngine(IUiDispatcher dispatcher, Action showPanel, UserDataPaths paths, ILogger<WebViewBrowserEngine> logger)
+    {
+        _host = new WebViewHost(dispatcher, showPanel, paths, logger);
         _host.PagesChanged += (_, _) => PagesChanged?.Invoke(this, EventArgs.Empty);
     }
 
@@ -39,9 +45,9 @@ public sealed class WebViewBrowserEngine : IBrowserEngine, IDisposable
         }
     }
 
-    public IBrowserPage CreatePage(BrowserPageState? restored = null)
+    public IBrowserPage CreatePage(BrowserPageState? restored = null, bool forAgent = false)
     {
-        var page = new WebViewPage(_host, restored, Remove);
+        var page = new WebViewPage(_host, restored, forAgent, Remove);
         lock (_gate)
         {
             _pages.Add(page);

@@ -16,6 +16,26 @@ internal sealed class FakeBrowserPage : IBrowserPage
 
     public bool IsDisposed { get; private set; }
 
+    /// <summary>The page was made for the agent: it holds dialogs for the agent's answer.</summary>
+    public bool IsForAgent { get; init; }
+
+    public BrowserDialog? Dialog { get; set; }
+
+    /// <summary>Answers given to dialogs: accepted or not, and the text.</summary>
+    public List<(bool Accept, string? Text)> DialogAnswers { get; } = [];
+
+    public Task AnswerDialogAsync(bool accept, string? text, CancellationToken cancellationToken)
+    {
+        if (Dialog is null)
+        {
+            return Task.FromException(new BrowserException("нет диалога"));
+        }
+
+        DialogAnswers.Add((accept, text));
+        Dialog = null;
+        return Task.CompletedTask;
+    }
+
     public ReadOnlyMemory<byte> Favicon { get; set; }
 
     public BrowserNetworkLog Network { get; } = new();
@@ -113,10 +133,36 @@ internal sealed class FakeBrowserPage : IBrowserPage
     /// <summary>Runs when the page gets a script: a test makes the page react (open a window on a click).</summary>
     public Action<string>? OnScript { get; set; }
 
+    /// <summary>What the page answers about the point to click: <c>element</c>, <c>file</c> or <c>select</c>.</summary>
+    public string PointKind { get; set; } = "element";
+
+    public bool IsDraggable { get; set; }
+
+    /// <summary>The real mouse click reached the element; otherwise the tool falls back to a script click.</summary>
+    public bool ClickReached { get; set; } = true;
+
     public Task<string> EvaluateAsync(string script, CancellationToken cancellationToken)
     {
+        // A page that shows a dialog answers nothing until the dialog is answered.
+        if (Dialog is { } dialog)
+        {
+            return Task.FromException<string>(new BrowserException(dialog.Message) { Dialog = dialog });
+        }
+
         Scripts.Add(script);
         OnScript?.Invoke(script);
+        if (script.Contains("window.__agentClick = null", StringComparison.Ordinal))
+        {
+            return Task.FromResult(ActionResult.Contains("false", StringComparison.Ordinal)
+                ? ActionResult
+                : $$"""{"ok":true,"x":120,"y":40,"kind":"{{PointKind}}","draggable":{{(IsDraggable ? "true" : "false")}}}""");
+        }
+
+        if (script.StartsWith("window.__agentClick ===", StringComparison.Ordinal))
+        {
+            return Task.FromResult(ClickReached ? "true" : "false");
+        }
+
         if (script == BrowserSnapshot.Script)
         {
             return Task.FromResult(SnapshotResult);

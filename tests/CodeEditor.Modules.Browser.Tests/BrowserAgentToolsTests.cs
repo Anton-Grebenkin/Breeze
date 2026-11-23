@@ -67,7 +67,7 @@ public sealed class BrowserAgentToolsTests
 
     [Theory]
     [InlineData("navigate", "file:///C:/secret.txt", "http")]
-    [InlineData("hover", null, "snapshot")]
+    [InlineData("teleport", null, "snapshot")]
     [InlineData("click", null, "ref")]
     public async Task BadCalls_AreExplained(string action, string? url, string expected)
     {

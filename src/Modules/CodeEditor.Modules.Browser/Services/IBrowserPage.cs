@@ -31,6 +31,12 @@ public interface IBrowserPage : IDisposable
     /// <summary>The page's requests, for the agent's <c>network</c> and <c>response</c> actions.</summary>
     BrowserNetworkLog Network { get; }
 
+    /// <summary>
+    /// The dialog (<c>alert</c>, <c>confirm</c>, <c>prompt</c>) the page shows and waits on. Only a page made for the
+    /// agent holds a dialog for an answer; in the user's pages the browser shows its own window.
+    /// </summary>
+    BrowserDialog? Dialog { get; }
+
     /// <summary>The address, title, icon or loading state changed; raised on the UI thread.</summary>
     event EventHandler? StateChanged;
 
@@ -71,6 +77,10 @@ public interface IBrowserPage : IDisposable
     /// <returns>The result as JSON.</returns>
     /// <exception cref="BrowserException">The browser is unavailable or the call failed.</exception>
     Task<string> DevToolsAsync(string method, string parameters, CancellationToken cancellationToken);
+
+    /// <summary>Answers the open dialog: accepts it (with <paramref name="text"/> for a prompt) or dismisses it.</summary>
+    /// <exception cref="BrowserException">No dialog is open.</exception>
+    Task AnswerDialogAsync(bool accept, string? text, CancellationToken cancellationToken);
 
     /// <summary>Console messages and page errors since the last call.</summary>
     IReadOnlyList<BrowserConsoleMessage> TakeConsole();

@@ -126,4 +126,22 @@
   <data name="FindMore" xml:space="preserve"><value>…there are more places: make the text more specific.</value></data>
   <data name="FeedRead" xml:space="preserve"><value>page text</value></data>
   <data name="FeedFind" xml:space="preserve"><value>looking for '{0}'</value></data>
+  <!-- Acting like a person. -->
+  <data name="UseUpload" xml:space="preserve"><value>This is a file field: put a file into it with the upload action (ref, path).</value></data>
+  <data name="NotFileField" xml:space="preserve"><value>The element is not a file field: take the ref of an input of type file from the snapshot.</value></data>
+  <data name="UploadDone" xml:space="preserve"><value>The file {0} is in the field.</value></data>
+  <data name="UploadApprovalTitle" xml:space="preserve"><value>The agent wants to send a file to a site</value></data>
+  <data name="DialogOpen" xml:space="preserve"><value>The page shows a dialog and waits for the answer: {0} "{1}". Answer it with the dialog action (accept=true or false; text for a prompt); until then the page does not respond.</value></data>
+  <data name="NoDialog" xml:space="preserve"><value>The page shows no dialog.</value></data>
+  <data name="CardHover" xml:space="preserve"><value>Hover: {0}</value></data>
+  <data name="CardDrag" xml:space="preserve"><value>Drag {0} onto {1}</value></data>
+  <data name="CardDialog" xml:space="preserve"><value>Answer the page dialog: {0}</value></data>
+  <data name="DialogAccept" xml:space="preserve"><value>accept</value></data>
+  <data name="DialogDismiss" xml:space="preserve"><value>dismiss</value></data>
+  <data name="FeedHover" xml:space="preserve"><value>hover {0}</value></data>
+  <data name="FeedDrag" xml:space="preserve"><value>dragging {0}</value></data>
+  <data name="FeedUpload" xml:space="preserve"><value>file {0}</value></data>
+  <data name="FeedDialog" xml:space="preserve"><value>dialog</value></data>
+  <data name="UploadNeedsFolder" xml:space="preserve"><value>A file can be sent only from an open folder.</value></data>
+  <data name="UploadNoFile" xml:space="preserve"><value>There is no file {0}.</value></data>
 </root>

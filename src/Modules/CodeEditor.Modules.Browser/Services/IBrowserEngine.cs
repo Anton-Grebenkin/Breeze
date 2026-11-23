@@ -7,5 +7,8 @@ namespace CodeEditor.Modules.Browser.Services;
 public interface IBrowserEngine
 {
     /// <summary>A new page; <paramref name="restored"/> is the address it opens when first shown or called.</summary>
-    IBrowserPage CreatePage(BrowserPageState? restored = null);
+    /// <param name="forAgent">
+    /// The page is the agent's: a dialog it opens waits for the agent's answer instead of showing the browser's window.
+    /// </param>
+    IBrowserPage CreatePage(BrowserPageState? restored = null, bool forAgent = false);
 }

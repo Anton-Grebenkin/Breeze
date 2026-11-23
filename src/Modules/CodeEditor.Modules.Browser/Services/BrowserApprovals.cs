@@ -12,7 +12,8 @@ namespace CodeEditor.Modules.Browser.Services;
 /// carry data away. A script runs without asking only on a page of this machine: on a site where the user is logged in
 /// it could send the session elsewhere. In its own tab the agent clicks and types freely: the user sees the browser and
 /// can step in. The user's tabs it reads freely, but going elsewhere, closing, or clicking and typing on a page that is
-/// not of this machine needs a card that names the element.
+/// not of this machine needs a card that names the element. A file goes into a form without asking only on a page of
+/// this machine.
 /// </summary>
 public sealed partial class BrowserApprovals(IOptionsMonitor<BrowserOptions> options, BrowserAgentTabs tabs, ISettingsService settings, ILogger<BrowserApprovals> logger)
     : IAgentApprovalPolicy
@@ -37,8 +38,11 @@ public sealed partial class BrowserApprovals(IOptionsMonitor<BrowserOptions> opt
             BrowserAgentTools.Navigate => !isUsers && Host(arguments) is { } host && IsAllowed(host),
             BrowserAgentTools.OpenTab => Text(arguments, "url") is not { Length: > 0 } || (Host(arguments) is { } host && IsAllowed(host)),
             BrowserAgentTools.Evaluate => isLocal,
-            BrowserAgentTools.Click or BrowserAgentTools.Type or BrowserAgentTools.Press
-                or BrowserAgentTools.Back or BrowserAgentTools.Forward or BrowserAgentTools.Reload => !isUsers || isLocal,
+            BrowserAgentTools.Click or BrowserAgentTools.Type or BrowserAgentTools.Press or BrowserAgentTools.Hover or BrowserAgentTools.Drag
+                or BrowserAgentTools.Dialog or BrowserAgentTools.Back or BrowserAgentTools.Forward or BrowserAgentTools.Reload => !isUsers || isLocal,
+
+            // A file put into a form leaves the machine with it.
+            BrowserAgentTools.Upload => isLocal,
             BrowserAgentTools.CloseTab => !isUsers,
             _ => true,
         };

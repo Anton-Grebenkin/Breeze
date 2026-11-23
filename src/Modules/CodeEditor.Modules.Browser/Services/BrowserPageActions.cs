@@ -9,7 +9,8 @@ namespace CodeEditor.Modules.Browser.Services;
 
 /// <summary>
 /// Browser tool actions beyond navigation and the snapshot (<see cref="BrowserAgentTools"/>), as in Playwright MCP:
-/// pressing keys, scrolling, waiting for text, running a script and reading the page's network requests and responses.
+/// clicking, hovering and dragging with real mouse events, choosing a file for a file field, pressing keys, scrolling,
+/// waiting for text, running a script and reading the page's network requests and responses.
 /// Made for the page a call works on.
 /// </summary>
 public sealed class BrowserPageActions(IBrowserPage browser)
@@ -20,9 +21,100 @@ public sealed class BrowserPageActions(IBrowserPage browser)
     /// <summary>Requests shown by <c>network</c>; static files (images, fonts, styles) only if they failed.</summary>
     public const int MaxRequests = 50;
 
-    private static readonly TimeSpan SettleTimeout = TimeSpan.FromSeconds(10);
+    /// <summary>How long to wait for navigation after a click or typing.</summary>
+    public static readonly TimeSpan SettleTimeout = TimeSpan.FromSeconds(10);
     private static readonly TimeSpan PollInterval = TimeSpan.FromMilliseconds(300);
     private static readonly string[] StaticTypes = ["Image", "Font", "Stylesheet", "Media", "Manifest", "Other"];
+
+    /// <summary>
+    /// Clicks a snapshot element as a person would: the mouse moves there, presses and releases, so hover styles,
+    /// pointer handlers and trusted-event checks work. If the click did not reach the element — something covers it, or
+    /// the page is behind another tab and takes no input — the element is clicked by script, as before.
+    /// </summary>
+    public async Task ClickAsync(string reference, CancellationToken cancellationToken)
+    {
+        var address = browser.Url;
+        var point = await PointAsync(reference, cancellationToken);
+        if (point.Kind == "file")
+        {
+            throw new AgentToolException(Strings.UseUpload);
+        }
+
+        if (point.Kind != "select")
+        {
+            foreach (var mouse in BrowserPointer.Click(point.X, point.Y))
+            {
+                await browser.DevToolsAsync(BrowserPointer.Method, mouse, cancellationToken);
+            }
+        }
+
+        // A click that took the page elsewhere cannot be asked about: the probe lived in the page that is gone.
+        if (browser.IsLoading || browser.Url != address || await browser.EvaluateAsync(BrowserScripts.WasClicked(reference), cancellationToken) == "true")
+        {
+            return;
+        }
+
+        // Not found now means the real click did take the page elsewhere.
+        await browser.EvaluateAsync(BrowserScripts.Click(reference), cancellationToken);
+    }
+
+    /// <summary>
+    /// Types into a snapshot field, replacing the value; a list picks an option by text; <paramref name="submit"/>
+    /// presses Enter. Typing may start navigation, so the load is awaited.
+    /// </summary>
+    public async Task TypeAsync(string reference, string text, bool submit, CancellationToken cancellationToken)
+    {
+        using var result = JsonDocument.Parse(await browser.EvaluateAsync(BrowserScripts.Type(reference, text, submit), cancellationToken));
+        if (result.RootElement.TryGetProperty("ok", out var ok) && !ok.GetBoolean())
+        {
+            var error = result.RootElement.TryGetProperty("error", out var reason) ? reason.GetString() : null;
+            throw new AgentToolException(error == "no option" ? Strings.NoSuchOption : Strings.ElementNotFound);
+        }
+
+        await browser.WaitForLoadAsync(SettleTimeout, cancellationToken);
+    }
+
+    /// <summary>Moves the mouse over a snapshot element: menus and hints that open on hover appear.</summary>
+    public async Task HoverAsync(string reference, CancellationToken cancellationToken)
+    {
+        var point = await PointAsync(reference, cancellationToken);
+        await browser.DevToolsAsync(BrowserPointer.Method, BrowserPointer.Move(point.X, point.Y), cancellationToken);
+    }
+
+    /// <summary>
+    /// Drags a snapshot element onto another: with the mouse held, or — for an element marked draggable — with the
+    /// page's own drag-and-drop events.
+    /// </summary>
+    public async Task DragAsync(string reference, string target, CancellationToken cancellationToken)
+    {
+        var from = await PointAsync(reference, cancellationToken);
+        if (from.Draggable)
+        {
+            await RunAsync(BrowserScripts.DragDrop(reference, target), cancellationToken);
+            return;
+        }
+
+        var to = await PointAsync(target, cancellationToken);
+        from = await PointAsync(reference, cancellationToken);
+        foreach (var mouse in BrowserPointer.Drag(from.X, from.Y, to.X, to.Y))
+        {
+            await browser.DevToolsAsync(BrowserPointer.Method, mouse, cancellationToken);
+        }
+    }
+
+    /// <summary>Puts a file into a file field, without the system dialog; the page gets its change event.</summary>
+    public async Task UploadAsync(string reference, string fullPath, CancellationToken cancellationToken)
+    {
+        var found = new JsonObject { ["expression"] = BrowserScripts.FileInput(reference), ["returnByValue"] = false }.ToJsonString();
+        using var element = JsonDocument.Parse(await browser.DevToolsAsync("Runtime.evaluate", found, cancellationToken));
+        if (!element.RootElement.TryGetProperty("result", out var result) || !result.TryGetProperty("objectId", out var id))
+        {
+            throw new AgentToolException(Strings.NotFileField);
+        }
+
+        var files = new JsonObject { ["files"] = new JsonArray(fullPath), ["objectId"] = id.GetString() }.ToJsonString();
+        await browser.DevToolsAsync("DOM.setFileInputFiles", files, cancellationToken);
+    }
 
     /// <summary>Presses a key on the focused element, or on <paramref name="reference"/> after focusing it.</summary>
     public async Task PressAsync(string key, string? reference, CancellationToken cancellationToken)
@@ -130,6 +222,16 @@ public sealed class BrowserPageActions(IBrowserPage browser)
         var bytes = Convert.FromBase64String(base64);
         var isText = mimeType is { } mime && (mime.StartsWith("text/", StringComparison.OrdinalIgnoreCase) || mime.Contains("json", StringComparison.OrdinalIgnoreCase) || mime.Contains("xml", StringComparison.OrdinalIgnoreCase));
         return isText ? Encoding.UTF8.GetString(bytes) : Format(Strings.BinaryBody, bytes.Length);
+    }
+
+    // Scrolled into view first: the second look at a drag's start accounts for the scroll its target caused.
+    private async Task<(double X, double Y, string Kind, bool Draggable)> PointAsync(string reference, CancellationToken cancellationToken)
+    {
+        using var reply = JsonDocument.Parse(await browser.EvaluateAsync(BrowserScripts.Point(reference), cancellationToken));
+        var point = reply.RootElement;
+        return point.TryGetProperty("ok", out var ok) && ok.GetBoolean()
+            ? (point.GetProperty("x").GetDouble(), point.GetProperty("y").GetDouble(), point.GetProperty("kind").GetString() ?? string.Empty, point.GetProperty("draggable").GetBoolean())
+            : throw new AgentToolException(Strings.ElementNotFound);
     }
 
     private async Task RunAsync(string script, CancellationToken cancellationToken)

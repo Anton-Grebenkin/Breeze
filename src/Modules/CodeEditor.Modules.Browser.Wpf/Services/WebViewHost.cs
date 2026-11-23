@@ -1,6 +1,5 @@
 using CodeEditor.Core.Storage;
 using CodeEditor.Core.Threading;
-using CodeEditor.Shell.Layout;
 using Microsoft.Extensions.Logging;
 using Microsoft.Web.WebView2.Core;
 
@@ -10,7 +9,7 @@ namespace CodeEditor.Modules.Browser.Wpf.Services;
 /// What every browser page shares: one WebView2 environment, so tabs live in one profile (cookies, sign-ins, cache) in
 /// the editor's data folder, plus the UI thread and the panel that shows the pages.
 /// </summary>
-internal sealed class WebViewHost(IUiDispatcher dispatcher, WorkbenchLayout layout, UserDataPaths paths, ILogger logger)
+internal sealed class WebViewHost(IUiDispatcher dispatcher, Action showPanel, UserDataPaths paths, ILogger logger)
 {
     private Task<CoreWebView2Environment>? _environment;
 
@@ -29,7 +28,7 @@ internal sealed class WebViewHost(IUiDispatcher dispatcher, WorkbenchLayout layo
     public void ForgetEnvironment() => _environment = null;
 
     /// <summary>The panel comes to the front without focus, so the chat box keeps it.</summary>
-    public Task ShowPanelAsync() => dispatcher.InvokeAsync(() => layout.Show(BrowserModule.ToolWindowId, focus: false));
+    public Task ShowPanelAsync() => dispatcher.InvokeAsync(showPanel);
 
     public void NotifyPagesChanged() => PagesChanged?.Invoke(this, EventArgs.Empty);
 }

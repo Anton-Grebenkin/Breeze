@@ -18,4 +18,10 @@ public sealed class BrowserException : Exception
         : base(message, innerException)
     {
     }
+
+    /// <summary>
+    /// The call did not finish because a page of the agent's opened this dialog and waits for the answer: the agent
+    /// answers it with the <c>dialog</c> action instead of waiting for a timeout.
+    /// </summary>
+    public BrowserDialog? Dialog { get; init; }
 }

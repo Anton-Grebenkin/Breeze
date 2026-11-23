@@ -178,7 +178,7 @@ public sealed class BrowserTabs : IDisposable
 
     private BrowserTab Create(BrowserTabOwner owner, string? openerId, BrowserPageState? restored)
     {
-        var page = _engine.CreatePage(restored);
+        var page = _engine.CreatePage(restored, forAgent: owner == BrowserTabOwner.Agent);
         page.StateChanged += OnPageStateChanged;
         page.PopupRequested += OnPopupRequested;
         page.CloseRequested += OnCloseRequested;

@@ -34,6 +34,7 @@ public sealed partial class WebViewPage
             _suspend?.Stop();
             Fail(_ready, new BrowserException(Strings.TabClosed));
             _loading?.TrySetResult(Strings.TabClosed);
+            CloseDialog();
             _control?.Dispose();
             _control = null;
         });
@@ -55,6 +56,11 @@ public sealed partial class WebViewPage
             await control.EnsureCoreWebView2Async(await _host.EnvironmentAsync());
             var core = control.CoreWebView2;
             Subscribe(core);
+            if (_forAgent)
+            {
+                HoldDialogs(core);
+            }
+
             foreach (var domain in (string[])["Runtime.enable", "Log.enable", "Network.enable"])
             {
                 await core.CallDevToolsProtocolMethodAsync(domain, "{}");
