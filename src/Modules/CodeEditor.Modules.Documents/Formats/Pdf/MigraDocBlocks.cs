@@ -12,7 +12,7 @@ namespace CodeEditor.Modules.Documents.Formats.Pdf;
 /// </summary>
 internal sealed class MigraDocBlocks
 {
-    private const string TextFont = "Segoe UI";
+    public const string TextFont = "Segoe UI";
     private const string CodeFont = "Consolas";
     private const string CodeStyle = "Code";
     private const string QuoteStyle = "Quote";

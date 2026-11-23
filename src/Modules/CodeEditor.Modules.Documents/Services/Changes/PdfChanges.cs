@@ -29,7 +29,15 @@ internal sealed class PdfChanges(DocumentFiles files)
 
         var before = files.Exists(target) ? string.Empty : null;
         var pages = PdfPageTools.PageCount(bytes);
-        return new DocumentPlan(target, bytes, Of(target, before, markdown, Strings.ApprovalPdfCreate), Format(Strings.PdfCreated, target.Relative, pages));
+        var result = Format(Strings.PdfCreated, target.Relative, pages);
+
+        // A character without a glyph becomes an empty box with no error: the model learns it here, not from the user.
+        if (PdfGlyphs.Missing(markdown, MigraDocBlocks.TextFont) is { Count: > 0 } missing)
+        {
+            result += " " + Format(Strings.PdfMissingGlyphs, string.Join(' ', missing.Take(PdfGlyphs.MaxListed)), missing.Count);
+        }
+
+        return new DocumentPlan(target, bytes, Of(target, before, markdown, Strings.ApprovalPdfCreate), result);
     }
 
     public DocumentPlan Merge(DocumentChange change, DocumentPath target)

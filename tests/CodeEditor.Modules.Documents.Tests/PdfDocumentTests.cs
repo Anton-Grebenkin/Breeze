@@ -38,6 +38,16 @@ public sealed class PdfDocumentTests
         Assert.Contains("var", text, StringComparison.Ordinal);
     }
 
+    // A character the font has no glyph for (an emoji, a hieroglyph) becomes an empty box in the file with no error:
+    // it is found up front, each once, so the tool can tell the model.
+    [Fact]
+    public void CharactersWithoutAGlyph_AreFound_OnceEach()
+    {
+        var missing = PdfGlyphs.Missing("Готово 🚀, 汉字 и ещё раз 🚀. Сумма: 1 500 ₽ — «ёлка» → ok", MigraDocBlocks.TextFont);
+
+        Assert.Equal(["🚀", "汉", "字"], missing);
+    }
+
     [Fact]
     public void Combine_TakesPagesInOrder()
     {
