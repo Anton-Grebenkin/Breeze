@@ -6,6 +6,7 @@ using System.Text.Json;
 using CodeEditor.Modules.Agent.Contracts;
 using CodeEditor.Modules.Agent.Contracts.Approvals;
 using CodeEditor.Modules.Browser.Resources;
+using CodeEditor.Modules.Browser.Services.Tabs;
 using Microsoft.Extensions.AI;
 
 namespace CodeEditor.Modules.Browser.Services;
@@ -18,7 +19,7 @@ namespace CodeEditor.Modules.Browser.Services;
 /// (<see cref="IAgentImages"/>, ADR 0030) if it can see images. Sites not on this machine and scripts on them need
 /// approval (<see cref="BrowserApprovals"/>).
 /// </summary>
-public sealed class BrowserAgentTools(IBrowserEngine browser, BrowserPageActions page, IAgentOutputStore outputs, IAgentImages images)
+public sealed class BrowserAgentTools(BrowserTabs tabs, IAgentOutputStore outputs, IAgentImages images)
     : IAgentToolProvider, IAgentChangePreviewer
 {
     public const string ToolName = "browser";
@@ -67,7 +68,7 @@ public sealed class BrowserAgentTools(IBrowserEngine browser, BrowserPageActions
         {
             var script = Required(ToolArguments.GetOptional<string>(arguments, "script"), "script");
             return Task.FromResult<IReadOnlyList<FileChangePreview>>(
-                [new FileChangePreview(ProposedChangeKind.Command, ".", string.Empty, script) { Title = Strings.EvaluateApprovalTitle, Header = browser.Url?.IdnHost ?? string.Empty }]);
+                [new FileChangePreview(ProposedChangeKind.Command, ".", string.Empty, script) { Title = Strings.EvaluateApprovalTitle, Header = tabs.Active?.Page.Url?.IdnHost ?? string.Empty }]);
         }
 
         var url = Address(ToolArguments.GetOptional<string>(arguments, "url"));
@@ -88,6 +89,8 @@ public sealed class BrowserAgentTools(IBrowserEngine browser, BrowserPageActions
         [Description("wait_for: how long to wait, 1–60 seconds; default 10.")] int? timeoutSeconds = null,
         CancellationToken cancellationToken = default)
     {
+        var browser = (tabs.Active ?? tabs.Open()).Page;
+        var page = new BrowserPageActions(browser);
         try
         {
             switch (action)
@@ -98,10 +101,10 @@ public sealed class BrowserAgentTools(IBrowserEngine browser, BrowserPageActions
                 case Snapshot:
                     break;
                 case Click:
-                    await RunAsync(BrowserScripts.Click(Required(@ref, "ref")), cancellationToken);
+                    await RunAsync(browser, BrowserScripts.Click(Required(@ref, "ref")), cancellationToken);
                     break;
                 case Type:
-                    await RunAsync(BrowserScripts.Type(Required(@ref, "ref"), text ?? string.Empty, submit), cancellationToken);
+                    await RunAsync(browser, BrowserScripts.Type(Required(@ref, "ref"), text ?? string.Empty, submit), cancellationToken);
                     break;
                 case Press:
                     await page.PressAsync(Required(key, "key"), @ref, cancellationToken);
@@ -110,7 +113,7 @@ public sealed class BrowserAgentTools(IBrowserEngine browser, BrowserPageActions
                     await page.ScrollAsync(@ref, direction, cancellationToken);
                     break;
                 case WaitFor:
-                    return await WaitForAsync(Required(text, "text"), timeoutSeconds, cancellationToken);
+                    return await WaitForAsync(browser, Required(text, "text"), timeoutSeconds, cancellationToken);
                 case Back:
                     await browser.GoBackAsync(cancellationToken);
                     break;
@@ -129,12 +132,12 @@ public sealed class BrowserAgentTools(IBrowserEngine browser, BrowserPageActions
                 case Evaluate:
                     return outputs.Fit(await page.EvaluateAsync(Required(script, "script"), cancellationToken), ToolName);
                 case Screenshot:
-                    return await ScreenshotAsync(cancellationToken);
+                    return await ScreenshotAsync(browser, cancellationToken);
                 default:
                     throw new AgentToolException(Format(Strings.UnknownAction, action, string.Join(", ", Actions)));
             }
 
-            return outputs.Fit(await SnapshotAsync(cancellationToken), ToolName);
+            return outputs.Fit(await SnapshotAsync(browser, cancellationToken), ToolName);
         }
         catch (BrowserException exception)
         {
@@ -143,16 +146,16 @@ public sealed class BrowserAgentTools(IBrowserEngine browser, BrowserPageActions
     }
 
     // The snapshot comes either way: what the page shows instead of the text is often the answer.
-    private async Task<string> WaitForAsync(string text, int? seconds, CancellationToken cancellationToken)
+    private async Task<string> WaitForAsync(IBrowserPage browser, string text, int? seconds, CancellationToken cancellationToken)
     {
-        var shown = await page.WaitForTextAsync(text, seconds, cancellationToken);
-        var snapshot = await SnapshotAsync(cancellationToken);
+        var shown = await new BrowserPageActions(browser).WaitForTextAsync(text, seconds, cancellationToken);
+        var snapshot = await SnapshotAsync(browser, cancellationToken);
         var note = shown ? string.Empty : Format(Strings.TextNotShown, text, Math.Clamp(seconds ?? BrowserPageActions.DefaultWaitSeconds, 1, BrowserPageActions.MaxWaitSeconds)) + "\n";
         return outputs.Fit(note + snapshot, ToolName);
     }
 
     // The image goes to the model in the next message; a PNG over the model's limit is retried as JPEG.
-    private async Task<string> ScreenshotAsync(CancellationToken cancellationToken)
+    private async Task<string> ScreenshotAsync(IBrowserPage browser, CancellationToken cancellationToken)
     {
         if (!images.CanShow)
         {
@@ -166,7 +169,7 @@ public sealed class BrowserAgentTools(IBrowserEngine browser, BrowserPageActions
     }
 
     // A click or typing may start navigation, so the snapshot waits for the new page to load.
-    private async Task RunAsync(string script, CancellationToken cancellationToken)
+    private static async Task RunAsync(IBrowserPage browser, string script, CancellationToken cancellationToken)
     {
         using var result = JsonDocument.Parse(await browser.EvaluateAsync(script, cancellationToken));
         if (result.RootElement.TryGetProperty("ok", out var ok) && !ok.GetBoolean())
@@ -178,12 +181,12 @@ public sealed class BrowserAgentTools(IBrowserEngine browser, BrowserPageActions
         await browser.WaitForLoadAsync(SettleTimeout, cancellationToken);
     }
 
-    private async Task<string> SnapshotAsync(CancellationToken cancellationToken)
+    private static async Task<string> SnapshotAsync(IBrowserPage browser, CancellationToken cancellationToken)
     {
         using var snapshot = JsonDocument.Parse(await browser.EvaluateAsync(BrowserScripts.Snapshot, cancellationToken));
         var content = snapshot.RootElement;
         var text = new StringBuilder()
-            .Append(CultureInfo.InvariantCulture, $"<browser_page url=\"{WebUtility.HtmlEncode(Text(content, "url"))}\" title=\"{WebUtility.HtmlEncode(Text(content, "title"))}\"{Status()}>\n")
+            .Append(CultureInfo.InvariantCulture, $"<browser_page url=\"{WebUtility.HtmlEncode(Text(content, "url"))}\" title=\"{WebUtility.HtmlEncode(Text(content, "title"))}\"{Status(browser)}>\n")
             .Append(Text(content, "text") is { Length: > 0 } body ? body : Strings.EmptyPage);
         if (content.TryGetProperty("truncated", out var truncated) && truncated.ValueKind == JsonValueKind.True)
         {
@@ -194,7 +197,7 @@ public sealed class BrowserAgentTools(IBrowserEngine browser, BrowserPageActions
     }
 
     // An error status of the document: the snapshot then shows the server's error page.
-    private string Status() => browser.StatusCode is >= 400 and var code ? string.Create(CultureInfo.InvariantCulture, $" status=\"{code}\"") : string.Empty;
+    private static string Status(IBrowserPage browser) => browser.StatusCode is >= 400 and var code ? string.Create(CultureInfo.InvariantCulture, $" status=\"{code}\"") : string.Empty;
 
     private static string ConsoleText(IReadOnlyList<BrowserConsoleMessage> messages) =>
         messages.Count == 0

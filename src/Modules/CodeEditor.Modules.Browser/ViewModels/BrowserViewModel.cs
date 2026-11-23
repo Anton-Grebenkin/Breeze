@@ -1,5 +1,9 @@
+using System.Collections.ObjectModel;
+using CodeEditor.Core.Context;
+using CodeEditor.Core.Threading;
 using CodeEditor.Modules.Browser.Resources;
 using CodeEditor.Modules.Browser.Services;
+using CodeEditor.Modules.Browser.Services.Tabs;
 using CodeEditor.Shell.Menus;
 using CodeEditor.Shell.Palette;
 using CodeEditor.Shell.ToolWindows;
@@ -9,29 +13,45 @@ using CommunityToolkit.Mvvm.Input;
 namespace CodeEditor.Modules.Browser.ViewModels;
 
 /// <summary>
-/// The Browser panel (ADR 0027): address bar, back, forward, reload, history. The view (WebView2) shows the page and the
-/// agent drives the same view, so the user sees every action and can take over. An address without a scheme gets http
-/// for <c>localhost:5000</c> and https otherwise. "Show: Browser" puts the caret into the address bar. The history menu
-/// lists recent pages; all of them are searchable in "Browser: Recent Pages".
+/// The Browser panel (ADR 0027, 0054): a tab strip, and for the shown tab the address bar, back, forward, reload and
+/// history. The view (WebView2) shows the pages; the agent works in the same tabs, so the user sees every action and can
+/// take over. An address without a scheme gets http for <c>localhost:5000</c> and https otherwise. "Show: Browser" puts
+/// the caret into the address bar.
 /// </summary>
 public sealed partial class BrowserViewModel : ObservableObject, IFocusableContent, IDisposable
 {
-    /// <summary>Pages in the address bar's history menu; the rest are in the palette.</summary>
-    public const int MenuSize = 15;
+    /// <summary>Context key: keyboard focus is in the panel, so <c>Ctrl+T</c>, <c>Ctrl+W</c> and <c>Ctrl+Tab</c> act on its tabs.</summary>
+    public const string FocusContextKey = "browserFocus";
 
-    private const int MaxLabel = 90;
+    /// <summary>Context key: the browser has a tab to close or switch to.</summary>
+    public const string HasTabsContextKey = "browserHasTabs";
 
-    private readonly IBrowserEngine _browser;
+    private readonly BrowserTabs _tabs;
+    private readonly BrowserTabStrip _strip;
+    private readonly IUiDispatcher _dispatcher;
     private readonly BrowserHistory? _history;
     private readonly IQuickPick? _quickPick;
+    private readonly IContextKeyService? _context;
+    private (BrowserTab? Tab, Uri? Url) _shown;
 
-    public BrowserViewModel(IBrowserEngine browser, BrowserHistory? history = null, IQuickPick? quickPick = null)
+    public BrowserViewModel(BrowserTabs tabs, IUiDispatcher dispatcher, BrowserHistory? history = null, IQuickPick? quickPick = null, IContextKeyService? context = null)
     {
-        _browser = browser;
+        _tabs = tabs;
+        _strip = new BrowserTabStrip(tabs);
+        _dispatcher = dispatcher;
         _history = history;
         _quickPick = quickPick;
-        _browser.StateChanged += OnStateChanged;
+        _context = context;
+        _tabs.Changed += OnTabsChanged;
+        _tabs.PageChanged += OnPageChanged;
+        Sync();
     }
+
+    public ObservableCollection<BrowserTabViewModel> Tabs => _strip.Items;
+
+    /// <summary>The shown tab; the view shows its page.</summary>
+    [ObservableProperty]
+    public partial BrowserTabViewModel? ActiveTab { get; private set; }
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(GoCommand))]
@@ -46,6 +66,10 @@ public sealed partial class BrowserViewModel : ObservableObject, IFocusableConte
     [ObservableProperty]
     public partial string? Error { get; private set; }
 
+    /// <summary>The shown tab has a page or is loading one; an empty tab shows a hint instead of a blank page.</summary>
+    [ObservableProperty]
+    public partial bool IsPageShown { get; private set; }
+
     /// <summary>The history menu is open; the view opens it under the button.</summary>
     [ObservableProperty]
     public partial bool IsHistoryOpen { get; set; }
@@ -57,14 +81,28 @@ public sealed partial class BrowserViewModel : ObservableObject, IFocusableConte
 
     public void RequestFocus() => FocusRequested?.Invoke(this, EventArgs.Empty);
 
-    public void Dispose() => _browser.StateChanged -= OnStateChanged;
+    public void SetFocused(bool focused) => _context?.Set(FocusContextKey, focused);
 
-    /// <summary>Opens the address as if typed into the bar; load errors show on the panel.</summary>
+    public void Dispose()
+    {
+        _tabs.Changed -= OnTabsChanged;
+        _tabs.PageChanged -= OnPageChanged;
+        _context?.Set(FocusContextKey, false);
+    }
+
+    /// <summary>
+    /// Opens the address as if typed into the bar, in a new tab unless the shown one is empty; load errors show on the
+    /// panel.
+    /// </summary>
     public Task OpenAsync(Uri url)
     {
         ArgumentNullException.ThrowIfNull(url);
-        Address = url.AbsoluteUri;
-        return GoAsync();
+        if (_tabs.Active is not { HasWebPage: false })
+        {
+            OpenTab();
+        }
+
+        return NavigateAsync(url);
     }
 
     /// <summary>Address from the bar: https without a scheme, http for this machine.</summary>
@@ -85,37 +123,60 @@ public sealed partial class BrowserViewModel : ObservableObject, IFocusableConte
         return Uri.TryCreate(text, UriKind.Absolute, out var url) && url.Scheme is "http" or "https" ? url : null;
     }
 
-    /// <summary>"Title — localhost:5000/orders": history rows are found by either.</summary>
-    public static string Label(BrowserVisit visit)
-    {
-        ArgumentNullException.ThrowIfNull(visit);
-        var address = Uri.TryCreate(visit.Url, UriKind.Absolute, out var url) ? url.Authority + url.PathAndQuery.TrimEnd('/') : visit.Url;
-        var label = visit.Title.Length > 0 ? visit.Title + " — " + address : address;
-        return label.Length <= MaxLabel ? label : string.Concat(label.AsSpan(0, MaxLabel), "…");
-    }
-
     [RelayCommand(CanExecute = nameof(CanGo))]
-    private Task GoAsync() => RunAsync(token => Normalize(Address) is { } url ? _browser.NavigateAsync(url, token) : Task.CompletedTask);
+    private Task GoAsync() => Normalize(Address) is { } url ? NavigateAsync(url) : Task.CompletedTask;
 
     private bool CanGo() => Normalize(Address) is not null;
 
     [RelayCommand(CanExecute = nameof(CanGoBack))]
-    private Task BackAsync() => RunAsync(_browser.GoBackAsync);
+    private Task BackAsync() => RunAsync(token => _tabs.Active?.Page.GoBackAsync(token) ?? Task.CompletedTask);
 
-    private bool CanGoBack() => _browser.CanGoBack;
+    private bool CanGoBack() => _tabs.Active?.Page.CanGoBack == true;
 
     [RelayCommand(CanExecute = nameof(CanGoForward))]
-    private Task ForwardAsync() => RunAsync(_browser.GoForwardAsync);
+    private Task ForwardAsync() => RunAsync(token => _tabs.Active?.Page.GoForwardAsync(token) ?? Task.CompletedTask);
 
-    private bool CanGoForward() => _browser.CanGoForward;
+    private bool CanGoForward() => _tabs.Active?.Page.CanGoForward == true;
 
     [RelayCommand]
-    private Task ReloadAsync() => RunAsync(_browser.ReloadAsync);
+    private Task ReloadAsync() => RunAsync(token => _tabs.Active?.Page.ReloadAsync(token) ?? Task.CompletedTask);
+
+    /// <summary>A new empty tab with the caret in the address bar.</summary>
+    [RelayCommand]
+    private void NewTab()
+    {
+        OpenTab();
+        RequestFocus();
+    }
+
+    [RelayCommand]
+    private void CloseTab()
+    {
+        if (_tabs.Active is { } tab)
+        {
+            _tabs.Close(tab);
+        }
+    }
+
+    [RelayCommand]
+    private void NextTab() => _tabs.SelectNext(1);
+
+    [RelayCommand]
+    private void PreviousTab() => _tabs.SelectNext(-1);
+
+    [RelayCommand]
+    private void TogglePin()
+    {
+        if (_tabs.Active is { } tab)
+        {
+            _tabs.SetPinned(tab, !tab.IsPinned);
+        }
+    }
 
     [RelayCommand]
     private void ShowHistory()
     {
-        HistoryMenu = BuildHistoryMenu();
+        HistoryMenu = BrowserHistoryMenu.Build(_history?.Visits ?? [], OpenAsync, ShowRecentPagesCommand, ClearHistoryCommand);
         IsHistoryOpen = true;
     }
 
@@ -128,7 +189,7 @@ public sealed partial class BrowserViewModel : ObservableObject, IFocusableConte
             return Task.CompletedTask;
         }
 
-        var items = _history.Visits.Select(visit => new QuickPickItem(visit.Url, Label(visit))).ToList();
+        var items = _history.Visits.Select(visit => new QuickPickItem(visit.Url, BrowserHistoryMenu.Label(visit))).ToList();
         _quickPick.Show(new QuickPickProvider(Strings.RecentPagesPlaceholder, items, item => OpenAsync(new Uri(item.Id))) { EmptyText = Strings.HistoryEmpty });
         return Task.CompletedTask;
     }
@@ -140,22 +201,19 @@ public sealed partial class BrowserViewModel : ObservableObject, IFocusableConte
         return Task.CompletedTask;
     }
 
-    private List<MenuItemViewModel> BuildHistoryMenu()
+    private Task NavigateAsync(Uri url)
     {
-        var visits = _history?.Visits ?? [];
-        if (visits.Count == 0)
-        {
-            return [MenuItemViewModel.ForAction(Strings.HistoryEmpty, "Browser.History.Empty", new AsyncRelayCommand(() => Task.CompletedTask, () => false))];
-        }
+        var page = (_tabs.Active ?? OpenTab()).Page;
+        Address = url.AbsoluteUri;
+        return RunAsync(token => page.NavigateAsync(url, token));
+    }
 
-        return
-        [
-            .. visits.Take(MenuSize).Select((visit, index) =>
-                MenuItemViewModel.ForAction(Label(visit), "Browser.History.Page" + index, new AsyncRelayCommand(() => OpenAsync(new Uri(visit.Url))))),
-            MenuItemViewModel.CreateSeparator(),
-            MenuItemViewModel.ForAction(Strings.AllPages, "Browser.History.All", ShowRecentPagesCommand),
-            MenuItemViewModel.ForAction(Strings.ClearHistory, "Browser.History.Clear", ClearHistoryCommand),
-        ];
+    // The strip follows at once: the queued update would otherwise clear the address typed for the new tab.
+    private BrowserTab OpenTab()
+    {
+        var tab = _tabs.Open();
+        Sync();
+        return tab;
     }
 
     private async Task RunAsync(Func<CancellationToken, Task> action)
@@ -171,12 +229,45 @@ public sealed partial class BrowserViewModel : ObservableObject, IFocusableConte
         }
     }
 
-    // Address and title come from the browser: both the agent and link navigation change them.
-    private void OnStateChanged(object? sender, EventArgs e)
+    // The agent changes tabs from its own thread.
+    private void OnTabsChanged(object? sender, EventArgs e) => _dispatcher.Post(Sync);
+
+    private void OnPageChanged(object? sender, BrowserTabEventArgs e) => _dispatcher.Post(() =>
     {
-        Address = _browser.Url?.AbsoluteUri ?? Address;
-        Title = _browser.Title;
-        IsLoading = _browser.IsLoading;
+        _strip.Refresh(e.Tab);
+        if (e.Tab == _tabs.Active)
+        {
+            ShowActivePage();
+        }
+    });
+
+    private void Sync()
+    {
+        ActiveTab = _strip.Sync();
+        _context?.Set(HasTabsContextKey, Tabs.Count > 0);
+        ShowActivePage();
+    }
+
+    // Address and title come from the shown page: both the agent and link navigation change them. The bar is rewritten
+    // only when the page or its address changed, so a title update does not erase what the user is typing.
+    private void ShowActivePage()
+    {
+        var tab = _tabs.Active;
+        var page = tab?.Page;
+        if (_shown != (tab, page?.Url))
+        {
+            if (_shown.Tab != tab)
+            {
+                Error = null;
+            }
+
+            _shown = (tab, page?.Url);
+            Address = page?.Url?.AbsoluteUri ?? string.Empty;
+        }
+
+        Title = page?.Title ?? string.Empty;
+        IsLoading = page?.IsLoading ?? false;
+        IsPageShown = page is not null && (page.IsLoading || page.Url is { Scheme: not "about" });
         BackCommand.NotifyCanExecuteChanged();
         ForwardCommand.NotifyCanExecuteChanged();
     }

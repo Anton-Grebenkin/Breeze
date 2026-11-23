@@ -1,5 +1,6 @@
 using CodeEditor.Core.Settings;
 using CodeEditor.Modules.Agent.Contracts.Approvals;
+using CodeEditor.Modules.Browser.Services.Tabs;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -12,7 +13,7 @@ namespace CodeEditor.Modules.Browser.Services;
 /// it could send the session elsewhere. Other actions on an open page need no approval: the user sees the browser and
 /// can step in.
 /// </summary>
-public sealed partial class BrowserApprovals(IOptionsMonitor<BrowserOptions> options, IBrowserEngine browser, ISettingsService settings, ILogger<BrowserApprovals> logger)
+public sealed partial class BrowserApprovals(IOptionsMonitor<BrowserOptions> options, BrowserTabs tabs, ISettingsService settings, ILogger<BrowserApprovals> logger)
     : IAgentApprovalPolicy
 {
     public const string AllowedHostsKey = BrowserOptions.Section + ".allowedHosts";
@@ -23,7 +24,7 @@ public sealed partial class BrowserApprovals(IOptionsMonitor<BrowserOptions> opt
         CanDecide(toolName) && Action(arguments) switch
         {
             BrowserAgentTools.Navigate => Host(arguments) is { } host && IsAllowed(host),
-            BrowserAgentTools.Evaluate => browser.Url is { } page && IsLocal(page.IdnHost),
+            BrowserAgentTools.Evaluate => tabs.Active?.Page.Url is { } page && IsLocal(page.IdnHost),
             _ => true,
         };
 

@@ -1,5 +1,6 @@
 using CodeEditor.Modules.Agent.Contracts.Feed;
 using CodeEditor.Modules.Browser.Services;
+using CodeEditor.Modules.Browser.Services.Tabs;
 using CodeEditor.Modules.Browser.ViewModels;
 using CodeEditor.Testing;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -22,8 +23,7 @@ public sealed class BrowserPanelTests
     [Fact]
     public async Task Go_OpensTheAddress_StateFollowsTheBrowser()
     {
-        var browser = new FakeBrowserEngine();
-        using var panel = new BrowserViewModel(browser) { Address = "localhost:5000" };
+        using var panel = new BrowserViewModel(FakeBrowserEngine.Tabs(out var browser), new InlineUiDispatcher()) { Address = "localhost:5000" };
 
         await panel.GoCommand.ExecuteAsync(null);
 
@@ -35,8 +35,7 @@ public sealed class BrowserPanelTests
     [Fact]
     public async Task Open_PutsTheAddressIntoTheBar_AndNavigates()
     {
-        var browser = new FakeBrowserEngine();
-        using var panel = new BrowserViewModel(browser);
+        using var panel = new BrowserViewModel(FakeBrowserEngine.Tabs(out var browser), new InlineUiDispatcher());
 
         await panel.OpenAsync(new Uri("http://localhost:8080"));
 
@@ -47,8 +46,8 @@ public sealed class BrowserPanelTests
     [Fact]
     public async Task BrowserFailure_IsShownInThePanel()
     {
-        var browser = new FakeBrowserEngine { Failure = new BrowserException("Браузер недоступен: нет WebView2") };
-        using var panel = new BrowserViewModel(browser) { Address = "localhost:5000" };
+        using var panel = new BrowserViewModel(FakeBrowserEngine.Tabs(out var browser), new InlineUiDispatcher()) { Address = "localhost:5000" };
+        browser.Failure = new BrowserException("Браузер недоступен: нет WebView2");
 
         await panel.GoCommand.ExecuteAsync(null);
 
@@ -102,7 +101,7 @@ public sealed class BrowserPanelTests
     private static BrowserApprovals Approvals(out FakeSettingsService settings)
     {
         settings = new FakeSettingsService();
-        return new BrowserApprovals(new TestOptionsMonitor<BrowserOptions>(new BrowserOptions()), new FakeBrowserEngine(), settings, NullLogger<BrowserApprovals>.Instance);
+        return new BrowserApprovals(new TestOptionsMonitor<BrowserOptions>(new BrowserOptions()), new BrowserTabs(new FakeBrowserEngine()), settings, NullLogger<BrowserApprovals>.Instance);
     }
 
     private static Dictionary<string, object?> Call(string action, string? url) => new() { ["action"] = action, ["url"] = url };

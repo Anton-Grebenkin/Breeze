@@ -7,6 +7,7 @@
              xmlns:ui="clr-namespace:CodeEditor.UI.Themes;assembly=CodeEditor.UI"
              xmlns:controls="clr-namespace:CodeEditor.UI.Controls;assembly=CodeEditor.UI"
              xmlns:res="clr-namespace:CodeEditor.Modules.Browser.Resources;assembly=CodeEditor.Modules.Browser"
+             xmlns:views="clr-namespace:CodeEditor.Modules.Browser.Wpf.Views"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance Type=vm:BrowserViewModel}"
              AutomationProperties.AutomationId="Browser"
@@ -18,10 +19,87 @@
       <Setter Property="FontFamily" Value="{DynamicResource Font.Icons}" />
       <Setter Property="FontSize" Value="{DynamicResource FontSize.Icon}" />
     </Style>
+    <Style x:Key="Button.TabClose" TargetType="Button" BasedOn="{StaticResource Button.Subtle}">
+      <Setter Property="Width" Value="18" />
+      <Setter Property="Height" Value="18" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="Margin" Value="4,0,0,0" />
+      <Setter Property="Focusable" Value="False" />
+      <Setter Property="FontFamily" Value="{DynamicResource Font.Icons}" />
+      <Setter Property="FontSize" Value="{DynamicResource FontSize.CaptionIcon}" />
+      <Setter Property="Foreground" Value="{DynamicResource Brush.Tab.InactiveForeground}" />
+    </Style>
   </UserControl.Resources>
 
-  <!-- Address bar and page; both the user and the agent drive the page. -->
+  <!-- Tab strip, address bar and the page of the shown tab; both the user and the agent work in the tabs. -->
   <DockPanel>
+    <Border DockPanel.Dock="Top" BorderBrush="{DynamicResource Brush.Border}" BorderThickness="0,0,0,1">
+      <DockPanel>
+        <Button DockPanel.Dock="Right" Margin="0,0,4,0" VerticalAlignment="Center" Style="{StaticResource Button.Toolbar}"
+                Content="{x:Static ui:IconGlyphs.Add}"
+                ToolTip="{x:Static res:Strings.NewTabToolTip}" Command="{Binding NewTabCommand}"
+                AutomationProperties.AutomationId="Browser.NewTab" AutomationProperties.Name="{x:Static res:Strings.NewTab}" />
+        <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled">
+          <ItemsControl ItemsSource="{Binding Tabs}" Focusable="False" MinHeight="31" Padding="4,0,0,0"
+                        AutomationProperties.AutomationId="Browser.Tabs" AutomationProperties.Name="{x:Static res:Strings.TabStrip}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <StackPanel Orientation="Horizontal" />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate DataType="{x:Type vm:BrowserTabViewModel}">
+                <!-- Left click shows the tab, middle click closes it; a pinned tab is its icon alone. -->
+                <controls:AutomationBorder x:Name="Tab" Height="27" Margin="0,4,2,0" Padding="8,0,4,0" CornerRadius="6,6,0,0"
+                                           Background="{DynamicResource Brush.Tab.InactiveBackground}"
+                                           ToolTip="{Binding ToolTip}"
+                                           MouseDown="OnTabMouseDown"
+                                           AutomationProperties.AutomationId="{Binding AutomationId}"
+                                           AutomationProperties.Name="{Binding Title}">
+                  <controls:AutomationBorder.ContextMenu>
+                    <ContextMenu ItemsSource="{Binding Menu}" ItemContainerStyle="{StaticResource MenuItem.Bound}" />
+                  </controls:AutomationBorder.ContextMenu>
+                  <Grid>
+                    <Border x:Name="ActiveMarker" Height="2" CornerRadius="1" VerticalAlignment="Bottom" Margin="0,0,4,0"
+                            Background="{DynamicResource Brush.Accent}" Visibility="Collapsed" />
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                      <Image Width="16" Height="16" VerticalAlignment="Center"
+                             Source="{Binding Favicon, Converter={x:Static views:FaviconConverter.Instance}}"
+                             Visibility="{Binding HasFavicon, Converter={StaticResource BoolToVisibility}}" />
+                      <TextBlock x:Name="Globe" VerticalAlignment="Center" FontFamily="{DynamicResource Font.Icons}" FontSize="{DynamicResource FontSize.Icon}"
+                                 Foreground="{DynamicResource Brush.Tab.InactiveForeground}"
+                                 Text="{Binding Source=globe, Mode=OneTime, Converter={x:Static controls:IconGlyphConverter.Instance}}"
+                                 Visibility="{Binding HasFavicon, Converter={x:Static controls:InverseBoolToVisibilityConverter.Instance}}" />
+                      <TextBlock Margin="4,0,0,0" VerticalAlignment="Center" FontFamily="{DynamicResource Font.Icons}" FontSize="{DynamicResource FontSize.Icon}"
+                                 Foreground="{DynamicResource Brush.Accent}" Text="{x:Static ui:IconGlyphs.Sparkle}"
+                                 ToolTip="{x:Static res:Strings.AgentTab}"
+                                 Visibility="{Binding IsAgent, Converter={StaticResource BoolToVisibility}}" />
+                      <TextBlock x:Name="Title" Margin="6,0,0,0" MaxWidth="150" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                                 Text="{Binding Title}" Foreground="{DynamicResource Brush.Tab.InactiveForeground}"
+                                 Visibility="{Binding IsPinned, Converter={x:Static controls:InverseBoolToVisibilityConverter.Instance}}" />
+                      <Button Style="{StaticResource Button.TabClose}" Content="{x:Static ui:IconGlyphs.Close}"
+                              Command="{Binding CloseCommand}"
+                              ToolTip="{x:Static res:Strings.CloseTabToolTip}"
+                              Visibility="{Binding IsPinned, Converter={x:Static controls:InverseBoolToVisibilityConverter.Instance}}"
+                              AutomationProperties.AutomationId="{Binding AutomationId, StringFormat={}{0}.Close}"
+                              AutomationProperties.Name="{x:Static res:Strings.CloseTab}" />
+                    </StackPanel>
+                  </Grid>
+                </controls:AutomationBorder>
+                <DataTemplate.Triggers>
+                  <DataTrigger Binding="{Binding IsActive}" Value="True">
+                    <Setter TargetName="Tab" Property="Background" Value="{DynamicResource Brush.Tab.ActiveBackground}" />
+                    <Setter TargetName="Title" Property="Foreground" Value="{DynamicResource Brush.Tab.ActiveForeground}" />
+                    <Setter TargetName="Globe" Property="Foreground" Value="{DynamicResource Brush.Tab.ActiveForeground}" />
+                    <Setter TargetName="ActiveMarker" Property="Visibility" Value="Visible" />
+                  </DataTrigger>
+                </DataTemplate.Triggers>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
+      </DockPanel>
+    </Border>
     <DockPanel DockPanel.Dock="Top" Margin="4">
       <Button DockPanel.Dock="Left" Style="{StaticResource Button.Toolbar}" Content="{x:Static ui:IconGlyphs.ArrowLeft}"
               ToolTip="{x:Static res:Strings.Back}" Command="{Binding BackCommand}"
@@ -61,6 +139,13 @@
                Foreground="{DynamicResource Brush.Error.Foreground}" Text="{Binding Error}"
                Visibility="{Binding Error, Converter={x:Static controls:NullToCollapsedConverter.Instance}}"
                AutomationProperties.AutomationId="Browser.Error" />
-    <ContentControl x:Name="Host" Focusable="False" />
+    <!-- Pages of the tabs that were shown or called; only the page of the shown tab is visible. An empty tab shows a hint. -->
+    <Grid>
+      <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Margin="16" TextWrapping="Wrap" TextAlignment="Center"
+                 Foreground="{DynamicResource Brush.Text.Secondary}" Text="{x:Static res:Strings.EmptyTabHint}"
+                 Visibility="{Binding IsPageShown, Converter={x:Static controls:InverseBoolToVisibilityConverter.Instance}}"
+                 AutomationProperties.AutomationId="Browser.EmptyHint" />
+      <Grid x:Name="Pages" />
+    </Grid>
   </DockPanel>
 </UserControl>

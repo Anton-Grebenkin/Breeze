@@ -78,4 +78,23 @@
   <data name="ContextTabActive" xml:space="preserve"><value> (активная)</value></data>
   <data name="ContextTabAgent" xml:space="preserve"><value> (вкладка агента)</value></data>
   <data name="ContextTabTitle" xml:space="preserve"><value> — заголовок: «{0}»</value></data>
+  <!-- Tabs. -->
+  <data name="NewTab" xml:space="preserve"><value>Новая вкладка</value></data>
+  <data name="NewTabToolTip" xml:space="preserve"><value>Новая вкладка (Ctrl+T)</value></data>
+  <data name="CloseTab" xml:space="preserve"><value>Закрыть</value></data>
+  <data name="CloseTabToolTip" xml:space="preserve"><value>Закрыть вкладку (Ctrl+W)</value></data>
+  <data name="CloseOtherTabs" xml:space="preserve"><value>Закрыть остальные</value></data>
+  <data name="PinTab" xml:space="preserve"><value>Закрепить</value></data>
+  <data name="UnpinTab" xml:space="preserve"><value>Открепить</value></data>
+  <data name="AgentTab" xml:space="preserve"><value>В этой вкладке работает агент</value></data>
+  <data name="TabStrip" xml:space="preserve"><value>Вкладки браузера</value></data>
+  <data name="NewTabCommand" xml:space="preserve"><value>Новая вкладка</value></data>
+  <data name="CloseTabCommand" xml:space="preserve"><value>Закрыть вкладку</value></data>
+  <data name="CloseOtherTabsCommand" xml:space="preserve"><value>Закрыть остальные вкладки</value></data>
+  <data name="NextTabCommand" xml:space="preserve"><value>Следующая вкладка</value></data>
+  <data name="PreviousTabCommand" xml:space="preserve"><value>Предыдущая вкладка</value></data>
+  <data name="PinTabCommand" xml:space="preserve"><value>Закрепить или открепить вкладку</value></data>
+  <data name="TabClosed" xml:space="preserve"><value>Вкладка закрыта.</value></data>
+  <data name="BrowserRestarted" xml:space="preserve"><value>браузер перезапустился после сбоя; страница загружается заново</value></data>
+  <data name="EmptyTabHint" xml:space="preserve"><value>Введите адрес сайта или localhost:5000 в строку выше и нажмите Enter.</value></data>
 </root>

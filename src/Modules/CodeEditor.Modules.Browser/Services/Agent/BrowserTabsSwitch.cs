@@ -3,6 +3,7 @@ using System.Globalization;
 using CodeEditor.Core.Settings;
 using CodeEditor.Modules.Agent.Contracts.Context;
 using CodeEditor.Modules.Browser.Resources;
+using CodeEditor.Modules.Browser.Services.Tabs;
 using CodeEditor.Shell;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -18,19 +19,20 @@ public sealed partial class BrowserTabsSwitch : IAgentContextSwitch, IDisposable
     public const string SwitchId = "BrowserTabs";
     public const string ShareKey = BrowserOptions.Section + ".shareTabsWithAgent";
 
-    private readonly IBrowserEngine _browser;
+    private readonly BrowserTabs _tabs;
     private readonly IOptionsMonitor<BrowserOptions> _options;
     private readonly ISettingsService _settings;
     private readonly ILogger<BrowserTabsSwitch> _logger;
     private readonly IDisposable? _subscription;
 
-    public BrowserTabsSwitch(IBrowserEngine browser, IOptionsMonitor<BrowserOptions> options, ISettingsService settings, ILogger<BrowserTabsSwitch> logger)
+    public BrowserTabsSwitch(BrowserTabs tabs, IOptionsMonitor<BrowserOptions> options, ISettingsService settings, ILogger<BrowserTabsSwitch> logger)
     {
-        _browser = browser;
+        _tabs = tabs;
         _options = options;
         _settings = settings;
         _logger = logger;
-        _browser.StateChanged += OnBrowserChanged;
+        _tabs.Changed += OnTabsChanged;
+        _tabs.PageChanged += OnTabsChanged;
         _subscription = options.OnChange(_ => Notify());
     }
 
@@ -59,18 +61,22 @@ public sealed partial class BrowserTabsSwitch : IAgentContextSwitch, IDisposable
     }
 
     /// <summary>Open http(s) pages, as the agent would be told about them.</summary>
-    public IReadOnlyList<BrowserTabInfo> Tabs() =>
-        _browser.Url is { Scheme: "http" or "https" } url ? [new BrowserTabInfo(Id: null, url, _browser.Title, IsActive: false, IsAgent: false)] : [];
+    public IReadOnlyList<BrowserTabInfo> Tabs()
+    {
+        var active = _tabs.Active;
+        return [.. _tabs.Tabs.Where(static tab => tab.HasWebPage).Select(tab => new BrowserTabInfo(tab.Id, tab.Page.Url!, tab.Page.Title, tab == active, tab.IsAgent))];
+    }
 
     public void Toggle() => IsOn = !IsOn;
 
     public void Dispose()
     {
-        _browser.StateChanged -= OnBrowserChanged;
+        _tabs.Changed -= OnTabsChanged;
+        _tabs.PageChanged -= OnTabsChanged;
         _subscription?.Dispose();
     }
 
-    private void OnBrowserChanged(object? sender, EventArgs e) => Notify();
+    private void OnTabsChanged(object? sender, EventArgs e) => Notify();
 
     private void Notify() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(string.Empty));
 

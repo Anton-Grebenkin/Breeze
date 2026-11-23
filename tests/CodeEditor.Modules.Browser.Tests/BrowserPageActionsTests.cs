@@ -1,6 +1,7 @@
 using CodeEditor.Modules.Agent.Contracts;
 using CodeEditor.Modules.Agent.Contracts.Feed;
 using CodeEditor.Modules.Browser.Services;
+using CodeEditor.Modules.Browser.Services.Tabs;
 using CodeEditor.Testing;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -13,13 +14,15 @@ namespace CodeEditor.Modules.Browser.Tests;
 /// </summary>
 public sealed class BrowserPageActionsTests
 {
-    private readonly FakeBrowserEngine _browser = new();
-    private readonly BrowserNetworkLog _network = new();
+    private readonly BrowserTabs _tabs;
+    private readonly FakeBrowserPage _browser;
     private readonly AIFunction _tool;
 
-    public BrowserPageActionsTests() =>
-        _tool = new BrowserAgentTools(_browser, new BrowserPageActions(_browser, _network), new PassThroughOutputStore(), new NoImages())
-            .CreateTools().OfType<AIFunction>().Single();
+    public BrowserPageActionsTests()
+    {
+        _tabs = FakeBrowserEngine.Tabs(out _browser);
+        _tool = new BrowserAgentTools(_tabs, new PassThroughOutputStore(), new NoImages()).CreateTools().OfType<AIFunction>().Single();
+    }
 
     [Fact]
     public async Task Press_FocusesTheElement_SendsARealKeyPress_ThenSnapshot()
@@ -79,10 +82,10 @@ public sealed class BrowserPageActionsTests
     [Fact]
     public async Task Network_ListsApiCalls_ResponseReadsTheBody()
     {
-        _network.Record(BrowserNetworkLog.RequestWillBeSent, """{"requestId":"7","type":"XHR","request":{"url":"http://localhost:5000/api/items","method":"GET"}}""");
-        _network.Record(BrowserNetworkLog.ResponseReceived, """{"requestId":"7","response":{"status":404,"mimeType":"application/json"}}""");
-        _network.Record(BrowserNetworkLog.RequestWillBeSent, """{"requestId":"8","type":"Image","request":{"url":"http://localhost:5000/logo.png","method":"GET"}}""");
-        _network.Record(BrowserNetworkLog.ResponseReceived, """{"requestId":"8","response":{"status":200,"mimeType":"image/png"}}""");
+        _browser.Network.Record(BrowserNetworkLog.RequestWillBeSent, """{"requestId":"7","type":"XHR","request":{"url":"http://localhost:5000/api/items","method":"GET"}}""");
+        _browser.Network.Record(BrowserNetworkLog.ResponseReceived, """{"requestId":"7","response":{"status":404,"mimeType":"application/json"}}""");
+        _browser.Network.Record(BrowserNetworkLog.RequestWillBeSent, """{"requestId":"8","type":"Image","request":{"url":"http://localhost:5000/logo.png","method":"GET"}}""");
+        _browser.Network.Record(BrowserNetworkLog.ResponseReceived, """{"requestId":"8","response":{"status":200,"mimeType":"image/png"}}""");
         _browser.DevToolsReplies["Network.getResponseBody"] = """{"body":"eyJlcnJvciI6Im5vdCBmb3VuZCJ9","base64Encoded":true}""";
 
         var list = await InvokeAsync(new() { ["action"] = "network" });
@@ -96,11 +99,11 @@ public sealed class BrowserPageActionsTests
     [Fact]
     public void NetworkLog_KeepsFailures_SkipsDataUrls()
     {
-        _network.Record(BrowserNetworkLog.RequestWillBeSent, """{"requestId":"2","type":"Fetch","request":{"url":"http://localhost:5001/graphql","method":"POST"}}""");
-        _network.Record(BrowserNetworkLog.LoadingFailed, """{"requestId":"2","errorText":"net::ERR_CONNECTION_REFUSED"}""");
-        _network.Record(BrowserNetworkLog.RequestWillBeSent, """{"requestId":"3","type":"Image","request":{"url":"data:image/png;base64,AAAA","method":"GET"}}""");
+        _browser.Network.Record(BrowserNetworkLog.RequestWillBeSent, """{"requestId":"2","type":"Fetch","request":{"url":"http://localhost:5001/graphql","method":"POST"}}""");
+        _browser.Network.Record(BrowserNetworkLog.LoadingFailed, """{"requestId":"2","errorText":"net::ERR_CONNECTION_REFUSED"}""");
+        _browser.Network.Record(BrowserNetworkLog.RequestWillBeSent, """{"requestId":"3","type":"Image","request":{"url":"data:image/png;base64,AAAA","method":"GET"}}""");
 
-        Assert.Equal(["[2] POST net::ERR_CONNECTION_REFUSED Fetch http://localhost:5001/graphql"], _network.Recent(10).Select(BrowserNetworkLog.Describe));
+        Assert.Equal(["[2] POST net::ERR_CONNECTION_REFUSED Fetch http://localhost:5001/graphql"], _browser.Network.Recent(10).Select(BrowserNetworkLog.Describe));
     }
 
     // A server's error page loads like any page: the model reads it, with its status.
@@ -142,10 +145,10 @@ public sealed class BrowserPageActionsTests
     public async Task Evaluate_AsksOnSitesOfOtherMachines(string page, bool preapproved)
     {
         await _browser.NavigateAsync(new Uri(page), TestContext.Current.CancellationToken);
-        var approvals = new BrowserApprovals(new TestOptionsMonitor<BrowserOptions>(new BrowserOptions()), _browser, new FakeSettingsService(), NullLogger<BrowserApprovals>.Instance);
+        var approvals = new BrowserApprovals(new TestOptionsMonitor<BrowserOptions>(new BrowserOptions()), _tabs, new FakeSettingsService(), NullLogger<BrowserApprovals>.Instance);
         var call = new Dictionary<string, object?> { ["action"] = "evaluate", ["script"] = "document.cookie" };
 
-        var preview = Assert.Single(await new BrowserAgentTools(_browser, new BrowserPageActions(_browser, _network), new PassThroughOutputStore(), new NoImages())
+        var preview = Assert.Single(await new BrowserAgentTools(_tabs, new PassThroughOutputStore(), new NoImages())
             .PreviewAsync(BrowserAgentTools.ToolName, call, TestContext.Current.CancellationToken));
 
         Assert.Equal(preapproved, approvals.IsPreapproved(BrowserAgentTools.ToolName, call));

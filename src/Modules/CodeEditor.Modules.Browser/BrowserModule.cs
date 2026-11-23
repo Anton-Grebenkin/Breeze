@@ -1,4 +1,5 @@
 using CodeEditor.Core.Commands;
+using CodeEditor.Core.Keybindings;
 using CodeEditor.Core.Modules;
 using CodeEditor.Core.Settings;
 using CodeEditor.Modules.Agent.Contracts;
@@ -9,8 +10,10 @@ using CodeEditor.Modules.Browser.Commands;
 using CodeEditor.Modules.Browser.Resources;
 using CodeEditor.Modules.Browser.Services;
 using CodeEditor.Modules.Browser.Services.Agent;
+using CodeEditor.Modules.Browser.Services.Tabs;
 using CodeEditor.Modules.Browser.ViewModels;
 using CodeEditor.Shell;
+using CodeEditor.Shell.Layout;
 using CodeEditor.Shell.Services;
 using CodeEditor.Shell.ToolWindows;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,9 +21,9 @@ using Microsoft.Extensions.DependencyInjection;
 namespace CodeEditor.Modules.Browser;
 
 /// <summary>
-/// Browser module (ADR 0027): a real browser in a tab next to files, as in Cursor (ADR 0031; it can move to any area),
-/// and the agent's <c>browser</c> tool. The engine (<see cref="IBrowserEngine"/>) comes from the module's view and is
-/// created when the panel is first shown, by the user or by an agent call. The "Show: Browser" command and the View
+/// Browser module (ADR 0027, 0054): a real browser with tabs in a tab next to files, as in Cursor (ADR 0031; it can
+/// move to any area), and the agent's <c>browser</c> tool. The engine (<see cref="IBrowserEngine"/>) comes from the
+/// module's view; a page loads when its tab is first shown, by the user or by an agent call. The "Show: Browser" command and the View
 /// menu item come from the panel registration. Pages other modules open (<see cref="IWebPageOpener"/>) open here too.
 /// </summary>
 public sealed class BrowserModule : IModule
@@ -38,8 +41,8 @@ public sealed class BrowserModule : IModule
         services.AddUserOnlySetting(BrowserApprovals.AllowedHostsKey);
         services.AddUserOnlySetting(BrowserTabsSwitch.ShareKey);
         services.AddSingleton<BrowserHistory>();
-        services.AddSingleton<BrowserNetworkLog>();
-        services.AddSingleton<BrowserPageActions>();
+        services.AddSingleton<BrowserTabStore>();
+        services.AddSingleton<BrowserTabs>();
         services.AddSingleton<BrowserViewModel>();
         services.AddSingleton<BrowserAgentTools>();
         services.AddSingleton<IAgentToolProvider>(provider => provider.GetRequiredService<BrowserAgentTools>());
@@ -59,6 +62,7 @@ public sealed class BrowserModule : IModule
         {
             Order = 10,
         }));
-        _registrations.AddRange(new BrowserCommands(services.GetRequiredService<BrowserViewModel>, services.GetRequiredService<BrowserTabsSwitch>()).Register(services.GetRequiredService<ICommandRegistry>()));
+        _registrations.AddRange(new BrowserCommands(services.GetRequiredService<BrowserViewModel>, services.GetRequiredService<BrowserTabsSwitch>(), services.GetRequiredService<WorkbenchLayout>())
+            .Register(services.GetRequiredService<ICommandRegistry>(), services.GetRequiredService<IKeybindingRegistry>()));
     }
 }

@@ -12,7 +12,7 @@ namespace CodeEditor.Modules.Browser.Wpf;
 
 /// <summary>
 /// Browser module view (ADR 0027): the WebView2 browser (<see cref="WebViewBrowserEngine"/>) and its panel. WebView2
-/// assemblies load on first panel show.
+/// assemblies load when a page is first shown or called.
 /// </summary>
 public sealed class BrowserWpfModule : IModule
 {

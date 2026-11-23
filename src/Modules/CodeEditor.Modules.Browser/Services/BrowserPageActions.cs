@@ -10,8 +10,9 @@ namespace CodeEditor.Modules.Browser.Services;
 /// <summary>
 /// Browser tool actions beyond navigation and the snapshot (<see cref="BrowserAgentTools"/>), as in Playwright MCP:
 /// pressing keys, scrolling, waiting for text, running a script and reading the page's network requests and responses.
+/// Made for the page a call works on.
 /// </summary>
-public sealed class BrowserPageActions(IBrowserEngine browser, BrowserNetworkLog network)
+public sealed class BrowserPageActions(IBrowserPage browser)
 {
     public const int DefaultWaitSeconds = 10;
     public const int MaxWaitSeconds = 60;
@@ -94,7 +95,7 @@ public sealed class BrowserPageActions(IBrowserEngine browser, BrowserNetworkLog
     /// <summary>The page's latest requests, oldest first; static files only if they failed.</summary>
     public string Requests()
     {
-        var shown = network.Recent(BrowserNetworkLog.Capacity)
+        var shown = browser.Network.Recent(BrowserNetworkLog.Capacity)
             .Where(static request => !StaticTypes.Contains(request.Type) || request.Error is not null || request.Status >= 400)
             .TakeLast(MaxRequests)
             .Select(BrowserNetworkLog.Describe)
@@ -105,7 +106,7 @@ public sealed class BrowserPageActions(IBrowserEngine browser, BrowserNetworkLog
     /// <summary>The body of a request's response, as text.</summary>
     public async Task<string> ResponseAsync(string id, CancellationToken cancellationToken)
     {
-        var request = network.Find(id) ?? throw new AgentToolException(Format(Strings.NoSuchRequest, id));
+        var request = browser.Network.Find(id) ?? throw new AgentToolException(Format(Strings.NoSuchRequest, id));
         string reply;
         try
         {

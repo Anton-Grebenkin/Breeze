@@ -42,13 +42,7 @@ public static class BrowserTabLines
 
     private static string Line(BrowserTabInfo tab)
     {
-        var line = new StringBuilder("- ");
-        if (tab.Id is not null)
-        {
-            line.Append(tab.Id).Append(": ");
-        }
-
-        line.Append(Address(tab.Url));
+        var line = new StringBuilder("- ").Append(tab.Id).Append(": ").Append(Address(tab.Url));
         if (tab.IsActive)
         {
             line.Append(Strings.ContextTabActive);

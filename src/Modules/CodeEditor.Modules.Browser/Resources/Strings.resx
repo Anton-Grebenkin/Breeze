@@ -78,4 +78,23 @@
   <data name="ContextTabActive" xml:space="preserve"><value> (active)</value></data>
   <data name="ContextTabAgent" xml:space="preserve"><value> (the agent's tab)</value></data>
   <data name="ContextTabTitle" xml:space="preserve"><value> — title: "{0}"</value></data>
+  <!-- Tabs. -->
+  <data name="NewTab" xml:space="preserve"><value>New tab</value></data>
+  <data name="NewTabToolTip" xml:space="preserve"><value>New tab (Ctrl+T)</value></data>
+  <data name="CloseTab" xml:space="preserve"><value>Close</value></data>
+  <data name="CloseTabToolTip" xml:space="preserve"><value>Close tab (Ctrl+W)</value></data>
+  <data name="CloseOtherTabs" xml:space="preserve"><value>Close Other Tabs</value></data>
+  <data name="PinTab" xml:space="preserve"><value>Pin</value></data>
+  <data name="UnpinTab" xml:space="preserve"><value>Unpin</value></data>
+  <data name="AgentTab" xml:space="preserve"><value>The agent works in this tab</value></data>
+  <data name="TabStrip" xml:space="preserve"><value>Browser tabs</value></data>
+  <data name="NewTabCommand" xml:space="preserve"><value>New Tab</value></data>
+  <data name="CloseTabCommand" xml:space="preserve"><value>Close Tab</value></data>
+  <data name="CloseOtherTabsCommand" xml:space="preserve"><value>Close Other Tabs</value></data>
+  <data name="NextTabCommand" xml:space="preserve"><value>Next Tab</value></data>
+  <data name="PreviousTabCommand" xml:space="preserve"><value>Previous Tab</value></data>
+  <data name="PinTabCommand" xml:space="preserve"><value>Pin or Unpin Tab</value></data>
+  <data name="TabClosed" xml:space="preserve"><value>The tab was closed.</value></data>
+  <data name="BrowserRestarted" xml:space="preserve"><value>the browser restarted after a failure; the page is loading again</value></data>
+  <data name="EmptyTabHint" xml:space="preserve"><value>Type a site address or localhost:5000 into the bar above and press Enter.</value></data>
 </root>

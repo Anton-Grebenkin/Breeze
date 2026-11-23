@@ -8,7 +8,7 @@ namespace CodeEditor.Modules.Browser.Services;
 /// Why a page did not open, for the model and the user. WebView2 reports a status name (<c>CannotConnect</c>,
 /// <c>Unknown</c>). When no server answered on this machine, the likely cause is an app that isn't running, so the text
 /// says so; for a site elsewhere that question misleads, and the text points at the address and the network. An HTTP
-/// error page is not a failure: it loads, with its status (<see cref="IBrowserEngine.StatusCode"/>).
+/// error page is not a failure: it loads, with its status (<see cref="IBrowserPage.StatusCode"/>).
 /// </summary>
 public static class BrowserErrors
 {

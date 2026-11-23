@@ -1,5 +1,6 @@
 using CodeEditor.Modules.Agent.Contracts;
 using CodeEditor.Modules.Browser.Services;
+using CodeEditor.Modules.Browser.Services.Tabs;
 using Microsoft.Extensions.AI;
 
 namespace CodeEditor.Modules.Browser.Tests;
@@ -11,13 +12,16 @@ namespace CodeEditor.Modules.Browser.Tests;
 /// </summary>
 public sealed class BrowserAgentToolsTests
 {
-    private readonly FakeBrowserEngine _browser = new();
+    private readonly BrowserTabs _tabs;
+    private readonly FakeBrowserPage _browser;
     private readonly FakeAgentImages _images = new();
-    private readonly BrowserNetworkLog _network = new();
     private readonly AIFunction _tool;
 
-    public BrowserAgentToolsTests() =>
-        _tool = new BrowserAgentTools(_browser, new BrowserPageActions(_browser, _network), new PassThroughOutputStore(), _images).CreateTools().OfType<AIFunction>().Single();
+    public BrowserAgentToolsTests()
+    {
+        _tabs = FakeBrowserEngine.Tabs(out _browser);
+        _tool = new BrowserAgentTools(_tabs, new PassThroughOutputStore(), _images).CreateTools().OfType<AIFunction>().Single();
+    }
 
     [Fact]
     public async Task Navigate_OpensThePage_AndReturnsTheSnapshot()
@@ -121,7 +125,7 @@ public sealed class BrowserAgentToolsTests
     [Fact]
     public async Task Preview_OfExternalSite_NamesIt()
     {
-        var preview = Assert.Single(await new BrowserAgentTools(_browser, new BrowserPageActions(_browser, _network), new PassThroughOutputStore(), _images)
+        var preview = Assert.Single(await new BrowserAgentTools(_tabs, new PassThroughOutputStore(), _images)
             .PreviewAsync(BrowserAgentTools.ToolName, new Dictionary<string, object?> { ["action"] = "navigate", ["url"] = "https://example.org/a" }, TestContext.Current.CancellationToken));
 
         Assert.Equal(("Агент хочет открыть страницу в браузере", "example.org", "GET https://example.org/a"), (preview.Title, preview.Header, preview.NewText));
