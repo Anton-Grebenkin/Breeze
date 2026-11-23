@@ -75,7 +75,7 @@ public sealed class AutoSaveService : IDisposable
     {
         foreach (var document in _documents.Documents.Where(CanAutoSave).ToArray())
         {
-            await _saver.SaveAsync(document);
+            await _saver.SaveAsync(document, ask: false);
         }
     }
 

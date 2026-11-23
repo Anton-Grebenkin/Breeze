@@ -12,7 +12,7 @@ public sealed class DocumentServiceTests : IDisposable
     private static readonly string Root = Path.GetFullPath(@"C:\repo");
     private static readonly string Program = Path.Combine(Root, "Program.cs");
 
-    private readonly FakeFileSystem _fileSystem = new FakeFileSystem().AddFile(Program, "class Program {}\n");
+    private readonly FakeFileSystem _fileSystem = new FakeFileSystem().AddFile(Program, "class Program {}\n").AddFile(Path.Combine(Root, ".gitignore"), "docs/\n");
     private readonly Workspace _workspace;
     private readonly DocumentService _documents;
 
@@ -143,6 +143,54 @@ public sealed class DocumentServiceTests : IDisposable
         _fileSystem.Watchers[0].Raise(new FileChange(Program, FileChangeKind.Deleted));
 
         Assert.True(document.IsDeletedOnDisk);
+    }
+
+    // The file changed on disk and no watcher event came (an excluded path, a missed event): the save does not discard
+    // that change; the document is flagged, and a save of a flagged document is the decision to overwrite.
+    [Fact]
+    public async Task Save_OverAChangeNobodyNoticed_IsRefused_UntilDecided()
+    {
+        var document = await Open();
+        document.Buffer.Replace(0, 0, "// мои правки\n");
+        _fileSystem.AddFile(Program, "чужая правка");
+        _fileSystem.Touch(Program);
+
+        await Assert.ThrowsAsync<DocumentChangedOnDiskException>(() => _documents.SaveAsync(document, TestContext.Current.CancellationToken));
+
+        Assert.Equal("чужая правка", _fileSystem.ReadAllText(Program));
+        Assert.True(document.HasExternalChanges);
+        Assert.True(document.IsDirty);
+
+        await _documents.SaveAsync(document, TestContext.Current.CancellationToken);
+
+        Assert.StartsWith("// мои правки", _fileSystem.ReadAllText(Program), StringComparison.Ordinal);
+        Assert.False(document.HasExternalChanges);
+    }
+
+    // The folder watcher reports neither a file outside the folder nor one excluded by .gitignore; an open one is
+    // checked by its write time, so it reloads (clean) or is flagged (edited) like any other file.
+    [Theory]
+    [InlineData(@"C:\notes\todo.md")]
+    [InlineData(@"C:\repo\docs\plan.md")]
+    public async Task UnwatchedFile_ChangedOnDisk_IsReloadedOrFlagged(string file)
+    {
+        var path = Path.GetFullPath(file);
+        _fileSystem.AddFile(path, "было");
+        var time = new ManualTimeProvider();
+        using var documents = new DocumentService(_fileSystem, new TestTextBufferFactory(), new InlineUiDispatcher(), _workspace, NullLogger<DocumentService>.Instance, time);
+        var document = await documents.OpenAsync(path, TestContext.Current.CancellationToken);
+
+        _fileSystem.AddFile(path, "стало");
+        _fileSystem.Touch(path);
+        time.Advance(TimeSpan.FromSeconds(2));
+        await WaitUntil(() => document.Buffer.GetText() == "стало");
+
+        document.Buffer.Replace(0, 0, "моё ");
+        _fileSystem.Touch(path);
+        time.Advance(TimeSpan.FromSeconds(2));
+        await WaitUntil(() => document.HasExternalChanges);
+
+        Assert.Equal("моё стало", document.Buffer.GetText());
     }
 
     [Fact]

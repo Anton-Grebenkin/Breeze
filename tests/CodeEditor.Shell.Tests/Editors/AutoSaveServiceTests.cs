@@ -98,6 +98,23 @@ public sealed class AutoSaveServiceTests : IDisposable
         Assert.Equal("чужая правка", _fixture.FileSystem.ReadAllText(EditorAreaFixture.PathOf("a.cs")));
     }
 
+    // The change on disk is found only at the write (no watcher event): auto save neither overwrites nor asks.
+    [Fact]
+    public async Task ChangedOnDiskUnnoticed_IsNotOverwritten_AndNothingIsAsked()
+    {
+        var tab = await _fixture.OpenAsync("a.cs");
+        tab.Document.Buffer.Replace(0, 0, "x");
+        _fixture.FileSystem.AddFile(EditorAreaFixture.PathOf("a.cs"), "чужая правка");
+        _fixture.FileSystem.Touch(EditorAreaFixture.PathOf("a.cs"));
+
+        _time.Advance(Delay);
+        await Task.Delay(300, TestContext.Current.CancellationToken);
+
+        Assert.Equal("чужая правка", _fixture.FileSystem.ReadAllText(EditorAreaFixture.PathOf("a.cs")));
+        Assert.True(tab.Document.HasExternalChanges);
+        Assert.Empty(_fixture.Dialogs.Confirmations);
+    }
+
     // Saving runs in the background: wait for the dirty flag to clear.
     private static async Task WaitSavedAsync(EditorTabViewModel tab)
     {
