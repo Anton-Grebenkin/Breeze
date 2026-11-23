@@ -13,7 +13,8 @@ namespace CodeEditor.Modules.Agent.Services.Turn;
 /// Agent tool wrapper:
 /// - logs the call and its duration; returns <see cref="AgentToolException"/> as text so the model can fix the call;
 /// - refuses a tool not available in the turn's mode and tells the model why (<see cref="ToolPolicy"/>);
-/// - runs nothing once the turn budget is exhausted;
+/// - runs nothing once the turn budget is exhausted, or once the tool reported that it cannot work in this
+///   environment (<see cref="AgentToolException.ToolUnavailable"/>): it stays off until the end of the turn;
 /// - marks an identical call the second time and blocks it from the third (loops); a successful edit resets the count;
 /// - after a long run of reads without edits or checks, appends a request for an interim summary;
 /// - runs mutating tools (those needing approval) one at a time, reads in parallel;
@@ -59,6 +60,11 @@ internal sealed partial class GuardedToolFunction(
         if (budget.IsExhausted)
         {
             return ExhaustedResult;
+        }
+
+        if (budget.SwitchedOffReason(Name) is { } reason)
+        {
+            return SwitchedOff(reason);
         }
 
         foreach (var name in ToolArgumentRepair.Repair(arguments, JsonSchema))
@@ -211,7 +217,7 @@ internal sealed partial class GuardedToolFunction(
         catch (AgentToolException exception)
         {
             LogRejected(logger, Name, exception.Message);
-            return $"{ToolViews.ErrorPrefix} {exception.Message}";
+            return exception.ToolUnavailable ? SwitchOff(exception.Message) : $"{ToolViews.ErrorPrefix} {exception.Message}";
         }
         catch (Exception exception) when (exception is JsonException or ArgumentException or FormatException or InvalidCastException)
         {
@@ -224,6 +230,19 @@ internal sealed partial class GuardedToolFunction(
             throw;
         }
     }
+
+    // The first line of the tool's message is the reason; the rest is the output that proves it.
+    private string SwitchOff(string message)
+    {
+        var reason = message.AsSpan().Trim();
+        var end = reason.IndexOfAny('\r', '\n');
+        budget.SwitchOff(Name, (end < 0 ? reason : reason[..end]).ToString());
+        LogSwitchedOff(logger, Name);
+        return $"{ToolViews.ErrorPrefix} {message}\n\n{string.Format(CultureInfo.CurrentCulture, Strings.ToolSwitchedOffNote, Name)}";
+    }
+
+    private string SwitchedOff(string reason) =>
+        $"{ToolViews.ErrorPrefix} {string.Format(CultureInfo.CurrentCulture, Strings.ToolSwitchedOff, Name, reason)}";
 
     // Parameters from the schema: "edits: array, path: string".
     private string Parameters() =>
@@ -270,6 +289,9 @@ internal sealed partial class GuardedToolFunction(
 
     [LoggerMessage(Level = LogLevel.Information, Message = "Tool {Tool}: argument {Argument} came as a JSON string and was parsed")]
     private static partial void LogArgumentRepaired(ILogger logger, string tool, string argument);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Tool {Tool} cannot work in this environment: switched off until the end of the turn")]
+    private static partial void LogSwitchedOff(ILogger logger, string tool);
 
     [LoggerMessage(Level = LogLevel.Information, Message = "Tool {Tool} refused in {Mode} mode")]
     private static partial void LogRefused(ILogger logger, string tool, AgentMode mode);

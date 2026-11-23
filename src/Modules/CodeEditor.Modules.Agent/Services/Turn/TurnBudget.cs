@@ -21,6 +21,7 @@ public sealed class TurnBudget
     public const int ReadsBeforeReflection = 20;
 
     private readonly ConcurrentDictionary<string, int> _calls = new(StringComparer.Ordinal);
+    private readonly ConcurrentDictionary<string, string> _switchedOff = new(StringComparer.Ordinal);
     private int _requests;
     private int _readsInRow;
     private int _externalContent;
@@ -54,6 +55,7 @@ public sealed class TurnBudget
         Interlocked.Exchange(ref _readsInRow, 0);
         Interlocked.Exchange(ref _externalContent, 0);
         _calls.Clear();
+        _switchedOff.Clear();
     }
 
     /// <summary>Counts a model request.</summary>
@@ -69,6 +71,12 @@ public sealed class TurnBudget
 
     /// <summary>The workspace changed: earlier calls are no longer repeats.</summary>
     public void ForgetCalls() => _calls.Clear();
+
+    /// <summary>The tool reported that it cannot work here: its calls are not run until the turn ends.</summary>
+    public void SwitchOff(string tool, string reason) => _switchedOff[tool] = reason;
+
+    /// <returns>Why the tool is switched off for this turn; <c>null</c> if it is not.</returns>
+    public string? SwitchedOffReason(string tool) => _switchedOff.GetValueOrDefault(tool);
 
     /// <summary>Counts a read or search.</summary>
     /// <returns><c>true</c> after <see cref="ReadsBeforeReflection"/> in a row: time to stop and summarize.</returns>

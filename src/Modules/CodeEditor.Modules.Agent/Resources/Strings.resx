@@ -27,6 +27,8 @@
   <data name="ToolBudgetExhausted" xml:space="preserve"><value>Not executed: the step limit for this turn is exhausted. Summarize without calling tools.</value></data>
   <data name="ToolRepeatNote" xml:space="preserve"><value>(An identical call with the same arguments was already made in this turn. Do not repeat it — use the previous result or change the approach.)</value></data>
   <data name="ToolRepeatBlocked" xml:space="preserve"><value>Not executed: this call with the same arguments is repeated for the third time in this turn. Change the approach or ask the user.</value></data>
+  <data name="ToolSwitchedOff" xml:space="preserve"><value>Not executed: {0} is switched off until the end of the turn because it does not work in this environment. {1}</value></data>
+  <data name="ToolSwitchedOffNote" xml:space="preserve"><value>{0} is switched off until the end of the turn: do not call it again.</value></data>
   <data name="ToolArgumentsInvalid" xml:space="preserve"><value>Not executed: the arguments don't match the tool's parameters ({0}). Parameters: {1}. Pass arrays and objects as JSON values, not as strings, and fix the call instead of working around it.</value></data>
   <data name="AdvisorBeforeEditResult" xml:space="preserve"><value>Not applied yet: before the first edit, an advisor (another model) reviewed your approach:
 

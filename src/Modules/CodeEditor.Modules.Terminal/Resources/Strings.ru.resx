@@ -36,6 +36,8 @@
   <data name="NoOutput" xml:space="preserve"><value> Вывода нет.</value></data>
   <data name="FolderNotFound" xml:space="preserve"><value>Папки «{0}» нет.</value></data>
   <data name="CommandForbidden" xml:space="preserve"><value>Команда запрещена политикой редактора: {0}. Если она действительно нужна, пользователь выполнит её сам.</value></data>
+  <data name="CommandBlockedByAntivirus" xml:space="preserve"><value>Команда не выполнялась: антивирус этого компьютера блокирует сценарии PowerShell, которые запускает редактор (ScriptContainedMaliciousContent). Повтор не поможет. Обойдись другими инструментами — чтение, поиск, правки, build, run_tests, git — и скажи пользователю, что команды агента блокирует антивирус.</value></data>
+  <data name="CommandsBlockedNotification" xml:space="preserve"><value>Антивирус блокирует команды агента: PowerShell отклоняет сценарии, которые запускает Breeze. Пока они не разрешены в антивирусе, агент не может выполнять команды на этом компьютере.</value></data>
   <data name="CommandTooLong" xml:space="preserve"><value>Команда слишком длинная для командной строки: {0} знаков при пределе {1}. Сохрани сценарий в файл и запусти файл или разбей команду.</value></data>
   <data name="BackgroundRunning" xml:space="preserve"><value>Фоновая команда #{0} идёт ({1} с).</value></data>
   <data name="BackgroundExited" xml:space="preserve"><value>Фоновая команда #{0} завершилась с кодом {1} за {2} с.</value></data>

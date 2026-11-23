@@ -13,7 +13,7 @@ public sealed class CommandAgentToolsTests : IDisposable
 
     public CommandAgentToolsTests()
     {
-        _tools = new CommandAgentTools(_fixture.Workspace, _fixture.FileSystem, _fixture.Output, _fixture.SaveBeforeRun, _fixture.Outputs, _fixture.Background, _fixture.Activity, _fixture.Shell);
+        _tools = new CommandAgentTools(_fixture.Workspace, _fixture.FileSystem, _fixture.Output, _fixture.SaveBeforeRun, _fixture.Outputs, _fixture.Background, _fixture.Activity, _fixture.Shell, _fixture.Blocks);
         _run = _tools.CreateTools().OfType<AIFunction>().Single();
     }
 
@@ -90,18 +90,24 @@ public sealed class CommandAgentToolsTests : IDisposable
         Assert.True(_fixture.FileSystem.FileExists(Path.Combine(TerminalFixture.UserData, PowerShellMode.FileName)));
     }
 
-    // Blocked even bare: the model gets the antivirus message, and nothing is retried forever.
+    // Blocked even bare: the model gets the reason in plain words, the second block in a row switches the tool off,
+    // and the user is told once.
     [Fact]
-    public async Task Run_BlockedEvenBare_ReturnsTheBlock()
+    public async Task Run_BlockedEvenBare_ExplainsIt_AndSwitchesTheToolOffOnTheSecondBlock()
     {
         _fixture.Runner
             .Returns(1, PowerShellLauncher.BlockedMarker)
+            .Returns(1, "bare: " + PowerShellLauncher.BlockedMarker)
             .Returns(1, "bare: " + PowerShellLauncher.BlockedMarker);
 
-        var result = await Invoke(new() { ["command"] = "git status", ["waitSeconds"] = 5000 });
+        var first = await Assert.ThrowsAsync<AgentToolException>(() => Invoke(new() { ["command"] = "git status", ["waitSeconds"] = 5000 }));
+        var second = await Assert.ThrowsAsync<AgentToolException>(() => Invoke(new() { ["command"] = "echo hello", ["waitSeconds"] = 5000 }));
 
-        Assert.Equal(2, _fixture.Runner.Requests.Count);
-        Assert.Contains("bare: " + PowerShellLauncher.BlockedMarker, result, StringComparison.Ordinal);
+        Assert.Equal(3, _fixture.Runner.Requests.Count);
+        Assert.StartsWith("Команда не выполнялась: антивирус", first.Message, StringComparison.Ordinal);
+        Assert.EndsWith("bare: " + PowerShellLauncher.BlockedMarker, first.Message, StringComparison.Ordinal);
+        Assert.Equal((false, true), (first.ToolUnavailable, second.ToolUnavailable));
+        Assert.Equal(CommandBlocks.NotificationId, Assert.Single(_fixture.Notifications.Shown).Id);
     }
 
     [Fact]

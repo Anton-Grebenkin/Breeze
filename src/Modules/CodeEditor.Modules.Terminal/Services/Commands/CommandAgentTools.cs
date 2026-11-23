@@ -31,7 +31,8 @@ public sealed class CommandAgentTools(
     IAgentOutputStore outputs,
     BackgroundCommands background,
     IAgentToolActivity activity,
-    PowerShellMode shell) : IAgentToolProvider, IAgentChangePreviewer
+    PowerShellMode shell,
+    CommandBlocks blocks) : IAgentToolProvider, IAgentChangePreviewer
 {
     public const string RunCommandName = "run_command";
     public static string ChannelName => Strings.Commands;
@@ -111,7 +112,7 @@ public sealed class CommandAgentTools(
             : null;
 
     // The first line is the summary (parsed by the feed row), then a hint for a non-obvious exit code, then output.
-    private static string Report(BackgroundCommand command, TimeSpan elapsed)
+    private string Report(BackgroundCommand command, TimeSpan elapsed)
     {
         var output = command.ReadNew().TrimEnd();
         if (command.ExitCode is not { } exitCode)
@@ -119,6 +120,13 @@ public sealed class CommandAgentTools(
             // The process didn't start; the output says why.
             throw new AgentToolException(output);
         }
+
+        if (exitCode != 0 && output.Contains(PowerShellLauncher.BlockedMarker, StringComparison.Ordinal))
+        {
+            throw blocks.Blocked(output);
+        }
+
+        blocks.Ran();
 
         var header = Format(Strings.CommandExitCode, exitCode, Durations.Seconds(elapsed));
         if (CommandExitHints.For(command.Command, exitCode) is { } hint)

@@ -38,7 +38,13 @@ internal sealed class TerminalFixture : IDisposable
         Tests = new DotNetTests(Runner, Target, Workspace, Index, FileSystem, Output, SaveBeforeRun, NullLogger<DotNetTests>.Instance);
         Background = new BackgroundCommands(Runner, Workspace, TimeProvider.System, NullLogger<BackgroundCommands>.Instance);
         Shell = new PowerShellMode(FileSystem, new UserDataPaths(UserData), NullLogger<PowerShellMode>.Instance);
+        Blocks = new CommandBlocks(Notifications, new InlineUiDispatcher());
     }
+
+    public FakeNotifications Notifications { get; } = new();
+
+    /// <summary>Antivirus blocks of agent commands and the user's notification about them.</summary>
+    public CommandBlocks Blocks { get; }
 
     public static readonly string UserData = Path.GetFullPath(@"C:\user-data");
 

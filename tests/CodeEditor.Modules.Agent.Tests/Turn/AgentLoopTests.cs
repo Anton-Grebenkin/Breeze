@@ -154,6 +154,36 @@ public sealed class AgentLoopTests : IDisposable
         Assert.EndsWith(GuardedToolFunction.RepeatNote, afterFailedEdit?.ToString(), StringComparison.Ordinal);
     }
 
+    // A tool that cannot work here (antivirus blocks every command) is not called again until the next turn.
+    [Fact]
+    public async Task UnavailableTool_IsSwitchedOff_UntilTheNextTurn()
+    {
+        var budget = new TurnBudget();
+        budget.Begin();
+        using var writeLock = new SemaphoreSlim(1);
+        var runs = 0;
+        var run = new GuardedToolFunction(AIFunctionFactory.Create(Blocked, "run_command"), budget, writeLock, NullLogger.Instance);
+        var token = TestContext.Current.CancellationToken;
+
+        var first = (await run.InvokeAsync(Arguments("echo 1"), token))?.ToString();
+        var second = (await run.InvokeAsync(Arguments("echo 2"), token))?.ToString();
+        budget.Begin();
+        await run.InvokeAsync(Arguments("echo 3"), token);
+
+        Assert.StartsWith("Ошибка: Антивирус блокирует команды.", first, StringComparison.Ordinal);
+        Assert.EndsWith("Инструмент run_command отключён до конца хода: не вызывай его снова.", first, StringComparison.Ordinal);
+        Assert.Equal("Ошибка: Не выполнено: инструмент run_command отключён до конца хода, потому что в этой среде он не работает. Антивирус блокирует команды.", second);
+        Assert.Equal(2, runs);
+
+        string Blocked(string command)
+        {
+            runs++;
+            throw new AgentToolException("Антивирус блокирует команды.\nScriptContainedMaliciousContent") { ToolUnavailable = true };
+        }
+
+        static AIFunctionArguments Arguments(string command) => new(new Dictionary<string, object?> { ["command"] = command });
+    }
+
     [Theory]
     [InlineData(AgentMode.Agent, true, true)]
     [InlineData(AgentMode.Ask, true, true)]

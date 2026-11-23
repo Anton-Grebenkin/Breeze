@@ -27,6 +27,8 @@
   <data name="ToolBudgetExhausted" xml:space="preserve"><value>Не выполнено: лимит шагов хода исчерпан. Подведи итог без вызова инструментов.</value></data>
   <data name="ToolRepeatNote" xml:space="preserve"><value>(Такой же вызов с теми же аргументами уже был в этом ходе. Не повторяй его — используй прежний результат или смени подход.)</value></data>
   <data name="ToolRepeatBlocked" xml:space="preserve"><value>Не выполнено: этот вызов с теми же аргументами повторяется уже в третий раз за ход. Смени подход или спроси пользователя.</value></data>
+  <data name="ToolSwitchedOff" xml:space="preserve"><value>Не выполнено: инструмент {0} отключён до конца хода, потому что в этой среде он не работает. {1}</value></data>
+  <data name="ToolSwitchedOffNote" xml:space="preserve"><value>Инструмент {0} отключён до конца хода: не вызывай его снова.</value></data>
   <data name="ToolArgumentsInvalid" xml:space="preserve"><value>Не выполнено: аргументы не подходят к параметрам инструмента ({0}). Параметры: {1}. Передавай массивы и объекты значениями JSON, а не строками, и исправь вызов, а не обходи его.</value></data>
   <data name="AdvisorBeforeEditResult" xml:space="preserve"><value>Пока не применено: перед первой правкой советник (другая модель) разобрал твой подход:
 
