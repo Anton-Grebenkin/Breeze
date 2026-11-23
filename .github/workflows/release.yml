@@ -67,6 +67,14 @@ jobs:
         shell: pwsh
         run: ./build/publish.ps1 -Version ${{ steps.version.outputs.version }} -RepositoryUrl ${{ steps.version.outputs.repo }} -Pack
 
+      # The published build, as the user gets it: the numbers go to the job summary. A runner is several times slower
+      # than a desktop, so the limit only catches a start that got much worse. It does not block the release until a
+      # few releases have shown that a runner opens the window reliably.
+      - name: Measure startup
+        shell: pwsh
+        continue-on-error: true
+        run: ./build/measure-startup.ps1 -Exe publish/Breeze.exe -BudgetMs 6000 -Runs 2
+
       - name: Upload to GitHub release
         shell: pwsh
         run: |

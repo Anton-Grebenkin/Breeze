@@ -33,6 +33,9 @@ internal sealed partial class StartupReporter(
         var total = StartupClock.SinceProcessStart();
 
         LogStartup(logger, (long)total.TotalMilliseconds, (long)sinceMain.TotalMilliseconds);
+
+        // Always in the log: a slow start on someone's machine can be studied afterwards without a special run.
+        LogPhases(logger, string.Join("; ", clock.Phases.Select(static phase => string.Create(CultureInfo.InvariantCulture, $"{phase.Phase}={phase.Elapsed.TotalMilliseconds:F0}"))));
         statusBar.Message = string.Format(CultureInfo.CurrentCulture, Strings.StartupTime, (long)total.TotalMilliseconds);
         WriteTrace(total);
     }
@@ -58,4 +61,7 @@ internal sealed partial class StartupReporter(
     [LoggerMessage(Level = LogLevel.Information,
         Message = "Window rendered {TotalMs} ms after process start ({SinceMainMs} ms after entering Main)")]
     private static partial void LogStartup(ILogger logger, long totalMs, long sinceMainMs);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Startup phases, ms after entering Main: {Phases}")]
+    private static partial void LogPhases(ILogger logger, string phases);
 }
