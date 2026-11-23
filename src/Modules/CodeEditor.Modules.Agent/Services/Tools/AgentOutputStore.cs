@@ -9,7 +9,8 @@ namespace CodeEditor.Modules.Agent.Services.Tools;
 
 /// <summary>
 /// Long tool outputs go to <c>.breeze/agent/outputs/</c> (ADR 0012); the model gets the head and tail, line and
-/// character counts and the path to the full text. Files older than three days are deleted when a new one is written.
+/// character counts and the path to the full text; JSON in one long line is saved indented (<see cref="JsonLines"/>).
+/// Files older than three days are deleted when a new one is written.
 /// Without an open folder or if the write fails, only the head and tail.
 /// </summary>
 public sealed partial class AgentOutputStore(IWorkspace workspace, IFileSystem fileSystem, TimeProvider time, ILogger<AgentOutputStore> logger) : IAgentOutputStore
@@ -38,11 +39,12 @@ public sealed partial class AgentOutputStore(IWorkspace workspace, IFileSystem f
             return text;
         }
 
-        var preview = ToolOutput.HeadAndTail(text, HeadCharacters, TailCharacters);
-        var lines = text.AsSpan().Count('\n') + 1;
-        var note = Save(text, toolName) is { } path
-            ? Format(Strings.OutputSavedToFile, lines, text.Length, path)
-            : Format(Strings.OutputNotSaved, lines, text.Length);
+        var readable = JsonLines.Unfold(text);
+        var preview = ToolOutput.HeadAndTail(readable, HeadCharacters, TailCharacters);
+        var lines = readable.AsSpan().Count('\n') + 1;
+        var note = Save(readable, toolName) is { } path
+            ? Format(Strings.OutputSavedToFile, lines, readable.Length, path)
+            : Format(Strings.OutputNotSaved, lines, readable.Length);
         return preview + "\n\n" + note;
     }
 

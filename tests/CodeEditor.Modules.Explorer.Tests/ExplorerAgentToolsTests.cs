@@ -212,6 +212,22 @@ public sealed class ExplorerAgentToolsTests : IDisposable
         Assert.Contains($"продолжение — startLine={shown + 1}", page, StringComparison.Ordinal);
     }
 
+    // A line over the cap (minified JSON) is cut with the column to continue from, so its rest can be read too.
+    [Fact]
+    public async Task ReadFile_HugeLine_IsCut_AndItsRestIsReadWithStartColumn()
+    {
+        const int cap = ExplorerAgentTools.MaxCharactersPerRead;
+        _fileSystem.AddFile(Path.Combine(Root, "wide.json"), new string('a', cap) + new string('b', cap) + new string('c', 100) + "\nend\n");
+
+        var head = await Invoke("read_file", new() { ["path"] = "wide.json" });
+        var middle = await Invoke("read_file", new() { ["path"] = "wide.json", ["startColumn"] = cap + 1 });
+        var tail = await Invoke("read_file", new() { ["path"] = "wide.json", ["startColumn"] = (2 * cap) + 1 });
+
+        Assert.StartsWith($"1\t{new string('a', cap)}…(знаки 1–{cap} из {(2 * cap) + 100} в этой строке; продолжение — startLine=1, startColumn={cap + 1})\n", head, StringComparison.Ordinal);
+        Assert.StartsWith($"1\t{new string('b', cap)}…(знаки {cap + 1}–{2 * cap} из", middle, StringComparison.Ordinal);
+        Assert.StartsWith($"1\t{new string('c', 100)}\n", tail, StringComparison.Ordinal);
+    }
+
     // Agent data (chat history, memory, outputs) is hidden from the agent's file listings.
     [Fact]
     public async Task AgentData_IsHiddenFromListsAndFind()

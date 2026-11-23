@@ -41,6 +41,7 @@
   <data name="ToolEmptyFile" xml:space="preserve"><value>(empty file)</value></data>
   <data name="ToolLinesUnchanged" xml:space="preserve"><value>(Lines {0}–{1} of {2} are unchanged since the previous read in this chat — use the earlier result.)</value></data>
   <data name="ToolLinesPage" xml:space="preserve"><value>…(lines {0}–{1} of {2}; continue with startLine={3})</value></data>
+  <data name="ToolLineCut" xml:space="preserve"><value>…(characters {0}–{1} of {2} in this line; continue with startLine={3}, startColumn={4})</value></data>
   <data name="ToolWorkspaceNotOpen" xml:space="preserve"><value>No workspace folder is open.</value></data>
   <data name="ToolNoFilesFound" xml:space="preserve"><value>(nothing found)</value></data>
   <data name="ToolSimilarPaths" xml:space="preserve"><value> Similar paths in the workspace: {0}.</value></data>

@@ -16,6 +16,7 @@
   <data name="ProtectedFolder" xml:space="preserve"><value>"{0}" is in a service folder (git history, build output, chat history): the agent does not edit it.</value></data>
   <data name="OutputTruncated" xml:space="preserve"><value>…(truncated: showing {0} of {1} characters; narrow the request)</value></data>
   <data name="OutputOmittedLines" xml:space="preserve"><value>… {0} lines omitted …</value></data>
+  <data name="OutputOmittedCharacters" xml:space="preserve"><value>… {0} characters omitted …</value></data>
   <data name="FrontMatterNotClosed" xml:space="preserve"><value>The header is not closed: add a line with --- after the settings.</value></data>
   <data name="FrontMatterBadLine" xml:space="preserve"><value>Line {0}: expected "key: value", a list item "- value" or "name: value" under a key.</value></data>
   <data name="FrontMatterDuplicateKey" xml:space="preserve"><value>Line {0}: "{1}" is already set above.</value></data>

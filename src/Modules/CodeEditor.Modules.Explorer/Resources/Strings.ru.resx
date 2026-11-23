@@ -41,6 +41,7 @@
   <data name="ToolEmptyFile" xml:space="preserve"><value>(пустой файл)</value></data>
   <data name="ToolLinesUnchanged" xml:space="preserve"><value>(Строки {0}–{1} файла {2} не изменились с прошлого чтения в этом чате — используйте прежний результат.)</value></data>
   <data name="ToolLinesPage" xml:space="preserve"><value>…(строки {0}–{1} из {2}; продолжение — startLine={3})</value></data>
+  <data name="ToolLineCut" xml:space="preserve"><value>…(знаки {0}–{1} из {2} в этой строке; продолжение — startLine={3}, startColumn={4})</value></data>
   <data name="ToolWorkspaceNotOpen" xml:space="preserve"><value>Рабочая папка не открыта.</value></data>
   <data name="ToolNoFilesFound" xml:space="preserve"><value>(ничего не найдено)</value></data>
   <data name="ToolSimilarPaths" xml:space="preserve"><value> Похожие пути в папке: {0}.</value></data>
