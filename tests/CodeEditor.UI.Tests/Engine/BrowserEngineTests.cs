@@ -84,6 +84,23 @@ public sealed class BrowserEngineTests : IDisposable
         Assert.Equal("t1", _tabs.Tabs[1].OpenerId);
     }
 
+    // The tabs share one profile, as in an ordinary browser: what the user signed in to in their tab — cookies and the
+    // site's stored data — is there in the agent's tab. Only the per-tab session storage is each tab's own.
+    [Fact]
+    public async Task SignInInTheUsersTab_IsThereInTheAgentsTab()
+    {
+        var mine = _tabs.Open();
+        await mine.Page.NavigateAsync(new Uri(Address("/")), TestContext.Current.CancellationToken);
+        await mine.Page.EvaluateAsync(
+            "document.cookie = 'session=abc123; path=/'; localStorage.setItem('token', 'xyz'); sessionStorage.setItem('draft', 'mine')", TestContext.Current.CancellationToken);
+
+        await UseAsync(new() { ["action"] = "navigate", ["url"] = Address("/report") });
+        var seen = await UseAsync(new() { ["action"] = "evaluate", ["script"] = "document.cookie + '|' + localStorage.getItem('token') + '|' + sessionStorage.getItem('draft')" });
+
+        Assert.Equal("\"session=abc123|xyz|null\"", seen);
+        Assert.Equal((2, false, true), (_tabs.Tabs.Length, _tabs.Tabs[0].IsAgent, _tabs.Tabs[1].IsAgent));
+    }
+
     [Fact]
     public async Task RestoredPage_ShowsItsAddressAtOnce_AndLoadsWhenFirstCalled()
     {
