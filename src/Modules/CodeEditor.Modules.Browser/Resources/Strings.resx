@@ -148,4 +148,5 @@
   <data name="SearchEngineInvalid" xml:space="preserve"><value>The search engine '{0}' (browser.searchEngine) is neither a known one ({1}) nor an http(s) address with {{query}}.</value></data>
   <data name="SearchNeedsUser" xml:space="preserve"><value>The search page asks for a person (a captcha or a consent window) and nobody answered. It is open in the browser: ask the user to pass the check, then search again.</value></data>
   <data name="SearchNeedsUserNotification" xml:space="preserve"><value>The search engine asks to confirm you are a person. Pass the check in the browser tab: the agent is waiting.</value></data>
+  <data name="SearchCheckWords" xml:space="preserve"><value>captcha|robot|unusual traffic|verify you are|consent</value></data>
 </root>

@@ -148,4 +148,5 @@
   <data name="SearchEngineInvalid" xml:space="preserve"><value>Поисковик «{0}» (browser.searchEngine) — не известное имя ({1}) и не адрес http(s) с {{query}}.</value></data>
   <data name="SearchNeedsUser" xml:space="preserve"><value>Страница поиска требует человека (капча или окно согласия), и никто не ответил. Она открыта в браузере: попроси пользователя пройти проверку и повтори поиск.</value></data>
   <data name="SearchNeedsUserNotification" xml:space="preserve"><value>Поисковик просит подтвердить, что вы человек. Пройдите проверку во вкладке браузера: агент ждёт.</value></data>
+  <data name="SearchCheckWords" xml:space="preserve"><value>captcha|робот|robot|unusual traffic|verify you are|подтвердите|согласие|consent</value></data>
 </root>

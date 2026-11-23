@@ -1,11 +1,14 @@
 using System.Globalization;
+using System.Text.Json;
+using CodeEditor.Modules.Browser.Resources;
 
 namespace CodeEditor.Modules.Browser.Services.Web;
 
 /// <summary>
 /// Reads a search engine's results page without knowing its markup, which changes often: a result is a link in a
 /// heading that leads to another site; the excerpt is the rest of the text of the block around it. Links the engine
-/// wraps in a redirect are unwrapped. A page with no results that speaks of a check or a consent needs the user.
+/// wraps in a redirect are unwrapped. A page with no results that speaks of a check or a consent needs the user; the
+/// words it is known by are in the resources, in the editor's language and in English.
 /// </summary>
 public static class BrowserSearchScript
 {
@@ -42,7 +45,9 @@ public static class BrowserSearchScript
             hits.push({ title: title.slice(0, 200), url, snippet: around.replace(title, '').trim().slice(0, 300) });
           }
           const text = document.body ? document.body.innerText.slice(0, 4000) : '';
-          return { hits, needsUser: hits.length === 0 && /captcha|робот|robot|unusual traffic|verify you are|подтвердите|consent|cookie/i.test(text) };
+          return { hits, needsUser: hits.length === 0 && new RegExp(__CHECK__, 'i').test(text) };
         })()
-        """.Replace("__MAX__", MaxHits.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal);
+        """
+        .Replace("__MAX__", MaxHits.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal)
+        .Replace("__CHECK__", JsonSerializer.Serialize(Strings.SearchCheckWords), StringComparison.Ordinal);
 }
