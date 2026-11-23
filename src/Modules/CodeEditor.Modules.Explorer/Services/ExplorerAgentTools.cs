@@ -140,8 +140,9 @@ public sealed class ExplorerAgentTools(
     }
 
     /// <summary>
-    /// Resolves a model-supplied path as is or, if missing, to the only indexed file with that name or path ending
-    /// ("DictionaryRecord.cs", "Domain/Dictionary.cs"); otherwise models ran text searches just to find the path.
+    /// Resolves a model-supplied path as is or, if missing, to the only indexed file with that path ending
+    /// ("DictionaryRecord.cs", "Domain/Dictionary.cs") or, with a wrongly guessed folder, with that name; otherwise
+    /// models ran text searches just to find the path.
     /// </summary>
     private (string File, string Note) ResolveFile(string path)
     {
@@ -153,11 +154,14 @@ public sealed class ExplorerAgentTools(
 
         var ending = path.Replace('\\', '/').TrimStart('.', '/');
         var suffix = "/" + ending;
-        var candidates = index.Files
-            .Where(candidate => !SensitivePaths.IsAgentData(candidate.RelativePath)
-                && (candidate.RelativePath.Equals(ending, StringComparison.OrdinalIgnoreCase) || candidate.RelativePath.EndsWith(suffix, StringComparison.OrdinalIgnoreCase)))
-            .Take(MaxAmbiguous + 1)
-            .ToList();
+        var candidates = Indexed(candidate => candidate.RelativePath.Equals(ending, StringComparison.OrdinalIgnoreCase) || candidate.RelativePath.EndsWith(suffix, StringComparison.OrdinalIgnoreCase));
+        if (candidates.Count == 0)
+        {
+            // Several files with this name are not listed here: the "not found" error suggests them.
+            var name = ending[(ending.LastIndexOf('/') + 1)..];
+            candidates = Indexed(candidate => candidate.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) is [var only] ? [only] : [];
+        }
+
         return candidates.Count switch
         {
             1 => (candidates[0].FullPath, Format(Strings.ToolPathResolved, path, candidates[0].RelativePath) + "\n"),
@@ -165,6 +169,9 @@ public sealed class ExplorerAgentTools(
             _ => (file, string.Empty),
         };
     }
+
+    private List<IndexedFile> Indexed(Func<IndexedFile, bool> matches) =>
+        [.. index.Files.Where(candidate => !SensitivePaths.IsAgentData(candidate.RelativePath) && matches(candidate)).Take(MaxAmbiguous + 1)];
 
     /// <summary>Last line of the page within the character cap; the first line always fits (reading truncates it).</summary>
     private static int LastLineWithin(string[] lines, int first, int last)

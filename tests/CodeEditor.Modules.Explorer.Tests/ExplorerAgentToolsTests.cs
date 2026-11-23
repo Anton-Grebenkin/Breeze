@@ -157,6 +157,29 @@ public sealed class ExplorerAgentToolsTests : IDisposable
         Assert.Equal("(«Helper.cs» — это src/Utils/Helper.cs)\n1\tclass Helper { }\n", result);
     }
 
+    // The folder was guessed wrong: the only file with this name is read; with two of them the error lists both.
+    [Fact]
+    public async Task ReadFile_WrongFolder_ReadsTheOnlyFileWithThatName()
+    {
+        await _index.WhenReady;
+
+        var result = await Invoke("read_file", new() { ["path"] = "src/Services/Helper.cs" });
+
+        Assert.Equal("(«src/Services/Helper.cs» — это src/Utils/Helper.cs)\n1\tclass Helper { }\n", result);
+    }
+
+    [Fact]
+    public async Task ReadFile_WrongFolder_SeveralFilesWithThatName_AreSuggested()
+    {
+        _fileSystem.AddFile(Path.Combine(Root, "tests", "Helper.cs"), "class TestHelper { }");
+        _workspace.Open(Root);
+        await _index.WhenReady;
+
+        var error = await Assert.ThrowsAsync<AgentToolException>(() => Invoke("read_file", new() { ["path"] = "src/Services/Helper.cs" }));
+
+        Assert.Equal("Файла «src/Services/Helper.cs» нет. Похожие пути в папке: tests/Helper.cs, src/Utils/Helper.cs, src.", error.Message);
+    }
+
     [Fact]
     public async Task ReadFile_AmbiguousName_ListsCandidates()
     {

@@ -3,11 +3,15 @@ namespace CodeEditor.Core.Files;
 /// <summary>
 /// Similar paths for a glob or path that matched no files, so the agent does not search blindly: "Catalog" gives
 /// <c>src/Acme.Catalog</c>, "Migrations/Snapshot.cs" gives the file's full path. Literal parts of the pattern are compared
-/// with folder and file names case-insensitively: exact name first, then substring. O(files × depth).
+/// with folder and file names case-insensitively: exact name first, then substring. Files come first, then folders
+/// from the deepest part of the pattern up. O(files × depth).
 /// </summary>
 public static class SimilarPaths
 {
     public const int DefaultMax = 5;
+
+    /// <summary>A shorter beginning of a file name matches too many files to be a hint.</summary>
+    private const int MinStemLength = 3;
 
     private static readonly char[] Wildcards = ['*', '?', '{', '['];
 
@@ -28,16 +32,25 @@ public static class SimilarPaths
         var suggestions = new List<string>();
         if (fileName is not null)
         {
-            suggestions.AddRange(Ranked(paths, fileName));
+            suggestions.AddRange(Files(paths, fileName));
         }
 
+        // The nearest folder first: the top ones ("src") the caller wrote and knows.
         var folders = Folders(paths);
-        foreach (var segment in segments.Where(segment => segment != fileName))
+        foreach (var segment in segments.Where(segment => segment != fileName).Reverse())
         {
             suggestions.AddRange(Ranked(folders, segment));
         }
 
         return [.. suggestions.Distinct(StringComparer.Ordinal).Take(max)];
+    }
+
+    // A guessed name often has the right beginning: "OrderStore.Delete.cs" for OrderStore.cs.
+    private static IEnumerable<string> Files(List<string> paths, string fileName)
+    {
+        var byName = Ranked(paths, fileName).ToList();
+        var stem = fileName[..fileName.IndexOf('.', StringComparison.Ordinal)];
+        return byName.Count > 0 || stem.Length < MinStemLength ? byName : Ranked(paths, stem);
     }
 
     // Exact name, then a name part ("Catalog" in "Acme.Catalog") or prefix; a substring inside a word ("log" in
