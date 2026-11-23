@@ -25,8 +25,7 @@ internal sealed class WebViewHost(IUiDispatcher dispatcher, Action showPanel, Us
     public BrowserOptions Options => options();
 
     /// <summary>
-    /// UI thread only. The proxy and the sign-in servers go to the browser process as it starts, so a change in them
-    /// applies after a restart.
+    /// UI thread only. The proxy goes to the browser process as it starts, so a change in it applies after a restart.
     /// </summary>
     public Task<CoreWebView2Environment> EnvironmentAsync() => _environment ??= CoreWebView2Environment.CreateAsync(
         browserExecutableFolder: null,

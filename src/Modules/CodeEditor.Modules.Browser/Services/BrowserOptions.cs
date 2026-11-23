@@ -32,12 +32,6 @@ public sealed class BrowserOptions
     /// </summary>
     public string Proxy { get; set; } = string.Empty;
 
-    /// <summary>
-    /// Servers the browser signs in to with the Windows account (Kerberos, NTLM) besides the intranet zone, like
-    /// <c>*.corp.example</c>. Applied when the editor starts.
-    /// </summary>
-    public List<string> AuthServers { get; set; } = [];
-
     /// <summary>The agent is told which sites are open in the browser; the chip above the chat input switches it.</summary>
     public bool ShareTabsWithAgent { get; set; } = true;
 }
