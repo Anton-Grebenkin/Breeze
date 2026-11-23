@@ -1,6 +1,7 @@
 using CodeEditor.Modules.Agent.Contracts;
 using CodeEditor.Modules.Browser.Services;
 using CodeEditor.Modules.Browser.Services.Agent;
+using CodeEditor.Modules.Browser.Services.Reading;
 using Microsoft.Extensions.AI;
 
 namespace CodeEditor.Modules.Browser.Tests;
@@ -42,7 +43,7 @@ public sealed class BrowserAgentToolsTests
         var script = _browser.Scripts[0];
         Assert.Contains("(\"e1\", \"a\\u0022); alert(1); (\\u0022\", true)", script, StringComparison.Ordinal);
         Assert.Equal(1, _browser.Waits);
-        Assert.Equal(BrowserScripts.Snapshot, _browser.Scripts[^1]);
+        Assert.Equal(BrowserSnapshot.Script, _browser.Scripts[^1]);
     }
 
     [Fact]

@@ -118,4 +118,12 @@
   <data name="FeedSelectTab" xml:space="preserve"><value>showing tab {0}</value></data>
   <data name="FeedCloseTab" xml:space="preserve"><value>closing tab {0}</value></data>
   <data name="TabOpened" xml:space="preserve"><value>Tab {0} is open; it is your current tab now.</value></data>
+  <!-- Reading a page. -->
+  <data name="PartNote" xml:space="preserve"><value>…(part {0} of {1}; the next: {2} with part={3})</value></data>
+  <data name="FindNone" xml:space="preserve"><value>The text '{0}' is not on the page.</value></data>
+  <data name="FindSummary" xml:space="preserve"><value>'{0}': {1} matches in {2} places.</value></data>
+  <data name="FindUnder" xml:space="preserve"><value>under "{0}"</value></data>
+  <data name="FindMore" xml:space="preserve"><value>…there are more places: make the text more specific.</value></data>
+  <data name="FeedRead" xml:space="preserve"><value>page text</value></data>
+  <data name="FeedFind" xml:space="preserve"><value>looking for '{0}'</value></data>
 </root>

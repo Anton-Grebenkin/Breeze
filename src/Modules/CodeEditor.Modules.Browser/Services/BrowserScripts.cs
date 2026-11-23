@@ -3,72 +3,36 @@ using System.Text.Json;
 namespace CodeEditor.Modules.Browser.Services;
 
 /// <summary>
-/// Page scripts for the <c>browser</c> tool (ADR 0027), like the Playwright MCP accessibility snapshot. The snapshot
-/// walks visible elements and tags each interactive one with <c>data-agent-ref</c> (<c>e1</c>, <c>e2</c>…), which the
-/// model uses to click and type. Model values enter a script only as JSON strings, so no code can be injected.
+/// Page scripts for the <c>browser</c> tool (ADR 0027) that act on an element of the snapshot
+/// (<see cref="Reading.BrowserSnapshot"/>) by its <c>data-agent-ref</c> (<c>e1</c>, <c>e2</c>…). Model values enter a
+/// script only as JSON strings, so no code can be injected.
 /// </summary>
 public static class BrowserScripts
 {
-    /// <summary>Snapshot length limit; the rest of the page is cut with a notice.</summary>
-    public const int MaxSnapshotCharacters = 12_000;
-
-    /// <summary>Snapshot: <c>{ title, url, text, truncated }</c>.</summary>
-    public static string Snapshot { get; } = """
-        (() => {
-          const max = __MAX__;
-          let refs = 0, length = 0;
-          const lines = [];
-          const add = (depth, text) => { if (length > max) return; const line = '  '.repeat(depth) + text; lines.push(line); length += line.length + 1; };
-          const clean = s => (s || '').replace(/\s+/g, ' ').trim();
-          const short = (s, n) => { s = clean(s); return s.length > n ? s.slice(0, n) + '…' : s; };
-          const hidden = el => { if (el.hidden || el.getAttribute('aria-hidden') === 'true') return true; const st = getComputedStyle(el); return st.display === 'none' || st.visibility === 'hidden'; };
-          const skip = new Set(['SCRIPT', 'STYLE', 'NOSCRIPT', 'TEMPLATE', 'SVG', 'IFRAME', 'META', 'LINK']);
-          const interactive = 'a[href],button,input:not([type=hidden]),select,textarea,summary,[role=button],[role=link],[role=checkbox],[role=radio],[role=tab],[role=menuitem],[role=option],[role=switch],[contenteditable=""],[contenteditable=true]';
-          const textBlocks = new Set(['P', 'LI', 'TD', 'TH', 'LABEL', 'DT', 'DD', 'BLOCKQUOTE', 'PRE', 'CAPTION', 'FIGCAPTION', 'SPAN', 'DIV', 'SECTION', 'ARTICLE', 'MAIN']);
-          const roleOf = el => {
-            const role = el.getAttribute('role');
-            if (role) return role;
-            const tag = el.tagName;
-            if (tag === 'A') return 'link';
-            if (tag === 'BUTTON' || tag === 'SUMMARY') return 'button';
-            if (tag === 'SELECT') return 'combobox';
-            if (tag === 'TEXTAREA') return 'textbox';
-            if (tag === 'INPUT') { const type = (el.type || 'text').toLowerCase(); return ['checkbox', 'radio', 'button', 'submit', 'reset', 'range', 'file'].includes(type) ? type : 'textbox'; }
-            return 'editable';
-          };
-          const nameOf = el => short(el.getAttribute('aria-label') || (el.labels && el.labels[0] && el.labels[0].innerText) || el.innerText || (el.type === 'password' ? '' : el.value) || el.placeholder || el.title || el.alt || el.name || '', 80);
-          const describe = el => {
-            const ref = 'e' + (++refs);
-            el.setAttribute('data-agent-ref', ref);
-            const role = roleOf(el);
-            let line = `- ${role} "${nameOf(el)}" [ref=${ref}]`;
-            if (role === 'link') line += ' -> ' + el.getAttribute('href');
-            if (role === 'textbox' && el.type !== 'password' && el.value) line += ` value="${short(el.value, 60)}"`;
-            if ((role === 'checkbox' || role === 'radio') && el.checked) line += ' (checked)';
-            if (role === 'combobox' && el.selectedOptions && el.selectedOptions[0]) line += ` selected="${short(el.selectedOptions[0].text, 40)}"`;
-            if (el.disabled) line += ' (disabled)';
-            return line;
-          };
-          const walk = (el, depth) => {
-            for (const child of el.children) {
-              if (length > max) return;
-              if (skip.has(child.tagName) || hidden(child)) continue;
-              if (child.matches(interactive)) { add(depth, describe(child)); continue; }
-              if (/^H[1-6]$/.test(child.tagName)) { add(depth, `- heading "${short(child.innerText, 120)}"`); continue; }
-              if (textBlocks.has(child.tagName) && !child.querySelector(interactive)) { const text = short(child.innerText, 300); if (text) add(depth, `- text "${text}"`); continue; }
-              walk(child, child.matches('nav,header,footer,form,dialog,[role=dialog],table,ul,ol') ? depth + 1 : depth);
+    // Finds a snapshot element wherever it was tagged: in the page, an open shadow root or a frame of the same site.
+    private const string Locate = """
+        const locate = ref => {
+          const selector = `[data-agent-ref="${CSS.escape(ref)}"]`;
+          const search = root => {
+            const hit = root.querySelector(selector);
+            if (hit) return hit;
+            for (const el of root.querySelectorAll('*')) {
+              let inner = null;
+              if (el.shadowRoot) inner = search(el.shadowRoot);
+              else if (el.tagName === 'IFRAME') { try { inner = el.contentDocument ? search(el.contentDocument) : null; } catch { } }
+              if (inner) return inner;
             }
+            return null;
           };
-          document.querySelectorAll('[data-agent-ref]').forEach(el => el.removeAttribute('data-agent-ref'));
-          if (document.body) walk(document.body, 0);
-          return { title: document.title, url: location.href, text: lines.join('\n'), truncated: length > max };
-        })()
-        """.Replace("__MAX__", MaxSnapshotCharacters.ToString(System.Globalization.CultureInfo.InvariantCulture), StringComparison.Ordinal);
+          return search(document);
+        };
+        """;
 
     /// <summary>Clicks a snapshot element: <c>{ ok, error }</c>.</summary>
     public static string Click(string reference) => $$"""
         (ref => {
-          const el = document.querySelector(`[data-agent-ref="${CSS.escape(ref)}"]`);
+          {{Locate}}
+          const el = locate(ref);
           if (!el) return { ok: false, error: 'not found' };
           el.scrollIntoView({ block: 'center', inline: 'center' });
           if (el.focus) el.focus();
@@ -83,7 +47,8 @@ public static class BrowserScripts
     /// </summary>
     public static string Type(string reference, string text, bool submit) => $$"""
         ((ref, text, submit) => {
-          const el = document.querySelector(`[data-agent-ref="${CSS.escape(ref)}"]`);
+          {{Locate}}
+          const el = locate(ref);
           if (!el) return { ok: false, error: 'not found' };
           el.scrollIntoView({ block: 'center' });
           el.focus();
@@ -114,17 +79,39 @@ public static class BrowserScripts
     /// <summary>A snapshot element as the page names it, for an approval card: <c>{ ok, role, name }</c>.</summary>
     public static string Describe(string reference) => $$"""
         (ref => {
-          const el = document.querySelector(`[data-agent-ref="${CSS.escape(ref)}"]`);
+          {{Locate}}
+          const el = locate(ref);
           if (!el) return { ok: false, error: 'not found' };
           const text = el.getAttribute('aria-label') || (el.labels && el.labels[0] && el.labels[0].innerText) || el.innerText || (el.type === 'password' ? '' : el.value) || el.placeholder || el.title || el.alt || el.name || '';
           return { ok: true, role: el.getAttribute('role') || el.tagName.toLowerCase(), name: text.replace(/\s+/g, ' ').trim().slice(0, 80) };
         })({{JsonSerializer.Serialize(reference)}})
         """;
 
+    /// <summary>
+    /// Scrolls a snapshot element into view and returns its box in page coordinates, for a screenshot of it alone:
+    /// <c>{ ok, x, y, width, height }</c>. An element in a frame is placed by the frames it sits in.
+    /// </summary>
+    public static string Box(string reference) => $$"""
+        (ref => {
+          {{Locate}}
+          const el = locate(ref);
+          if (!el) return { ok: false, error: 'not found' };
+          el.scrollIntoView({ block: 'center', inline: 'center' });
+          const box = el.getBoundingClientRect();
+          let x = box.x, y = box.y;
+          for (let view = el.ownerDocument.defaultView; view && view !== window && view.frameElement; view = view.parent) {
+            const frame = view.frameElement.getBoundingClientRect();
+            x += frame.x; y += frame.y;
+          }
+          return { ok: true, x: x + scrollX, y: y + scrollY, width: box.width, height: box.height };
+        })({{JsonSerializer.Serialize(reference)}})
+        """;
+
     /// <summary>Focuses a snapshot element before a key press: <c>{ ok, error }</c>.</summary>
     public static string Focus(string reference) => $$"""
         (ref => {
-          const el = document.querySelector(`[data-agent-ref="${CSS.escape(ref)}"]`);
+          {{Locate}}
+          const el = locate(ref);
           if (!el) return { ok: false, error: 'not found' };
           el.scrollIntoView({ block: 'center' });
           if (el.focus) el.focus();
@@ -138,8 +125,9 @@ public static class BrowserScripts
     /// </summary>
     public static string Scroll(string? reference, string? direction) => $$"""
         ((ref, direction) => {
+          {{Locate}}
           if (ref) {
-            const el = document.querySelector(`[data-agent-ref="${CSS.escape(ref)}"]`);
+            const el = locate(ref);
             if (!el) return { ok: false, error: 'not found' };
             el.scrollIntoView({ block: 'center' });
             return { ok: true };

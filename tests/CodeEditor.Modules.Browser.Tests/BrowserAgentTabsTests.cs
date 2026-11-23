@@ -1,6 +1,7 @@
 using CodeEditor.Modules.Agent.Contracts;
 using CodeEditor.Modules.Browser.Services;
 using CodeEditor.Modules.Browser.Services.Agent;
+using CodeEditor.Modules.Browser.Services.Reading;
 using CodeEditor.Modules.Browser.Services.Tabs;
 using CodeEditor.Testing;
 using Microsoft.Extensions.AI;
@@ -157,7 +158,7 @@ public sealed class BrowserAgentTabsTests
         await InvokeAsync(new() { ["action"] = "snapshot" });
 
         Assert.StartsWith("Действие открыло новую вкладку t3; ты продолжаешь в ней.\n<browser_page tab=\"t3\"", result, StringComparison.Ordinal);
-        Assert.Equal(BrowserScripts.Snapshot, popup!.Scripts[^1]);
+        Assert.Equal(BrowserSnapshot.Script, popup!.Scripts[^1]);
         Assert.True(_tabs.Find("t3")!.IsAgent);
     }
 
@@ -165,7 +166,7 @@ public sealed class BrowserAgentTabsTests
     [Fact]
     public void Scripts_NeverTakeAPasswordAsAnElementName()
     {
-        Assert.Contains("(el.type === 'password' ? '' : el.value)", BrowserScripts.Snapshot, StringComparison.Ordinal);
+        Assert.Contains("(el.type === 'password' ? '' : el.value)", BrowserSnapshot.Script, StringComparison.Ordinal);
         Assert.Contains("(el.type === 'password' ? '' : el.value)", BrowserScripts.Describe("e1"), StringComparison.Ordinal);
     }
 

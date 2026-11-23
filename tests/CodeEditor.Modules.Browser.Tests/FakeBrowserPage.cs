@@ -1,4 +1,5 @@
 using CodeEditor.Modules.Browser.Services;
+using CodeEditor.Modules.Browser.Services.Reading;
 
 namespace CodeEditor.Modules.Browser.Tests;
 
@@ -46,6 +47,9 @@ internal sealed class FakeBrowserPage : IBrowserPage
     public string ActionResult { get; set; } = """{"ok":true}""";
 
     public string SnapshotResult { get; set; } = """{"title":"Вход","url":"http://localhost:5000/login","text":"- heading \"Вход\"\n- textbox \"Email\" [ref=e1]","truncated":false}""";
+
+    /// <summary>Result of <c>read</c>: the page's main text as Markdown.</summary>
+    public string MarkdownResult { get; set; } = """{"title":"Вход","url":"http://localhost:5000/login","text":"# Вход\n\nВведите почту.","truncated":false}""";
 
     public Exception? Failure { get; set; }
 
@@ -113,9 +117,14 @@ internal sealed class FakeBrowserPage : IBrowserPage
     {
         Scripts.Add(script);
         OnScript?.Invoke(script);
-        if (script == BrowserScripts.Snapshot)
+        if (script == BrowserSnapshot.Script)
         {
             return Task.FromResult(SnapshotResult);
+        }
+
+        if (script == BrowserReading.Markdown)
+        {
+            return Task.FromResult(MarkdownResult);
         }
 
         return Task.FromResult(ScriptReplies.TryGetValue(script, out var replies) && replies.Count > 0 ? replies.Dequeue() : ActionResult);

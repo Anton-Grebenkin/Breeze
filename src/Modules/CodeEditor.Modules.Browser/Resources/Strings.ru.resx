@@ -118,4 +118,12 @@
   <data name="FeedSelectTab" xml:space="preserve"><value>показ вкладки {0}</value></data>
   <data name="FeedCloseTab" xml:space="preserve"><value>закрытие вкладки {0}</value></data>
   <data name="TabOpened" xml:space="preserve"><value>Вкладка {0} открыта; теперь это твоя текущая вкладка.</value></data>
+  <!-- Reading a page. -->
+  <data name="PartNote" xml:space="preserve"><value>…(часть {0} из {1}; следующая: {2} с part={3})</value></data>
+  <data name="FindNone" xml:space="preserve"><value>Текста «{0}» на странице нет.</value></data>
+  <data name="FindSummary" xml:space="preserve"><value>«{0}»: совпадений {1}, мест {2}.</value></data>
+  <data name="FindUnder" xml:space="preserve"><value>под заголовком «{0}»</value></data>
+  <data name="FindMore" xml:space="preserve"><value>…мест больше: уточни текст.</value></data>
+  <data name="FeedRead" xml:space="preserve"><value>текст страницы</value></data>
+  <data name="FeedFind" xml:space="preserve"><value>поиск «{0}»</value></data>
 </root>
