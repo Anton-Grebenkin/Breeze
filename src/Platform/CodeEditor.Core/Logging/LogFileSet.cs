@@ -50,7 +50,10 @@ internal sealed class LogFileSet(string folder, LogFileLimits limits)
         return null;
     }
 
-    /// <summary>Deletes log files not modified within the retention period; skips files in use.</summary>
+    /// <summary>
+    /// Deletes log files not modified within the retention period, then the oldest ones until the rest fits the total
+    /// size limit; skips files in use.
+    /// </summary>
     public void DeleteExpired(DateTimeOffset now)
     {
         if (!Directory.Exists(folder))
@@ -59,13 +62,18 @@ internal sealed class LogFileSet(string folder, LogFileLimits limits)
         }
 
         var cutoff = now.UtcDateTime - TimeSpan.FromDays(limits.RetentionDays);
-        foreach (var file in Directory.EnumerateFiles(folder, Prefix + "*" + Extension))
+        long kept = 0;
+        foreach (var file in new DirectoryInfo(folder).EnumerateFiles(Prefix + "*" + Extension).OrderByDescending(static file => file.LastWriteTimeUtc))
         {
             try
             {
-                if (File.GetLastWriteTimeUtc(file) < cutoff)
+                if (file.LastWriteTimeUtc < cutoff || kept + file.Length > limits.MaxTotalSize)
                 {
-                    File.Delete(file);
+                    file.Delete();
+                }
+                else
+                {
+                    kept += file.Length;
                 }
             }
             catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)

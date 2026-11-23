@@ -1,3 +1,4 @@
+using CodeEditor.Modules.Agent.Services.Settings;
 using CodeEditor.Modules.Agent.Tests.Infrastructure;
 using CodeEditor.Modules.Agent.ViewModels.Chat;
 using Microsoft.Extensions.AI;
@@ -75,6 +76,23 @@ public sealed class ChatHistoryTests : IDisposable
         _fixture.Workspace.Open(AgentFixture.Root);
 
         Assert.Equal(2, _fixture.Chat.Messages.Count);
+    }
+
+    // To study a chat afterwards: every saved row has the time it appeared, a question also the model and the mode.
+    [Fact]
+    public async Task SavedRows_CarryTheirTime_AndQuestionsTheModelAndMode()
+    {
+        _fixture.Client.Reply("ответ");
+        await _fixture.SendAsync("вопрос");
+        _fixture.Time.Advance(TimeSpan.FromMinutes(5));
+
+        var saved = _fixture.CreateChat(_fixture.CreateHistory());
+        await saved.Session.LoadLatestAsync();
+
+        var question = saved.Messages[0];
+        Assert.Equal((AgentFixture.TestModel, AgentMode.Agent), (question.Model, question.Mode));
+        Assert.All(saved.Messages, message => Assert.Equal(_fixture.Time.GetLocalNow().AddMinutes(-5), message.At));
+        Assert.Null(saved.Messages[1].Model);
     }
 
     // A new chat started while a turn runs: the stopped turn is saved into its own chat, and nothing of it (the stop

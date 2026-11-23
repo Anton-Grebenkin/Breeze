@@ -25,6 +25,14 @@ public sealed partial class ChatMessageViewModel(ChatMessageKind kind, string te
 
     public string? FilesText => Files is { Count: > 0 } files ? string.Join(", ", files) : null;
 
+    /// <summary>When the row appeared in the feed; the session stamps it, a restored chat brings its own.</summary>
+    public DateTimeOffset? At { get; set; }
+
+    /// <summary>On a question: the model that answers it and the turn's mode, saved with the chat.</summary>
+    public string? Model { get; init; }
+
+    public AgentMode? Mode { get; init; }
+
     /// <summary>A message from the turn queue (ADR 0026), shown in the feed like one sent directly.</summary>
     public static ChatMessageViewModel FromUser(QueuedMessage message)
     {

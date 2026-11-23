@@ -38,6 +38,15 @@ public sealed partial class ChatSession : ObservableObject, IDisposable
         _options = options;
         _turnMessages = turnMessages;
         _resume = new TurnResume(Messages);
+
+        // Every row gets the time it appeared: saved with the chat, it shows afterwards how long each step took.
+        Messages.CollectionChanged += (_, e) =>
+        {
+            foreach (var message in e.NewItems?.OfType<ChatMessageViewModel>() ?? [])
+            {
+                message.At ??= _services.Time.GetLocalNow();
+            }
+        };
         _memory = new TurnMemory(services, history, Messages, dispatcher);
         _services.Questions.Asked += OnQuestionAsked;
     }
@@ -74,7 +83,8 @@ public sealed partial class ChatSession : ObservableObject, IDisposable
 
         _resume.Retire();
         var startsChat = !Messages.Any(message => message.Kind == ChatMessageKind.User);
-        Messages.Add(new ChatMessageViewModel(ChatMessageKind.User, text) { Attachment = attachment, Files = names.Count > 0 ? names : null });
+        var options = _options.CurrentValue;
+        Messages.Add(new ChatMessageViewModel(ChatMessageKind.User, text) { Attachment = attachment, Files = names.Count > 0 ? names : null, Model = options.Model, Mode = options.Mode });
         _turn = RunTurnAsync(token => BuildAsync(text, includeActiveEditor, startsChat, files, token), text.Length, attachment, files.Count);
         await _turn;
     }
@@ -238,6 +248,9 @@ public sealed partial class ChatSession : ObservableObject, IDisposable
             {
                 Attachment = message.Attachment,
                 Files = message.Files,
+                At = message.At,
+                Model = message.Model,
+                Mode = message.Mode,
                 Tool = message.Tool is { } tool ? new ToolRowViewModel(tool.ToView(message.Text)) : null,
             });
         }
