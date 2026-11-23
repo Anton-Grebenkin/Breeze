@@ -61,7 +61,11 @@ public sealed class CommandAgentTools(
         var command = ToolArguments.Get<string>(arguments, "command");
         CommandPolicy.EnsureAllowed(command);
         var folder = Folder(arguments.TryGetValue("cwd", out var cwd) ? cwd?.ToString() : null);
-        return Task.FromResult<IReadOnlyList<FileChangePreview>>([new FileChangePreview(ProposedChangeKind.Command, workspace.RelativePath(folder), string.Empty, command)]);
+        var preview = new FileChangePreview(ProposedChangeKind.Command, workspace.RelativePath(folder), string.Empty, command)
+        {
+            Title = CommandPolicy.IsLeasePushToOwnBranch(command) ? Strings.LeasePushCardTitle : null,
+        };
+        return Task.FromResult<IReadOnlyList<FileChangePreview>>([preview]);
     }
 
     private async Task<string> RunCommandAsync(

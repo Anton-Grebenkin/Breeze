@@ -17,8 +17,12 @@ public sealed partial class CommandApprovals(IOptionsMonitor<TerminalOptions> op
     public bool CanDecide(string toolName) => toolName == CommandAgentTools.RunCommandName;
 
     public bool IsPreapproved(string toolName, IDictionary<string, object?> arguments) =>
-        CanDecide(toolName) && Command(arguments) is { } command
+        CanDecide(toolName) && Command(arguments) is { } command && !CommandPolicy.IsLeasePushToOwnBranch(command)
         && CommandRules.IsAllowed(CommandTokenizer.Parse(command), options.CurrentValue.AllowedCommands);
+
+    /// <summary>Rewriting a branch on the server asks every time: no rule and no mode approves it.</summary>
+    public bool AlwaysAsks(string toolName, IDictionary<string, object?> arguments) =>
+        CanDecide(toolName) && Command(arguments) is { } command && CommandPolicy.IsLeasePushToOwnBranch(command);
 
     public bool IsReadOnly(string toolName, IDictionary<string, object?> arguments) =>
         CanDecide(toolName) && Command(arguments) is { } command && ReadOnlyCommands.IsReadOnly(CommandTokenizer.Parse(command));

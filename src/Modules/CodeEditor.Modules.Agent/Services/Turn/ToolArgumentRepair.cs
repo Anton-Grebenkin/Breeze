@@ -7,8 +7,8 @@ namespace CodeEditor.Modules.Agent.Services.Turn;
 /// <summary>
 /// Fixes arguments that models send off-schema but unambiguously: some models pass the <c>edits</c> array as a JSON
 /// string, binding fails, and the model works around the tool (deleting and recreating the file). A string is parsed
-/// when the parameter's schema is an array or object and the string is valid JSON of that kind. Anything else is left
-/// alone; the wrapper explains the error.
+/// when the parameter's schema is an array or object and the string is valid JSON of that kind; the text "null" in an
+/// optional parameter means the parameter was left out. Anything else is left alone; the wrapper explains the error.
 /// </summary>
 internal static class ToolArgumentRepair
 {
@@ -22,8 +22,19 @@ internal static class ToolArgumentRepair
         }
 
         var repaired = new List<string>();
+        var required = Required(schema);
         foreach (var (name, value) in arguments.ToList())
         {
+            // "null" as text in an optional parameter is the model's way of leaving it out, not a value: taken
+            // literally it became a git revision and a folder named "null".
+            if (Text(value) is { } word && word.Trim().Equals("null", StringComparison.OrdinalIgnoreCase)
+                && properties.TryGetProperty(name, out _) && !required.Contains(name))
+            {
+                arguments.Remove(name);
+                repaired.Add(name);
+                continue;
+            }
+
             if (Text(value) is { } text
                 && properties.TryGetProperty(name, out var property)
                 && ExpectedKind(property) is { } expected
@@ -37,6 +48,11 @@ internal static class ToolArgumentRepair
 
         return repaired;
     }
+
+    private static HashSet<string> Required(JsonElement schema) =>
+        schema.TryGetProperty("required", out var required) && required.ValueKind == JsonValueKind.Array
+            ? [.. required.EnumerateArray().Select(static name => name.GetString()).OfType<string>()]
+            : [];
 
     private static string? Text(object? value) => value switch
     {

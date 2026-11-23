@@ -59,6 +59,8 @@
   <data name="PolicyFormatDisk" xml:space="preserve"><value>formatting a disk</value></data>
   <data name="PolicyPowerOff" xml:space="preserve"><value>shutting down or restarting the computer</value></data>
   <data name="PolicyForcePush" xml:space="preserve"><value>force-pushing to git (--force)</value></data>
+  <data name="PolicyLeasePush" xml:space="preserve"><value>force-pushing with --force-with-lease is allowed only to a branch named in the command (git push --force-with-lease origin my-branch), and never to main or master</value></data>
+  <data name="LeasePushCardTitle" xml:space="preserve"><value>The agent wants to force-push a branch: its history on the server will be rewritten</value></data>
   <data name="PolicyWipeRoot" xml:space="preserve"><value>deleting a drive root or the user profile</value></data>
   <data name="PolicyRemoteScript" xml:space="preserve"><value>running a script downloaded from the internet</value></data>
   <data name="PolicyRegistry" xml:space="preserve"><value>changing the Windows registry</value></data>
