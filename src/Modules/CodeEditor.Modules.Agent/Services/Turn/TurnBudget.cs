@@ -69,7 +69,7 @@ public sealed class TurnBudget
     /// <summary>The model received external text: a page, search results, a browser snapshot.</summary>
     public void RegisterExternalContent() => Interlocked.Exchange(ref _externalContent, 1);
 
-    /// <summary>The workspace changed: earlier calls are no longer repeats.</summary>
+    /// <summary>The workspace changed or earlier results left the context: earlier calls are no longer repeats.</summary>
     public void ForgetCalls() => _calls.Clear();
 
     /// <summary>The tool reported that it cannot work here: its calls are not run until the turn ends.</summary>

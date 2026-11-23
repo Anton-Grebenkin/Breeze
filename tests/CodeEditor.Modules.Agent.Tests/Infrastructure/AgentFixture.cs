@@ -55,7 +55,7 @@ internal sealed class AgentFixture : IDisposable
         Documents = new DocumentService(FileSystem, new TestTextBufferFactory(), new InlineUiDispatcher(), Workspace, NullLogger<DocumentService>.Instance);
         Changes = new ChatChanges(FileState, Documents, FileSystem, Workspace, new InlineUiDispatcher());
         Gate = new VerificationGate(FileState);
-        Compaction = new ContextCompaction(FileState, Todos, Workspace, Start, HelperUsage, Outputs, NullLoggerFactory.Instance);
+        Compaction = new ContextCompaction(FileState, Todos, Workspace, Start, HelperUsage, Outputs, Budget, NullLoggerFactory.Instance);
         Subagents = new SubagentRunner(new Factory(this), FileState, HelperUsage, NullLogger<SubagentRunner>.Instance);
         ReadTools = new ReadOnlyToolSet(Policies);
         Explorer = new ExploreAgent(Subagents, ReadTools, Options, Start);

@@ -34,6 +34,7 @@ public sealed class ContextCompaction(
     ChatStartContext start,
     HelperUsage usage,
     AgentOutputStore outputs,
+    TurnBudget turn,
     ILoggerFactory loggerFactory)
 {
     /// <summary>Name of the file with the summarized history (in <c>.breeze/agent/outputs/</c>).</summary>
@@ -99,8 +100,8 @@ public sealed class ContextCompaction(
         var pipeline = new PipelineCompactionStrategy(
         [
             new NotifyingCompactionStrategy(summary, OnSummarized),
-            new NotifyingCompactionStrategy(tools, fileState.ForgetWindows),
-            new NotifyingCompactionStrategy(truncation, () => _notices.Enqueue(TruncatedNotice)),
+            new NotifyingCompactionStrategy(tools, OnCollapsed),
+            new NotifyingCompactionStrategy(truncation, OnTruncated),
             new MeteringCompactionStrategy(meter),
         ]);
         return new CompactionProvider(pipeline, StateKey, loggerFactory);
@@ -156,6 +157,20 @@ public sealed class ContextCompaction(
     private void OnSummarized()
     {
         fileState.ForgetReads();
+        turn.ForgetCalls();
         _notices.Enqueue(SummarizedNotice);
+    }
+
+    // A folded result is gone from the context: reading it again is not a loop, so the repeat guard starts over.
+    private void OnCollapsed()
+    {
+        fileState.ForgetWindows();
+        turn.ForgetCalls();
+    }
+
+    private void OnTruncated()
+    {
+        turn.ForgetCalls();
+        _notices.Enqueue(TruncatedNotice);
     }
 }
