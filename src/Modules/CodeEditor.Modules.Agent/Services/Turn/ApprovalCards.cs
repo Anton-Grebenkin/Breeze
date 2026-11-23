@@ -24,6 +24,18 @@ public sealed class ApprovalCards(IEnumerable<IAgentChangePreviewer> previewers,
         return Policy(name)?.IsPreapproved(name, arguments) == true && rules?.AskReason(arguments, []) is null;
     }
 
+    /// <summary>The mode lets the call run: the tool works in it, or the owning module says this call only looks.</summary>
+    public bool AllowedIn(AgentMode mode, ToolApprovalRequestContent request)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        var (name, arguments) = Describe(request);
+        return ToolPolicy.AllowsByName(mode, name) || ReadsInEveryMode(name, arguments);
+    }
+
+    /// <summary>The owning module says the call only looks (reading a browser page), so it runs in every mode.</summary>
+    public bool ReadsInEveryMode(string toolName, IDictionary<string, object?> arguments) =>
+        Policy(toolName)?.ReadsInEveryMode(toolName, arguments) == true;
+
     /// <summary>New chat: rules for files are sent to the model again.</summary>
     public void ResetChat() => rules?.Reset();
 

@@ -51,7 +51,7 @@ internal sealed partial class GuardedToolFunction(
 
     protected override async ValueTask<object?> InvokeCoreAsync(AIFunctionArguments arguments, CancellationToken cancellationToken)
     {
-        if (!ToolPolicy.Allows(budget.Mode, this))
+        if (!ToolPolicy.Allows(budget.Mode, this) && guards?.Approvals?.ReadsInEveryMode(Name, arguments) != true)
         {
             LogRefused(logger, Name, budget.Mode);
             return Refusal(Name, budget.Mode);

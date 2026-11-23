@@ -9,7 +9,7 @@ namespace CodeEditor.UI.Tests.Agent;
 /// <summary>
 /// The agent and browser tabs on real WebView2 and a fake model (ADR 0054): the agent is told which tabs are open,
 /// opens its page in a tab of its own behind the user's one, answers a dialog its click opened, and reads the user's
-/// tab by id without touching it.
+/// tab by id without touching it. In Ask mode it still reads a tab, but a click is refused.
 /// </summary>
 public sealed class AgentBrowserTests : IDisposable
 {
@@ -31,8 +31,7 @@ public sealed class AgentBrowserTests : IDisposable
         _folder = Directory.CreateDirectory(Path.Combine(Path.GetTempPath(), "CodeEditor.UI.Tests", Guid.NewGuid().ToString("N"), "project")).FullName;
         File.WriteAllText(Path.Combine(_folder, "A.cs"), "class A { }\r\n");
 
-        // The agent talks to a local fake model; the key is a test key that never leaves this server.
-        File.WriteAllText(Path.Combine(_userData, "settings.json"), $$"""{ "agent.endpoint": "{{_model.Endpoint}}", "agent.model": "test/model", "agent.autoMemory": false }""");
+        WriteSettings(mode: "agent");
         new DpapiSecretStore(new PhysicalFileSystem(), new UserDataPaths(_userData)).Set("agent-api-key", "test-key");
     }
 
@@ -55,21 +54,8 @@ public sealed class AgentBrowserTests : IDisposable
             .Reply("Готово.");
 
         using var session = AppSession.WithUserData(_userData, _folder);
-        session.WaitFor("Explorer.Node.A.cs");
-        session.Find(AutomationIds.MenuItem("menubar.view")).GuardedClick();
-        session.WaitFor(AutomationIds.MenuItem(ShowBrowserCommand)).GuardedClick();
-        session.TypeInto("Browser.Address", _site.Address("/mine"));
-        Keyboard.Type(VirtualKeyShort.ENTER);
-        WaitForTab(session, "Browser.Tab.t1", "Моя");
-
-        Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.ALT, VirtualKeyShort.KEY_I);
-        session.WaitForFocus("Agent.Input");
-        Assert.Equal("localhost", session.WaitFor("Agent.Context.BrowserTabs").Name);
-        session.TypeInto("Agent.Input", "Проверь заказы");
-        Keyboard.Type(VirtualKeyShort.ENTER);
-
-        Assert.True(Retry.WhileFalse(() => _model.Requests.Count == 5, PageTimeout).Result, $"Запросов к модели: {_model.Requests.Count}");
-        var requests = _model.Requests.ToArray();
+        OpenInBrowser(session, "/mine", "Моя");
+        var requests = Ask(session, "Проверь заказы", requestCount: 5);
         Assert.Contains($"t1: localhost:{_site.Port}/mine (активная)", requests[0], StringComparison.Ordinal);
         Assert.Contains("Список заказов", requests[1], StringComparison.Ordinal);
 
@@ -83,6 +69,53 @@ public sealed class AgentBrowserTests : IDisposable
         WaitForTab(session, "Browser.Tab.t2", "Удалён");
         Assert.Equal($"http://localhost:{_site.Port}/mine", session.ValueOf("Browser.Address"));
         session.SaveScreenshot("browser-agent-tab");
+    }
+
+    [Fact]
+    public void AskMode_ReadsTheUsersTab_ButDoesNotPress()
+    {
+        WriteSettings(mode: "ask");
+        _model
+            .CallTool("browser", new { action = "snapshot", tab = "t1" })
+            .CallTool("browser", new { action = "click", tab = "t1", @ref = "e1" })
+            .Reply("Готово.");
+
+        using var session = AppSession.WithUserData(_userData, _folder);
+        OpenInBrowser(session, "/orders", "Заказы");
+        var requests = Ask(session, "Что на странице?", requestCount: 3);
+
+        Assert.Contains("Список заказов", requests[1], StringComparison.Ordinal);
+        Assert.Contains("изменения недоступны", requests[2], StringComparison.Ordinal);
+
+        // The button was not pressed: no dialog, the page is as it was.
+        Assert.Equal("Заказы", session.Find("Browser.Tab.t1").Name);
+    }
+
+    // The agent talks to a local fake model; the key is a test key that never leaves this server.
+    private void WriteSettings(string mode) =>
+        File.WriteAllText(Path.Combine(_userData, "settings.json"), $$"""{ "agent.endpoint": "{{_model.Endpoint}}", "agent.model": "test/model", "agent.autoMemory": false, "agent.mode": "{{mode}}" }""");
+
+    private void OpenInBrowser(AppSession session, string path, string title)
+    {
+        session.WaitFor("Explorer.Node.A.cs");
+        session.Find(AutomationIds.MenuItem("menubar.view")).GuardedClick();
+        session.WaitFor(AutomationIds.MenuItem(ShowBrowserCommand)).GuardedClick();
+        session.TypeInto("Browser.Address", _site.Address(path));
+        Keyboard.Type(VirtualKeyShort.ENTER);
+        WaitForTab(session, "Browser.Tab.t1", title);
+    }
+
+    /// <summary>Sends the text to the agent and returns the requests the model got.</summary>
+    private string[] Ask(AppSession session, string text, int requestCount)
+    {
+        Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.ALT, VirtualKeyShort.KEY_I);
+        session.WaitForFocus("Agent.Input");
+        Assert.Equal("localhost", session.WaitFor("Agent.Context.BrowserTabs").Name);
+        session.TypeInto("Agent.Input", text);
+        Keyboard.Type(VirtualKeyShort.ENTER);
+
+        Assert.True(Retry.WhileFalse(() => _model.Requests.Count == requestCount, PageTimeout).Result, $"Запросов к модели: {_model.Requests.Count}");
+        return _model.Requests.ToArray();
     }
 
     private static void WaitForTab(AppSession session, string automationId, string title) =>

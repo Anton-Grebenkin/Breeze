@@ -67,7 +67,8 @@ internal sealed class AgentFixture : IDisposable
         RunningCalls = new RunningToolCalls(Time);
         Hooks = new HookRunner(Options, Processes, Workspace, NullLogger<HookRunner>.Instance);
         Observers = new ToolCallObservers(new TurnWatchdog(Budget), []);
-        Conversation = new AgentConversation(new Factory(this), Options, ApiKey, new SystemPrompt(Workspace, Instructions), ToolProviders, Budget, Compaction, Meter, Explorer, ReadTools, Transcript, CacheKey, new CacheWarmup(HelperUsage, TimeProvider.System, NullLogger<CacheWarmup>.Instance), new ToolGuards(Deep, Queue, Rules, Observers, RunningCalls, Hooks), ConversationLog);
+        Cards = new ApprovalCards(Previewers, Policies, Rules);
+        Conversation = new AgentConversation(new Factory(this), Options, ApiKey, new SystemPrompt(Workspace, Instructions), ToolProviders, Budget, Compaction, Meter, Explorer, ReadTools, Transcript, CacheKey, new CacheWarmup(HelperUsage, TimeProvider.System, NullLogger<CacheWarmup>.Instance), new ToolGuards(Deep, Queue, Rules, Observers, RunningCalls, Hooks, Cards), ConversationLog);
         Reverter = new FakeChangeReverter(FileSystem);
         Checks = new TurnChecks(Gate, Budget, Verifiers, Todos, Deep, [Jobs], Hooks);
         Editors = new EditorAreaViewModel(Documents, [], [], new DocumentSaver(Documents, new FakeDialogs(), StatusBar), new ContextKeyService(), StatusBar);
@@ -84,6 +85,8 @@ internal sealed class AgentFixture : IDisposable
     public ProjectInstructions Instructions { get; }
 
     public ProjectRuleGuard Rules { get; }
+
+    public ApprovalCards Cards { get; }
 
     public FakeFileSystem FileSystem { get; } = new FakeFileSystem().AddDirectory(Root);
 
@@ -267,7 +270,7 @@ internal sealed class AgentFixture : IDisposable
             new ChangesPanelViewModel(Changes, FileState, Reverter, Documents, new InlineUiDispatcher(), Commands, StatusBar),
             new ChatAttachmentsViewModel(AttachmentPicker, Attachments, new PastedAttachments(Workspace, FileSystem, UserData, TimeProvider.System), Options, StatusBar),
             new QueuedMessagesViewModel(Queue, new InlineUiDispatcher()));
-        var services = new AgentTurnServices(Conversation, new ApprovalCards(Previewers, Policies, Rules), usage, new AgentActivityLog(ActivityLog), Budget, FileState, Todos, Questions, Checks, Compaction, HelperUsage, new ToolViews(Presenters, NullLogger<ToolViews>.Instance), Deep, MemoryExtractor, Queue, Images, Observers, RunningCalls, Retries, new InlineUiDispatcher(), Time);
+        var services = new AgentTurnServices(Conversation, Cards, usage, new AgentActivityLog(ActivityLog), Budget, FileState, Todos, Questions, Checks, Compaction, HelperUsage, new ToolViews(Presenters, NullLogger<ToolViews>.Instance), Deep, MemoryExtractor, Queue, Images, Observers, RunningCalls, Retries, new InlineUiDispatcher(), Time);
         var session = new ChatSession(services, history, Options, new TurnMessageBuilder(ContextProviders, Start, Attachments, Options, TimeProvider.System, NullLogger<TurnMessageBuilder>.Instance, Hooks), new InlineUiDispatcher());
         var links = new ChatLinkOpener(Workspace, FileSystem, Index, QuickPick, Commands, Shell, StatusBar);
         return new ChatViewModel(session, history, parts, links, QuickPick, Shell, Workspace, ApiKey, Commands, TimeProvider.System);

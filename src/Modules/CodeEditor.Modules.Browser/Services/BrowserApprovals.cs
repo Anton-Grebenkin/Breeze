@@ -69,6 +69,20 @@ public sealed partial class BrowserApprovals(
 
     public bool IsReadOnly(string toolName, IDictionary<string, object?> arguments) => false;
 
+    // Looking at pages and moving between them changes nothing, so it works in Ask and Plan too; pressing, typing,
+    // scripts, files and requests that change a site do not. A new action is not a looking one until it is listed.
+    public bool ReadsInEveryMode(string toolName, IDictionary<string, object?> arguments) =>
+        CanDecide(toolName) && Action(arguments) switch
+        {
+            BrowserAgentTools.Navigate or BrowserAgentTools.Back or BrowserAgentTools.Forward or BrowserAgentTools.Reload
+                or BrowserAgentTools.Snapshot or BrowserAgentTools.Read or BrowserAgentTools.Find or BrowserAgentTools.Screenshot
+                or BrowserAgentTools.Scroll or BrowserAgentTools.Hover or BrowserAgentTools.WaitFor
+                or BrowserAgentTools.Console or BrowserAgentTools.Network or BrowserAgentTools.Response
+                or BrowserAgentTools.Tabs or BrowserAgentTools.OpenTab or BrowserAgentTools.SelectTab or BrowserAgentTools.CloseTab => true,
+            BrowserAgentTools.Request => BrowserPageActions.IsReading(Text(arguments, "method")),
+            _ => false,
+        };
+
     // A request that changes something on a site and a file sent to one cannot be taken back: "allow for this chat"
     // does not cover them.
     public bool AlwaysAsks(string toolName, IDictionary<string, object?> arguments) =>

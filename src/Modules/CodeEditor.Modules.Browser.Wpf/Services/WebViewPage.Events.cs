@@ -124,13 +124,13 @@ public sealed partial class WebViewPage
         core.WindowCloseRequested += (_, _) => CloseRequested?.Invoke(this, EventArgs.Empty);
         core.WebMessageReceived += (_, e) => OnWebMessage(e.WebMessageAsJson);
 
-        // The browser's own sign-in window: a call waiting for the load is told at once instead of timing out, and the
-        // tab is shown to the user (BrowserAttention).
+        // The browser's own sign-in window: the tab is shown to the user (BrowserAttention), then a call waiting for
+        // the load is told at once instead of timing out. In that order: the call goes on in another thread.
         core.BasicAuthenticationRequested += (_, _) =>
         {
             NeedsUser = true;
-            EndLoading(Strings.SignInWindowShown);
             StateChanged?.Invoke(this, EventArgs.Empty);
+            EndLoading(Strings.SignInWindowShown);
         };
         core.ProcessFailed += (_, e) => OnProcessFailed(core, e.ProcessFailedKind);
         foreach (var method in BrowserConsoleEvents.Methods)

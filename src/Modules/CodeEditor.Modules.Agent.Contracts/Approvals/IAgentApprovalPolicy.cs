@@ -15,6 +15,12 @@ public interface IAgentApprovalPolicy
     /// <summary>The call only reads (ignoring user rules), so the scout may be trusted with it.</summary>
     bool IsReadOnly(string toolName, IDictionary<string, object?> arguments);
 
+    /// <summary>
+    /// The call only looks at something outside the folder (a browser page) and changes nothing, so it also runs in
+    /// the modes that do not change code. Unlike <see cref="IsReadOnly"/>, it does not give the tool to the scout.
+    /// </summary>
+    bool ReadsInEveryMode(string toolName, IDictionary<string, object?> arguments) => false;
+
     /// <summary>Rule for the "Always allow" button (e.g. <c>dotnet test</c>); <c>null</c> to offer none.</summary>
     string? SuggestRule(string toolName, IDictionary<string, object?> arguments);
 

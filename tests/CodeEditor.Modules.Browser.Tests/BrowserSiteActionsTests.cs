@@ -102,6 +102,37 @@ public sealed class BrowserSiteActionsTests
     private async Task SnapshotAsync() =>
         await _tools.CreateTools().OfType<AIFunction>().Single().InvokeAsync(new AIFunctionArguments { ["action"] = "snapshot" }, TestContext.Current.CancellationToken);
 
+    // Ask and Plan: the agent looks at pages and moves between them; acting on one waits for a mode that changes things.
+    [Theory]
+    [InlineData("snapshot", true)]
+    [InlineData("read", true)]
+    [InlineData("find", true)]
+    [InlineData("screenshot", true)]
+    [InlineData("network", true)]
+    [InlineData("tabs", true)]
+    [InlineData("navigate", true)]
+    [InlineData("open_tab", true)]
+    [InlineData("scroll", true)]
+    [InlineData("click", false)]
+    [InlineData("type", false)]
+    [InlineData("press", false)]
+    [InlineData("drag", false)]
+    [InlineData("upload", false)]
+    [InlineData("dialog", false)]
+    [InlineData("evaluate", false)]
+    [InlineData("made_up", false)]
+    public void ReadingModes_LookAndMove_ButDoNotAct(string action, bool expected) =>
+        Assert.Equal(expected, _approvals.ReadsInEveryMode(BrowserAgentTools.ToolName, Call(action, "e2")));
+
+    [Fact]
+    public void ReadingModes_RequestThatOnlyReads_Works_OneThatChangesDoesNot()
+    {
+        Assert.True(_approvals.ReadsInEveryMode(BrowserAgentTools.ToolName, Call("request", null)));
+        Assert.True(_approvals.ReadsInEveryMode(BrowserAgentTools.ToolName, new Dictionary<string, object?> { ["action"] = "request", ["method"] = "get" }));
+        Assert.False(_approvals.ReadsInEveryMode(BrowserAgentTools.ToolName, new Dictionary<string, object?> { ["action"] = "request", ["method"] = "POST" }));
+        Assert.False(_approvals.ReadsInEveryMode("run_command", Call("snapshot", null)));
+    }
+
     private static Dictionary<string, object?> Call(string action, string? reference) => new() { ["action"] = action, ["ref"] = reference };
 
     private sealed class PassThroughOutputStore : IAgentOutputStore
