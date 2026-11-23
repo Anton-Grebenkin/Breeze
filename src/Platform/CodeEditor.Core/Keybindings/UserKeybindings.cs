@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
+using CodeEditor.Core.Commands;
 using CodeEditor.Core.Files;
 using CodeEditor.Core.Resources;
 using CodeEditor.Core.Storage;
@@ -19,7 +20,7 @@ public sealed partial class UserKeybindings : IDisposable
 {
     public const string FileName = "keybindings.json";
 
-    private const string TemplateExamples = "// { \"key\": \"ctrl+shift+d\", \"command\": \"workbench.action.toggleTheme\" },\n// { \"key\": \"ctrl+k ctrl+t\", \"command\": \"-workbench.action.toggleTheme\" }\n[\n]\n";
+    private const string TemplateExamples = "// { \"key\": \"ctrl+shift+d\", \"command\": \"workbench.theme.toggle\" },\n// { \"key\": \"ctrl+k ctrl+t\", \"command\": \"-workbench.theme.toggle\" }\n[\n]\n";
 
     private static readonly JsonDocumentOptions DocumentOptions = new()
     {
@@ -31,11 +32,15 @@ public sealed partial class UserKeybindings : IDisposable
     private readonly IFileSystem _fileSystem;
     private readonly IUiDispatcher _dispatcher;
     private readonly ILogger<UserKeybindings> _logger;
+    private readonly ICommandRegistry? _commands;
     private readonly List<IDisposable> _registrations = [];
     private IFileWatcher? _watcher;
 
-    public UserKeybindings(IKeybindingRegistry registry, IFileSystem fileSystem, UserDataPaths paths, IUiDispatcher dispatcher, ILogger<UserKeybindings> logger)
+    /// <param name="commands">Known commands, to report a rule for a command that does not exist; <c>null</c> to skip the check.</param>
+    public UserKeybindings(
+        IKeybindingRegistry registry, IFileSystem fileSystem, UserDataPaths paths, IUiDispatcher dispatcher, ILogger<UserKeybindings> logger, ICommandRegistry? commands = null)
     {
+        _commands = commands;
         _registry = registry;
         _fileSystem = fileSystem;
         _dispatcher = dispatcher;
@@ -135,6 +140,11 @@ public sealed partial class UserKeybindings : IDisposable
         }
 
         errors.AddRange(rules.Select(rule => rule.Error).OfType<string>());
+
+        // The rule stays (a module may add the command later), but a mistyped id must not pass silently.
+        errors.AddRange(rules
+            .Where(rule => rule.Error is null && _commands is not null && !_commands.TryGet(rule.CommandId, out _))
+            .Select(rule => string.Format(CultureInfo.CurrentCulture, Strings.KeybindingRuleUnknownCommand, rule.CommandId)));
     }
 
     private void Unregister()

@@ -121,7 +121,6 @@ public static class PromptSections
         ## Modes
         The user picks a mode; the <reminder> in their latest message names the current one, and it overrides earlier messages.
         - Agent: read, edit, build and run commands. Before changing code decide how you will verify the change. For work of three or more steps keep a plan in manage_todo and mark each item done as soon as it is; questions and overviews need no plan. When the request lists several requirements (rules, API, examples, expected behaviour), make each of them a plan item with how you will verify it, and mark it done only once verified. Before the final answer, go through the requirements one by one: where each is implemented and what verified it.
-        - Deep: as Agent, plus an advisor — another model — at fixed checkpoints: it reviews the risks of your approach before your first edit, suggests another angle when you are stuck, and an independent reviewer checks the changes before you finish. Weigh its points against the code: act on what is right, rebut with evidence what is wrong. For a bug or a behaviour change, first write a test that fails on the current code. A turn with code changes needs a passing build and tests. End with each requirement and its evidence (test or build output, path:line) and the remaining risks.
         - Ask: answer questions about the code without changing anything; edits, commands, build and tests are refused in this mode. If an answer needs a change, show it and say that Agent mode can apply it: under such an answer the user gets an "Apply in Agent mode" button.
         - Plan: research the code and propose a plan without changing anything. If the plan depends on something only the user knows, ask with ask_user. The final answer is the plan in Markdown: the goal, the steps (file or symbol, the change, how to verify it), risks and open questions. The user runs the plan with the "Run plan" button below it, which switches to Agent mode.
         """;
@@ -160,7 +159,8 @@ public static class PromptSections
     /// <summary>The current mode, as the first phrase of the reminder in the user message.</summary>
     public static string ModeReminder(AgentMode mode) => mode switch
     {
-        AgentMode.Deep => "Mode: Deep — edit, build and test; an advisor reviews at checkpoints; finish with evidence for each requirement.",
+        // The whole description travels with the mode: the system prompt of every chat does not pay for a mode few use.
+        AgentMode.Deep => "Mode: Deep — as Agent, plus an advisor — another model — at fixed checkpoints: it reviews the risks of your approach before your first edit, suggests another angle when you are stuck, and an independent reviewer checks the changes before you finish. Weigh its points against the code: act on what is right, rebut with evidence what is wrong. For a bug or a behaviour change, first write a test that fails on the current code. A turn with code changes needs a passing build and tests. End with each requirement and its evidence (test or build output, path:line) and the remaining risks.",
         AgentMode.Ask => "Mode: Ask — answer without changing anything.",
         AgentMode.Plan => "Mode: Plan — research and end with a plan; change nothing.",
         _ => "Mode: Agent — you may edit, build and run commands.",

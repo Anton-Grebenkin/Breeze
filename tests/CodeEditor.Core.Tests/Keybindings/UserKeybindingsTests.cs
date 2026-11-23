@@ -1,3 +1,4 @@
+using CodeEditor.Core.Commands;
 using CodeEditor.Core.Context;
 using CodeEditor.Core.Files;
 using CodeEditor.Core.Keybindings;
@@ -113,6 +114,22 @@ public sealed class UserKeybindingsTests : IDisposable
         _user.Reload();
 
         Assert.Empty(_user.Errors);
+    }
+
+    // A rule for a command that does not exist (a mistyped id; the template used to teach one) is reported, and it
+    // still binds: a module may add the command later.
+    [Fact]
+    public void RuleForUnknownCommand_IsReported_ButStillBinds()
+    {
+        var commands = new CommandRegistry();
+        using var known = commands.Register(new CommandDefinition("theme.toggle", "Toggle theme", (_, _) => ValueTask.CompletedTask));
+        using var user = new UserKeybindings(_registry, _fileSystem, new UserDataPaths(UserData), new InlineUiDispatcher(), NullLogger<UserKeybindings>.Instance, commands);
+        Write("""[ { "key": "ctrl+shift+d", "command": "theme.toggle" }, { "key": "ctrl+shift+y", "command": "workbench.action.toggleTheme" } ]""");
+
+        user.Reload();
+
+        Assert.Equal("команды «workbench.action.toggleTheme» нет; идентификаторы команд показывает палитра", Assert.Single(user.Errors));
+        Assert.Equal("workbench.action.toggleTheme", Resolve("Ctrl+Shift+Y"));
     }
 
     private void Write(string json) => _fileSystem.AddFile(File, json);

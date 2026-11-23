@@ -13,4 +13,14 @@ public interface ICommandService
         string commandId,
         object? argument = null,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// A command's handler threw. Whoever ran the command (a key, a menu item) has nowhere to show it, so the shell
+    /// tells the user. Raised on the thread that ran the command.
+    /// </summary>
+    event EventHandler<CommandFailedEventArgs>? Failed
+    {
+        add { }
+        remove { }
+    }
 }

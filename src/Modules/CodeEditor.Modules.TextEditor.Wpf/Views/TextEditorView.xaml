@@ -24,11 +24,11 @@
         <Button DockPanel.Dock="Right" Padding="8,2" Style="{StaticResource Button.Primary}" Content="{x:Static res:Strings.AcceptAll}"
                 ToolTip="{x:Static res:Strings.AcceptAllToolTip}" Command="{Binding AcceptAllCommand}"
                 AutomationProperties.AutomationId="TextEditor.AgentChanges.AcceptAll" />
-        <Button DockPanel.Dock="Right" Margin="0,0,8,0" Style="{StaticResource Button.Subtle}" Padding="6,2" Content="{x:Static ui:IconGlyphs.ArrowDown}"
+        <Button DockPanel.Dock="Right" Margin="0,0,8,0" Style="{StaticResource Button.Subtle}" Padding="6,2" FontFamily="{DynamicResource Font.Icons}" Content="{x:Static ui:IconGlyphs.ArrowDown}"
                 ToolTip="{x:Static res:Strings.NextChangeToolTip}" Command="{Binding NextCommand}"
                 CommandParameter="{Binding DataContext.CaretLine, RelativeSource={RelativeSource AncestorType=UserControl}}"
                 AutomationProperties.AutomationId="TextEditor.AgentChanges.Next" AutomationProperties.Name="{x:Static res:Strings.NextAgentChange}" />
-        <Button DockPanel.Dock="Right" Style="{StaticResource Button.Subtle}" Padding="6,2" Content="{x:Static ui:IconGlyphs.ArrowUp}"
+        <Button DockPanel.Dock="Right" Style="{StaticResource Button.Subtle}" Padding="6,2" FontFamily="{DynamicResource Font.Icons}" Content="{x:Static ui:IconGlyphs.ArrowUp}"
                 ToolTip="{x:Static res:Strings.PreviousChangeToolTip}" Command="{Binding PreviousCommand}"
                 CommandParameter="{Binding DataContext.CaretLine, RelativeSource={RelativeSource AncestorType=UserControl}}"
                 AutomationProperties.AutomationId="TextEditor.AgentChanges.Previous" AutomationProperties.Name="{x:Static res:Strings.PreviousAgentChange}" />

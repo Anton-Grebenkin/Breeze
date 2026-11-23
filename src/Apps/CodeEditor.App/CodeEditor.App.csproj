@@ -21,6 +21,8 @@
     <AssemblyTitle>Breeze</AssemblyTitle>
     <Description>Breeze Code Editor</Description>
     <ApplicationIcon>..\..\..\assets\brand\breeze.ico</ApplicationIcon>
+    <!-- Per-monitor DPI: without it the window is blurry on a second monitor with another scale. -->
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
 
   <PropertyGroup>

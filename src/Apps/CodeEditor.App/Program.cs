@@ -9,7 +9,6 @@ using CodeEditor.Shell.Instances;
 using CodeEditor.Shell.Integration;
 using CodeEditor.Shell.Services;
 using CodeEditor.Shell.Session;
-using CodeEditor.Shell.ViewModels;
 using CodeEditor.Shell.Wpf.Views;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -66,8 +65,7 @@ internal static partial class Program
         clock.Mark("host-built");
         host.Start();
 
-        var statusBar = host.Services.GetRequiredService<StatusBarViewModel>();
-        crashes.AttachToDispatcher(app, message => statusBar.Message = message);
+        crashes.AttachToDispatcher(app, host.Services.GetRequiredService<FailureNotifier>().Show);
 
         // Folder before the window so the explorer is ready for the first frame; tabs after it so file reads don't
         // delay startup.

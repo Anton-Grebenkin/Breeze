@@ -30,6 +30,7 @@
   <data name="ToggleVisibility" xml:space="preserve"><value>Показать или скрыть: {0}</value></data>
   <data name="ShowToolWindow" xml:space="preserve"><value>Показать: {0}</value></data>
   <data name="OpenLog" xml:space="preserve"><value>Открыть журнал</value></data>
+  <data name="CommandFailed" xml:space="preserve"><value>Команда «{0}» не выполнена: {1}</value></data>
   <data name="RevealLogs" xml:space="preserve"><value>Показать папку журналов</value></data>
   <data name="SetLogLevel" xml:space="preserve"><value>Уровень журнала…</value></data>
   <data name="LogUnavailable" xml:space="preserve"><value>Журнал недоступен: не удалось открыть файл в {0}</value></data>

@@ -104,6 +104,7 @@ public sealed class ShellModule : IModule
         // The Browser module replaces it so pages open in a tab next to files.
         services.TryAddSingleton<IWebPageOpener, SystemWebPageOpener>();
         services.AddSingleton<AutoSaveService>();
+        services.AddSingleton<FailureNotifier>();
         services.AddSingleton<ISessionStore, JsonSessionStore>();
         services.AddSingleton<SessionService>();
     }
@@ -135,5 +136,8 @@ public sealed class ShellModule : IModule
         // files.exclude must apply before the command-line folder opens.
         services.GetRequiredService<ExcludeSettings>().Start();
         _ = services.GetRequiredService<AutoSaveService>();
+
+        // Creating it subscribes to failed commands.
+        _ = services.GetRequiredService<FailureNotifier>();
     }
 }
