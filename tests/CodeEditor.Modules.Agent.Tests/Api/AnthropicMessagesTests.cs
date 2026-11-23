@@ -38,6 +38,20 @@ public sealed class AnthropicMessagesTests
         Assert.Null(body["temperature"]);
     }
 
+    // A turn's last request switches tools off but keeps their definitions: Anthropic rejects a history with tool
+    // calls and no tools.
+    [Fact]
+    public void Request_ToolsSwitchedOff_KeepDefinitions_WithToolChoiceNone()
+    {
+        var options = Options();
+        options.ToolMode = ChatToolMode.None;
+
+        var body = AnthropicRequest.Build(Opus, History(), options);
+
+        Assert.Equal("none", (string?)body["tool_choice"]!["type"]);
+        Assert.Equal("object", (string?)body["tools"]![0]!["input_schema"]!["type"]);
+    }
+
     // Agent Framework passes agent instructions as a chat option; without them Claude would have no system prompt.
     [Fact]
     public void Request_InstructionsOfTheChat_ComeFirstInSystem()

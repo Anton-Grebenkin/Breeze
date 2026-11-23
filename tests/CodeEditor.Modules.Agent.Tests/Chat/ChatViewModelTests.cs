@@ -254,6 +254,7 @@ public sealed class ChatViewModelTests : IDisposable
         _fixture.Options.Set(new AgentOptions { Model = "openai/gpt-5-mini" });
         await _fixture.SendAsync("третий");
         Assert.Equal(3, _fixture.ClientsCreated);
+        Assert.Contains(_fixture.Client.Requests[2], message => message.Question() == "первый");
     }
 
     // The mode is read on every turn, so switching it neither rebuilds the client nor cancels the cache warmup.

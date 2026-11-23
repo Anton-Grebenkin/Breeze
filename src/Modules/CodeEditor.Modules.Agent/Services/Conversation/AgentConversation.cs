@@ -255,14 +255,11 @@ public sealed partial class AgentConversation : IDisposable
     // must not reach the history). Summaries and cache warmup repeat the request as the model got it.
     private IChatClient CompactingClient(AgentOptions options)
     {
-        _summaryClient = _clients.Create(new AgentOptions
-        {
-            Endpoint = options.Endpoint,
-            Model = string.IsNullOrWhiteSpace(options.HelperModel) ? options.Model : options.HelperModel,
-        });
+        var helperModel = string.IsNullOrWhiteSpace(options.HelperModel) ? options.Model : options.HelperModel;
+        _summaryClient = _clients.Create(new AgentOptions { Endpoint = options.Endpoint, Model = helperModel });
         var model = _clients.Create(options);
         _warmup = _warmups.Wrap(model, options);
-        var summaries = new CompactionModels(model, () => _cache.LastOptions, _summaryClient);
+        var summaries = CompactionModels.ForChat(model, _summaryClient, options.Endpoint, options.Model, helperModel, () => _cache.LastOptions);
         return new DetachedMessagesChatClient(new ChatClientBuilder(new ModelHistoryChatClient(new LoggingChatClient(_warmup ?? model, options.Model, _cache, _meter, _logger), options.Endpoint, options.Model))
             .UseAIContextProviders(_compaction.CreateProvider(options, summaries, _meter))
             .Build());

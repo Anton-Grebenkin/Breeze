@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using CodeEditor.Modules.Agent.Resources;
+using CodeEditor.Modules.Agent.Services.Context;
 using CodeEditor.Modules.Agent.Services.Conversation;
 using Microsoft.Extensions.AI;
 
@@ -43,6 +44,23 @@ public sealed class ModelHistoryTests
         await SendAsync(model, new ChatMessage(ChatRole.Assistant, [Reasoning("думаю", signature, origin: null), new TextContent("ответ")]));
 
         Assert.Equal(kept, Sent().Contents.OfType<TextReasoningContent>().Any());
+    }
+
+    // The compaction summary repeats the chat's request, so it passes the same layer: the summarizing model would
+    // reject another model's reasoning, and the helper model gets a history written by the main one.
+    [Fact]
+    public async Task CompactionSummary_PassesTheSameLayer_ForBothModels()
+    {
+        var foreign = Reasoning(string.Empty, "gAAAAAenc", ModelHistoryChatClient.Origin(Service, Gpt));
+        var answer = new ChatMessage(ChatRole.Assistant, [foreign, new TextContent("ответ")]);
+        var models = CompactionModels.ForChat(_inner, _inner, Service, Claude, "deepseek/deepseek-chat", () => null);
+
+        foreach (var client in new[] { models.Conversation, models.Helper })
+        {
+            await client.GetStreamingResponseAsync([answer], cancellationToken: TestContext.Current.CancellationToken).ToChatResponseAsync(TestContext.Current.CancellationToken);
+
+            Assert.Equal([answer.Contents[^1]], Sent().Contents);
+        }
     }
 
     [Fact]
