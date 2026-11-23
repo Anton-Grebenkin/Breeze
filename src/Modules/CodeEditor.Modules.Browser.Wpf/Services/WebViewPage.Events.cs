@@ -55,6 +55,7 @@ public sealed partial class WebViewPage
         {
             await control.EnsureCoreWebView2Async(await _host.EnvironmentAsync());
             var core = control.CoreWebView2;
+            core.Settings.IsPasswordAutosaveEnabled = core.Settings.IsGeneralAutofillEnabled = _host.Options.SavePasswords;
             Subscribe(core);
             if (_forAgent)
             {

@@ -3,6 +3,7 @@ using CodeEditor.Core.Threading;
 using CodeEditor.Modules.Browser.Services;
 using CodeEditor.Shell.Layout;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace CodeEditor.Modules.Browser.Wpf.Services;
 
@@ -19,15 +20,16 @@ public sealed class WebViewBrowserEngine : IBrowserEngine, IDisposable
     private readonly Lock _gate = new();
     private readonly List<WebViewPage> _pages = [];
 
-    public WebViewBrowserEngine(IUiDispatcher dispatcher, WorkbenchLayout layout, UserDataPaths paths, ILogger<WebViewBrowserEngine> logger)
-        : this(dispatcher, () => layout.Show(BrowserModule.ToolWindowId, focus: false), paths, logger)
+    public WebViewBrowserEngine(IUiDispatcher dispatcher, WorkbenchLayout layout, UserDataPaths paths, IOptionsMonitor<BrowserOptions> options, ILogger<WebViewBrowserEngine> logger)
+        : this(dispatcher, () => layout.Show(BrowserModule.ToolWindowId, focus: false), paths, () => options.CurrentValue, logger)
     {
     }
 
     /// <param name="showPanel">Brings the panel that hosts the pages to the front without focus; called on the UI thread.</param>
-    public WebViewBrowserEngine(IUiDispatcher dispatcher, Action showPanel, UserDataPaths paths, ILogger<WebViewBrowserEngine> logger)
+    /// <param name="options">The user's browser settings as they are now.</param>
+    public WebViewBrowserEngine(IUiDispatcher dispatcher, Action showPanel, UserDataPaths paths, Func<BrowserOptions> options, ILogger<WebViewBrowserEngine> logger)
     {
-        _host = new WebViewHost(dispatcher, showPanel, paths, logger);
+        _host = new WebViewHost(dispatcher, showPanel, paths, options, logger);
         _host.PagesChanged += (_, _) => PagesChanged?.Invoke(this, EventArgs.Empty);
     }
 

@@ -3,6 +3,7 @@ using System.Windows.Controls;
 using System.Windows.Threading;
 using CodeEditor.Core.Storage;
 using CodeEditor.Core.Threading;
+using CodeEditor.Modules.Browser.Services;
 using CodeEditor.Modules.Browser.Wpf.Services;
 using Microsoft.Extensions.Logging.Abstractions;
 
@@ -37,7 +38,7 @@ internal sealed class OffScreenBrowser : IDisposable
         thread.Start();
         _dispatcher = started.Task.GetAwaiter().GetResult();
         Directory.CreateDirectory(_data);
-        Engine = new WebViewBrowserEngine(new UiDispatcher(_dispatcher), () => { }, new UserDataPaths(_data), NullLogger<WebViewBrowserEngine>.Instance);
+        Engine = new WebViewBrowserEngine(new UiDispatcher(_dispatcher), () => { }, new UserDataPaths(_data), () => new BrowserOptions(), NullLogger<WebViewBrowserEngine>.Instance);
         Engine.PagesChanged += (_, _) => _dispatcher.BeginInvoke(HostPages);
         _dispatcher.Invoke(() =>
         {

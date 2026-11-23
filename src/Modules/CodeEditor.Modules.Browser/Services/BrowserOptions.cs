@@ -14,6 +14,24 @@ public sealed class BrowserOptions
     /// </summary>
     public string SearchEngine { get; set; } = "duckduckgo";
 
+    /// <summary>
+    /// The browser offers to save passwords and fills them in, as an ordinary browser does; saved sign-ins stay in the
+    /// editor's browser profile.
+    /// </summary>
+    public bool SavePasswords { get; set; } = true;
+
+    /// <summary>
+    /// The proxy for the browser, like <c>http://proxy.corp.example:3128</c> or <c>socks5://127.0.0.1:1080</c>; empty
+    /// for the system's one. Applied when the editor starts.
+    /// </summary>
+    public string Proxy { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Servers the browser signs in to with the Windows account (Kerberos, NTLM) besides the intranet zone, like
+    /// <c>*.corp.example</c>. Applied when the editor starts.
+    /// </summary>
+    public List<string> AuthServers { get; set; } = [];
+
     /// <summary>The agent is told which sites are open in the browser; the chip above the chat input switches it.</summary>
     public bool ShareTabsWithAgent { get; set; } = true;
 }
