@@ -26,6 +26,9 @@ public sealed partial class HookRunner(IOptionsMonitor<AgentOptions> options, IP
     private const string Prelude =
         "$u = New-Object System.Text.UTF8Encoding $false; [Console]::OutputEncoding = $u; [Console]::InputEncoding = $u; $OutputEncoding = $u; ";
 
+    /// <summary>PowerShell's error id when antimalware scanning refuses a script before running it.</summary>
+    private const string BlockedMarker = "ScriptContainedMaliciousContent";
+
     private static readonly TimeSpan MatchTimeout = TimeSpan.FromMilliseconds(100);
 
     /// <summary>The event has hooks: building its JSON is worth it.</summary>
@@ -102,10 +105,19 @@ public sealed partial class HookRunner(IOptionsMonitor<AgentOptions> options, IP
         }
     }
 
+    // An antivirus may refuse the script with the prelude (nothing has run then, ADR 0052): the hook goes again as written.
     private async Task<ProcessResult> RunOneAsync(string hookEvent, AgentHook hook, string json, CancellationToken cancellationToken)
     {
+        var result = await RunScriptAsync(hookEvent, hook, Prelude + hook.Command, json, cancellationToken);
+        return result.ExitCode != 0 && result.Output.Contains(BlockedMarker, StringComparison.Ordinal)
+            ? await RunScriptAsync(hookEvent, hook, hook.Command, json, cancellationToken)
+            : result;
+    }
+
+    private async Task<ProcessResult> RunScriptAsync(string hookEvent, AgentHook hook, string script, string json, CancellationToken cancellationToken)
+    {
         var folder = workspace.Root ?? Path.GetTempPath();
-        var request = new ProcessRequest("powershell.exe", ["-NoLogo", "-NoProfile", "-NonInteractive", "-Command", Prelude + hook.Command], folder)
+        var request = new ProcessRequest("powershell.exe", ["-NoLogo", "-NoProfile", "-NonInteractive", "-Command", script], folder)
         {
             Timeout = TimeSpan.FromSeconds(Math.Clamp(hook.TimeoutSeconds ?? DefaultTimeoutSeconds, 1, MaxTimeoutSeconds)),
             Input = json,
