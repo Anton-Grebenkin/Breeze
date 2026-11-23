@@ -13,7 +13,16 @@ public sealed class OutputService : IOutputService
 
     public event EventHandler? ChannelsChanged;
 
+    /// <summary>A channel asked to be shown (<see cref="Reveal"/>); raised on the caller's thread.</summary>
+    public event EventHandler<IOutputChannel>? RevealRequested;
+
     public IReadOnlyList<IOutputChannel> Channels => Volatile.Read(ref _channels);
+
+    public void Reveal(IOutputChannel channel)
+    {
+        ArgumentNullException.ThrowIfNull(channel);
+        RevealRequested?.Invoke(this, channel);
+    }
 
     public IOutputChannel GetOrCreate(string name)
     {

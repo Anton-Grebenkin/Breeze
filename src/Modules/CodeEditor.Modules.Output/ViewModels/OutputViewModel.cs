@@ -5,13 +5,13 @@ using CommunityToolkit.Mvvm.Input;
 namespace CodeEditor.Modules.Output.ViewModels;
 
 /// <summary>
-/// Output panel: channel selection and its text. The view calls <see cref="Refresh"/> on a timer while visible;
-/// the text is re-read only when the channel changed.
+/// Output panel: channel selection and its text. The view polls <see cref="Read"/> on a timer while visible and keeps
+/// its own cursor, so it appends what is new instead of copying the whole channel (up to a million characters) four
+/// times a second.
 /// </summary>
 public sealed partial class OutputViewModel : ObservableObject, IDisposable
 {
     private readonly IOutputService _output;
-    private long _shownVersion = -1;
 
     public OutputViewModel(IOutputService output)
     {
@@ -27,37 +27,17 @@ public sealed partial class OutputViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     public partial IOutputChannel? SelectedChannel { get; set; }
 
-    [ObservableProperty]
-    public partial string Text { get; private set; } = string.Empty;
-
-    /// <summary>Re-reads the selected channel if it changed; returns whether the text was updated.</summary>
-    public bool Refresh()
-    {
-        var channel = SelectedChannel;
-        if (channel is null || channel.Version == _shownVersion)
-        {
-            return false;
-        }
-
-        _shownVersion = channel.Version;
-        Text = channel.Snapshot();
-        return true;
-    }
+    /// <summary>
+    /// What the selected channel gained since the reader's cursor: appended text, or the whole text after a clear or a
+    /// trim. A reader that showed another channel passes <see cref="OutputCursor.None"/>.
+    /// </summary>
+    public OutputDelta Read(OutputCursor cursor) =>
+        SelectedChannel?.ReadSince(cursor) ?? new OutputDelta(string.Empty, IsReset: cursor != OutputCursor.None, OutputCursor.None);
 
     [RelayCommand]
-    public void Clear()
-    {
-        SelectedChannel?.Clear();
-        Refresh();
-    }
+    public void Clear() => SelectedChannel?.Clear();
 
     public void Dispose() => _output.ChannelsChanged -= OnChannelsChanged;
-
-    partial void OnSelectedChannelChanged(IOutputChannel? value)
-    {
-        _shownVersion = -1;
-        Refresh();
-    }
 
     // May arrive on a background thread: WPF marshals simple property changes to the UI thread.
     private void OnChannelsChanged(object? sender, EventArgs e)

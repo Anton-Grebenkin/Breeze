@@ -49,7 +49,6 @@
              TextWrapping="NoWrap"
              HorizontalScrollBarVisibility="Auto"
              VerticalScrollBarVisibility="Auto"
-             Text="{Binding Text, Mode=OneWay}"
              AutomationProperties.AutomationId="Output.Text"
              AutomationProperties.Name="{x:Static res:Strings.ModuleName}" />
   </DockPanel>

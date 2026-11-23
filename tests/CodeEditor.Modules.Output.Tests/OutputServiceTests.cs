@@ -40,17 +40,22 @@ public sealed class OutputServiceTests
         Assert.Contains("InvalidOperationException: сбой", text, StringComparison.Ordinal);
     }
 
+    // The view keeps a cursor and appends what is new: the whole channel is not copied on every change.
     [Fact]
-    public void ViewModel_RefreshesOnlyWhenChannelChanged()
+    public void ViewModel_GivesOnlyWhatIsNewSinceTheCursor()
     {
         var channel = _output.GetOrCreate("Сборка");
         using var viewModel = new OutputViewModel(_output);
-
         channel.AppendLine("строка");
 
-        Assert.True(viewModel.Refresh());
-        Assert.False(viewModel.Refresh());
-        Assert.Equal("строка\n", viewModel.Text);
+        var first = viewModel.Read(OutputCursor.None);
+        var nothing = viewModel.Read(first.Cursor);
+        channel.AppendLine("ещё");
+        var appended = viewModel.Read(first.Cursor);
+
+        Assert.Equal(("строка\n", true), (first.Text, first.IsReset));
+        Assert.True(nothing.IsEmpty);
+        Assert.Equal(("ещё\n", false), (appended.Text, appended.IsReset));
     }
 
     [Fact]
@@ -58,22 +63,46 @@ public sealed class OutputServiceTests
     {
         using var viewModel = new OutputViewModel(_output);
         Assert.Null(viewModel.SelectedChannel);
+        Assert.True(viewModel.Read(OutputCursor.None).IsEmpty);
 
         _output.GetOrCreate("Журнал").AppendLine("старт");
-        viewModel.Refresh();
 
         Assert.Equal("Журнал", viewModel.SelectedChannel?.Name);
-        Assert.Equal("старт\n", viewModel.Text);
+        Assert.Equal("старт\n", viewModel.Read(OutputCursor.None).Text);
     }
 
+    // Removed text (a clear, the oldest quarter dropped on overflow) makes the reader start over: what it shows no
+    // longer matches the channel.
     [Fact]
-    public void ViewModel_Clear_EmptiesSelectedChannel()
+    public void ClearAndTrim_ResetTheReader()
     {
-        _output.GetOrCreate("Журнал").AppendLine("старт");
+        var channel = _output.GetOrCreate("Журнал");
         using var viewModel = new OutputViewModel(_output);
+        channel.AppendLine("старт");
+        var cursor = viewModel.Read(OutputCursor.None).Cursor;
 
         viewModel.ClearCommand.Execute(null);
+        var cleared = viewModel.Read(cursor);
+        channel.AppendLine(new string('x', OutputChannel.MaxLength));
+        channel.AppendLine("хвост");
+        var trimmed = viewModel.Read(cleared.Cursor);
 
-        Assert.Empty(viewModel.Text);
+        Assert.Equal((string.Empty, true), (cleared.Text, cleared.IsReset));
+        Assert.True(trimmed.IsReset);
+        Assert.Equal(channel.Snapshot(), trimmed.Text);
+        Assert.EndsWith("хвост\n", trimmed.Text, StringComparison.Ordinal);
+    }
+
+    // A failed build asks for its channel to be shown; the module selects it and brings the panel forward.
+    [Fact]
+    public void Reveal_RaisesTheRequestForTheChannel()
+    {
+        var channel = _output.GetOrCreate("Сборка");
+        IOutputChannel? requested = null;
+        _output.RevealRequested += (_, revealed) => requested = revealed;
+
+        ((IOutputService)_output).Reveal(channel);
+
+        Assert.Same(channel, requested);
     }
 }

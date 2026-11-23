@@ -18,6 +18,9 @@ internal sealed class OutputChannel(string name) : IOutputChannel
     private readonly StringBuilder _text = new();
     private long _version;
 
+    // Grows when text is removed: a reader that shows the removed part has to start over.
+    private long _epoch;
+
     public string Name { get; } = name;
 
     public long Version => Interlocked.Read(ref _version);
@@ -38,6 +41,7 @@ internal sealed class OutputChannel(string name) : IOutputChannel
         lock (_lock)
         {
             _text.Clear();
+            _epoch++;
         }
 
         Interlocked.Increment(ref _version);
@@ -48,6 +52,17 @@ internal sealed class OutputChannel(string name) : IOutputChannel
         lock (_lock)
         {
             return _text.ToString();
+        }
+    }
+
+    public OutputDelta ReadSince(OutputCursor cursor)
+    {
+        lock (_lock)
+        {
+            var end = new OutputCursor(_epoch, _text.Length);
+            return cursor.Epoch == _epoch && cursor.Position <= _text.Length
+                ? new OutputDelta(_text.ToString((int)cursor.Position, _text.Length - (int)cursor.Position), IsReset: false, end)
+                : new OutputDelta(_text.ToString(), IsReset: true, end);
         }
     }
 
@@ -65,5 +80,6 @@ internal sealed class OutputChannel(string name) : IOutputChannel
         }
 
         _text.Remove(0, cut);
+        _epoch++;
     }
 }
