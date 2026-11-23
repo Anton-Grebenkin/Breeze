@@ -149,4 +149,7 @@
   <data name="SearchNeedsUser" xml:space="preserve"><value>Страница поиска требует человека (капча или окно согласия), и никто не ответил. Она открыта в браузере: попроси пользователя пройти проверку и повтори поиск.</value></data>
   <data name="SearchNeedsUserNotification" xml:space="preserve"><value>Поисковик просит подтвердить, что вы человек. Пройдите проверку во вкладке браузера: агент ждёт.</value></data>
   <data name="SearchCheckWords" xml:space="preserve"><value>captcha|робот|robot|unusual traffic|verify you are|подтвердите|согласие|consent</value></data>
+  <!-- Acting on a site. -->
+  <data name="SiteActionApprovalTitle" xml:space="preserve"><value>Агент хочет действовать на сайте</value></data>
+  <data name="ActRule" xml:space="preserve"><value>действия на {0}</value></data>
 </root>

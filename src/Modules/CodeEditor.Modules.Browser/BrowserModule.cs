@@ -43,6 +43,7 @@ public sealed class BrowserModule : IModule
     {
         services.AddSettingsSection<BrowserOptions>(BrowserOptions.Section, SettingScope.User);
         services.AddUserOnlySetting(BrowserApprovals.AllowedHostsKey);
+        services.AddUserOnlySetting(BrowserApprovals.ActHostsKey);
         services.AddUserOnlySetting(BrowserTabsSwitch.ShareKey);
         services.AddSingleton<BrowserHistory>();
         services.AddSingleton<BrowserTabStore>();

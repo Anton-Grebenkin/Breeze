@@ -9,6 +9,12 @@ public sealed class BrowserOptions
     public List<string> AllowedHosts { get; set; } = [];
 
     /// <summary>
+    /// Sites where the agent presses buttons and fills in fields in its own tab without asking; "Always allow" on such
+    /// a card adds a site here. Elsewhere the agent only reads and follows links.
+    /// </summary>
+    public List<string> ActHosts { get; set; } = [];
+
+    /// <summary>
     /// The search engine for the agent's search through the browser: <c>duckduckgo</c>, <c>bing</c>, <c>google</c>,
     /// <c>yandex</c>, or an address of one's own with <c>{query}</c> where the query goes.
     /// </summary>

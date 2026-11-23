@@ -1,4 +1,6 @@
 using System.Globalization;
+using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using CodeEditor.Modules.Agent.Contracts;
 using CodeEditor.Modules.Browser.Resources;
 using CodeEditor.Modules.Browser.Services.Tabs;
@@ -11,11 +13,12 @@ namespace CodeEditor.Modules.Browser.Services.Agent;
 /// a tab works there; without a tab of its own the agent reads the shown one. When the agent's action opens a window,
 /// the agent continues in that tab.
 /// </summary>
-public sealed class BrowserAgentTabs : IDisposable
+public sealed partial class BrowserAgentTabs : IDisposable
 {
     private static readonly Uri Blank = new("about:blank");
 
     private readonly BrowserTabs _tabs;
+    private readonly ConditionalWeakTable<BrowserTab, HashSet<string>> _links = [];
     private readonly Func<Task>? _showPanel;
     private volatile BrowserTab? _current;
     private volatile BrowserTab? _target;
@@ -66,6 +69,19 @@ public sealed class BrowserAgentTabs : IDisposable
         return opened is not null && _tabs.Tabs.Contains(opened) ? opened : null;
     }
 
+    /// <summary>
+    /// Remembers which refs of the tab's latest snapshot are links: following a link is reading on, pressing anything
+    /// else is acting on the site, and the approval is decided before the page can be asked.
+    /// </summary>
+    public void RememberLinks(BrowserTab tab, string snapshot)
+    {
+        ArgumentNullException.ThrowIfNull(snapshot);
+        _links.AddOrUpdate(tab, [.. LinkRef().Matches(snapshot).Select(static match => match.Groups[1].Value)]);
+    }
+
+    public bool IsLink(BrowserTab tab, string? reference) =>
+        reference is not null && _links.TryGetValue(tab, out var links) && links.Contains(reference.Trim());
+
     /// <summary>Shows the tab to the user, bringing the panel to the front.</summary>
     public async Task SelectAsync(BrowserTab tab)
     {
@@ -102,6 +118,9 @@ public sealed class BrowserAgentTabs : IDisposable
             _current = e.Tab;
         }
     }
+
+    [GeneratedRegex(@"(?:^|[\s|])link ""[^\n]*?\[ref=(e\d+)\]", RegexOptions.Multiline)]
+    private static partial Regex LinkRef();
 
     private string Ids() => _tabs.Tabs is { IsEmpty: false } tabs ? string.Join(", ", tabs.Select(static tab => tab.Id)) : "—";
 

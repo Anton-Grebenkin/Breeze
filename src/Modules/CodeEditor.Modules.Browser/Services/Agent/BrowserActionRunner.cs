@@ -66,7 +66,7 @@ public sealed class BrowserActionRunner(BrowserAgentTabs tabs, IAgentImages imag
                 await browser.NavigateAsync(BrowserAgentTools.Address(call.Url), cancellationToken);
                 break;
             case BrowserAgentTools.Snapshot:
-                return await BrowserPageReader.SnapshotAsync(target, call.Part, cancellationToken);
+                return await SnapshotAsync(target, call.Part, cancellationToken);
             case BrowserAgentTools.Read:
                 return await BrowserPageReader.TextAsync(target, call.Part, cancellationToken);
             case BrowserAgentTools.Find:
@@ -83,7 +83,7 @@ public sealed class BrowserActionRunner(BrowserAgentTabs tabs, IAgentImages imag
                 break;
             case BrowserAgentTools.Upload:
                 await page.UploadAsync(Required(call.Ref, "ref"), FilePath(call.Path), cancellationToken);
-                return Format(Strings.UploadDone, call.Path!.Trim()) + "\n" + await BrowserPageReader.SnapshotAsync(target, part: null, cancellationToken);
+                return Format(Strings.UploadDone, call.Path!.Trim()) + "\n" + await SnapshotAsync(target, part: null, cancellationToken);
             case BrowserAgentTools.Type:
                 await page.TypeAsync(Required(call.Ref, "ref"), call.Text ?? string.Empty, call.Submit, cancellationToken);
                 break;
@@ -124,17 +124,24 @@ public sealed class BrowserActionRunner(BrowserAgentTabs tabs, IAgentImages imag
 
         // A click that opened a window: the agent continues in that tab and is told so.
         return tabs.TakeOpened() is { } opened
-            ? Format(Strings.OpenedTabNote, opened.Id) + "\n" + await BrowserPageReader.SnapshotAsync(opened, part: null, cancellationToken)
-            : await BrowserPageReader.SnapshotAsync(target, part: null, cancellationToken);
+            ? Format(Strings.OpenedTabNote, opened.Id) + "\n" + await SnapshotAsync(opened, part: null, cancellationToken)
+            : await SnapshotAsync(target, part: null, cancellationToken);
     }
 
     // The snapshot comes either way: what the page shows instead of the text is often the answer.
-    private static async Task<string> WaitForAsync(BrowserTab tab, string text, int? seconds, CancellationToken cancellationToken)
+    private async Task<string> WaitForAsync(BrowserTab tab, string text, int? seconds, CancellationToken cancellationToken)
     {
         var shown = await new BrowserPageActions(tab.Page).WaitForTextAsync(text, seconds, cancellationToken);
-        var snapshot = await BrowserPageReader.SnapshotAsync(tab, part: null, cancellationToken);
+        var snapshot = await SnapshotAsync(tab, part: null, cancellationToken);
         var note = shown ? string.Empty : Format(Strings.TextNotShown, text, Math.Clamp(seconds ?? BrowserPageActions.DefaultWaitSeconds, 1, BrowserPageActions.MaxWaitSeconds)) + "\n";
         return note + snapshot;
+    }
+
+    private async Task<string> SnapshotAsync(BrowserTab tab, int? part, CancellationToken cancellationToken)
+    {
+        var snapshot = await BrowserPageReader.SnapshotAsync(tab, part, cancellationToken);
+        tabs.RememberLinks(tab, snapshot);
+        return snapshot;
     }
 
     // Only a shown page renders, so the tab comes to the front first. The image goes to the model in the next message;

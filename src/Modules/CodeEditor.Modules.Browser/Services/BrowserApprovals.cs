@@ -1,5 +1,7 @@
+using System.Globalization;
 using CodeEditor.Core.Settings;
 using CodeEditor.Modules.Agent.Contracts.Approvals;
+using CodeEditor.Modules.Browser.Resources;
 using CodeEditor.Modules.Browser.Services.Agent;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -10,8 +12,9 @@ namespace CodeEditor.Modules.Browser.Services;
 /// Approval for the <c>browser</c> tool (ADR 0027, 0054): pages on this machine (<c>localhost</c>, <c>127.0.0.1</c>,
 /// <c>*.localhost</c>) and sites in <c>browser.allowedHosts</c> open without asking; others need a card, since a URL can
 /// carry data away. A script runs without asking only on a page of this machine: on a site where the user is logged in
-/// it could send the session elsewhere. In its own tab the agent clicks and types freely: the user sees the browser and
-/// can step in. The user's tabs it reads freely, but going elsewhere, closing, or clicking and typing on a page that is
+/// it could send the session elsewhere. In its own tab the agent reads and follows links freely, and presses buttons
+/// and fills in fields on a page of this machine or a site from <c>browser.actHosts</c>; elsewhere such an action needs
+/// a card that names the button, with "always allow for this site". The user's tabs it reads freely, but going elsewhere, closing, or clicking and typing on a page that is
 /// not of this machine needs a card that names the element. A file goes into a form without asking only on a page of
 /// this machine.
 /// </summary>
@@ -19,6 +22,10 @@ public sealed partial class BrowserApprovals(IOptionsMonitor<BrowserOptions> opt
     : IAgentApprovalPolicy
 {
     public const string AllowedHostsKey = BrowserOptions.Section + ".allowedHosts";
+    public const string ActHostsKey = BrowserOptions.Section + ".actHosts";
+
+    // "Always allow" rules offered for acting on a site, by the text shown on the card.
+    private readonly Dictionary<string, string> _actRules = new(StringComparer.Ordinal);
 
     public bool CanDecide(string toolName) => toolName == BrowserAgentTools.ToolName;
 
@@ -32,14 +39,18 @@ public sealed partial class BrowserApprovals(IOptionsMonitor<BrowserOptions> opt
         var action = Action(arguments);
         var tab = tabs.Peek(Text(arguments, "tab"), opens: action == BrowserAgentTools.Navigate);
         var isUsers = tab is { IsAgent: false };
-        var isLocal = tab?.Page.Url is { } page && IsLocal(page.IdnHost);
+        var site = tab?.Page.Url is { Scheme: "http" or "https" } page ? page.IdnHost : null;
+        var isLocal = site is not null && IsLocal(site);
+        var mayAct = site is null || isLocal || (!isUsers && options.CurrentValue.ActHosts.Contains(site, StringComparer.OrdinalIgnoreCase));
         return action switch
         {
             BrowserAgentTools.Navigate => !isUsers && Host(arguments) is { } host && IsAllowed(host),
             BrowserAgentTools.OpenTab => Text(arguments, "url") is not { Length: > 0 } || (Host(arguments) is { } host && IsAllowed(host)),
             BrowserAgentTools.Evaluate => isLocal,
-            BrowserAgentTools.Click or BrowserAgentTools.Type or BrowserAgentTools.Press or BrowserAgentTools.Hover or BrowserAgentTools.Drag
-                or BrowserAgentTools.Dialog or BrowserAgentTools.Back or BrowserAgentTools.Forward or BrowserAgentTools.Reload => !isUsers || isLocal,
+            // Following a link is reading on; a button or a field acts on the site.
+            BrowserAgentTools.Click => mayAct || (!isUsers && tabs.IsLink(tab!, Text(arguments, "ref"))),
+            BrowserAgentTools.Type or BrowserAgentTools.Press or BrowserAgentTools.Drag or BrowserAgentTools.Dialog => mayAct,
+            BrowserAgentTools.Hover or BrowserAgentTools.Back or BrowserAgentTools.Forward or BrowserAgentTools.Reload => !isUsers || isLocal,
 
             // A file put into a form leaves the machine with it.
             BrowserAgentTools.Upload => isLocal,
@@ -50,23 +61,60 @@ public sealed partial class BrowserApprovals(IOptionsMonitor<BrowserOptions> opt
 
     public bool IsReadOnly(string toolName, IDictionary<string, object?> arguments) => false;
 
-    // "Always allow" is about the site; a card about a tab of the user's offers none.
-    public string? SuggestRule(string toolName, IDictionary<string, object?> arguments) =>
-        CanDecide(toolName) && Action(arguments) is BrowserAgentTools.Navigate or BrowserAgentTools.OpenTab && Host(arguments) is { } host && !IsLocal(host)
-        && tabs.Peek(Text(arguments, "tab"), opens: true) is not { IsAgent: false }
-            ? host
-            : null;
+    // "Always allow" is about the site: opening it, or acting on it in the agent's own tab. A card about a tab of the
+    // user's offers none.
+    public string? SuggestRule(string toolName, IDictionary<string, object?> arguments)
+    {
+        if (!CanDecide(toolName))
+        {
+            return null;
+        }
+
+        var action = Action(arguments);
+        var tab = tabs.Peek(Text(arguments, "tab"), opens: action is BrowserAgentTools.Navigate or BrowserAgentTools.OpenTab);
+        if (tab is { IsAgent: false })
+        {
+            return null;
+        }
+
+        if (action is BrowserAgentTools.Navigate or BrowserAgentTools.OpenTab)
+        {
+            return Host(arguments) is { } host && !IsLocal(host) ? host : null;
+        }
+
+        if (action is not (BrowserAgentTools.Click or BrowserAgentTools.Type or BrowserAgentTools.Press or BrowserAgentTools.Drag or BrowserAgentTools.Dialog)
+            || tab?.Page.Url is not { Scheme: "http" or "https" } page || IsLocal(page.IdnHost))
+        {
+            return null;
+        }
+
+        var rule = string.Format(CultureInfo.CurrentCulture, Strings.ActRule, page.IdnHost);
+        lock (_actRules)
+        {
+            _actRules[rule] = page.IdnHost;
+        }
+
+        return rule;
+    }
 
     public void AllowAlways(string toolName, string rule)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(rule);
-        var hosts = options.CurrentValue.AllowedHosts;
-        if (!CanDecide(toolName) || hosts.Contains(rule, StringComparer.OrdinalIgnoreCase))
+        string? acting;
+        lock (_actRules)
+        {
+            acting = _actRules.GetValueOrDefault(rule);
+        }
+
+        var (key, hosts, host) = acting is null
+            ? (AllowedHostsKey, options.CurrentValue.AllowedHosts, rule)
+            : (ActHostsKey, options.CurrentValue.ActHosts, acting);
+        if (!CanDecide(toolName) || hosts.Contains(host, StringComparer.OrdinalIgnoreCase))
         {
             return;
         }
 
-        if (!settings.TrySetUserValue(AllowedHostsKey, (string[])[.. hosts, rule], out var error))
+        if (!settings.TrySetUserValue(key, (string[])[.. hosts, host], out var error))
         {
             LogRuleNotSaved(logger, rule, error);
         }

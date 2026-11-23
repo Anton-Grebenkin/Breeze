@@ -65,6 +65,7 @@ public sealed class BrowserAgentTools(BrowserAgentTabs tabs, IAgentOutputStore o
             "Controls the editor's browser, a real browser with tabs that the user sees, with their cookies and logins: open the app you develop (http://localhost:...) or a site, read pages, act like a user, debug. " +
             "Tabs: the context block lists the open tabs by id (t1, t2…). You work in a tab of your own: navigate opens it and later calls reuse it, so the user's pages stay as they are. " +
             "To read a page the user has open, pass its id as tab: reading is free; navigating, clicking or typing in a user's tab needs their approval, so do that in your own tab. " +
+            "On a site that is not this machine you read and follow links freely, but pressing a button or filling in a field asks the user until they allow the site. " +
             "Actions: navigate (url), snapshot (title, address, HTTP status if it is an error, and page content: headings, text, links, fields and buttons, each interactive element with [ref=eN]; " +
             "tables come as rows, frames and web components are included, a canvas or chart is named as a graphic; a long page comes in parts: ask the next with part), " +
             "read (the page's main text as Markdown, without menus: for articles and docs; parts as in snapshot), find (text: where it occurs on the page, with the heading above and the nearest ref), " +

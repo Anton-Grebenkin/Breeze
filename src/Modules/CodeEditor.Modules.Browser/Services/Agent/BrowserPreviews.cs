@@ -29,7 +29,7 @@ public sealed class BrowserPreviews(BrowserAgentTabs tabs)
             case BrowserAgentTools.Upload:
                 return Card(Strings.UploadApprovalTitle, site, BrowserAgentTools.Required(Text(arguments, "path"), "path") + " → " + await ElementAsync(tab, Text(arguments, "ref"), cancellationToken));
             default:
-                return Card(Strings.UserTabApprovalTitle, site, await DescribeAsync(action, arguments, tab, cancellationToken));
+                return Card(tab is { IsAgent: false } ? Strings.UserTabApprovalTitle : Strings.SiteActionApprovalTitle, site, await DescribeAsync(action, arguments, tab, cancellationToken));
         }
     }
 
