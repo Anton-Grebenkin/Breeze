@@ -129,11 +129,12 @@ public sealed partial class WebViewPage : IBrowserPage
 
     public IReadOnlyList<BrowserConsoleMessage> TakeConsole() => _console.Take();
 
-    // Navigates and waits for the load; the panel comes to the front because the agent looks at the page.
+    // Navigates and waits for the load. The panel comes to the front if this is the shown tab: the agent looks at the
+    // page. A tab behind another one loads where it is, so the agent does not take the screen from the user.
     private async Task LoadAsync(Action<CoreWebView2> start, CancellationToken cancellationToken, Func<bool>? possible = null)
     {
         _pending = null;
-        var core = await ReadyAsync(show: true, cancellationToken);
+        var core = await ReadyAsync(show: _shown, cancellationToken);
         TaskCompletionSource<string?>? loading = null;
         await _host.Dispatcher.InvokeAsync(() =>
         {

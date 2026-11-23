@@ -24,13 +24,24 @@ public static class BrowserTabLines
         }
 
         var lines = new List<string>(Math.Min(tabs.Count, MaxTabs) + 2) { Strings.ContextTabs };
-        lines.AddRange(tabs.Take(MaxTabs).Select(Line));
+        lines.AddRange(tabs.Take(MaxTabs).Select(static tab => Line(tab, Address(tab.Url), tab.IsAgent ? Strings.ContextTabAgent : string.Empty)));
         if (tabs.Count > MaxTabs)
         {
             lines.Add(Format(Strings.ContextTabsMore, tabs.Count - MaxTabs));
         }
 
         return lines;
+    }
+
+    /// <summary>
+    /// Every tab with its full address, for the <c>tabs</c> action: the agent asked, and a snapshot shows the address
+    /// anyway.
+    /// </summary>
+    /// <param name="current">The id of the agent's working tab.</param>
+    public static IReadOnlyList<string> List(IReadOnlyList<BrowserTabInfo> tabs, string? current)
+    {
+        ArgumentNullException.ThrowIfNull(tabs);
+        return [Strings.TabsList, .. tabs.Select(tab => Line(tab, tab.Url.AbsoluteUri, tab.Id == current ? Strings.TabCurrent : tab.IsAgent ? Strings.TabYours : string.Empty))];
     }
 
     /// <summary>"gitlab.example.com/group/project": the site and the path, no query string or fragment.</summary>
@@ -40,18 +51,9 @@ public static class BrowserTabLines
         return Cut(url.Authority + url.AbsolutePath.TrimEnd('/'), MaxAddress);
     }
 
-    private static string Line(BrowserTabInfo tab)
+    private static string Line(BrowserTabInfo tab, string address, string owner)
     {
-        var line = new StringBuilder("- ").Append(tab.Id).Append(": ").Append(Address(tab.Url));
-        if (tab.IsActive)
-        {
-            line.Append(Strings.ContextTabActive);
-        }
-
-        if (tab.IsAgent)
-        {
-            line.Append(Strings.ContextTabAgent);
-        }
+        var line = new StringBuilder("- ").Append(tab.Id).Append(": ").Append(address).Append(tab.IsActive ? Strings.ContextTabActive : string.Empty).Append(owner);
 
         return Clean(tab.Title) is { Length: > 0 } title ? line.Append(Format(Strings.ContextTabTitle, title)).ToString() : line.ToString();
     }

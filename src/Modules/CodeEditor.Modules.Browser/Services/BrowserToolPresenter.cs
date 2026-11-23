@@ -32,12 +32,16 @@ public sealed class BrowserToolPresenter : IAgentToolPresenter
             BrowserAgentTools.Response => Format(Strings.FeedResponse, call.Text("id") ?? "?"),
             BrowserAgentTools.Evaluate => Strings.FeedEvaluate,
             BrowserAgentTools.Screenshot => Strings.FeedScreenshot,
+            BrowserAgentTools.Tabs => Strings.FeedTabs,
+            BrowserAgentTools.OpenTab => call.Text("url") is { Length: > 0 } opened ? Site(opened) : Strings.FeedOpenTab,
+            BrowserAgentTools.SelectTab => Format(Strings.FeedSelectTab, call.Text("tab") ?? "?"),
+            BrowserAgentTools.CloseTab => Format(Strings.FeedCloseTab, call.Text("tab") ?? string.Empty).TrimEnd(),
             _ => Strings.FeedSnapshot,
         };
         return new AgentToolView(AgentToolIcon.Web, Format(Strings.FeedTitle, detail))
         {
             IsExploration = action is BrowserAgentTools.Snapshot or BrowserAgentTools.Console or BrowserAgentTools.Screenshot
-                or BrowserAgentTools.Network or BrowserAgentTools.Response,
+                or BrowserAgentTools.Network or BrowserAgentTools.Response or BrowserAgentTools.Tabs,
         };
     }
 

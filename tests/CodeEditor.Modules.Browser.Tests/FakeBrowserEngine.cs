@@ -1,4 +1,5 @@
 using CodeEditor.Modules.Browser.Services;
+using CodeEditor.Modules.Browser.Services.Agent;
 using CodeEditor.Modules.Browser.Services.Tabs;
 
 namespace CodeEditor.Modules.Browser.Tests;
@@ -19,6 +20,14 @@ internal sealed class FakeBrowserEngine : IBrowserEngine
     public static BrowserTabs Tabs(out FakeBrowserPage page)
     {
         var tabs = new BrowserTabs(new FakeBrowserEngine());
+        page = (FakeBrowserPage)tabs.Open().Page;
+        return tabs;
+    }
+
+    /// <summary>The agent's view of a fake browser where the agent already has its tab; <paramref name="page"/> is its page.</summary>
+    public static BrowserAgentTabs AgentTabs(out FakeBrowserPage page)
+    {
+        var tabs = new BrowserAgentTabs(new BrowserTabs(new FakeBrowserEngine()));
         page = (FakeBrowserPage)tabs.Open().Page;
         return tabs;
     }

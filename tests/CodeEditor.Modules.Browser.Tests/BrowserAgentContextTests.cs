@@ -92,7 +92,7 @@ public sealed class BrowserAgentContextTests
 
         Assert.Equal(12, lines.Count);
         Assert.Equal("- t2: site2.example.com/a (активная)", lines[2]);
-        Assert.Equal("- t3: site3.example.com/a (вкладка агента)", lines[3]);
+        Assert.Equal("- t3: site3.example.com/a (твоя вкладка)", lines[3]);
         Assert.Equal("…и ещё 3.", lines[^1]);
     }
 

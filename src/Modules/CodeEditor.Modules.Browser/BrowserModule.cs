@@ -2,6 +2,7 @@ using CodeEditor.Core.Commands;
 using CodeEditor.Core.Keybindings;
 using CodeEditor.Core.Modules;
 using CodeEditor.Core.Settings;
+using CodeEditor.Core.Threading;
 using CodeEditor.Modules.Agent.Contracts;
 using CodeEditor.Modules.Agent.Contracts.Approvals;
 using CodeEditor.Modules.Agent.Contracts.Context;
@@ -44,6 +45,8 @@ public sealed class BrowserModule : IModule
         services.AddSingleton<BrowserTabStore>();
         services.AddSingleton<BrowserTabs>();
         services.AddSingleton<BrowserViewModel>();
+        services.AddSingleton(provider => new BrowserAgentTabs(provider.GetRequiredService<BrowserTabs>(), () =>
+            provider.GetRequiredService<IUiDispatcher>().InvokeAsync(() => provider.GetRequiredService<WorkbenchLayout>().Show(ToolWindowId, focus: false))));
         services.AddSingleton<BrowserAgentTools>();
         services.AddSingleton<IAgentToolProvider>(provider => provider.GetRequiredService<BrowserAgentTools>());
         services.AddSingleton<IAgentChangePreviewer>(provider => provider.GetRequiredService<BrowserAgentTools>());

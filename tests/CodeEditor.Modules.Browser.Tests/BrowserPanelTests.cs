@@ -1,5 +1,6 @@
 using CodeEditor.Modules.Agent.Contracts.Feed;
 using CodeEditor.Modules.Browser.Services;
+using CodeEditor.Modules.Browser.Services.Agent;
 using CodeEditor.Modules.Browser.Services.Tabs;
 using CodeEditor.Modules.Browser.ViewModels;
 using CodeEditor.Testing;
@@ -101,7 +102,7 @@ public sealed class BrowserPanelTests
     private static BrowserApprovals Approvals(out FakeSettingsService settings)
     {
         settings = new FakeSettingsService();
-        return new BrowserApprovals(new TestOptionsMonitor<BrowserOptions>(new BrowserOptions()), new BrowserTabs(new FakeBrowserEngine()), settings, NullLogger<BrowserApprovals>.Instance);
+        return new BrowserApprovals(new TestOptionsMonitor<BrowserOptions>(new BrowserOptions()), new BrowserAgentTabs(new BrowserTabs(new FakeBrowserEngine())), settings, NullLogger<BrowserApprovals>.Instance);
     }
 
     private static Dictionary<string, object?> Call(string action, string? url) => new() { ["action"] = action, ["url"] = url };

@@ -36,7 +36,7 @@ public static class BrowserScripts
             if (tag === 'INPUT') { const type = (el.type || 'text').toLowerCase(); return ['checkbox', 'radio', 'button', 'submit', 'reset', 'range', 'file'].includes(type) ? type : 'textbox'; }
             return 'editable';
           };
-          const nameOf = el => short(el.getAttribute('aria-label') || (el.labels && el.labels[0] && el.labels[0].innerText) || el.innerText || el.value || el.placeholder || el.title || el.alt || el.name || '', 80);
+          const nameOf = el => short(el.getAttribute('aria-label') || (el.labels && el.labels[0] && el.labels[0].innerText) || el.innerText || (el.type === 'password' ? '' : el.value) || el.placeholder || el.title || el.alt || el.name || '', 80);
           const describe = el => {
             const ref = 'e' + (++refs);
             el.setAttribute('data-agent-ref', ref);
@@ -109,6 +109,16 @@ public static class BrowserScripts
           }
           return { ok: true };
         })({{JsonSerializer.Serialize(reference)}}, {{JsonSerializer.Serialize(text)}}, {{(submit ? "true" : "false")}})
+        """;
+
+    /// <summary>A snapshot element as the page names it, for an approval card: <c>{ ok, role, name }</c>.</summary>
+    public static string Describe(string reference) => $$"""
+        (ref => {
+          const el = document.querySelector(`[data-agent-ref="${CSS.escape(ref)}"]`);
+          if (!el) return { ok: false, error: 'not found' };
+          const text = el.getAttribute('aria-label') || (el.labels && el.labels[0] && el.labels[0].innerText) || el.innerText || (el.type === 'password' ? '' : el.value) || el.placeholder || el.title || el.alt || el.name || '';
+          return { ok: true, role: el.getAttribute('role') || el.tagName.toLowerCase(), name: text.replace(/\s+/g, ' ').trim().slice(0, 80) };
+        })({{JsonSerializer.Serialize(reference)}})
         """;
 
     /// <summary>Focuses a snapshot element before a key press: <c>{ ok, error }</c>.</summary>

@@ -1,7 +1,7 @@
 using CodeEditor.Modules.Agent.Contracts;
 using CodeEditor.Modules.Agent.Contracts.Feed;
 using CodeEditor.Modules.Browser.Services;
-using CodeEditor.Modules.Browser.Services.Tabs;
+using CodeEditor.Modules.Browser.Services.Agent;
 using CodeEditor.Testing;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -14,13 +14,13 @@ namespace CodeEditor.Modules.Browser.Tests;
 /// </summary>
 public sealed class BrowserPageActionsTests
 {
-    private readonly BrowserTabs _tabs;
+    private readonly BrowserAgentTabs _tabs;
     private readonly FakeBrowserPage _browser;
     private readonly AIFunction _tool;
 
     public BrowserPageActionsTests()
     {
-        _tabs = FakeBrowserEngine.Tabs(out _browser);
+        _tabs = FakeBrowserEngine.AgentTabs(out _browser);
         _tool = new BrowserAgentTools(_tabs, new PassThroughOutputStore(), new NoImages()).CreateTools().OfType<AIFunction>().Single();
     }
 
@@ -114,7 +114,7 @@ public sealed class BrowserPageActionsTests
 
         var result = await InvokeAsync(new() { ["action"] = "navigate", ["url"] = "http://localhost:5000/missing" });
 
-        Assert.StartsWith("<browser_page url=\"http://localhost:5000/login\" title=\"Вход\" status=\"404\">", result, StringComparison.Ordinal);
+        Assert.StartsWith("<browser_page tab=\"t1\" url=\"http://localhost:5000/login\" title=\"Вход\" status=\"404\">", result, StringComparison.Ordinal);
     }
 
     [Theory]

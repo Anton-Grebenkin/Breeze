@@ -106,9 +106,13 @@ internal sealed class FakeBrowserPage : IBrowserPage
         return Task.CompletedTask;
     }
 
+    /// <summary>Runs when the page gets a script: a test makes the page react (open a window on a click).</summary>
+    public Action<string>? OnScript { get; set; }
+
     public Task<string> EvaluateAsync(string script, CancellationToken cancellationToken)
     {
         Scripts.Add(script);
+        OnScript?.Invoke(script);
         if (script == BrowserScripts.Snapshot)
         {
             return Task.FromResult(SnapshotResult);
