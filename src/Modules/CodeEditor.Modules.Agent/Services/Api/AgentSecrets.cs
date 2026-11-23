@@ -9,4 +9,7 @@ public static class AgentSecrets
     public const string ProvodApiKey = "agent-api-key-provod";
 
     public const string AitunnelApiKey = "agent-api-key-aitunnel";
+
+    /// <summary>Key of the user's own connection (<see cref="AgentConnection"/>).</summary>
+    public static string ForConnection(string connectionId) => "agent-api-key-connection-" + connectionId.ToLowerInvariant();
 }

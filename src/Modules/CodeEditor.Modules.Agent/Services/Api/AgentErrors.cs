@@ -20,15 +20,15 @@ public static class AgentErrors
 
             // 403 is not always about the key: Provod uses it to demand a first top-up and explains why in the body.
             ClientResultException { Status: (int)HttpStatusCode.Forbidden } forbidden when ServiceErrorText.Of(forbidden) is null => Strings.ErrorApiKeyRejected,
-            ClientResultException { Status: (int)HttpStatusCode.NotFound } => Format(Strings.ErrorModelNotFound, options.Model, options.Endpoint),
+            ClientResultException { Status: (int)HttpStatusCode.NotFound } => Format(Strings.ErrorModelNotFound, ModelRoutes.For(options).Model, ModelRoutes.For(options).Endpoint),
             ClientResultException { Status: (int)HttpStatusCode.PaymentRequired } => Strings.ErrorPaymentRequired,
             ClientResultException { Status: (int)HttpStatusCode.TooManyRequests } => Strings.ErrorTooManyRequests,
 
             // Status 0: the request got no answer; the library's message is the raw .NET text.
-            ClientResultException { Status: 0 } => Format(Strings.ErrorNoConnection, options.Endpoint),
+            ClientResultException { Status: 0 } => Format(Strings.ErrorNoConnection, ModelRoutes.For(options).Endpoint),
             ClientResultException result => Format(Strings.ErrorService, result.Status, ServiceErrorText.Of(result) ?? result.Message),
             ModelStreamException stream => Format(Strings.ErrorStream, stream.Message),
-            HttpRequestException => Format(Strings.ErrorNoConnection, options.Endpoint),
+            HttpRequestException => Format(Strings.ErrorNoConnection, ModelRoutes.For(options).Endpoint),
             IOException => Strings.ErrorConnectionLost,
             TimeoutException or OperationCanceledException => Strings.ErrorTimeout,
             _ => exception.Message,

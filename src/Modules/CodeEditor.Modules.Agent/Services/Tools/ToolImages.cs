@@ -16,7 +16,7 @@ public sealed class ToolImages(IOptionsMonitor<AgentOptions> options) : IAgentIm
     private readonly Lock _gate = new();
     private readonly List<AIContent> _pending = [];
 
-    public bool CanShow => ModelProfiles.For(options.CurrentValue.Model).SeesImages;
+    public bool CanShow => ModelProfiles.For(options.CurrentValue).SeesImages;
 
     public bool TryShow(string name, byte[] data, string mediaType)
     {

@@ -85,11 +85,18 @@ public static class ModelCatalog
         ("devstral", 256_000),
     ];
 
-    /// <summary>Models in the input and role pickers: the current service's models, always including the current one.</summary>
+    /// <summary>
+    /// Models in the input and role pickers: the described models of the user's connections, then the models of the
+    /// service at <c>agent.endpoint</c>; always including the current one.
+    /// </summary>
     public static IReadOnlyList<string> Choices(AgentOptions options)
     {
         ArgumentNullException.ThrowIfNull(options);
-        var models = AgentServices.For(options.Endpoint)?.Models ?? DefaultModels;
+        IReadOnlyList<string> models =
+        [
+            .. options.Connections.SelectMany(connection => connection.Models.Select(model => ModelRoutes.Reference(connection, model.Id))),
+            .. AgentServices.For(options.Endpoint)?.Models ?? DefaultModels,
+        ];
         return models.Contains(options.Model, StringComparer.OrdinalIgnoreCase) ? models : [options.Model, .. models];
     }
 
@@ -109,14 +116,20 @@ public static class ModelCatalog
             return configured;
         }
 
-        if (SupportedFor(options.Model) is { } supported)
+        var route = ModelRoutes.For(options);
+        if (route.Description?.ContextWindow is > 0 and var described)
+        {
+            return described;
+        }
+
+        if (SupportedFor(route.Model) is { } supported)
         {
             return supported.ContextWindow;
         }
 
         foreach (var (marker, tokens) in ContextWindows)
         {
-            if (options.Model.Contains(marker, StringComparison.OrdinalIgnoreCase))
+            if (route.Model.Contains(marker, StringComparison.OrdinalIgnoreCase))
             {
                 return tokens;
             }

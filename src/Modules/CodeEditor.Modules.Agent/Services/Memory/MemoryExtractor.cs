@@ -42,16 +42,11 @@ public sealed partial class MemoryExtractor(
     public async Task<IReadOnlyList<MemoryNote>> ExtractAsync(string finalAnswer, CancellationToken cancellationToken)
     {
         var agent = options.CurrentValue;
-        var settings = new AgentOptions
-        {
-            Endpoint = agent.Endpoint,
-            Api = agent.Api,
-            Model = string.IsNullOrWhiteSpace(agent.HelperModel) ? agent.Model : agent.HelperModel,
-        };
+        var settings = agent.ForModel(string.IsNullOrWhiteSpace(agent.HelperModel) ? agent.Model : agent.HelperModel);
         try
         {
             var digest = ToolOutput.Limit(TranscriptDigest.Render(transcript.LastRequest) + "\n\nAGENT: " + finalAnswer, MaxDigestCharacters);
-            var profile = ModelProfiles.For(settings.Model);
+            var profile = ModelProfiles.For(settings);
             using var client = new UsageCountingChatClient(clients.Create(settings), usage);
             var response = await client.GetResponseAsync(
                 [new ChatMessage(ChatRole.User, MemoryPrompts.Request(memory.IndexForModel() ?? ChatStartContext.EmptyMemory, digest))],

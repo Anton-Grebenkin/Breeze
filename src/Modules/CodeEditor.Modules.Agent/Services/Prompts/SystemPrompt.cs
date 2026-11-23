@@ -36,7 +36,7 @@ public sealed class SystemPrompt : IDisposable
     public string Build(AgentOptions options)
     {
         ArgumentNullException.ThrowIfNull(options);
-        var profile = ModelProfiles.For(options.Model);
+        var profile = ModelProfiles.For(options);
         string?[] sections =
         [
             PromptSections.Role(_workspace.Name, _workspace.Root),

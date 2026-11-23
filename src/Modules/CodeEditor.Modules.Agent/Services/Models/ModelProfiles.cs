@@ -5,6 +5,8 @@ namespace CodeEditor.Modules.Agent.Services.Models;
 
 /// <summary>
 /// Profile by model id (<c>vendor/model</c>): family, texts from <see cref="FamilyPrompts"/> and request settings.
+/// What the user said about a model of their connection (<see cref="ModelDescription"/>) comes first; the rest is
+/// guessed from the id.
 /// Adjustments follow Copilot, Cursor and Claude Code experience (ADR 0010): Claude tends to over-explore, older GPT
 /// stops mid-work, Gemini describes calls in text, weak models need short imperative rules and one step at a time.
 /// </summary>
@@ -21,8 +23,8 @@ public static partial class ModelProfiles
         ("gemini", ModelFamily.Gemini),
         ("deepseek", ModelFamily.DeepSeek),
         ("grok", ModelFamily.Frontier),
-        ("qwen3", ModelFamily.Frontier),
-        ("qwen-3", ModelFamily.Frontier),
+        ("qwen3", ModelFamily.Qwen),
+        ("qwen-3", ModelFamily.Qwen),
         ("kimi", ModelFamily.Frontier),
         ("glm", ModelFamily.Frontier),
         ("minimax", ModelFamily.Frontier),
@@ -51,25 +53,43 @@ public static partial class ModelProfiles
     /// <summary>From this version on Claude reasons in "adaptive" mode and rejects a token budget.</summary>
     private const int ClaudeAdaptiveThinkingSince = 5;
 
+    /// <summary>The profile of the conversation model.</summary>
+    public static ModelProfile For(AgentOptions options) => For(ModelRoutes.For(options));
+
+    public static ModelProfile For(ModelRoute route)
+    {
+        ArgumentNullException.ThrowIfNull(route);
+        return Build(route.Model, route.Description);
+    }
+
+    /// <summary>The profile guessed from the id alone.</summary>
     public static ModelProfile For(string model)
     {
         ArgumentNullException.ThrowIfNull(model);
+        return Build(model, description: null);
+    }
+
+    private static ModelProfile Build(string model, ModelDescription? description)
+    {
         var name = model[(model.LastIndexOf('/') + 1)..].ToLowerInvariant();
-        var family = FamilyOf(name);
+        var family = description?.Family ?? FamilyOf(name);
         var (guidance, reminder) = FamilyPrompts.For(family);
         return new ModelProfile(family, IsReasoning(name), guidance, reminder)
         {
-            DefaultMaxOutputTokens = ModelCatalog.SupportedFor(model) is { } supported
-                ? Math.Min(OutputTokenCap, supported.MaxOutputTokens)
-                : family == ModelFamily.Claude ? OutputTokenCap : null,
+            DefaultMaxOutputTokens = OutputLimit(model, family, description),
             AcceptsTemperature = family is not (ModelFamily.Claude or ModelFamily.GptReasoning),
             RequestsReasoningSummary = family == ModelFamily.GptReasoning,
-            EditFormat = family == ModelFamily.GptReasoning ? EditFormat.Patch : EditFormat.Replace,
+            EditFormat = description?.EditFormat ?? (family == ModelFamily.GptReasoning ? EditFormat.Patch : EditFormat.Replace),
             Thinking = family == ModelFamily.Claude ? ThinkingOf(name) : ClaudeThinking.None,
-            Reasoning = ReasoningOf(family, name),
-            SeesImages = SeesImages(family, name),
+            Reasoning = description?.Reasoning ?? ReasoningOf(family, name),
+            SeesImages = description?.Images ?? SeesImages(family, name),
         };
     }
+
+    private static int? OutputLimit(string model, ModelFamily family, ModelDescription? description) =>
+        description?.MaxOutputTokens is > 0 and var described ? Math.Min(OutputTokenCap, described)
+        : ModelCatalog.SupportedFor(model) is { } supported ? Math.Min(OutputTokenCap, supported.MaxOutputTokens)
+        : family == ModelFamily.Claude ? OutputTokenCap : null;
 
     // Native reasoning comes from GPT (summary), Claude (thinking) and most open models (reasoning_content); coding
     // models and older chat models lack it, so the prompt tells them to think aloud.

@@ -17,7 +17,7 @@ public sealed class ModelProfilesTests
     [InlineData("deepseek/deepseek-chat", ModelFamily.DeepSeek, false)]
     [InlineData("deepseek/deepseek-v4-flash", ModelFamily.DeepSeek, false)]
     [InlineData("deepseek/deepseek-reasoner", ModelFamily.DeepSeek, true)]
-    [InlineData("qwen/qwen3-coder", ModelFamily.Frontier, false)]
+    [InlineData("qwen/qwen3-coder", ModelFamily.Qwen, false)]
     [InlineData("x-ai/grok-4.7", ModelFamily.Frontier, false)]
     [InlineData("moonshotai/kimi-k2.7-code", ModelFamily.Frontier, false)]
     [InlineData("llama3", ModelFamily.Other, false)]

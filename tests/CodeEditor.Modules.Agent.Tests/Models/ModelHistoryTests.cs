@@ -1,7 +1,9 @@
 using System.Runtime.CompilerServices;
 using CodeEditor.Modules.Agent.Resources;
+using CodeEditor.Modules.Agent.Services.Api;
 using CodeEditor.Modules.Agent.Services.Context;
 using CodeEditor.Modules.Agent.Services.Conversation;
+using CodeEditor.Modules.Agent.Services.Settings;
 using Microsoft.Extensions.AI;
 
 namespace CodeEditor.Modules.Agent.Tests.Models;
@@ -53,7 +55,8 @@ public sealed class ModelHistoryTests
     {
         var foreign = Reasoning(string.Empty, "gAAAAAenc", ModelHistoryChatClient.Origin(Service, Gpt));
         var answer = new ChatMessage(ChatRole.Assistant, [foreign, new TextContent("ответ")]);
-        var models = CompactionModels.ForChat(_inner, _inner, Service, Claude, "deepseek/deepseek-chat", () => null);
+        var options = new AgentOptions { Endpoint = Service, Model = Claude };
+        var models = CompactionModels.ForChat(_inner, _inner, ModelRoutes.For(options), ModelRoutes.For(options, "deepseek/deepseek-chat"), () => null);
 
         foreach (var client in new[] { models.Conversation, models.Helper })
         {

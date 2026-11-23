@@ -90,7 +90,7 @@ public sealed partial class AgentConversation : IDisposable
     public AgentRequestPreview Preview()
     {
         var options = _options.CurrentValue;
-        return new AgentRequestPreview(_prompt.Build(options), CollectTools(ModelProfiles.For(options.Model)));
+        return new AgentRequestPreview(_prompt.Build(options), CollectTools(ModelProfiles.For(options)));
     }
 
     /// <summary>Sends a message and streams the response: text, tool calls and their results.</summary>
@@ -231,9 +231,9 @@ public sealed partial class AgentConversation : IDisposable
 
         var options = _options.CurrentValue;
         _client = new RecordingChatClient(new BudgetChatClient(CompactingClient(options), _budget), _transcript);
-        var profile = ModelProfiles.For(options.Model);
+        var profile = ModelProfiles.For(options);
         var tools = CollectTools(profile);
-        LogAgentCreated(_logger, options.Model, EndpointHost(options.Endpoint), tools.Count, options.Temperature, options.MaxOutputTokens, options.ReasoningEffort);
+        LogAgentCreated(_logger, options.Model, EndpointHost(ModelRoutes.For(options).Endpoint), tools.Count, options.Temperature, options.MaxOutputTokens, options.ReasoningEffort);
         _agent = _client.AsAIAgent(new ChatClientAgentOptions
         {
             Name = AgentName,
@@ -256,11 +256,12 @@ public sealed partial class AgentConversation : IDisposable
     private IChatClient CompactingClient(AgentOptions options)
     {
         var helperModel = string.IsNullOrWhiteSpace(options.HelperModel) ? options.Model : options.HelperModel;
-        _summaryClient = _clients.Create(new AgentOptions { Endpoint = options.Endpoint, Model = helperModel });
+        _summaryClient = _clients.Create(options.ForModel(helperModel));
         var model = _clients.Create(options);
         _warmup = _warmups.Wrap(model, options);
-        var summaries = CompactionModels.ForChat(model, _summaryClient, options.Endpoint, options.Model, helperModel, () => _cache.LastOptions);
-        return new DetachedMessagesChatClient(new ChatClientBuilder(new ModelHistoryChatClient(new LoggingChatClient(_warmup ?? model, options.Model, _cache, _meter, _logger), options.Endpoint, options.Model))
+        var route = ModelRoutes.For(options);
+        var summaries = CompactionModels.ForChat(model, _summaryClient, route, ModelRoutes.For(options, helperModel), () => _cache.LastOptions);
+        return new DetachedMessagesChatClient(new ChatClientBuilder(new ModelHistoryChatClient(new LoggingChatClient(_warmup ?? model, options.Model, _cache, _meter, _logger), route))
             .UseAIContextProviders(_compaction.CreateProvider(options, summaries, _meter))
             .Build());
     }

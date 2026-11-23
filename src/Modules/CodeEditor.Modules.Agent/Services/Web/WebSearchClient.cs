@@ -29,17 +29,20 @@ public sealed class WebSearchClient(
         "Search the web to answer the query. Reply with the facts you found, concisely, with versions and dates where they matter; " +
         "mark each fact with the source number like [1]. If nothing relevant is found, say so. Write in the language of the query.";
 
-    /// <summary>The configured service supports search.</summary>
-    public bool IsAvailable => AgentServices.DialectFor(options.CurrentValue.Endpoint).WebSearchTool;
+    /// <summary>The service of the search model supports search, and its key is there.</summary>
+    public bool IsAvailable =>
+        ModelRoutes.For(options.CurrentValue, options.CurrentValue.WebSearchModel) is { Dialect.WebSearchTool: true } route
+        && (route.Keyless || secrets.Get(route.SecretName) is not null);
 
     /// <exception cref="ClientResultException">The service returned an error.</exception>
     public async Task<WebSearchResult> SearchAsync(string query, CancellationToken cancellationToken)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(query);
         var agent = options.CurrentValue;
-        var search = new AgentOptions { Endpoint = agent.Endpoint, Model = agent.WebSearchModel };
+        var search = agent.ForModel(agent.WebSearchModel);
+        var route = ModelRoutes.For(search);
         var (key, endpoint) = OpenAIChatClientFactory.Connection(search, secrets);
-        var model = AgentServices.DialectFor(search.Endpoint).ShortModelIds ? ModelVendors.ShortName(search.Model) : search.Model;
+        var model = route.Dialect.ShortModelIds ? ModelVendors.ShortName(route.Model) : route.Model;
 
         var pipeline = Pipeline(key, agent);
         using var message = pipeline.CreateMessage();

@@ -88,8 +88,8 @@ public sealed partial class ModelSettingsViewModel : ObservableObject, IDisposab
 
     public string Model => _options.CurrentValue.Model;
 
-    /// <summary>The model name without the vendor, for the button.</summary>
-    public string ModelShortName => ModelVendors.ShortName(Model);
+    /// <summary>The model name without the vendor, for the button; a described model of a connection goes by its name.</summary>
+    public string ModelShortName => ModelVendors.ShortName(Route(Model).Title);
 
     /// <summary>Chooses which models appear in the picker.</summary>
     public ModelManagerViewModel Manager { get; }
@@ -109,10 +109,13 @@ public sealed partial class ModelSettingsViewModel : ObservableObject, IDisposab
 
     public void Dispose() => _subscription?.Dispose();
 
-    // "OpenAI · optimal · current": vendor, tier for supported models (ADR 0017), and a mark on the current one.
+    private ModelRoute Route(string model) => ModelRoutes.For(_options.CurrentValue, model);
+
+    // "OpenAI · optimal · current": vendor or the user's connection, tier for supported models (ADR 0017), and a mark
+    // on the current one.
     private string ModelDetail(string model)
     {
-        List<string> parts = [ModelVendors.Title(ModelVendors.VendorOf(model))];
+        List<string> parts = [Route(model) is { Connection: not null } route ? route.ServiceTitle : ModelVendors.Title(ModelVendors.VendorOf(model))];
         if (ModelCatalog.SupportedFor(model) is { } supported)
         {
             parts.Add(supported.Tier switch
@@ -139,10 +142,10 @@ public sealed partial class ModelSettingsViewModel : ObservableObject, IDisposab
     private void PickModel()
     {
         IsParametersOpen = false;
-        var items = ModelCatalog.Choices(_options.CurrentValue).Select(model => new QuickPickItem(model, model) { Detail = ModelDetail(model) }).ToList();
+        var items = ModelCatalog.Choices(_options.CurrentValue).Select(model => new QuickPickItem(model, Route(model).Title) { Detail = ModelDetail(model) }).ToList();
         _quickPick.Show(new QuickPickProvider(Strings.PickModelPrompt, items, item =>
         {
-            Write(ModelKey, item.Id, string.Format(CultureInfo.CurrentCulture, Strings.ModelChanged, item.Id));
+            Write(ModelKey, item.Id, string.Format(CultureInfo.CurrentCulture, Strings.ModelChanged, item.Title));
             return Task.CompletedTask;
         }));
     }
@@ -170,12 +173,12 @@ public sealed partial class ModelSettingsViewModel : ObservableObject, IDisposab
         [
             new(string.Empty, SameAsAgentTitle) { Detail = string.IsNullOrWhiteSpace(current) ? Strings.CurrentModel : Model },
             .. ModelCatalog.Choices(_options.CurrentValue)
-                .Select(model => new QuickPickItem(model, model) { Detail = string.Equals(model, current, StringComparison.OrdinalIgnoreCase) ? Strings.CurrentModel : null }),
+                .Select(model => new QuickPickItem(model, Route(model).Title) { Detail = string.Equals(model, current, StringComparison.OrdinalIgnoreCase) ? Strings.CurrentModel : ModelDetail(model) }),
         ];
         _quickPick.Show(new QuickPickProvider(title, items, item =>
         {
             var model = item.Id.Length == 0 ? null : item.Id;
-            Write(key, model, $"{status}: {model ?? SameAsAgentTitle.ToLowerInvariant()}");
+            Write(key, model, $"{status}: {(model is null ? SameAsAgentTitle.ToLowerInvariant() : item.Title)}");
             return Task.CompletedTask;
         }));
     }

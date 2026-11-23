@@ -12,4 +12,7 @@ public enum AgentApi
     ChatCompletions,
 
     Responses,
+
+    /// <summary>Anthropic Messages (<c>/v1/messages</c>), for a connection that serves Claude natively.</summary>
+    Messages,
 }

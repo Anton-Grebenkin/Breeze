@@ -53,7 +53,7 @@ public sealed partial class ChatAttachmentsViewModel(
         {
             statusBar.Message = Format(Strings.AttachmentRejected, string.Join(", ", rejected));
         }
-        else if (images > 0 && !ModelProfiles.For(options.CurrentValue.Model).SeesImages)
+        else if (images > 0 && !ModelProfiles.For(options.CurrentValue).SeesImages)
         {
             statusBar.Message = Format(Strings.ModelDoesNotSeeImages, ModelVendors.ShortName(options.CurrentValue.Model));
         }

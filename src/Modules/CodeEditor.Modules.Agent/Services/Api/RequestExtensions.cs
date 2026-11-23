@@ -15,15 +15,16 @@ internal static class RequestExtensions
         ArgumentNullException.ThrowIfNull(options);
         ArgumentNullException.ThrowIfNull(dialect);
         List<Func<JsonNode, bool>> edits = [];
+        var route = ModelRoutes.For(options);
         if (OpenAIChatClientFactory.UsesMessages(options))
         {
             // The Messages client builds the whole request itself and needs no OpenAI-format edits.
             return edits;
         }
 
-        if (IsVendor(options, OpenAIChatClientFactory.AnthropicVendorPrefix))
+        if (route.IsVendor(OpenAIChatClientFactory.AnthropicVendorPrefix))
         {
-            AddClaude(edits, options, dialect);
+            AddClaude(edits, route, dialect);
         }
 
         if (OpenAIChatClientFactory.UsesResponses(options))
@@ -35,7 +36,7 @@ internal static class RequestExtensions
             edits.Add(CompletionsFields.UseLegacyMaxTokens);
         }
 
-        if (IsVendor(options, OpenAIChatClientFactory.XaiVendorPrefix))
+        if (route.IsVendor(OpenAIChatClientFactory.XaiVendorPrefix))
         {
             AddGrok(edits, options, dialect, conversationKey);
         }
@@ -45,9 +46,9 @@ internal static class RequestExtensions
 
     /// <summary>Pins Grok to the server with its cache: the field is added here, the header by the factory.</summary>
     public static bool UsesGrokSessionKey(AgentOptions options, ServiceDialect dialect) =>
-        dialect.GrokSessionKey && IsVendor(options, OpenAIChatClientFactory.XaiVendorPrefix);
+        dialect.GrokSessionKey && ModelRoutes.For(options).IsVendor(OpenAIChatClientFactory.XaiVendorPrefix);
 
-    private static void AddClaude(List<Func<JsonNode, bool>> edits, AgentOptions options, ServiceDialect dialect)
+    private static void AddClaude(List<Func<JsonNode, bool>> edits, ModelRoute route, ServiceDialect dialect)
     {
         if (dialect.CacheControlMarks)
         {
@@ -56,7 +57,7 @@ internal static class RequestExtensions
 
         if (dialect.ThinkingField)
         {
-            var thinking = ModelProfiles.For(options.Model).Thinking;
+            var thinking = ModelProfiles.For(route).Thinking;
             edits.Add(body => AnthropicThinking.Enable(body, thinking));
         }
 
@@ -96,6 +97,4 @@ internal static class RequestExtensions
             edits.Add(body => CacheKeyField.Mark(body, CacheKeyField.PromptCacheKey, conversationKey()));
         }
     }
-
-    private static bool IsVendor(AgentOptions options, string prefix) => options.Model.StartsWith(prefix, StringComparison.OrdinalIgnoreCase);
 }

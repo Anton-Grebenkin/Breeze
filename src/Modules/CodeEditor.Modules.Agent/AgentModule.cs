@@ -39,6 +39,7 @@ public sealed class AgentModule : IModule
         services.AddUserOnlySetting(ModelSettingsViewModel.ApprovalsKey);
         services.AddUserOnlySetting(WebApprovals.HostsKey);
         services.AddUserOnlySetting(ServiceMenu.EndpointKey);
+        services.AddUserOnlySetting(AgentOptions.Section + ".connections");
         services.AddUserOnlySetting(AgentOptions.Section + ".hooks");
 
         // Writing every request to disk and paid cache warm-up are the user's call, not a repository's.

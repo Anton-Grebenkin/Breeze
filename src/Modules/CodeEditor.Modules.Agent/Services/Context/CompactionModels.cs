@@ -13,7 +13,6 @@ public sealed record CompactionModels(IChatClient Conversation, Func<ChatOptions
     /// switched models carries reasoning the summarizing model rejects, and only an identical request reads the
     /// chat's cache.
     /// </summary>
-    internal static CompactionModels ForChat(
-        IChatClient model, IChatClient helper, string endpoint, string modelId, string helperModelId, Func<ChatOptions?> lastOptions) =>
-        new(new ModelHistoryChatClient(model, endpoint, modelId), lastOptions, new ModelHistoryChatClient(helper, endpoint, helperModelId));
+    internal static CompactionModels ForChat(IChatClient model, IChatClient helper, ModelRoute route, ModelRoute helperRoute, Func<ChatOptions?> lastOptions) =>
+        new(new ModelHistoryChatClient(model, route), lastOptions, new ModelHistoryChatClient(helper, helperRoute));
 }
