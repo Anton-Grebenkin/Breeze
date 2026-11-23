@@ -7,4 +7,7 @@ public sealed class BrowserOptions
 
     /// <summary>Sites beyond this machine that the agent opens without asking; "Always allow" adds a site here.</summary>
     public List<string> AllowedHosts { get; set; } = [];
+
+    /// <summary>The agent is told which sites are open in the browser; the chip above the chat input switches it.</summary>
+    public bool ShareTabsWithAgent { get; set; } = true;
 }

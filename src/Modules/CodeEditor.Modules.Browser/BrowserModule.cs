@@ -3,10 +3,12 @@ using CodeEditor.Core.Modules;
 using CodeEditor.Core.Settings;
 using CodeEditor.Modules.Agent.Contracts;
 using CodeEditor.Modules.Agent.Contracts.Approvals;
+using CodeEditor.Modules.Agent.Contracts.Context;
 using CodeEditor.Modules.Agent.Contracts.Feed;
 using CodeEditor.Modules.Browser.Commands;
 using CodeEditor.Modules.Browser.Resources;
 using CodeEditor.Modules.Browser.Services;
+using CodeEditor.Modules.Browser.Services.Agent;
 using CodeEditor.Modules.Browser.ViewModels;
 using CodeEditor.Shell;
 using CodeEditor.Shell.Services;
@@ -34,6 +36,7 @@ public sealed class BrowserModule : IModule
     {
         services.AddSettingsSection<BrowserOptions>(BrowserOptions.Section, SettingScope.User);
         services.AddUserOnlySetting(BrowserApprovals.AllowedHostsKey);
+        services.AddUserOnlySetting(BrowserTabsSwitch.ShareKey);
         services.AddSingleton<BrowserHistory>();
         services.AddSingleton<BrowserNetworkLog>();
         services.AddSingleton<BrowserPageActions>();
@@ -44,6 +47,9 @@ public sealed class BrowserModule : IModule
         services.AddSingleton<IAgentApprovalPolicy, BrowserApprovals>();
         services.AddSingleton<IAgentToolPresenter, BrowserToolPresenter>();
         services.AddSingleton<IWebPageOpener, BrowserPageOpener>();
+        services.AddSingleton<BrowserTabsSwitch>();
+        services.AddSingleton<IAgentContextSwitch>(provider => provider.GetRequiredService<BrowserTabsSwitch>());
+        services.AddSingleton<IAgentContextProvider, BrowserAgentContext>();
     }
 
     public void Contribute(IServiceProvider services)
@@ -53,6 +59,6 @@ public sealed class BrowserModule : IModule
         {
             Order = 10,
         }));
-        _registrations.AddRange(new BrowserCommands(services.GetRequiredService<BrowserViewModel>).Register(services.GetRequiredService<ICommandRegistry>()));
+        _registrations.AddRange(new BrowserCommands(services.GetRequiredService<BrowserViewModel>, services.GetRequiredService<BrowserTabsSwitch>()).Register(services.GetRequiredService<ICommandRegistry>()));
     }
 }

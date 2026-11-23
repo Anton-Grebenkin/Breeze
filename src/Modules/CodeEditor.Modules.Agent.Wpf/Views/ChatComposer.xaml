@@ -111,6 +111,43 @@
                        FontSize="{DynamicResource FontSize.Small}" Text="{Binding FileName}" />
           </StackPanel>
         </Button>
+        <!-- Chips of other modules (browser tabs): the same click turns telling the agent on or off. -->
+        <ItemsControl ItemsSource="{Binding ActiveFile.Switches}" Focusable="False">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <WrapPanel />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <Button Margin="4,4,0,0" Padding="4,1" MaxWidth="260"
+                      Command="{Binding ToggleCommand}"
+                      ToolTip="{Binding ToolTip}"
+                      Visibility="{Binding IsAvailable, Converter={StaticResource BoolToVisibility}}"
+                      AutomationProperties.AutomationId="{Binding AutomationId}"
+                      AutomationProperties.Name="{Binding Label}">
+                <Button.Style>
+                  <Style TargetType="Button" BasedOn="{StaticResource Button.Subtle}">
+                    <Setter Property="BorderThickness" Value="1" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource Brush.Widget.Border}" />
+                    <Style.Triggers>
+                      <DataTrigger Binding="{Binding IsOn}" Value="False">
+                        <Setter Property="Opacity" Value="0.6" />
+                        <Setter Property="BorderBrush" Value="Transparent" />
+                      </DataTrigger>
+                    </Style.Triggers>
+                  </Style>
+                </Button.Style>
+                <StackPanel Orientation="Horizontal">
+                  <TextBlock VerticalAlignment="Center" FontFamily="{DynamicResource Font.Icons}" FontSize="{DynamicResource FontSize.Normal}"
+                             Text="{Binding Icon, Converter={x:Static controls:IconGlyphConverter.Instance}}" />
+                  <TextBlock Margin="4,0,0,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                             FontSize="{DynamicResource FontSize.Small}" Text="{Binding Label}" />
+                </StackPanel>
+              </Button>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
         <ItemsControl ItemsSource="{Binding Attachments.Items}" Focusable="False" AutomationProperties.AutomationId="Agent.Attachments">
           <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
