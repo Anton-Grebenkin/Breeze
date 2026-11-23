@@ -181,10 +181,10 @@ public static class PatchParser
                 }
 
                 var anchor = _anchors[^1];
-                return new FileEdit(path, anchor, anchor + "\n" + string.Join('\n', _new)) { Anchors = [.. _anchors.SkipLast(1)] };
+                return new FileEdit(path, anchor, anchor + "\n" + string.Join('\n', _new)) { Anchors = [.. _anchors.SkipLast(1)], IsHunk = true };
             }
 
-            return new FileEdit(path, string.Join('\n', _old), string.Join('\n', _new)) { Anchors = [.. _anchors] };
+            return new FileEdit(path, string.Join('\n', _old), string.Join('\n', _new)) { Anchors = [.. _anchors], IsHunk = true };
         }
     }
 }
