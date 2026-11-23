@@ -375,6 +375,7 @@
   <!-- Web access (ADR 0025). -->
   <data name="WebOnlyHttp" xml:space="preserve"><value>Читаются только адреса http и https: {0}</value></data>
   <data name="WebHttpError" xml:space="preserve"><value>{0} ответил {1} {2}.</value></data>
+  <data name="WebRedirected" xml:space="preserve"><value>{0} ответил {1} и перенаправляет на {2}. Запросите этот адрес.</value></data>
   <data name="WebNotText" xml:space="preserve"><value>{0} — не текстовая страница ({1}): прочитать её текстом нельзя.</value></data>
   <data name="WebUnreachable" xml:space="preserve"><value>{0} недоступен: {1}</value></data>
   <data name="WebTimedOut" xml:space="preserve"><value>{0} не ответил за {1} с.</value></data>

@@ -29,7 +29,7 @@ public sealed partial class TurnMessageBuilder(
     public async Task<ChatMessage> BuildAsync(string text, bool includeActiveEditor, bool startsChat, AgentMode? previousMode, IReadOnlyList<string> files, CancellationToken cancellationToken)
     {
         var hooked = await PromptHooksAsync(text, cancellationToken);
-        var lines = new List<string> { string.Create(CultureInfo.InvariantCulture, $"Date: {time.GetLocalNow():yyyy-MM-dd}.") };
+        var lines = new List<string> { string.Create(CultureInfo.InvariantCulture, $"Date: {time.GetLocalNow():yyyy-MM-dd}."), ModelLine(options.CurrentValue) };
         var request = new AgentContextRequest(includeActiveEditor, text);
         foreach (var provider in providers)
         {
@@ -52,6 +52,10 @@ public sealed partial class TurnMessageBuilder(
         contents.Add(new TextContent($"<reminder>{Reminder(options.CurrentValue, text, previousMode)}</reminder>"));
         return new ChatMessage(ChatRole.User, contents);
     }
+
+    // Without this line the model named itself by guess when asked, and could not tell which service it runs through.
+    private static string ModelLine(AgentOptions options) =>
+        $"Model: {options.Model} via {AgentServices.For(options.Endpoint)?.Title ?? (Uri.TryCreate(options.Endpoint, UriKind.Absolute, out var endpoint) ? endpoint.Host : options.Endpoint)}.";
 
     /// <exception cref="HookBlockedException">A hook stopped the message.</exception>
     private async Task<string?> PromptHooksAsync(string text, CancellationToken cancellationToken)

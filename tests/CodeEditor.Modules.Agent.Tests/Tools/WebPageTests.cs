@@ -79,6 +79,30 @@ public sealed class WebPageTests
         Assert.Contains(expected, error.Message, StringComparison.Ordinal);
     }
 
+    // A redirect the client does not follow (https to http, too many hops) names its target, absolute even if the
+    // header was relative: the model fetched guessed addresses after a bare "301".
+    [Theory]
+    [InlineData("http://docs.example.test/new", "http://docs.example.test/new")]
+    [InlineData("/moved/here", "https://learn.example.com/moved/here")]
+    public async Task Reader_RedirectNotFollowed_NamesItsTarget(string location, string expected)
+    {
+        using var reader = new WebPageReader(new RedirectServer(location));
+
+        var error = await Assert.ThrowsAsync<AgentToolException>(() => reader.ReadAsync(Page, TestContext.Current.CancellationToken));
+
+        Assert.Contains("ответил 301 и перенаправляет на " + expected, error.Message, StringComparison.Ordinal);
+    }
+
+    private sealed class RedirectServer(string location) : HttpMessageHandler
+    {
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            var response = new HttpResponseMessage(HttpStatusCode.MovedPermanently) { RequestMessage = request };
+            response.Headers.Location = new Uri(location, UriKind.RelativeOrAbsolute);
+            return Task.FromResult(response);
+        }
+    }
+
     [Fact]
     public async Task Reader_OnlyHttp() =>
         await Assert.ThrowsAsync<AgentToolException>(() => new WebPageReader(new PageServer(HttpStatusCode.OK, "x", "text/plain")).ReadAsync(new Uri("file:///C:/secret.txt"), TestContext.Current.CancellationToken));

@@ -121,6 +121,20 @@ public sealed class BrowserPageActionsTests
     public void NavigationErrors_SayWhenTheServerDoesNotAnswer(string status, bool hint) =>
         Assert.Equal(hint, BrowserErrors.Describe(status).Contains("Приложение запущено?", StringComparison.Ordinal));
 
+    // "Is the app running?" is about this machine; for a site elsewhere the text points at the address and the network.
+    [Theory]
+    [InlineData("http://localhost:5000/", true)]
+    [InlineData("http://127.0.0.1:8080/health", true)]
+    [InlineData("http://api.localhost/", true)]
+    [InlineData("https://gitlab.example.com/group/project", false)]
+    public void NavigationErrors_AskAboutTheAppOnlyForThisMachine(string url, bool asksAboutApp)
+    {
+        var text = BrowserErrors.Describe("HostNameNotResolved", url);
+
+        Assert.Equal(asksAboutApp, text.Contains("Приложение запущено?", StringComparison.Ordinal));
+        Assert.Equal(!asksAboutApp, text.StartsWith("сайт не отвечает (HostNameNotResolved)", StringComparison.Ordinal));
+    }
+
     // A script on a site where the user is logged in could send the session elsewhere: it asks, with the script shown.
     [Theory]
     [InlineData("http://localhost:5000/", true)]

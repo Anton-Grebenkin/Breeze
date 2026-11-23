@@ -52,6 +52,7 @@
   <data name="EvaluateApprovalTitle" xml:space="preserve"><value>Run a script on the page</value></data>
   <data name="DevToolsFailed" xml:space="preserve"><value>The browser did not complete {0}: {1}</value></data>
   <data name="ServerNotReachable" xml:space="preserve"><value>the server does not answer ({0}). Is the app running?</value></data>
+  <data name="SiteNotReachable" xml:space="preserve"><value>the site does not answer ({0}). Check the address and the network; a corporate site may need VPN.</value></data>
   <data name="FeedPress" xml:space="preserve"><value>key {0}</value></data>
   <data name="FeedScroll" xml:space="preserve"><value>scroll</value></data>
   <data name="FeedWaitFor" xml:space="preserve"><value>waiting for '{0}'</value></data>

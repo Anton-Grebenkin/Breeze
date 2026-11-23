@@ -229,8 +229,10 @@ public sealed partial class WebViewBrowserEngine(IUiDispatcher dispatcher, Workb
 
     private void Subscribe(CoreWebView2 core)
     {
-        core.NavigationStarting += (_, _) =>
+        string? opening = null; // Source keeps the previous page's address when a navigation fails before any answer.
+        core.NavigationStarting += (_, e) =>
         {
+            opening = e.Uri;
             _loading ??= new TaskCompletionSource<string?>(TaskCreationOptions.RunContinuationsAsynchronously);
             IsLoading = true;
             Update(core);
@@ -240,7 +242,7 @@ public sealed partial class WebViewBrowserEngine(IUiDispatcher dispatcher, Workb
         core.NavigationCompleted += (_, e) =>
         {
             StatusCode = e.HttpStatusCode > 0 ? e.HttpStatusCode : null;
-            Finish(core, e.IsSuccess || e.HttpStatusCode > 0 ? null : BrowserErrors.Describe(e.WebErrorStatus.ToString()));
+            Finish(core, e.IsSuccess || e.HttpStatusCode > 0 ? null : BrowserErrors.Describe(e.WebErrorStatus.ToString(), opening ?? core.Source));
         };
 
         // In-page navigation (anchor, history.pushState) starts no load, so nothing needs to wait for one.
