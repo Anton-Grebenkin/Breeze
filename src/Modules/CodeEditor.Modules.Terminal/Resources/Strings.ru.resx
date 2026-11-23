@@ -36,6 +36,7 @@
   <data name="NoOutput" xml:space="preserve"><value> Вывода нет.</value></data>
   <data name="FolderNotFound" xml:space="preserve"><value>Папки «{0}» нет.</value></data>
   <data name="CommandForbidden" xml:space="preserve"><value>Команда запрещена политикой редактора: {0}. Если она действительно нужна, пользователь выполнит её сам.</value></data>
+  <data name="CommandTooLong" xml:space="preserve"><value>Команда слишком длинная для командной строки: {0} знаков при пределе {1}. Сохрани сценарий в файл и запусти файл или разбей команду.</value></data>
   <data name="BackgroundRunning" xml:space="preserve"><value>Фоновая команда #{0} идёт ({1} с).</value></data>
   <data name="BackgroundExited" xml:space="preserve"><value>Фоновая команда #{0} завершилась с кодом {1} за {2} с.</value></data>
   <data name="BackgroundStopped" xml:space="preserve"><value>Фоновая команда #{0} остановлена через {1} с.</value></data>

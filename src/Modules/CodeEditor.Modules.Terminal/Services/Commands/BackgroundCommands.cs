@@ -38,15 +38,19 @@ public sealed partial class BackgroundCommands : IDisposable
     /// <summary>The chat's commands by id, running and finished.</summary>
     public IReadOnlyList<BackgroundCommand> All => [.. _commands.Values.OrderBy(command => command.Id)];
 
+    /// <param name="retry">
+    /// Looks at the finished run and may return a request to run instead, when the first one never got to run the
+    /// command (antivirus blocked the launcher's script). Its output replaces the first run's.
+    /// </param>
     /// <exception cref="AgentToolException"><see cref="MaxRunning"/> background commands are already running.</exception>
-    public BackgroundCommand Start(ProcessRequest request, string command, Action<string> onLine)
+    public BackgroundCommand Start(ProcessRequest request, string command, Action<string> onLine, Func<ProcessResult, ProcessRequest?>? retry = null)
     {
         ArgumentNullException.ThrowIfNull(request);
         ArgumentNullException.ThrowIfNull(onLine);
         EnsureCapacity();
         var started = new BackgroundCommand(Interlocked.Increment(ref _nextId), command, request.WorkingDirectory, _time.GetUtcNow());
         _commands[started.Id] = started;
-        _ = RunAsync(started, request with { Timeout = Timeout.InfiniteTimeSpan }, onLine);
+        _ = RunAsync(started, request, onLine, retry);
         return started;
     }
 
@@ -108,15 +112,17 @@ public sealed partial class BackgroundCommands : IDisposable
         StopAll();
     }
 
-    private async Task RunAsync(BackgroundCommand command, ProcessRequest request, Action<string> onLine)
+    private async Task RunAsync(BackgroundCommand command, ProcessRequest request, Action<string> onLine, Func<ProcessResult, ProcessRequest?>? retry)
     {
         try
         {
-            var result = await _runner.RunAsync(request, line =>
+            var result = await RunOnceAsync(command, request, onLine);
+            if (retry?.Invoke(result) is { } second)
             {
-                command.Append(line);
-                onLine(line);
-            }, command.Cancellation.Token);
+                command.ClearOutput();
+                result = await RunOnceAsync(command, second, onLine);
+            }
+
             command.Finish(result.ExitCode, stopped: false, _time.GetUtcNow());
         }
         catch (OperationCanceledException)
@@ -131,6 +137,13 @@ public sealed partial class BackgroundCommands : IDisposable
 
         Completed(command);
     }
+
+    private Task<ProcessResult> RunOnceAsync(BackgroundCommand command, ProcessRequest request, Action<string> onLine) =>
+        _runner.RunAsync(request with { Timeout = Timeout.InfiniteTimeSpan }, line =>
+        {
+            command.Append(line);
+            onLine(line);
+        }, command.Cancellation.Token);
 
     private async Task RunJobAsync(BackgroundCommand job, Func<Action<string>, CancellationToken, Task<JobResult>> run, Action<string> onLine)
     {

@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Globalization;
 using CodeEditor.Core.Files;
 using CodeEditor.Core.Output;
+using CodeEditor.Core.Processes;
 using CodeEditor.Modules.Agent.Contracts;
 using CodeEditor.Modules.Agent.Contracts.Approvals;
 using CodeEditor.Modules.Agent.Contracts.Files;
@@ -13,7 +14,8 @@ namespace CodeEditor.Modules.Terminal.Services.Commands;
 
 /// <summary>
 /// Agent tool <c>run_command</c>: a Windows PowerShell 5.1 command in the workspace (<see cref="PowerShellLauncher"/>:
-/// UTF-8, correct exit code, <c>&amp;&amp;</c>) unless <see cref="CommandPolicy"/> forbids it. Read-only and
+/// UTF-8, correct exit code, <c>&amp;&amp;</c>; without the wrapper where antivirus blocks it, <see cref="PowerShellMode"/>)
+/// unless <see cref="CommandPolicy"/> forbids it. Read-only and
 /// user-allowed commands run without asking (<see cref="CommandApprovals"/>); others need approval (the card shows the
 /// command and folder). Input is closed; output goes to the Commands channel and to the model, long output as head and
 /// tail with a file link (<see cref="IAgentOutputStore"/>).
@@ -28,7 +30,8 @@ public sealed class CommandAgentTools(
     SaveBeforeRun saveBeforeRun,
     IAgentOutputStore outputs,
     BackgroundCommands background,
-    IAgentToolActivity activity) : IAgentToolProvider, IAgentChangePreviewer
+    IAgentToolActivity activity,
+    PowerShellMode shell) : IAgentToolProvider, IAgentChangePreviewer
 {
     public const string RunCommandName = "run_command";
     public static string ChannelName => Strings.Commands;
@@ -72,11 +75,15 @@ public sealed class CommandAgentTools(
         channel.AppendLine($"> {command}");
         var call = activity.Current();
         var release = call.OfferBackground();
-        var started = background.Start(PowerShellLauncher.Request(command, folder, Timeout.InfiniteTimeSpan), command, line =>
-        {
-            channel.AppendLine(line);
-            call.Report(line);
-        });
+        var started = background.Start(
+            PowerShellLauncher.Request(command, folder, Timeout.InfiniteTimeSpan, shell.Wrapping),
+            command,
+            line =>
+            {
+                channel.AppendLine(line);
+                call.Report(line);
+            },
+            result => RetryBare(result, command, folder));
         try
         {
             await started.WaitAsync(pattern: null, TimeSpan.FromSeconds(Math.Clamp(waitSeconds, 0, MaxWaitSeconds)), cancellationToken, release);
@@ -96,6 +103,12 @@ public sealed class CommandAgentTools(
         background.Forget(started.Id);
         return outputs.Fit(Report(started, background.Elapsed(started)), RunCommandName);
     }
+
+    // Antivirus refused the wrapped script before anything ran: the same command goes again without the wrapper.
+    private ProcessRequest? RetryBare(ProcessResult result, string command, string folder) =>
+        PowerShellLauncher.IsBlocked(result) && shell.TryFallBack()
+            ? PowerShellLauncher.Request(command, folder, Timeout.InfiniteTimeSpan, PowerShellWrapping.Bare)
+            : null;
 
     // The first line is the summary (parsed by the feed row), then a hint for a non-obvious exit code, then output.
     private static string Report(BackgroundCommand command, TimeSpan elapsed)

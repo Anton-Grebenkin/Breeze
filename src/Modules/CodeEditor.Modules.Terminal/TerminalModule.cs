@@ -52,6 +52,7 @@ public sealed class TerminalModule : IModule
         services.AddSingleton<IAgentToolProvider, BuildAgentTools>();
         services.AddSingleton<IAgentVerifier, DotNetVerifier>();
         services.AddSingleton<BackgroundCommands>();
+        services.AddSingleton<PowerShellMode>();
         services.AddSingleton<IAgentTurnNotes, BackgroundCommandNotes>();
         services.AddSingleton<IAgentRunningJobs, RunningJobs>();
         services.AddSingleton<IAgentToolProvider, BackgroundCommandTools>();

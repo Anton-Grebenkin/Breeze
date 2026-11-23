@@ -13,7 +13,7 @@ public sealed class CommandAgentToolsTests : IDisposable
 
     public CommandAgentToolsTests()
     {
-        _tools = new CommandAgentTools(_fixture.Workspace, _fixture.FileSystem, _fixture.Output, _fixture.SaveBeforeRun, _fixture.Outputs, _fixture.Background, _fixture.Activity);
+        _tools = new CommandAgentTools(_fixture.Workspace, _fixture.FileSystem, _fixture.Output, _fixture.SaveBeforeRun, _fixture.Outputs, _fixture.Background, _fixture.Activity, _fixture.Shell);
         _run = _tools.CreateTools().OfType<AIFunction>().Single();
     }
 
@@ -45,8 +45,8 @@ public sealed class CommandAgentToolsTests : IDisposable
 
         var request = Assert.Single(_fixture.Runner.Requests);
         Assert.Equal("powershell.exe", request.FileName);
-        Assert.Equal(PowerShellLauncher.Arguments, request.Arguments);
-        Assert.Equal("git status", request.Environment[PowerShellLauncher.CommandVariable]);
+        Assert.Equal("-Command", request.Arguments[^2]);
+        Assert.Equal(PowerShellLauncher.Script("git status"), request.Arguments[^1]);
         Assert.True(request.HideSecretVariables);
         Assert.Equal(TerminalFixture.PathOf("src"), request.WorkingDirectory);
         Assert.StartsWith("Код выхода 0 за ", result, StringComparison.Ordinal);
@@ -68,6 +68,40 @@ public sealed class CommandAgentToolsTests : IDisposable
         Assert.Contains("Building…", result, StringComparison.Ordinal);
         Assert.True(_fixture.Background.Get(1).IsRunning);
         _fixture.Runner.Hold.SetResult();
+    }
+
+    // Antivirus refused the wrapped script (nothing ran): the command goes again bare, and stays bare afterwards.
+    [Fact]
+    public async Task Run_BlockedByAntivirus_RepeatsWithoutTheWrapper_AndRemembersIt()
+    {
+        _fixture.Runner
+            .Returns(1, "At line:1 char:1\n+ FullyQualifiedErrorId : " + PowerShellLauncher.BlockedMarker)
+            .Returns(0, "On branch main")
+            .Returns(0, "v1");
+
+        var first = await Invoke(new() { ["command"] = "git status", ["waitSeconds"] = 5000 });
+        var second = await Invoke(new() { ["command"] = "git --version", ["waitSeconds"] = 5000 });
+
+        Assert.Equal(["git status", "git --version"], _fixture.Runner.Requests.Skip(1).Select(request => request.Arguments[^1]));
+        Assert.EndsWith("\nOn branch main", first, StringComparison.Ordinal);
+        Assert.DoesNotContain(PowerShellLauncher.BlockedMarker, first, StringComparison.Ordinal);
+        Assert.EndsWith("\nv1", second, StringComparison.Ordinal);
+        Assert.Equal(PowerShellWrapping.Bare, _fixture.Shell.Wrapping);
+        Assert.True(_fixture.FileSystem.FileExists(Path.Combine(TerminalFixture.UserData, PowerShellMode.FileName)));
+    }
+
+    // Blocked even bare: the model gets the antivirus message, and nothing is retried forever.
+    [Fact]
+    public async Task Run_BlockedEvenBare_ReturnsTheBlock()
+    {
+        _fixture.Runner
+            .Returns(1, PowerShellLauncher.BlockedMarker)
+            .Returns(1, "bare: " + PowerShellLauncher.BlockedMarker);
+
+        var result = await Invoke(new() { ["command"] = "git status", ["waitSeconds"] = 5000 });
+
+        Assert.Equal(2, _fixture.Runner.Requests.Count);
+        Assert.Contains("bare: " + PowerShellLauncher.BlockedMarker, result, StringComparison.Ordinal);
     }
 
     [Fact]

@@ -36,6 +36,7 @@
   <data name="NoOutput" xml:space="preserve"><value> No output.</value></data>
   <data name="FolderNotFound" xml:space="preserve"><value>Folder '{0}' does not exist.</value></data>
   <data name="CommandForbidden" xml:space="preserve"><value>The command is blocked by the editor policy: {0}. If it is really needed, the user will run it themselves.</value></data>
+  <data name="CommandTooLong" xml:space="preserve"><value>The command is too long for a command line: {0} characters, the limit is {1}. Save the script to a file and run the file, or split the command.</value></data>
   <data name="BackgroundRunning" xml:space="preserve"><value>Background command #{0} is running ({1} s).</value></data>
   <data name="BackgroundExited" xml:space="preserve"><value>Background command #{0} exited with code {1} after {2} s.</value></data>
   <data name="BackgroundStopped" xml:space="preserve"><value>Background command #{0} was stopped after {1} s.</value></data>
