@@ -133,6 +133,19 @@ public sealed partial class BrowserView : System.Windows.Controls.UserControl
         }
     }
 
+    // On the press, not the release: the list closes as soon as the address bar loses the caret.
+    private void OnSuggestionMouseDown(object sender, MouseButtonEventArgs e)
+    {
+        if (_viewModel is not null && (sender as FrameworkElement)?.DataContext is BrowserSuggestion suggestion)
+        {
+            _viewModel.Suggestions.Choose(suggestion);
+            _viewModel.GoCommand.Execute(null);
+            e.Handled = true;
+        }
+    }
+
+    private void OnAddressLostFocus(object sender, KeyboardFocusChangedEventArgs e) => _viewModel?.Suggestions.DismissCommand.Execute(null);
+
     private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
     {
         if (_viewModel is not null)

@@ -7,7 +7,8 @@ namespace CodeEditor.UI.Tests.Panels;
 /// <summary>
 /// Browser tabs on real WebView2 (ADR 0054): a second tab loads its own page while the first keeps its one, a link
 /// "in a new window" opens a tab and closing it returns to the opener, Ctrl+T and Ctrl+W act on browser tabs while the
-/// panel has focus, and tabs come back after a restart.
+/// panel has focus, and tabs come back after a restart. The address bar offers pages from the history, Ctrl+F finds
+/// text on the page, and the "more" menu sends the page to the agent's chat.
 /// </summary>
 public sealed class BrowserTabsTests : IDisposable
 {
@@ -81,6 +82,58 @@ public sealed class BrowserTabsTests : IDisposable
         restarted.Find("Browser.Tab.t1").GuardedClick();
         WaitForPage(restarted, "Первая страница");
         WaitForAddress(restarted, "/");
+    }
+
+    [Fact]
+    public void AddressSuggestions_FindOnPage_AndThePageGoesToTheChat()
+    {
+        using var session = AppSession.WithUserData(_userData);
+        ShowBrowser(session);
+        Open(session, "/");
+        WaitForPage(session, "Первая страница");
+        NewTab(session, "Browser.Tab.t2");
+        Open(session, "/third");
+        WaitForPage(session, "Третья страница");
+
+        // Typing offers pages from the history: the arrows and Enter open one.
+        NewTab(session, "Browser.Tab.t3");
+        session.TypeInto("Browser.Address", "third");
+        session.WaitFor("Browser.Suggestions");
+        Keyboard.Type(VirtualKeyShort.DOWN);
+        Keyboard.Type(VirtualKeyShort.ENTER);
+        WaitForAddress(session, "/third");
+        session.WaitUntilGone("Browser.Suggestions");
+
+        // A click opens one too.
+        NewTab(session, "Browser.Tab.t4");
+        session.TypeInto("Browser.Address", "local");
+        var suggestion = session.WaitFor($"Browser.Suggestion.localhost:{_site.Port}");
+        session.SaveScreenshot("browser-suggestions");
+        suggestion.GuardedClick();
+        WaitForAddress(session, "/");
+        WaitForPage(session, "Первая страница");
+
+        // Ctrl+F opens the find bar with the caret in it; Esc closes it.
+        session.Find("Browser.Address").GuardedClick();
+        Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_F);
+        session.WaitForFocus("Browser.Find.Text");
+        session.TypeInto("Browser.Find.Text", "страница");
+        session.WaitForText("Browser.Find.Status", status => status == "1 из 1", PageTimeout);
+        session.SaveScreenshot("browser-find");
+        Keyboard.Type(VirtualKeyShort.ESCAPE);
+        session.WaitUntilGone("Browser.Find.Text");
+
+        // The "more" menu sends the page to the chat: the agent panel opens with the page in the input.
+        session.Find("Browser.More").GuardedClick();
+        session.WaitFor("Browser.More.SendPage").GuardedClick();
+        session.WaitForValue("Agent.Input", value => value.Contains($"http://localhost:{_site.Port}/", StringComparison.Ordinal), PageTimeout);
+    }
+
+    private static void NewTab(AppSession session, string automationId)
+    {
+        session.Find("Browser.NewTab").GuardedClick();
+        session.WaitFor(automationId);
+        session.WaitForFocus("Browser.Address");
     }
 
     private static void ShowBrowser(AppSession session)

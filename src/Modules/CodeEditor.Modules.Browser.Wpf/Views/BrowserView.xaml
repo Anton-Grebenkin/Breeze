@@ -138,15 +138,50 @@
       <Button DockPanel.Dock="Right" Style="{StaticResource Button.Toolbar}" Content="{x:Static ui:IconGlyphs.ArrowRight}"
               ToolTip="{x:Static res:Strings.Go}" Command="{Binding GoCommand}"
               AutomationProperties.AutomationId="Browser.Go" AutomationProperties.Name="{x:Static res:Strings.Go}" />
-      <TextBox x:Name="AddressBox" Margin="4,0" Style="{StaticResource TextBox.Field}"
-               Tag="{x:Static res:Strings.AddressPlaceholder}"
-               Text="{Binding Address, UpdateSourceTrigger=PropertyChanged}"
-               ToolTip="{Binding Title}"
-               AutomationProperties.AutomationId="Browser.Address" AutomationProperties.Name="{x:Static res:Strings.Address}">
-        <TextBox.InputBindings>
-          <KeyBinding Key="Enter" Command="{Binding GoCommand}" />
-        </TextBox.InputBindings>
-      </TextBox>
+      <Grid Margin="4,0">
+        <TextBox x:Name="AddressBox" Style="{StaticResource TextBox.Field}"
+                 Tag="{x:Static res:Strings.AddressPlaceholder}"
+                 Text="{Binding Address, UpdateSourceTrigger=PropertyChanged}"
+                 ToolTip="{Binding Title}"
+                 LostKeyboardFocus="OnAddressLostFocus"
+                 AutomationProperties.AutomationId="Browser.Address" AutomationProperties.Name="{x:Static res:Strings.Address}">
+          <TextBox.InputBindings>
+            <KeyBinding Key="Enter" Command="{Binding GoCommand}" />
+            <KeyBinding Key="Down" Command="{Binding Suggestions.NextCommand}" />
+            <KeyBinding Key="Up" Command="{Binding Suggestions.PreviousCommand}" />
+            <KeyBinding Key="Escape" Command="{Binding Suggestions.DismissCommand}" />
+          </TextBox.InputBindings>
+        </TextBox>
+        <!-- Pages from the history that match the typed text: the arrows choose, Enter or a click opens. The caret stays
+             in the address bar, so the list takes no focus. -->
+        <Popup PlacementTarget="{Binding ElementName=AddressBox}" Placement="Bottom" VerticalOffset="2"
+               IsOpen="{Binding Suggestions.IsOpen, Mode=OneWay}"
+               AllowsTransparency="True" StaysOpen="True" Focusable="False" PopupAnimation="None">
+          <Border Margin="0,0,12,12" Padding="0,4" Width="{Binding ActualWidth, ElementName=AddressBox}" Style="{StaticResource Border.Widget}">
+            <ListBox Style="{StaticResource ListBox.Results}"
+                     ItemsSource="{Binding Suggestions.Items}"
+                     SelectedIndex="{Binding Suggestions.SelectedIndex}"
+                     AutomationProperties.AutomationId="Browser.Suggestions" AutomationProperties.Name="{x:Static res:Strings.Suggestions}">
+              <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem" BasedOn="{StaticResource ListBoxItem.Result}">
+                  <EventSetter Event="PreviewMouseLeftButtonDown" Handler="OnSuggestionMouseDown" />
+                  <Setter Property="AutomationProperties.AutomationId" Value="{Binding Address, StringFormat=Browser.Suggestion.{0}}" />
+                  <Setter Property="AutomationProperties.Name" Value="{Binding Address}" />
+                </Style>
+              </ListBox.ItemContainerStyle>
+              <ListBox.ItemTemplate>
+                <DataTemplate>
+                  <DockPanel>
+                    <TextBlock DockPanel.Dock="Left" Text="{Binding Address}" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Margin="8,0,0,0" Foreground="{DynamicResource Brush.Text.Secondary}"
+                               Text="{Binding Title}" TextTrimming="CharacterEllipsis" />
+                  </DockPanel>
+                </DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
+          </Border>
+        </Popup>
+      </Grid>
     </DockPanel>
     <!-- Find on page (Ctrl+F): Enter and Shift+Enter walk the matches, Esc closes. -->
     <DockPanel DockPanel.Dock="Top" Margin="8,0,4,4"

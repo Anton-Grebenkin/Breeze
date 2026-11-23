@@ -193,4 +193,6 @@ Selector: {4}
 ```html
 {5}
 ```</value></data>
+  <!-- Address suggestions -->
+  <data name="Suggestions" xml:space="preserve"><value>Address suggestions</value></data>
 </root>

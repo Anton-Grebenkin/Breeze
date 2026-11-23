@@ -36,12 +36,15 @@ public sealed partial class BrowserViewModel : ObservableObject, IFocusableConte
     private readonly IQuickPick? _quickPick;
     private readonly IContextKeyService? _context;
     private (BrowserTab? Tab, Uri? Url) _shown;
+    private bool _isTyping = true;
 
     public BrowserViewModel(
         BrowserTabs tabs, IUiDispatcher dispatcher, BrowserHistory? history = null, IQuickPick? quickPick = null, IContextKeyService? context = null,
-        ICommandService? commands = null, ISystemShell? shell = null, StatusBarViewModel? statusBar = null)
+        ICommandService? commands = null, ISystemShell? shell = null, StatusBarViewModel? statusBar = null, BrowserKnownSites? sites = null)
     {
         Tools = new BrowserPageToolsViewModel(tabs, commands, shell, statusBar);
+        Suggestions = new BrowserAddressSuggestions(history, sites);
+        Suggestions.PropertyChanged += (_, _) => GoCommand.NotifyCanExecuteChanged();
         _tabs = tabs;
         _strip = new BrowserTabStrip(tabs);
         _dispatcher = dispatcher;
@@ -57,6 +60,9 @@ public sealed partial class BrowserViewModel : ObservableObject, IFocusableConte
 
     /// <summary>Find on page, zoom, downloads, developer tools and sending to the chat, for the shown page.</summary>
     public BrowserPageToolsViewModel Tools { get; }
+
+    /// <summary>Pages from the history and known sites that match what is being typed into the address bar.</summary>
+    public BrowserAddressSuggestions Suggestions { get; }
 
     /// <summary>The shown tab; the view shows its page.</summary>
     [ObservableProperty]
@@ -133,9 +139,12 @@ public sealed partial class BrowserViewModel : ObservableObject, IFocusableConte
     }
 
     [RelayCommand(CanExecute = nameof(CanGo))]
-    private Task GoAsync() => Normalize(Address) is { } url ? NavigateAsync(url) : Task.CompletedTask;
+    private Task GoAsync() => Normalize(Suggestions.Take()?.Url ?? Address) is { } url ? NavigateAsync(url) : Task.CompletedTask;
 
-    private bool CanGo() => Normalize(Address) is not null;
+    private bool CanGo() => Suggestions.SelectedIndex >= 0 || Normalize(Address) is not null;
+
+    // Only what the user types asks for suggestions, not the address a page reports.
+    partial void OnAddressChanged(string value) => Suggestions.Update(_isTyping ? value : string.Empty);
 
     [RelayCommand(CanExecute = nameof(CanGoBack))]
     private Task BackAsync() => RunAsync(token => _tabs.Active?.Page.GoBackAsync(token) ?? Task.CompletedTask);
@@ -213,8 +222,15 @@ public sealed partial class BrowserViewModel : ObservableObject, IFocusableConte
     private Task NavigateAsync(Uri url)
     {
         var page = (_tabs.Active ?? OpenTab()).Page;
-        Address = url.AbsoluteUri;
+        ShowAddress(url.AbsoluteUri);
         return RunAsync(token => page.NavigateAsync(url, token));
+    }
+
+    private void ShowAddress(string address)
+    {
+        _isTyping = false;
+        Address = address;
+        _isTyping = true;
     }
 
     // The strip follows at once: the queued update would otherwise clear the address typed for the new tab.
@@ -271,7 +287,7 @@ public sealed partial class BrowserViewModel : ObservableObject, IFocusableConte
             }
 
             _shown = (tab, page?.Url);
-            Address = page?.Url?.AbsoluteUri ?? string.Empty;
+            ShowAddress(page?.Url?.AbsoluteUri ?? string.Empty);
         }
 
         Title = page?.Title ?? string.Empty;

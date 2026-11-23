@@ -193,4 +193,6 @@
 ```html
 {5}
 ```</value></data>
+  <!-- Address suggestions -->
+  <data name="Suggestions" xml:space="preserve"><value>Подсказки адреса</value></data>
 </root>
