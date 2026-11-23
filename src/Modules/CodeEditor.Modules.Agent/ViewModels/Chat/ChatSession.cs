@@ -22,6 +22,7 @@ public sealed partial class ChatSession : ObservableObject, IDisposable
     private readonly TurnMessageBuilder _turnMessages;
     private readonly IUiDispatcher _dispatcher;
     private readonly HashSet<string> _approvedTools = new(StringComparer.Ordinal);
+    private readonly TurnResume _resume;
     private CancellationTokenSource? _run;
 
     // The previous turn's mode in this chat, so the model is told about mode changes (TurnMessageBuilder).
@@ -34,6 +35,7 @@ public sealed partial class ChatSession : ObservableObject, IDisposable
         _options = options;
         _turnMessages = turnMessages;
         _dispatcher = dispatcher;
+        _resume = new TurnResume(Messages);
         _services.Questions.Asked += OnQuestionAsked;
     }
 
@@ -67,6 +69,7 @@ public sealed partial class ChatSession : ObservableObject, IDisposable
             return;
         }
 
+        _resume.Retire();
         var startsChat = !Messages.Any(message => message.Kind == ChatMessageKind.User);
         Messages.Add(new ChatMessageViewModel(ChatMessageKind.User, text) { Attachment = attachment, Files = names.Count > 0 ? names : null });
         await RunTurnAsync(token => BuildAsync(text, includeActiveEditor, startsChat, files, token), text.Length, attachment, files.Count);
@@ -80,7 +83,7 @@ public sealed partial class ChatSession : ObservableObject, IDisposable
         var turn = new AgentTurn(Messages, _services, _approvedTools, options.Approvals, AgentModes.RequestLimitOf(options));
         var started = _services.Log.TurnStarted(CurrentId, length, attachment, files);
         IsBusy = true;
-        var completed = false;
+        var (completed, stopped) = (false, false);
         try
         {
             var mode = _options.CurrentValue.Mode;
@@ -93,11 +96,13 @@ public sealed partial class ChatSession : ObservableObject, IDisposable
         {
             _services.Log.TurnStopped(started);
             turn.RejectPendingApprovals();
+            stopped = true;
         }
-        catch (Exception exception) when (exception is not OperationCanceledException)
+        catch (Exception exception)
         {
+            // Includes a cancellation nobody asked for: an HTTP timeout.
             _services.Log.TurnFailed(started, exception);
-            Messages.Add(new ChatMessageViewModel(ChatMessageKind.Error, AgentErrors.Describe(exception, _options.CurrentValue)));
+            _resume.AfterError(AgentErrors.Describe(exception, _options.CurrentValue), AgentErrors.CanContinue(exception));
         }
         finally
         {
@@ -107,10 +112,14 @@ public sealed partial class ChatSession : ObservableObject, IDisposable
             OnPropertyChanged(nameof(Title));
         }
 
-        // After saving: a new chat gets its id on the first save.
+        // After saving: a new chat gets its id on the first save, and the stop notice stays out of the history.
         if (completed)
         {
             Remembering = RememberAsync(turn, _run.Token);
+        }
+        else if (stopped)
+        {
+            _resume.AfterStop();
         }
 
         await ContinueWithQueueAsync(completed);

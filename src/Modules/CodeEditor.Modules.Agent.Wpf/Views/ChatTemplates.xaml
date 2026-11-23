@@ -242,10 +242,17 @@
     <ContentControl Margin="12,4,8,4" Content="{Binding Approval}" ContentTemplate="{StaticResource ApprovalTemplate}" Focusable="False" />
   </DataTemplate>
 
+  <!-- A turn's error; while it is the last row, the turn can go on with one click. -->
   <DataTemplate x:Key="Message.Error" DataType="{x:Type chat:ChatMessageViewModel}">
-    <TextBox Margin="12,4,8,4" Style="{StaticResource TextBox.Message}" Text="{Binding Text, Mode=OneWay}"
-             Foreground="{DynamicResource Brush.Error.Foreground}"
-             AutomationProperties.AutomationId="Agent.Message" AutomationProperties.Name="{Binding Author}" />
+    <StackPanel Margin="12,4,8,4">
+      <TextBox Style="{StaticResource TextBox.Message}" Text="{Binding Text, Mode=OneWay}"
+               Foreground="{DynamicResource Brush.Error.Foreground}"
+               AutomationProperties.AutomationId="Agent.Message" AutomationProperties.Name="{Binding Author}" />
+      <Button Margin="0,6,0,0" HorizontalAlignment="Left" Style="{StaticResource Button.Secondary}" Content="{x:Static res:Strings.Continue}"
+              Visibility="{Binding CanContinue, Converter={StaticResource BoolToVisibility}}"
+              Command="{Binding DataContext.ContinueCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+              AutomationProperties.AutomationId="Agent.ContinueAfterError" />
+    </StackPanel>
   </DataTemplate>
 
   <!-- Harness notice: the turn hit the request limit; continue. -->

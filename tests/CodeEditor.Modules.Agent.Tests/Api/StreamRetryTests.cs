@@ -1,3 +1,4 @@
+using System.ClientModel;
 using System.Runtime.CompilerServices;
 using CodeEditor.Modules.Agent.Services.Api;
 using Microsoft.Extensions.AI;
@@ -75,6 +76,54 @@ public sealed class StreamRetryTests
         Assert.Equal(3, inner.Calls);
     }
 
+    // A dropped connection or a 502 left after the library's own retries, before any content: the request is repeated
+    // and each pause is reported, so the feed can show a countdown.
+    [Fact]
+    public async Task ServiceFailureBeforeContent_IsRetried_AndThePauseIsReported()
+    {
+        var inner = new ScriptedClient([Started(), null], [null], [Text("ответ")]);
+        inner.Failures.Enqueue(new IOException("reset"));
+        inner.Failures.Enqueue(new ClientResultException("no answer"));
+        var retries = new RequestRetries();
+        var reported = new List<RequestRetry>();
+        retries.Waiting += (_, retry) => reported.Add(retry);
+        var client = new StreamFailureChatClient(inner, [TimeSpan.Zero, TimeSpan.Zero, TimeSpan.Zero], retries, error => "сбой: " + error.Message);
+
+        var response = await client.GetStreamingResponseAsync([], cancellationToken: TestContext.Current.CancellationToken).ToChatResponseAsync(TestContext.Current.CancellationToken);
+
+        Assert.Equal("ответ", response.Text);
+        Assert.Equal(3, inner.Calls);
+        Assert.Equal([("сбой: reset", 1, 3), ("сбой: no answer", 2, 3)], reported.Select(retry => (retry.Reason, retry.Attempt, retry.Attempts)));
+    }
+
+    // An error inside the stream may be the service's verdict on the request: two quick retries, as before.
+    [Fact]
+    public async Task StreamError_HasTwoRetries_HoweverManyPausesThereAre()
+    {
+        var inner = new ScriptedClient([RateLimited()], [RateLimited()], [RateLimited()], [Text("не дойдёт")]);
+        var pauses = Enumerable.Repeat(TimeSpan.Zero, 4).ToArray();
+
+        await Assert.ThrowsAsync<ModelStreamException>(() =>
+            new StreamFailureChatClient(inner, pauses).GetStreamingResponseAsync([], cancellationToken: TestContext.Current.CancellationToken)
+                .ToChatResponseAsync(TestContext.Current.CancellationToken));
+
+        Assert.Equal(3, inner.Calls);
+    }
+
+    // A failure of the request itself (here a bug) is not repeated: the answer would not change.
+    [Fact]
+    public async Task OtherFailure_IsNotRetried()
+    {
+        var inner = new ScriptedClient([null], [Text("не дойдёт")]);
+        inner.Failures.Enqueue(new InvalidOperationException("bug"));
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            new StreamFailureChatClient(inner, TwoRetries).GetStreamingResponseAsync([], cancellationToken: TestContext.Current.CancellationToken)
+                .ToChatResponseAsync(TestContext.Current.CancellationToken));
+
+        Assert.Equal(1, inner.Calls);
+    }
+
     private static ChatResponseUpdate Started() => new() { Role = ChatRole.Assistant };
 
     private static ChatResponseUpdate Text(string text) => new(ChatRole.Assistant, text);
@@ -82,10 +131,15 @@ public sealed class StreamRetryTests
     private static ChatResponseUpdate RateLimited() =>
         new(ChatRole.Assistant, [new ErrorContent("openai/gpt-6.1-sol is temporarily rate-limited upstream.") { ErrorCode = "429" }]);
 
-    /// <summary>Fake model with one stream per call; <c>null</c> in a stream throws a stream error.</summary>
+    /// <summary>
+    /// Fake model with one stream per call; <c>null</c> in a stream throws the next of <see cref="Failures"/>, or a
+    /// stream error.
+    /// </summary>
     private sealed class ScriptedClient(params ChatResponseUpdate?[][] streams) : IChatClient
     {
         public int Calls { get; private set; }
+
+        public Queue<Exception> Failures { get; } = new();
 
         public Task<ChatResponse> GetResponseAsync(IEnumerable<ChatMessage> messages, ChatOptions? options = null, CancellationToken cancellationToken = default) =>
             throw new NotSupportedException();
@@ -97,7 +151,7 @@ public sealed class StreamRetryTests
             foreach (var update in stream)
             {
                 await Task.Yield();
-                yield return update ?? throw new ModelStreamException("Request failed (api_error)");
+                yield return update ?? throw (Failures.TryDequeue(out var failure) ? failure : new ModelStreamException("Request failed (api_error)"));
             }
         }
 

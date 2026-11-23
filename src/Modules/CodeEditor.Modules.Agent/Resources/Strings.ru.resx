@@ -142,6 +142,11 @@
   <data name="ErrorService" xml:space="preserve"><value>Сервис вернул ошибку {0}: {1}</value></data>
   <data name="ErrorStream" xml:space="preserve"><value>Сервис оборвал ответ ошибкой: {0}</value></data>
   <data name="ErrorNoConnection" xml:space="preserve"><value>Нет связи с {0}. Проверьте подключение к интернету.</value></data>
+  <data name="ErrorConnectionLost" xml:space="preserve"><value>Связь с сервисом оборвалась посреди ответа.</value></data>
+  <data name="ErrorTimeout" xml:space="preserve"><value>Сервис не ответил вовремя.</value></data>
+  <data name="RetryWaiting" xml:space="preserve"><value>Повтор через {0} с (попытка {1} из {2}). {3}</value></data>
+  <data name="RetryRepeated" xml:space="preserve"><value>Запрос повторён (попытка {0} из {1}). {2}</value></data>
+  <data name="TurnStoppedNotice" xml:space="preserve"><value>Ход остановлен. Агент может продолжить с того места, где остановился.</value></data>
   <!-- Agent tool lines in the feed. -->
   <data name="FileForms" xml:space="preserve"><value>файл|файла|файлов</value></data>
   <data name="ToolAskUser" xml:space="preserve"><value>Вопрос пользователю</value></data>

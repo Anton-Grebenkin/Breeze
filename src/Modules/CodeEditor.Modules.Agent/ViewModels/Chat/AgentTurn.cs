@@ -52,6 +52,7 @@ public sealed class AgentTurn(
         _model = new ModelExecutor(services.Conversation, cancellationToken);
         var workflow = AgentTurnWorkflow.Build(_model, _approvals, new ChecksExecutor(services.Checks, services.Budget, services.Deep, services.Queue, services.Images, cancellationToken));
         using var progress = new LiveToolRows(services.RunningCalls, _feed.RowOf, services.Time, services.Dispatcher);
+        using var retries = new RetryRow(services.Retries, text => _feed.Notice(ChatMessageKind.Status, text), services.Dispatcher, services.Time);
 
         Exception? failure = null;
         var run = await InProcessExecution.RunStreamingAsync(workflow, new TurnInput(message), cancellationToken: cancellationToken);

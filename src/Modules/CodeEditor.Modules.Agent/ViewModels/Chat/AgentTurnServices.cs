@@ -23,5 +23,6 @@ public sealed record AgentTurnServices(
     ToolImages Images,
     ToolCallObservers Observers,
     RunningToolCalls RunningCalls,
+    RequestRetries Retries,
     IUiDispatcher Dispatcher,
     TimeProvider Time);

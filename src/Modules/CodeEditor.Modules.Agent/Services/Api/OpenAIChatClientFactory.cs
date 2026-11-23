@@ -16,7 +16,7 @@ namespace CodeEditor.Modules.Agent.Services.Api;
 /// the rest use Chat Completions. Fields missing from the library come from model and dialect together
 /// (<see cref="RequestExtensions"/>, ADR 0021). One conversation key per chat (<see cref="PromptCacheKey"/>).
 /// </summary>
-public sealed class OpenAIChatClientFactory(ISecretStore secrets, PromptCacheKey cacheKey, UserDataPaths paths, TimeProvider time) : IChatClientFactory
+public sealed class OpenAIChatClientFactory(ISecretStore secrets, PromptCacheKey cacheKey, UserDataPaths paths, TimeProvider time, RequestRetries retries) : IChatClientFactory
 {
     public const string OpenAIVendorPrefix = "openai/";
     public const string AnthropicVendorPrefix = "anthropic/";
@@ -35,7 +35,7 @@ public sealed class OpenAIChatClientFactory(ISecretStore secrets, PromptCacheKey
             clientOptions.AddPolicy(traffic, PipelinePosition.PerTry);
         }
 
-        return Create(options, new ApiKeyCredential(key), clientOptions);
+        return Create(options, new ApiKeyCredential(key), clientOptions, retries: retries);
     }
 
     /// <summary>API key and endpoint, shared by chat and the model list.</summary>
@@ -53,7 +53,9 @@ public sealed class OpenAIChatClientFactory(ISecretStore secrets, PromptCacheKey
 
     /// <summary>Client over the given transport options: tests plug in their own transport and see the request body.</summary>
     /// <param name="streamRetryDelays">Failed stream retry pauses (<see cref="StreamFailureChatClient"/>); <c>null</c> for defaults.</param>
-    internal static IChatClient Create(AgentOptions options, ApiKeyCredential key, OpenAIClientOptions clientOptions, IReadOnlyList<TimeSpan>? streamRetryDelays = null)
+    /// <param name="retries">Where a pause before a retry is reported; <c>null</c> for nowhere.</param>
+    internal static IChatClient Create(
+        AgentOptions options, ApiKeyCredential key, OpenAIClientOptions clientOptions, IReadOnlyList<TimeSpan>? streamRetryDelays = null, RequestRetries? retries = null)
     {
         var dialect = AgentServices.DialectFor(options.Endpoint);
 
@@ -73,7 +75,7 @@ public sealed class OpenAIChatClientFactory(ISecretStore secrets, PromptCacheKey
                 : client.GetChatClient(model).AsIChatClient();
         }
 
-        chat = new StreamFailureChatClient(chat, streamRetryDelays);
+        chat = new StreamFailureChatClient(chat, streamRetryDelays, retries, failure => AgentErrors.Describe(failure, options));
         return new EmptyContentFilterChatClient(dialect.EmptyReplyPlaceholder ? new ProxyPlaceholderChatClient(chat) : chat);
     }
 

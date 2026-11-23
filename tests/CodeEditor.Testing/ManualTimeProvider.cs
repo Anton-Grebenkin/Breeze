@@ -27,17 +27,21 @@ public sealed class ManualTimeProvider : TimeProvider
 
     private sealed class ManualTimer(ManualTimeProvider owner, TimerCallback callback, object? state) : ITimer
     {
+        private TimeSpan _period = Timeout.InfiniteTimeSpan;
+
         public DateTimeOffset? DueAt { get; private set; }
 
         public bool Change(TimeSpan dueTime, TimeSpan period)
         {
             DueAt = dueTime == Timeout.InfiniteTimeSpan ? null : owner._now + dueTime;
+            _period = period;
             return true;
         }
 
+        // A periodic timer fires once per Advance, however far the time moved.
         public void Fire()
         {
-            DueAt = null;
+            DueAt = _period > TimeSpan.Zero ? owner._now + _period : null;
             callback(state);
         }
 

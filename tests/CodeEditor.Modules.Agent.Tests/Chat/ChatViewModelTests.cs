@@ -1,6 +1,7 @@
 using System.ClientModel;
 using System.ClientModel.Primitives;
 using System.ComponentModel;
+using CodeEditor.Modules.Agent.Services.Api;
 using CodeEditor.Modules.Agent.Services.Settings;
 using CodeEditor.Modules.Agent.Tests.Infrastructure;
 using CodeEditor.Modules.Agent.ViewModels.Chat;
@@ -110,6 +111,73 @@ public sealed class ChatViewModelTests : IDisposable
 
         Assert.Equal("начало …(остановлено)", Chat.Messages[1].Text);
         Assert.False(Chat.IsBusy);
+    }
+
+    // A stopped turn offers "Continue" until the chat moves on; the notice is not part of the saved chat.
+    [Fact]
+    public async Task Stop_OffersContinue_UntilTheNextMessage()
+    {
+        _fixture.Workspace.Open(AgentFixture.Root);
+        _fixture.Client.Gate = new TaskCompletionSource();
+        _fixture.Client.Reply("начало", "никогда").Reply("дальше");
+        Chat.Input = "длинный ответ";
+        var sending = Chat.SendCommand.ExecuteAsync(null);
+        await Wait.UntilAsync(() => Chat.Messages.Count == 2 && Chat.Messages[1].Text == "начало");
+        Chat.StopCommand.Execute(null);
+        await sending;
+
+        Assert.Equal((ChatMessageKind.Notice, "Ход остановлен. Агент может продолжить с того места, где остановился."), (Chat.Messages[^1].Kind, Chat.Messages[^1].Text));
+        Assert.DoesNotContain(_fixture.History.Restore(Chat.Session.CurrentId!)!.Messages, message => message.Kind == ChatMessageKind.Notice);
+
+        _fixture.Client.Gate = null;
+        await Chat.ContinueCommand.ExecuteAsync(null);
+
+        Assert.Equal(
+            [ChatMessageKind.User, ChatMessageKind.Assistant, ChatMessageKind.User, ChatMessageKind.Assistant],
+            Chat.Messages.Select(message => message.Kind));
+        Assert.Equal((ChatViewModel.ContinueText, "дальше"), (Chat.Messages[2].Text, Chat.Messages[3].Text));
+    }
+
+    // A failed turn offers "Continue" under the error while the error is the last row.
+    [Fact]
+    public async Task ServiceFailure_OffersContinue_UntilTheNextMessage()
+    {
+        _fixture.Client.Fail(new IOException("The response ended prematurely.")).Reply("дальше");
+
+        await _fixture.SendAsync("привет");
+        var error = Chat.Messages[^1];
+
+        Assert.Equal((ChatMessageKind.Error, "Связь с сервисом оборвалась посреди ответа.", true), (error.Kind, error.Text, error.CanContinue));
+
+        await Chat.ContinueCommand.ExecuteAsync(null);
+
+        Assert.False(error.CanContinue);
+        Assert.Equal("дальше", Chat.Messages[^1].Text);
+    }
+
+    // The client waits before repeating a failed request: the feed counts the pause down and then says it repeated.
+    [Fact]
+    public async Task RetryPause_IsCountedDownInTheFeed()
+    {
+        _fixture.Client.Gate = new TaskCompletionSource();
+        _fixture.Client.Reply("начало", "конец");
+        Chat.Input = "вопрос";
+        var sending = Chat.SendCommand.ExecuteAsync(null);
+        await Wait.UntilAsync(() => Chat.Messages.Count == 2 && Chat.Messages[1].Text == "начало");
+
+        _fixture.Retries.Report(new RequestRetry("Сервис вернул ошибку 502: Bad Gateway", TimeSpan.FromSeconds(15), 2, 4));
+        var row = Chat.Messages.Single(message => message.Kind == ChatMessageKind.Status);
+        var first = row.Text;
+        _fixture.Time.Advance(TimeSpan.FromSeconds(5));
+        var later = row.Text;
+        _fixture.Time.Advance(TimeSpan.FromSeconds(10));
+        var repeated = row.Text;
+        _fixture.Client.Gate.SetResult();
+        await sending;
+
+        Assert.Equal("Повтор через 15 с (попытка 2 из 4). Сервис вернул ошибку 502: Bad Gateway", first);
+        Assert.Equal("Повтор через 10 с (попытка 2 из 4). Сервис вернул ошибку 502: Bad Gateway", later);
+        Assert.Equal("Запрос повторён (попытка 2 из 4). Сервис вернул ошибку 502: Bad Gateway", repeated);
     }
 
     [Fact]

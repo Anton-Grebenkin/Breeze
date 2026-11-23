@@ -47,6 +47,7 @@ public sealed class AgentModule : IModule
         services.AddSingleton<SystemPrompt>();
         services.AddSingleton<TurnMessageBuilder>();
         services.AddSingleton<PromptCacheKey>();
+        services.AddSingleton<RequestRetries>();
         services.AddSingleton<IChatClientFactory, OpenAIChatClientFactory>();
         services.AddSingleton<TurnBudget>();
         services.AddSingleton<TurnWatchdog>();
@@ -149,6 +150,7 @@ public sealed class AgentModule : IModule
             provider.GetRequiredService<ToolImages>(),
             provider.GetRequiredService<ToolCallObservers>(),
             provider.GetRequiredService<RunningToolCalls>(),
+            provider.GetRequiredService<RequestRetries>(),
             provider.GetRequiredService<IUiDispatcher>(),
             provider.GetRequiredService<TimeProvider>()));
         services.AddSingleton<ChatSession>();

@@ -68,6 +68,10 @@ public sealed partial class ChatMessageViewModel(ChatMessageKind kind, string te
     [ObservableProperty]
     public partial bool IsChainBusy { get; set; }
 
+    /// <summary>An error the turn ended with offers "Continue" while it is the feed's last row (<see cref="TurnResume"/>).</summary>
+    [ObservableProperty]
+    public partial bool CanContinue { get; set; }
+
     /// <summary>The first line: the header of a collapsed block (reviewer).</summary>
     public string Headline => Text.IndexOf('\n', StringComparison.Ordinal) is var end and >= 0 ? Text[..end] : Text;
 

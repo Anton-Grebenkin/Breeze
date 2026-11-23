@@ -44,6 +44,34 @@ public sealed class AgentApiTests
         Assert.Contains(expected, AgentErrors.Describe(error, new AgentOptions()), StringComparison.Ordinal);
     }
 
+    // A dropped connection used to reach the feed as raw .NET text.
+    [Fact]
+    public void ConnectionFailures_AreSaidInPlainWords()
+    {
+        var options = new AgentOptions { Endpoint = "https://api.example.test/v1" };
+
+        Assert.Equal("Нет связи с https://api.example.test/v1. Проверьте подключение к интернету.", AgentErrors.Describe(new ClientResultException("An error occurred while sending the request."), options));
+        Assert.Equal("Связь с сервисом оборвалась посреди ответа.", AgentErrors.Describe(new IOException("The response ended prematurely."), options));
+        Assert.Equal("Сервис не ответил вовремя.", AgentErrors.Describe(new TaskCanceledException(), options));
+    }
+
+    // "Continue" is offered unless the user has to fix something first: the key, the balance, the model, settings.
+    [Theory]
+    [InlineData(401, false)]
+    [InlineData(402, false)]
+    [InlineData(404, false)]
+    [InlineData(429, true)]
+    [InlineData(502, true)]
+    public void Continue_IsOfferedAfterFailuresThatMayPass(int status, bool expected) =>
+        Assert.Equal(expected, AgentErrors.CanContinue(new ClientResultException(new FakeResponse(status))));
+
+    [Fact]
+    public void Continue_IsOfferedAfterADroppedConnection_ButNotAfterASettingsError()
+    {
+        Assert.True(AgentErrors.CanContinue(new IOException("reset")));
+        Assert.False(AgentErrors.CanContinue(new AgentConfigurationException("no key")));
+    }
+
     private sealed class RecordingClient : IChatClient
     {
         public ChatOptions? Options { get; private set; }

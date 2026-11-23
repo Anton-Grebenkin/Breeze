@@ -142,6 +142,11 @@ Notes from earlier chats; the agent sees this list at the start of every chat. T
   <data name="ErrorService" xml:space="preserve"><value>The service returned error {0}: {1}</value></data>
   <data name="ErrorStream" xml:space="preserve"><value>The service ended the answer with an error: {0}</value></data>
   <data name="ErrorNoConnection" xml:space="preserve"><value>Cannot reach {0}. Check your internet connection.</value></data>
+  <data name="ErrorConnectionLost" xml:space="preserve"><value>The connection to the service dropped in the middle of the answer.</value></data>
+  <data name="ErrorTimeout" xml:space="preserve"><value>The service did not answer in time.</value></data>
+  <data name="RetryWaiting" xml:space="preserve"><value>Retrying in {0} s (attempt {1} of {2}). {3}</value></data>
+  <data name="RetryRepeated" xml:space="preserve"><value>The request was repeated (attempt {0} of {1}). {2}</value></data>
+  <data name="TurnStoppedNotice" xml:space="preserve"><value>The turn was stopped. The agent can go on from where it stopped.</value></data>
   <!-- Agent tool lines in the feed. -->
   <data name="FileForms" xml:space="preserve"><value>file|files</value></data>
   <data name="ToolAskUser" xml:space="preserve"><value>Question for the user</value></data>
