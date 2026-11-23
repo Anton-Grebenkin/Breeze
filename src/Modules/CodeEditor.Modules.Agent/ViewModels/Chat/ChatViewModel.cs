@@ -25,6 +25,7 @@ public sealed partial class ChatViewModel : ObservableObject, IFocusableContent,
     public static string ContinueText => Strings.ContinueRequest;
 
     public static string ExecutePlanText => Strings.ExecutePlanRequest;
+    public static string ApplyAnswerText => Strings.ApplyAnswerRequest;
 
     private readonly ChatHistory _history;
     private readonly ChatLinkOpener _links;
@@ -154,13 +155,14 @@ public sealed partial class ChatViewModel : ObservableObject, IFocusableContent,
     private Task ContinueAsync() =>
         Session.SendAsync(ContinueText, ActiveFile.IsAttached, ActiveFile.IsAttached ? ActiveFile.RelativePath : null);
 
-    /// <summary>Executes a Plan-mode plan in Agent mode: same history, all tools.</summary>
+    /// <summary>Carries out in Agent mode what another mode prepared: same history, all tools.</summary>
+    /// <param name="request">What to send; <c>null</c> for a Plan-mode plan, <see cref="ApplyAnswerText"/> for an Ask answer.</param>
     [RelayCommand(CanExecute = nameof(CanContinue))]
-    private async Task ExecutePlanAsync()
+    private async Task ExecutePlanAsync(string? request)
     {
         if (Mode.SetMode(AgentMode.Agent))
         {
-            await Session.SendAsync(ExecutePlanText, ActiveFile.IsAttached, ActiveFile.IsAttached ? ActiveFile.RelativePath : null);
+            await Session.SendAsync(request ?? ExecutePlanText, ActiveFile.IsAttached, ActiveFile.IsAttached ? ActiveFile.RelativePath : null);
         }
     }
 

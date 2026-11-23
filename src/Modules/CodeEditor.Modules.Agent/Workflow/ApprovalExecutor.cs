@@ -36,6 +36,9 @@ public sealed class ApprovalExecutor(
     /// <summary>Decisions in the turn, for the log.</summary>
     public int Count { get; private set; }
 
+    /// <summary>The model tried to change something in a mode that only reads: its answer holds a change it could not make.</summary>
+    public bool ChangeRefused { get; private set; }
+
     protected override ProtocolBuilder ConfigureProtocol(ProtocolBuilder protocolBuilder) =>
         protocolBuilder.SendsMessage<ApprovalPending>().SendsMessage<TurnInput>().ConfigureRoutes(routes => routes
             .AddHandler<ModelOutcome>(DecideAsync)
@@ -67,6 +70,7 @@ public sealed class ApprovalExecutor(
     {
         if (!AgentModes.CanChange(mode))
         {
+            ChangeRefused = true;
             return (request, request.CreateResponse(false, string.Format(CultureInfo.CurrentCulture, Strings.ChangesUnavailableInMode, AgentModes.Title(mode))), null);
         }
 

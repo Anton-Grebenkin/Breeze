@@ -284,6 +284,21 @@
   </DataTemplate>
 
   <!-- Agent question: option buttons and a free-form answer; the turn waits. A restored feed shows only the text. -->
+  <!-- An Ask-mode answer with a change: apply it in Agent mode without switching the mode and retyping. -->
+  <DataTemplate x:Key="Message.ApplyOffer" DataType="{x:Type chat:ChatMessageViewModel}">
+    <controls:AutomationBorder Margin="12,4,8,4" Padding="8,6" CornerRadius="6" BorderThickness="1"
+                               BorderBrush="{DynamicResource Brush.Widget.Border}"
+                               AutomationProperties.AutomationId="Agent.ApplyOffer">
+      <StackPanel>
+        <TextBox Style="{StaticResource TextBox.Message}" Foreground="{DynamicResource Brush.Text.Secondary}" Text="{Binding Text, Mode=OneWay}" />
+        <Button Margin="0,6,0,0" HorizontalAlignment="Left" Style="{StaticResource Button.Primary}" Content="{x:Static res:Strings.ApplyInAgentMode}"
+                Command="{Binding DataContext.ExecutePlanCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                CommandParameter="{x:Static chat:ChatViewModel.ApplyAnswerText}"
+                AutomationProperties.AutomationId="Agent.ApplyInAgentMode" />
+      </StackPanel>
+    </controls:AutomationBorder>
+  </DataTemplate>
+
   <DataTemplate x:Key="Message.Question" DataType="{x:Type chat:ChatMessageViewModel}">
     <controls:AutomationBorder Margin="12,4,8,4" Padding="8" CornerRadius="6" BorderThickness="1"
                                BorderBrush="{DynamicResource Brush.Accent}"
@@ -331,7 +346,8 @@
                                      Error="{StaticResource Message.Error}"
                                      Notice="{StaticResource Message.Notice}"
                                      Question="{StaticResource Message.Question}"
-                                     Handoff="{StaticResource Message.Handoff}" />
+                                     Handoff="{StaticResource Message.Handoff}"
+                                     ApplyOffer="{StaticResource Message.ApplyOffer}" />
 
   <views:FeedTemplateSelector x:Key="FeedTemplateSelector" Block="{StaticResource Feed.Block}" Messages="{StaticResource MessageTemplateSelector}" />
 

@@ -193,6 +193,10 @@
   <data name="StepForms" xml:space="preserve"><value>шаг|шага|шагов</value></data>
   <data name="ContinueRequest" xml:space="preserve"><value>Продолжай с того места, где остановился.</value></data>
   <data name="ExecutePlanRequest" xml:space="preserve"><value>Выполни этот план.</value></data>
+  <data name="ApplyAnswerRequest" xml:space="preserve"><value>Примени правку из своего ответа.</value></data>
+  <data name="ApplyOffer" xml:space="preserve"><value>В ответе есть правка. Применить её можно в режиме «Агент».</value></data>
+  <data name="ApplyInAgentMode" xml:space="preserve"><value>Применить в режиме агента</value></data>
+  <data name="AgentModeMention" xml:space="preserve"><value>\bagent\s+mode\b|режим\w*\s+[«"]?агент</value></data>
   <data name="ChatOpenDetail" xml:space="preserve"><value>{0} · открыт</value></data>
   <data name="OpenChatPrompt" xml:space="preserve"><value>Открыть чат этой папки</value></data>
   <data name="NoSavedChats" xml:space="preserve"><value>Сохранённых чатов пока нет</value></data>

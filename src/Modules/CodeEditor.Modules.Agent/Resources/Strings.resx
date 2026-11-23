@@ -193,6 +193,10 @@ Notes from earlier chats; the agent sees this list at the start of every chat. T
   <data name="StepForms" xml:space="preserve"><value>step|steps</value></data>
   <data name="ContinueRequest" xml:space="preserve"><value>Continue from where you left off.</value></data>
   <data name="ExecutePlanRequest" xml:space="preserve"><value>Execute this plan.</value></data>
+  <data name="ApplyAnswerRequest" xml:space="preserve"><value>Apply the change from your answer.</value></data>
+  <data name="ApplyOffer" xml:space="preserve"><value>The answer holds a change. Agent mode can apply it.</value></data>
+  <data name="ApplyInAgentMode" xml:space="preserve"><value>Apply in Agent mode</value></data>
+  <data name="AgentModeMention" xml:space="preserve"><value>\bagent\s+mode\b</value></data>
   <data name="ChatOpenDetail" xml:space="preserve"><value>{0} · open</value></data>
   <data name="OpenChatPrompt" xml:space="preserve"><value>Open a chat from this folder</value></data>
   <data name="NoSavedChats" xml:space="preserve"><value>No saved chats yet</value></data>

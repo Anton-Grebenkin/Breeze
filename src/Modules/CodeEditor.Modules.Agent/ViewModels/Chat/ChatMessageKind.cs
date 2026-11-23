@@ -36,4 +36,7 @@ public enum ChatMessageKind
 
     /// <summary>Plan is ready (Plan mode); "Execute plan" switches to Agent mode.</summary>
     Handoff,
+
+    /// <summary>An Ask-mode answer holds a change; "Apply in Agent mode" switches the mode and applies it.</summary>
+    ApplyOffer,
 }

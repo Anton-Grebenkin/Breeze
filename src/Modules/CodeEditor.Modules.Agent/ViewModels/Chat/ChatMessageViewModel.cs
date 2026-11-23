@@ -44,7 +44,7 @@ public sealed partial class ChatMessageViewModel(ChatMessageKind kind, string te
         ChatMessageKind.Status => Strings.AuthorCheck,
         ChatMessageKind.Review => Strings.AuthorReviewer,
         ChatMessageKind.Progress => Strings.AgentTitle,
-        ChatMessageKind.Handoff => Strings.AuthorEditor,
+        ChatMessageKind.Handoff or ChatMessageKind.ApplyOffer => Strings.AuthorEditor,
         _ => Strings.AuthorError,
     };
 

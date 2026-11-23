@@ -93,6 +93,39 @@ public sealed class AgentLoopTests : IDisposable
         Assert.True(Chat.ContinueCommand.CanExecute(null));
     }
 
+    // An Ask answer that holds a change (the model says Agent mode can apply it, or it tried to edit and was refused)
+    // gets "Apply in Agent mode": one click instead of switching the mode and retyping the request.
+    [Theory]
+    [InlineData("Чтобы исправить, замените строку 12. Применить правку можно в режиме «Агент».", false, true)]
+    [InlineData("Replace line 12; Agent mode can apply it.", false, true)]
+    [InlineData("Нужно заменить строку 12.", true, true)]
+    [InlineData("Метод вызывается из трёх мест.", false, false)]
+    public async Task AskMode_AnswerWithAChange_OffersToApplyItInAgentMode(string answer, bool triesToEdit, bool offered)
+    {
+        _fixture.Options.Set(new AgentOptions { Model = AgentFixture.TestModel, Mode = AgentMode.Ask });
+        _fixture.Conversation.Tools.Add(new ApprovalRequiredAIFunction(AIFunctionFactory.Create((string path) => "ok", "edit_probe")));
+        if (triesToEdit)
+        {
+            _fixture.Client.CallTool("c1", "edit_probe", new Dictionary<string, object?> { ["path"] = "a.cs" });
+        }
+
+        _fixture.Client.Reply(answer).Reply("Сделал.");
+
+        await _fixture.SendAsync("как исправить?");
+
+        Assert.Equal(offered ? ChatMessageKind.ApplyOffer : ChatMessageKind.Assistant, Chat.Messages[^1].Kind);
+        if (!offered)
+        {
+            return;
+        }
+
+        await Chat.ExecutePlanCommand.ExecuteAsync(ChatViewModel.ApplyAnswerText);
+
+        Assert.Equal(AgentMode.Agent, _fixture.Options.CurrentValue.Mode);
+        Assert.Equal(ChatViewModel.ApplyAnswerText, _fixture.Client.Requests[^1][^1].Question());
+        Assert.Equal("Сделал.", Chat.Messages[^1].Text);
+    }
+
     [Fact]
     public async Task PlanMode_AnswerOffersExecution_WhichSwitchesToAgent()
     {

@@ -25,6 +25,8 @@ public sealed class ChatMessageTemplateSelector : DataTemplateSelector
 
     public DataTemplate? Handoff { get; set; }
 
+    public DataTemplate? ApplyOffer { get; set; }
+
     public override DataTemplate? SelectTemplate(object item, DependencyObject container) =>
         (item as ChatMessageViewModel)?.Kind switch
         {
@@ -35,6 +37,7 @@ public sealed class ChatMessageTemplateSelector : DataTemplateSelector
             ChatMessageKind.Notice => Notice,
             ChatMessageKind.Question => Question,
             ChatMessageKind.Handoff => Handoff,
+            ChatMessageKind.ApplyOffer => ApplyOffer,
             _ => null,
         };
 }
