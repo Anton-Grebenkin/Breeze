@@ -88,6 +88,26 @@ public interface IBrowserPage : IDisposable
     /// <exception cref="BrowserException">No dialog is open.</exception>
     Task AnswerDialogAsync(bool accept, string? text, CancellationToken cancellationToken);
 
+    /// <summary>The page's zoom; 1 is 100 %.</summary>
+    double Zoom { get; }
+
+    Task SetZoomAsync(double zoom, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Finds the text on the page and highlights the matches, or moves to the next or the previous one; an empty text
+    /// ends the search and removes the highlight.
+    /// </summary>
+    Task<BrowserFindResult> FindAsync(string text, BrowserFindStep step, CancellationToken cancellationToken);
+
+    /// <summary>Opens a window of the browser itself for this page: the developer tools or the downloads.</summary>
+    Task OpenAsync(BrowserWindowKind kind, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Lets the user pick an element on the page with the mouse (<see cref="BrowserPicker"/>).
+    /// </summary>
+    /// <returns>The picked element; <c>null</c> if the user pressed Escape, the page went elsewhere or the pick was cancelled.</returns>
+    Task<BrowserPickedElement?> PickElementAsync(CancellationToken cancellationToken);
+
     /// <summary>Console messages and page errors since the last call.</summary>
     IReadOnlyList<BrowserConsoleMessage> TakeConsole();
 }

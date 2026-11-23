@@ -110,6 +110,19 @@
       <Button DockPanel.Dock="Left" Style="{StaticResource Button.Toolbar}" Content="{x:Static ui:IconGlyphs.Refresh}"
               ToolTip="{x:Static res:Strings.Reload}" Command="{Binding ReloadCommand}"
               AutomationProperties.AutomationId="Browser.Reload" AutomationProperties.Name="{x:Static res:Strings.Reload}" />
+      <!-- Rarely needed things for the shown page: find, zoom, downloads, developer tools, sending to the chat. Each is
+           also a palette command with the usual browser key. -->
+      <Button x:Name="MoreButton" DockPanel.Dock="Right" Style="{StaticResource Button.Toolbar}" Content="{x:Static ui:IconGlyphs.More}"
+              ToolTip="{x:Static res:Strings.More}" Command="{Binding Tools.ShowMenuCommand}"
+              AutomationProperties.AutomationId="Browser.More" AutomationProperties.Name="{x:Static res:Strings.More}">
+        <Button.ContextMenu>
+          <ContextMenu x:Name="ToolsMenu"
+                       ItemsSource="{Binding Tools.Menu}"
+                       ItemContainerStyle="{StaticResource MenuItem.Bound}"
+                       Closed="OnToolsMenuClosed"
+                       AutomationProperties.AutomationId="Browser.MoreMenu" />
+        </Button.ContextMenu>
+      </Button>
       <!-- Recent pages: the menu opens under the button; "Browser: Recent Pages" in the palette is its keyboard twin. -->
       <Button x:Name="HistoryButton" DockPanel.Dock="Right" Style="{StaticResource Button.Toolbar}" Content="{x:Static ui:IconGlyphs.History}"
               ToolTip="{x:Static res:Strings.History}" Command="{Binding ShowHistoryCommand}"
@@ -132,6 +145,32 @@
                AutomationProperties.AutomationId="Browser.Address" AutomationProperties.Name="{x:Static res:Strings.Address}">
         <TextBox.InputBindings>
           <KeyBinding Key="Enter" Command="{Binding GoCommand}" />
+        </TextBox.InputBindings>
+      </TextBox>
+    </DockPanel>
+    <!-- Find on page (Ctrl+F): Enter and Shift+Enter walk the matches, Esc closes. -->
+    <DockPanel DockPanel.Dock="Top" Margin="8,0,4,4"
+               Visibility="{Binding Tools.IsFindOpen, Converter={StaticResource BoolToVisibility}}">
+      <Button DockPanel.Dock="Right" Style="{StaticResource Button.Toolbar}" Content="{x:Static ui:IconGlyphs.Close}"
+              ToolTip="{x:Static res:Strings.FindClose}" Command="{Binding Tools.CloseFindCommand}"
+              AutomationProperties.AutomationId="Browser.Find.Close" AutomationProperties.Name="{x:Static res:Strings.FindClose}" />
+      <Button DockPanel.Dock="Right" Style="{StaticResource Button.Toolbar}" Content="{x:Static ui:IconGlyphs.ArrowDown}"
+              ToolTip="{x:Static res:Strings.FindNext}" Command="{Binding Tools.FindNextCommand}"
+              AutomationProperties.AutomationId="Browser.Find.Next" AutomationProperties.Name="{x:Static res:Strings.FindNext}" />
+      <Button DockPanel.Dock="Right" Style="{StaticResource Button.Toolbar}" Content="{x:Static ui:IconGlyphs.ArrowUp}"
+              ToolTip="{x:Static res:Strings.FindPrevious}" Command="{Binding Tools.FindPreviousCommand}"
+              AutomationProperties.AutomationId="Browser.Find.Previous" AutomationProperties.Name="{x:Static res:Strings.FindPrevious}" />
+      <TextBlock DockPanel.Dock="Right" Margin="8,0" VerticalAlignment="Center"
+                 Foreground="{DynamicResource Brush.Text.Secondary}" Text="{Binding Tools.FindStatus}"
+                 AutomationProperties.AutomationId="Browser.Find.Status" />
+      <TextBox x:Name="FindBox" Style="{StaticResource TextBox.Field}"
+               Tag="{x:Static res:Strings.FindPlaceholder}"
+               Text="{Binding Tools.FindText, UpdateSourceTrigger=PropertyChanged}"
+               AutomationProperties.AutomationId="Browser.Find.Text" AutomationProperties.Name="{x:Static res:Strings.FindOnPage}">
+        <TextBox.InputBindings>
+          <KeyBinding Key="Enter" Command="{Binding Tools.FindNextCommand}" />
+          <KeyBinding Key="Enter" Modifiers="Shift" Command="{Binding Tools.FindPreviousCommand}" />
+          <KeyBinding Key="Escape" Command="{Binding Tools.CloseFindCommand}" />
         </TextBox.InputBindings>
       </TextBox>
     </DockPanel>

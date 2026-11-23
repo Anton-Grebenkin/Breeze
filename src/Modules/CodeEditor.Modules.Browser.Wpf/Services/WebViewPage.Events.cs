@@ -35,6 +35,7 @@ public sealed partial class WebViewPage
             Fail(_ready, new BrowserException(Strings.TabClosed));
             _loading?.TrySetResult(Strings.TabClosed);
             CloseDialog();
+            EndPick(picked: null);
             _control?.Dispose();
             _control = null;
         });
@@ -43,7 +44,7 @@ public sealed partial class WebViewPage
 
     private WebView2 Create()
     {
-        var control = new WebView2();
+        var control = new WebView2 { ZoomFactor = Zoom };
         AutomationProperties.SetAutomationId(control, "Browser.Page");
         _ = InitializeAsync(control, _ready);
         return control;
@@ -90,6 +91,7 @@ public sealed partial class WebViewPage
         core.NavigationStarting += (_, e) =>
         {
             (opening, _unreached) = (e.Uri, null);
+            EndPick(picked: null);
             _loading ??= new TaskCompletionSource<string?>(TaskCreationOptions.RunContinuationsAsynchronously);
             IsLoading = true;
             Update(core);
@@ -120,6 +122,7 @@ public sealed partial class WebViewPage
         core.FaviconChanged += (_, _) => _ = UpdateFaviconAsync(core);
         core.NewWindowRequested += OnNewWindowRequested;
         core.WindowCloseRequested += (_, _) => CloseRequested?.Invoke(this, EventArgs.Empty);
+        core.WebMessageReceived += (_, e) => OnWebMessage(e.WebMessageAsJson);
 
         // The browser's own sign-in window: a call waiting for the load is told at once instead of timing out, and the
         // tab is shown to the user (BrowserAttention).

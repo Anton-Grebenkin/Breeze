@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using CodeEditor.Core.Commands;
 using CodeEditor.Core.Context;
 using CodeEditor.Core.Threading;
 using CodeEditor.Modules.Browser.Resources;
@@ -6,7 +7,9 @@ using CodeEditor.Modules.Browser.Services;
 using CodeEditor.Modules.Browser.Services.Tabs;
 using CodeEditor.Shell.Menus;
 using CodeEditor.Shell.Palette;
+using CodeEditor.Shell.Services;
 using CodeEditor.Shell.ToolWindows;
+using CodeEditor.Shell.ViewModels;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -34,8 +37,11 @@ public sealed partial class BrowserViewModel : ObservableObject, IFocusableConte
     private readonly IContextKeyService? _context;
     private (BrowserTab? Tab, Uri? Url) _shown;
 
-    public BrowserViewModel(BrowserTabs tabs, IUiDispatcher dispatcher, BrowserHistory? history = null, IQuickPick? quickPick = null, IContextKeyService? context = null)
+    public BrowserViewModel(
+        BrowserTabs tabs, IUiDispatcher dispatcher, BrowserHistory? history = null, IQuickPick? quickPick = null, IContextKeyService? context = null,
+        ICommandService? commands = null, ISystemShell? shell = null, StatusBarViewModel? statusBar = null)
     {
+        Tools = new BrowserPageToolsViewModel(tabs, commands, shell, statusBar);
         _tabs = tabs;
         _strip = new BrowserTabStrip(tabs);
         _dispatcher = dispatcher;
@@ -48,6 +54,9 @@ public sealed partial class BrowserViewModel : ObservableObject, IFocusableConte
     }
 
     public ObservableCollection<BrowserTabViewModel> Tabs => _strip.Items;
+
+    /// <summary>Find on page, zoom, downloads, developer tools and sending to the chat, for the shown page.</summary>
+    public BrowserPageToolsViewModel Tools { get; }
 
     /// <summary>The shown tab; the view shows its page.</summary>
     [ObservableProperty]

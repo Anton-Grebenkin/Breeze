@@ -163,4 +163,34 @@
   <!-- A page needs the user. -->
   <data name="SignInWindowShown" xml:space="preserve"><value>the site asks for a login and password in the browser's own window. The tab is shown to the user: ask them to sign in there, then go on</value></data>
   <data name="SignInWindowNotification" xml:space="preserve"><value>The site {0} in the agent's tab asks for a login and password. Enter them in the browser: the agent is waiting.</value></data>
+  <!-- Page tools. -->
+  <data name="More" xml:space="preserve"><value>More</value></data>
+  <data name="FocusAddressCommand" xml:space="preserve"><value>Go to the Address Bar</value></data>
+  <data name="FindOnPage" xml:space="preserve"><value>Find on Page</value></data>
+  <data name="FindPlaceholder" xml:space="preserve"><value>Find on page</value></data>
+  <data name="FindNext" xml:space="preserve"><value>Next match (Enter)</value></data>
+  <data name="FindPrevious" xml:space="preserve"><value>Previous match (Shift+Enter)</value></data>
+  <data name="FindClose" xml:space="preserve"><value>Close (Esc)</value></data>
+  <data name="FindNoMatches" xml:space="preserve"><value>no matches</value></data>
+  <data name="FindPosition" xml:space="preserve"><value>{0} of {1}</value></data>
+  <data name="ZoomIn" xml:space="preserve"><value>Zoom In</value></data>
+  <data name="ZoomOut" xml:space="preserve"><value>Zoom Out</value></data>
+  <data name="ZoomReset" xml:space="preserve"><value>Reset Zoom (now {0} %)</value></data>
+  <data name="ZoomResetCommand" xml:space="preserve"><value>Reset Zoom</value></data>
+  <data name="Downloads" xml:space="preserve"><value>Downloads</value></data>
+  <data name="DevTools" xml:space="preserve"><value>Developer Tools</value></data>
+  <data name="OpenExternal" xml:space="preserve"><value>Open in the System Browser</value></data>
+  <data name="SendPageToChat" xml:space="preserve"><value>Send Page to Chat</value></data>
+  <data name="SendSelectionToChat" xml:space="preserve"><value>Send Selection to Chat</value></data>
+  <data name="PickElementForChat" xml:space="preserve"><value>Pick an Element for Chat</value></data>
+  <data name="PickElementHint" xml:space="preserve"><value>Click an element on the page to send it to the chat; Esc cancels.</value></data>
+  <data name="NothingSelected" xml:space="preserve"><value>Nothing is selected on the page.</value></data>
+  <data name="ChatPage" xml:space="preserve"><value>The page in the browser, tab {0}: {1}</value></data>
+  <data name="ChatSelection" xml:space="preserve"><value>Selected on the page {1} (tab {0}):
+{2}</value></data>
+  <data name="ChatElement" xml:space="preserve"><value>An element on the page {1} (tab {0}): &lt;{2}&gt; "{3}"
+Selector: {4}
+```html
+{5}
+```</value></data>
 </root>

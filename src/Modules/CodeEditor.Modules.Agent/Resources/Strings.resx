@@ -469,4 +469,5 @@ The agent gets the text when it reads or edits a matching file.
   <!-- Web through the browser. -->
   <data name="WebSearchThroughBrowser" xml:space="preserve"><value>The search engine's results, opened in the editor's browser (no digest: read a source with web_fetch):</value></data>
   <data name="WebFetchBothFailed" xml:space="preserve"><value>{0} The browser did not open it either: {1}</value></data>
+  <data name="CommandFocusInput" xml:space="preserve"><value>Go to the Input Box</value></data>
 </root>

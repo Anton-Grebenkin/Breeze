@@ -14,7 +14,7 @@ namespace CodeEditor.Modules.Browser.Wpf.Views;
 /// The Browser panel hosts the browser controls, which the pages own for the app lifetime: the control of every tab
 /// that was shown or called sits here, and only the shown tab's one is visible, so background tabs keep working. When
 /// the panel leaves the screen it releases the controls, and the next panel takes them with the same pages. The show
-/// command puts the caret into the address bar; the history menu opens under its button.
+/// command puts the caret into the address bar; the history and "more" menus open under their buttons.
 /// </summary>
 public sealed partial class BrowserView : System.Windows.Controls.UserControl
 {
@@ -139,6 +139,8 @@ public sealed partial class BrowserView : System.Windows.Controls.UserControl
         {
             _viewModel.FocusRequested -= OnFocusRequested;
             _viewModel.PropertyChanged -= OnViewModelPropertyChanged;
+            _viewModel.Tools.PropertyChanged -= OnToolsPropertyChanged;
+            _viewModel.Tools.FindFocusRequested -= OnFindFocusRequested;
         }
 
         _viewModel = e.NewValue as BrowserViewModel;
@@ -146,6 +148,8 @@ public sealed partial class BrowserView : System.Windows.Controls.UserControl
         {
             _viewModel.FocusRequested += OnFocusRequested;
             _viewModel.PropertyChanged += OnViewModelPropertyChanged;
+            _viewModel.Tools.PropertyChanged += OnToolsPropertyChanged;
+            _viewModel.Tools.FindFocusRequested += OnFindFocusRequested;
             HostPages();
 
             // The view is created on first panel show, after focus was already requested.
@@ -176,6 +180,33 @@ public sealed partial class BrowserView : System.Windows.Controls.UserControl
             HistoryMenu.PlacementTarget = HistoryButton;
             HistoryMenu.Placement = PlacementMode.Bottom;
             HistoryMenu.IsOpen = _viewModel.IsHistoryOpen;
+        }
+    }
+
+    private void OnFindFocusRequested(object? sender, EventArgs e) =>
+        Dispatcher.BeginInvoke(DispatcherPriority.Input, () =>
+        {
+            Keyboard.Focus(FindBox);
+            FindBox.SelectAll();
+        });
+
+    private void OnToolsPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(BrowserPageToolsViewModel.IsMenuOpen) || _viewModel is null)
+        {
+            return;
+        }
+
+        ToolsMenu.PlacementTarget = MoreButton;
+        ToolsMenu.Placement = PlacementMode.Bottom;
+        ToolsMenu.IsOpen = _viewModel.Tools.IsMenuOpen;
+    }
+
+    private void OnToolsMenuClosed(object sender, RoutedEventArgs e)
+    {
+        if (_viewModel is not null)
+        {
+            _viewModel.Tools.IsMenuOpen = false;
         }
     }
 

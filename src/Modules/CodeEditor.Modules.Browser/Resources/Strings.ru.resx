@@ -163,4 +163,34 @@
   <!-- A page needs the user. -->
   <data name="SignInWindowShown" xml:space="preserve"><value>сайт просит логин и пароль в окне самого браузера. Вкладка показана пользователю: попроси его войти там и продолжай</value></data>
   <data name="SignInWindowNotification" xml:space="preserve"><value>Сайт {0} во вкладке агента просит логин и пароль. Введите их в браузере: агент ждёт.</value></data>
+  <!-- Page tools. -->
+  <data name="More" xml:space="preserve"><value>Ещё</value></data>
+  <data name="FocusAddressCommand" xml:space="preserve"><value>Перейти к адресной строке</value></data>
+  <data name="FindOnPage" xml:space="preserve"><value>Найти на странице</value></data>
+  <data name="FindPlaceholder" xml:space="preserve"><value>Найти на странице</value></data>
+  <data name="FindNext" xml:space="preserve"><value>Следующее совпадение (Enter)</value></data>
+  <data name="FindPrevious" xml:space="preserve"><value>Предыдущее совпадение (Shift+Enter)</value></data>
+  <data name="FindClose" xml:space="preserve"><value>Закрыть (Esc)</value></data>
+  <data name="FindNoMatches" xml:space="preserve"><value>нет совпадений</value></data>
+  <data name="FindPosition" xml:space="preserve"><value>{0} из {1}</value></data>
+  <data name="ZoomIn" xml:space="preserve"><value>Увеличить</value></data>
+  <data name="ZoomOut" xml:space="preserve"><value>Уменьшить</value></data>
+  <data name="ZoomReset" xml:space="preserve"><value>Сбросить масштаб (сейчас {0} %)</value></data>
+  <data name="ZoomResetCommand" xml:space="preserve"><value>Сбросить масштаб</value></data>
+  <data name="Downloads" xml:space="preserve"><value>Загрузки</value></data>
+  <data name="DevTools" xml:space="preserve"><value>Инструменты разработчика</value></data>
+  <data name="OpenExternal" xml:space="preserve"><value>Открыть во внешнем браузере</value></data>
+  <data name="SendPageToChat" xml:space="preserve"><value>Отправить страницу в чат</value></data>
+  <data name="SendSelectionToChat" xml:space="preserve"><value>Отправить выделенное в чат</value></data>
+  <data name="PickElementForChat" xml:space="preserve"><value>Выбрать элемент для чата</value></data>
+  <data name="PickElementHint" xml:space="preserve"><value>Щёлкните элемент на странице, чтобы отправить его в чат; Esc — отмена.</value></data>
+  <data name="NothingSelected" xml:space="preserve"><value>На странице ничего не выделено.</value></data>
+  <data name="ChatPage" xml:space="preserve"><value>Страница в браузере, вкладка {0}: {1}</value></data>
+  <data name="ChatSelection" xml:space="preserve"><value>Выделено на странице {1} (вкладка {0}):
+{2}</value></data>
+  <data name="ChatElement" xml:space="preserve"><value>Элемент на странице {1} (вкладка {0}): &lt;{2}&gt; «{3}»
+Селектор: {4}
+```html
+{5}
+```</value></data>
 </root>

@@ -19,6 +19,54 @@ internal sealed class FakeBrowserPage : IBrowserPage
     /// <summary>The page was made for the agent: it holds dialogs for the agent's answer.</summary>
     public bool IsForAgent { get; init; }
 
+    public double Zoom { get; private set; } = 1;
+
+    public Task SetZoomAsync(double zoom, CancellationToken cancellationToken)
+    {
+        Zoom = zoom;
+        StateChanged?.Invoke(this, EventArgs.Empty);
+        return Task.CompletedTask;
+    }
+
+    /// <summary>What "find on page" was asked: the text and the step, in order.</summary>
+    public List<(string Text, BrowserFindStep Step)> Finds { get; } = [];
+
+    /// <summary>How many times the page has the text being looked for.</summary>
+    public int FindCount { get; set; } = 3;
+
+    private int _findActive;
+
+    public Task<BrowserFindResult> FindAsync(string text, BrowserFindStep step, CancellationToken cancellationToken)
+    {
+        Finds.Add((text, step));
+        if (text.Length == 0 || FindCount == 0)
+        {
+            return Task.FromResult(default(BrowserFindResult));
+        }
+
+        _findActive = step switch
+        {
+            BrowserFindStep.Next => _findActive % FindCount + 1,
+            BrowserFindStep.Previous => (_findActive + FindCount - 2) % FindCount + 1,
+            _ => 1,
+        };
+        return Task.FromResult(new BrowserFindResult(_findActive, FindCount));
+    }
+
+    /// <summary>The browser's own windows opened for the page.</summary>
+    public List<BrowserWindowKind> Opened { get; } = [];
+
+    public Task OpenAsync(BrowserWindowKind kind, CancellationToken cancellationToken)
+    {
+        Opened.Add(kind);
+        return Task.CompletedTask;
+    }
+
+    /// <summary>What the user picks when asked; <c>null</c> is Escape.</summary>
+    public BrowserPickedElement? Picked { get; set; }
+
+    public Task<BrowserPickedElement?> PickElementAsync(CancellationToken cancellationToken) => Task.FromResult(Picked);
+
     public BrowserDialog? Dialog { get; set; }
 
     public bool NeedsUser { get; private set; }

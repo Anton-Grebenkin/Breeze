@@ -63,6 +63,16 @@ internal sealed class HeadlessBrowserPage : IBrowserPage
     /// <summary>Dialogs the page opened (<c>Page.javascriptDialogOpening</c> parameters), oldest first.</summary>
     public List<string> Dialogs { get; } = [];
 
+    public double Zoom => 1;
+
+    public Task SetZoomAsync(double zoom, CancellationToken cancellationToken) => Task.CompletedTask;
+
+    public Task<BrowserFindResult> FindAsync(string text, BrowserFindStep step, CancellationToken cancellationToken) => Task.FromResult(default(BrowserFindResult));
+
+    public Task OpenAsync(BrowserWindowKind kind, CancellationToken cancellationToken) => Task.CompletedTask;
+
+    public Task<BrowserPickedElement?> PickElementAsync(CancellationToken cancellationToken) => Task.FromResult<BrowserPickedElement?>(null);
+
     public BrowserDialog? Dialog => null;
 
     public bool NeedsUser => false;

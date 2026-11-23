@@ -1,5 +1,6 @@
 using CodeEditor.Core.Commands;
 using CodeEditor.Core.Menus;
+using CodeEditor.Modules.Agent.Contracts;
 using CodeEditor.Modules.Agent.Resources;
 using CodeEditor.Modules.Agent.Rules;
 using CodeEditor.Shell.Commands;
@@ -53,6 +54,7 @@ public sealed class AgentCommands(
         AddPanel(commands, AgentCommandIds.AcceptChanges, Strings.CommandAcceptChanges, panel => panel.Changes.AcceptCommand.Execute(null));
         AddPanel(commands, AgentCommandIds.RevertChanges, Strings.CommandRevertChanges, panel => panel.Changes.RevertAllCommand.Execute(null));
         Add(commands, AgentCommandIds.MoveToBackground, Strings.CommandMoveToBackground, MoveToBackground);
+        _registrations.Add(commands.Register(new CommandDefinition(AgentChatCommands.AddToInput, Strings.CommandFocusInput, AddToInputAsync, Category)));
         _registrations.Add(commands.Register(new CommandDefinition(AgentCommandIds.OpenMemory, Strings.CommandOpenMemory, (_, _) => OpenMemoryAsync(), Category)));
         _registrations.Add(commands.Register(new CommandDefinition(AgentCommandIds.OpenRules, Strings.CommandOpenRules, (_, _) => OpenRulesAsync(), Category)));
 
@@ -145,6 +147,19 @@ public sealed class AgentCommands(
             apiKey.Clear();
             statusBar.Message = Strings.ApiKeyDeleted;
         }
+    }
+
+    // Another module hands over text (a page, a selection): it joins what is typed, and the user finishes the request.
+    private async ValueTask AddToInputAsync(object? argument, CancellationToken cancellationToken)
+    {
+        await commandService.ExecuteAsync(ToolWindowAreaViewModel.ShowCommandId(AgentModule.ToolWindowId), cancellationToken: cancellationToken);
+        var panel = chat();
+        if (argument is string { Length: > 0 } text)
+        {
+            panel.Input = panel.Input.Trim().Length == 0 ? text : panel.Input.TrimEnd() + "\n\n" + text;
+        }
+
+        panel.RequestFocus();
     }
 
     private void Add(ICommandRegistry commands, string id, string title, Action handler) =>

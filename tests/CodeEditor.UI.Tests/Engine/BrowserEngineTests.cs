@@ -28,6 +28,11 @@ public sealed class BrowserEngineTests : IDisposable
             """,
         ["/report"] = "<html><head><title>Отчёт</title></head><body><h1>Отчёт за месяц</h1></body></html>",
         ["/secure"] = LocalSite.SignInRequired,
+        ["/words"] = """
+            <html><head><title>Слова</title></head><body><h1>Слова</h1><p>альфа бета альфа</p><p>Альфа</p>
+            <button id="go" onclick="document.title = 'нажато'">Кнопка выбора</button>
+            </body></html>
+            """,
     });
 
     private readonly BrowserTabs _tabs;
@@ -120,6 +125,40 @@ public sealed class BrowserEngineTests : IDisposable
         Assert.True(DateTime.UtcNow - started < TimeSpan.FromSeconds(15), "Окно входа должно вернуть управление сразу, а не по истечении ожидания загрузки.");
         Assert.True(_tabs.Active!.IsAgent);
         Assert.Contains("просит логин и пароль", Assert.Single(notifications.Shown), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task FindOnPage_CountsTheMatches_AndWalksThem()
+    {
+        await UseAsync(new() { ["action"] = "navigate", ["url"] = Address("/words") });
+        var page = _tabs.Tabs[0].Page;
+
+        var first = await page.FindAsync("альфа", BrowserFindStep.Start, TestContext.Current.CancellationToken);
+        var second = await page.FindAsync("альфа", BrowserFindStep.Next, TestContext.Current.CancellationToken);
+        var none = await page.FindAsync("гамма", BrowserFindStep.Start, TestContext.Current.CancellationToken);
+        var stopped = await page.FindAsync(string.Empty, BrowserFindStep.Start, TestContext.Current.CancellationToken);
+
+        Assert.Equal((new BrowserFindResult(1, 3), new BrowserFindResult(2, 3), new BrowserFindResult(0, 0), default(BrowserFindResult)), (first, second, none, stopped));
+    }
+
+    // Picking an element: the click goes to the picker, not to the page, and a message the page forges is ignored.
+    [Fact]
+    public async Task PickElement_ReturnsWhatWasClicked_ThePageDoesNotGetTheClick_AndCannotForgeAPick()
+    {
+        await UseAsync(new() { ["action"] = "navigate", ["url"] = Address("/words") });
+        var page = _tabs.Tabs[0].Page;
+
+        var pick = page.PickElementAsync(TestContext.Current.CancellationToken);
+        await page.EvaluateAsync("window.chrome.webview.postMessage({ breezePick: 'forged', tag: 'x', text: '', selector: '', html: '' })", TestContext.Current.CancellationToken);
+        await Task.Delay(TimeSpan.FromMilliseconds(300), TestContext.Current.CancellationToken);
+        Assert.False(pick.IsCompleted);
+
+        await PageMouse.PressAsync(page, "e1", TestContext.Current.CancellationToken);
+
+        var picked = await pick.WaitAsync(TimeSpan.FromSeconds(10), TestContext.Current.CancellationToken);
+        Assert.Equal(("button", "Кнопка выбора", "#go"), (picked!.Tag, picked.Text, picked.Selector));
+        Assert.StartsWith("<button id=\"go\"", picked.Html, StringComparison.Ordinal);
+        Assert.Equal("\"Слова\"", await page.EvaluateAsync("document.title", TestContext.Current.CancellationToken));
     }
 
     [Fact]
