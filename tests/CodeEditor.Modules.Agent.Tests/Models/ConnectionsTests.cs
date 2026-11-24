@@ -4,6 +4,7 @@ using System.Text.Json;
 using CodeEditor.Core.Settings;
 using CodeEditor.Modules.Agent.Services.Api;
 using CodeEditor.Modules.Agent.Services.Models;
+using CodeEditor.Modules.Agent.Services.Probes;
 using CodeEditor.Modules.Agent.Services.Settings;
 using CodeEditor.Modules.Agent.Tests.Infrastructure;
 using CodeEditor.Modules.Agent.ViewModels.Models;
@@ -25,6 +26,7 @@ public sealed class ConnectionsTests : IDisposable
     private readonly TestOptionsMonitor<AgentOptions> _options = new(new AgentOptions());
     private readonly AgentFixture.MemorySecrets _secrets = new();
     private readonly FakeProbe _probe = new();
+    private readonly FakeModelProbe _modelProbe = new();
     private readonly FakeDialogs _dialogs = new();
     private readonly StatusBarViewModel _statusBar = new();
     private readonly ConnectionsViewModel _panel;
@@ -35,7 +37,7 @@ public sealed class ConnectionsTests : IDisposable
         // Written values go through the real settings text and binder, as in the app.
         _settings.Changed += (_, _) => Reload();
         var store = new ConnectionStore(_options, _settings, _secrets);
-        _panel = new ConnectionsViewModel(new ConnectionServices(store, _probe, _dialogs, _settings, _options, _statusBar));
+        _panel = new ConnectionsViewModel(new ConnectionServices(store, _probe, _dialogs, _settings, _options, _statusBar, _modelProbe));
     }
 
     public void Dispose() => _panel.Dispose();
@@ -82,6 +84,35 @@ public sealed class ConnectionsTests : IDisposable
         Assert.Equal("gateway:hosted_vllm/team-pro", _options.CurrentValue.Model);
         Assert.Equal(ModelFamily.DeepSeek, ModelProfiles.For(_options.CurrentValue).Family);
         Assert.Equal(("Модель агента: DeepSeek, старшая", true), (_statusBar.Message, model.IsCurrent));
+    }
+
+    [Fact]
+    public async Task ModelCheck_ShowsItsReport_ApplyWritesTheFindingsToTheModelAndTheConnection()
+    {
+        _probe.Models = [new ServiceModel("hosted_vllm/team-pro")];
+        await AddGatewayAsync();
+        var model = _panel.Connections[0].Models.Single();
+        model.IsEnabled = true;
+        Assert.False(model.Images);
+        _modelProbe.Report = new ModelProbeReport(
+            [new ModelProbeStep(ModelProbeKind.Answer, true, "отвечает"), new ModelProbeStep(ModelProbeKind.ToolCall, false, "не вызвала инструмент")])
+        {
+            Images = true, Reasoning = ReasoningSource.ThinkAloud, LegacyMaxTokens = true,
+        };
+
+        await model.CheckCommand.ExecuteAsync(null);
+
+        Assert.Equal(("secret-key", "hosted_vllm/team-pro"), _modelProbe.Calls.Single());
+        Assert.Equal(["Ответ: отвечает", "Вызов инструмента: не вызвала инструмент"], model.Report.Select(line => line.ToString()));
+        Assert.Equal((false, true), (model.Report[0].IsFailed, model.Report[1].IsFailed));
+        Assert.True(model.CanApplyCheck);
+        Assert.False(_options.CurrentValue.Connections[0].LegacyMaxTokens);
+
+        model.ApplyCheckCommand.Execute(null);
+
+        var connection = _options.CurrentValue.Connections[0];
+        Assert.Equal((true, true, ReasoningSource.ThinkAloud), (connection.LegacyMaxTokens, connection.Models[0].Images, connection.Models[0].Reasoning));
+        Assert.Equal((true, false), (model.Images, model.CanApplyCheck));
     }
 
     [Fact]
@@ -222,6 +253,19 @@ public sealed class ConnectionsTests : IDisposable
         {
             Keys.Add(key);
             return Failure is null ? Task.FromResult(Models) : Task.FromException<IReadOnlyList<ServiceModel>>(Failure);
+        }
+    }
+
+    private sealed class FakeModelProbe : IModelProbe
+    {
+        public ModelProbeReport Report { get; set; } = new([]);
+
+        public List<(string? Key, string Model)> Calls { get; } = [];
+
+        public Task<ModelProbeReport> RunAsync(AgentConnection connection, string? key, string model, CancellationToken cancellationToken)
+        {
+            Calls.Add((key, model));
+            return Task.FromResult(Report);
         }
     }
 

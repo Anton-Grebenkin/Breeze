@@ -12,4 +12,5 @@ public sealed record ConnectionServices(
     IDialogService Dialogs,
     ISettingsService Settings,
     IOptionsMonitor<AgentOptions> Options,
-    StatusBarViewModel StatusBar);
+    StatusBarViewModel StatusBar,
+    IModelProbe ModelProbe);

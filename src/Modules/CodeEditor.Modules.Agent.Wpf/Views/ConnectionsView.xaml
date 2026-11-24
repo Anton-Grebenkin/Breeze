@@ -53,8 +53,43 @@
               <ToggleButton DockPanel.Dock="Left" Margin="12,0,0,0" VerticalAlignment="Center" Style="{StaticResource ToggleButton.Switch}"
                             IsChecked="{Binding Images}" ToolTip="{x:Static res:Strings.ModelImagesHint}"
                             AutomationProperties.AutomationId="{Binding Id, StringFormat=Agent.Connections.Images.{0}}" AutomationProperties.Name="{x:Static res:Strings.ModelImagesHint}" />
+              <Button DockPanel.Dock="Right" Padding="8,1" Style="{StaticResource Button.Secondary}"
+                      Content="{x:Static res:Strings.ModelCheck}" ToolTip="{x:Static res:Strings.ModelCheckHint}" Command="{Binding CheckCommand}"
+                      AutomationProperties.AutomationId="{Binding Id, StringFormat=Agent.Connections.Check.{0}}" />
               <TextBlock Margin="4,0,0,0" VerticalAlignment="Center" Style="{StaticResource TextBlock.Note}" TextWrapping="NoWrap" Text="{x:Static res:Strings.ModelImages}" />
             </DockPanel>
+            <!-- The model check: a line per probe, and a button that writes the findings into the settings. -->
+            <TextBlock Margin="0,4,0,0" Style="{StaticResource TextBlock.Note}" Text="{x:Static res:Strings.ModelChecking}"
+                       Visibility="{Binding IsChecking, Converter={StaticResource BoolToVisibility}}"
+                       AutomationProperties.AutomationId="{Binding Id, StringFormat=Agent.Connections.Checking.{0}}" />
+            <ItemsControl Margin="0,4,0,0" ItemsSource="{Binding Report}" Focusable="False"
+                          AutomationProperties.AutomationId="{Binding Id, StringFormat=Agent.Connections.Report.{0}}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="{x:Type models:ModelProbeLine}">
+                  <DockPanel Margin="0,1">
+                    <TextBlock x:Name="Mark" DockPanel.Dock="Left" Width="18" FontFamily="{DynamicResource Font.Icons}"
+                               Foreground="{DynamicResource Brush.Text.Secondary}" Text="{x:Static ui:IconGlyphs.CircleSmallFilled}" />
+                    <TextBlock x:Name="Line" Style="{StaticResource TextBlock.Note}"
+                               AutomationProperties.AutomationId="{Binding Kind, StringFormat=Agent.Connections.Probe.{0}}">
+                      <Run FontWeight="SemiBold" Text="{Binding Title, Mode=OneWay}" /><Run Text=": " /><Run Text="{Binding Detail, Mode=OneWay}" />
+                    </TextBlock>
+                  </DockPanel>
+                  <DataTemplate.Triggers>
+                    <DataTrigger Binding="{Binding IsPassed}" Value="True">
+                      <Setter TargetName="Mark" Property="Text" Value="{x:Static ui:IconGlyphs.Check}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding IsFailed}" Value="True">
+                      <Setter TargetName="Mark" Property="Text" Value="{x:Static ui:IconGlyphs.Error}" />
+                      <Setter TargetName="Line" Property="Foreground" Value="{DynamicResource Brush.Text.Primary}" />
+                    </DataTrigger>
+                  </DataTemplate.Triggers>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <Button Margin="0,4,0,0" Padding="8,1" HorizontalAlignment="Left" Style="{StaticResource Button.Secondary}"
+                    Content="{x:Static res:Strings.ModelApplyCheck}" ToolTip="{x:Static res:Strings.ModelApplyCheckHint}" Command="{Binding ApplyCheckCommand}"
+                    Visibility="{Binding CanApplyCheck, Converter={StaticResource BoolToVisibility}}"
+                    AutomationProperties.AutomationId="{Binding Id, StringFormat=Agent.Connections.ApplyCheck.{0}}" />
           </StackPanel>
         </StackPanel>
         <DataTemplate.Triggers>

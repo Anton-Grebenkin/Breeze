@@ -15,13 +15,16 @@ public sealed partial class ConnectionRowViewModel : ObservableObject
 {
     private readonly ConnectionServices _services;
     private IReadOnlyList<ServiceModel> _listed = [];
+    private readonly ConnectionModelActions _actions;
     private List<ConnectionModelRowViewModel> _rows = [];
     private CancellationTokenSource? _loading;
+    private bool _legacyMaxTokens;
 
     public ConnectionRowViewModel(AgentConnection connection, ConnectionServices services)
     {
         ArgumentNullException.ThrowIfNull(connection);
         _services = services;
+        _actions = new ConnectionModelActions(_ => Save(), Use, CheckAsync, report => _legacyMaxTokens |= report.LegacyMaxTokens);
         Id = connection.Id;
         Update(connection);
     }
@@ -174,8 +177,7 @@ public sealed partial class ConnectionRowViewModel : ObservableObject
                     model,
                     described.FirstOrDefault(description => string.Equals(description.Id, model.Id, StringComparison.OrdinalIgnoreCase)),
                     string.Equals(model.Id, current, StringComparison.OrdinalIgnoreCase),
-                    _ => Save(),
-                    Use))
+                    _actions))
                 .OrderByDescending(static row => row.IsEnabled)
                 .ThenBy(static row => row.Id, StringComparer.OrdinalIgnoreCase),
         ];
@@ -203,7 +205,7 @@ public sealed partial class ConnectionRowViewModel : ObservableObject
         var saved = new AgentConnection
         {
             Id = connection.Id, Name = connection.Name, Endpoint = connection.Endpoint, Api = connection.Api, Headers = connection.Headers,
-            Keyless = connection.Keyless, LegacyMaxTokens = connection.LegacyMaxTokens,
+            Keyless = connection.Keyless, LegacyMaxTokens = connection.LegacyMaxTokens || _legacyMaxTokens,
             Models = [.. _rows.Select(static row => row.ToDescription()).OfType<ModelDescription>()],
         };
         Status = _services.Store.TrySave(saved, out var error) ? Summary() : error;
@@ -217,6 +219,11 @@ public sealed partial class ConnectionRowViewModel : ObservableObject
             ? string.Format(CultureInfo.CurrentCulture, Strings.ModelChanged, row.Name.Length > 0 ? row.Name : row.Id)
             : error;
     }
+
+    private Task<ModelProbeReport> CheckAsync(ConnectionModelRowViewModel row, CancellationToken cancellationToken) =>
+        _services.Store.Find(Id) is { } connection
+            ? _services.ModelProbe.RunAsync(connection, connection.Keyless ? null : _services.Store.Key(connection), row.Id, cancellationToken)
+            : Task.FromResult(new ModelProbeReport([]));
 
     // The conversation model's id at the service, if it is a model of this connection.
     private string? CurrentModel() =>

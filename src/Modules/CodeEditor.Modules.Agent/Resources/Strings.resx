@@ -522,4 +522,43 @@ The agent gets the text when it reads or edits a matching file.
   <data name="CommandConnections" xml:space="preserve"><value>Agent: Connections and Models</value></data>
   <data name="MenuConnections" xml:space="preserve"><value>Connections and Models…</value></data>
   <data name="ConnectionsAction" xml:space="preserve"><value>Connections…</value></data>
+  <!-- Check the model (ADR 0055) -->
+  <data name="ProbeProtocol" xml:space="preserve"><value>The check works over Chat Completions; this connection uses another protocol.</value></data>
+  <data name="ProbeAnswers" xml:space="preserve"><value>answers</value></data>
+  <data name="ProbeNoAnswer" xml:space="preserve"><value>no answer: {0}</value></data>
+  <data name="ProbeStatus" xml:space="preserve"><value>the service answered {0}</value></data>
+  <data name="ProbeNotJson" xml:space="preserve"><value>the answer of the service is not JSON</value></data>
+  <data name="ProbeFailed" xml:space="preserve"><value>the request failed: {0}</value></data>
+  <data name="ProbeLimitNew" xml:space="preserve"><value>the max_completion_tokens field</value></data>
+  <data name="ProbeLimitLegacy" xml:space="preserve"><value>only the older max_tokens field is accepted</value></data>
+  <data name="ProbeToolCalled" xml:space="preserve"><value>calls the tool</value></data>
+  <data name="ProbeToolNotCalled" xml:space="preserve"><value>did not call the tool: the agent cannot work with this model</value></data>
+  <data name="ProbeToolArgumentsBroken" xml:space="preserve"><value>the arguments of the call are not JSON</value></data>
+  <data name="ProbeTwoCalls" xml:space="preserve"><value>two calls in one reply</value></data>
+  <data name="ProbeOneCall" xml:space="preserve"><value>one call per reply: the work will go slower</value></data>
+  <data name="ProbeNested" xml:space="preserve"><value>arrive whole</value></data>
+  <data name="ProbeNestedLost" xml:space="preserve"><value>lost or distorted: edits of several files may fail</value></data>
+  <data name="ProbeImageSeen" xml:space="preserve"><value>sees images</value></data>
+  <data name="ProbeImageNotSeen" xml:space="preserve"><value>does not see images</value></data>
+  <data name="ProbeImageRefused" xml:space="preserve"><value>the service did not take the picture: {0}</value></data>
+  <data name="ProbeReasoningField" xml:space="preserve"><value>come in a field of their own</value></data>
+  <data name="ProbeReasoningInline" xml:space="preserve"><value>come inside the answer text, in a think tag</value></data>
+  <data name="ProbeReasoningNone" xml:space="preserve"><value>none: the agent will ask the model to think aloud</value></data>
+  <data name="ProbeReasoningEffortRefused" xml:space="preserve"><value>the service rejects the reasoning_effort field: it will not be sent</value></data>
+  <data name="ProbeRussian" xml:space="preserve"><value>answers in Russian</value></data>
+  <data name="ProbeNotRussian" xml:space="preserve"><value>answered a question in Russian in another language</value></data>
+  <data name="ProbeTitleAnswer" xml:space="preserve"><value>Answer</value></data>
+  <data name="ProbeTitleOutputLimit" xml:space="preserve"><value>Response limit</value></data>
+  <data name="ProbeTitleToolCall" xml:space="preserve"><value>Tool call</value></data>
+  <data name="ProbeTitleParallel" xml:space="preserve"><value>Several calls</value></data>
+  <data name="ProbeTitleNested" xml:space="preserve"><value>Nested arguments</value></data>
+  <data name="ProbeTitleImage" xml:space="preserve"><value>Image</value></data>
+  <data name="ProbeTitleReasoning" xml:space="preserve"><value>Reasoning</value></data>
+  <data name="ProbeTitleLanguage" xml:space="preserve"><value>Russian</value></data>
+  <data name="ModelCheck" xml:space="preserve"><value>Check</value></data>
+  <data name="ModelCheckHint" xml:space="preserve"><value>A few short requests to the model: a tool call, an image, reasoning. Spends a few thousand tokens of your key.</value></data>
+  <data name="ModelChecking" xml:space="preserve"><value>Checking the model…</value></data>
+  <data name="ModelApplyCheck" xml:space="preserve"><value>Apply</value></data>
+  <data name="ModelApplyCheckHint" xml:space="preserve"><value>Write what the check found into the description of the model and the connection</value></data>
+  <data name="ProbeRussianQuestion" xml:space="preserve"><value>Ответь одним предложением: что такое рекурсия?</value></data>
 </root>

@@ -522,4 +522,43 @@ description: Стили XAML
   <data name="CommandConnections" xml:space="preserve"><value>Агент: подключения и модели</value></data>
   <data name="MenuConnections" xml:space="preserve"><value>Подключения и модели…</value></data>
   <data name="ConnectionsAction" xml:space="preserve"><value>Подключения…</value></data>
+  <!-- Check the model (ADR 0055) -->
+  <data name="ProbeProtocol" xml:space="preserve"><value>Проверка идёт через Chat Completions, а у подключения другой протокол.</value></data>
+  <data name="ProbeAnswers" xml:space="preserve"><value>отвечает</value></data>
+  <data name="ProbeNoAnswer" xml:space="preserve"><value>не отвечает: {0}</value></data>
+  <data name="ProbeStatus" xml:space="preserve"><value>сервис ответил {0}</value></data>
+  <data name="ProbeNotJson" xml:space="preserve"><value>ответ сервиса — не JSON</value></data>
+  <data name="ProbeFailed" xml:space="preserve"><value>запрос не прошёл: {0}</value></data>
+  <data name="ProbeLimitNew" xml:space="preserve"><value>поле max_completion_tokens</value></data>
+  <data name="ProbeLimitLegacy" xml:space="preserve"><value>сервис принимает только старое поле max_tokens</value></data>
+  <data name="ProbeToolCalled" xml:space="preserve"><value>вызывает инструмент</value></data>
+  <data name="ProbeToolNotCalled" xml:space="preserve"><value>не вызвала инструмент: агент с этой моделью работать не сможет</value></data>
+  <data name="ProbeToolArgumentsBroken" xml:space="preserve"><value>аргументы вызова — не JSON</value></data>
+  <data name="ProbeTwoCalls" xml:space="preserve"><value>два вызова в одном ответе</value></data>
+  <data name="ProbeOneCall" xml:space="preserve"><value>один вызов за ответ: работа пойдёт медленнее</value></data>
+  <data name="ProbeNested" xml:space="preserve"><value>приходят целыми</value></data>
+  <data name="ProbeNestedLost" xml:space="preserve"><value>потеряны или искажены: правки нескольких файлов могут не проходить</value></data>
+  <data name="ProbeImageSeen" xml:space="preserve"><value>видит изображения</value></data>
+  <data name="ProbeImageNotSeen" xml:space="preserve"><value>не видит изображения</value></data>
+  <data name="ProbeImageRefused" xml:space="preserve"><value>сервис не принял картинку: {0}</value></data>
+  <data name="ProbeReasoningField" xml:space="preserve"><value>приходят отдельным полем</value></data>
+  <data name="ProbeReasoningInline" xml:space="preserve"><value>приходят в тексте ответа, в теге think</value></data>
+  <data name="ProbeReasoningNone" xml:space="preserve"><value>нет: агент попросит модель рассуждать вслух</value></data>
+  <data name="ProbeReasoningEffortRefused" xml:space="preserve"><value>сервис отклоняет поле reasoning_effort: оно не будет отправляться</value></data>
+  <data name="ProbeRussian" xml:space="preserve"><value>отвечает по-русски</value></data>
+  <data name="ProbeNotRussian" xml:space="preserve"><value>на вопрос по-русски ответила на другом языке</value></data>
+  <data name="ProbeTitleAnswer" xml:space="preserve"><value>Ответ</value></data>
+  <data name="ProbeTitleOutputLimit" xml:space="preserve"><value>Предел ответа</value></data>
+  <data name="ProbeTitleToolCall" xml:space="preserve"><value>Вызов инструмента</value></data>
+  <data name="ProbeTitleParallel" xml:space="preserve"><value>Несколько вызовов</value></data>
+  <data name="ProbeTitleNested" xml:space="preserve"><value>Вложенные аргументы</value></data>
+  <data name="ProbeTitleImage" xml:space="preserve"><value>Изображение</value></data>
+  <data name="ProbeTitleReasoning" xml:space="preserve"><value>Рассуждения</value></data>
+  <data name="ProbeTitleLanguage" xml:space="preserve"><value>Русский язык</value></data>
+  <data name="ModelCheck" xml:space="preserve"><value>Проверить</value></data>
+  <data name="ModelCheckHint" xml:space="preserve"><value>Несколько коротких запросов к модели: вызов инструмента, изображение, рассуждения. Тратит несколько тысяч токенов вашего ключа.</value></data>
+  <data name="ModelChecking" xml:space="preserve"><value>Проверяю модель…</value></data>
+  <data name="ModelApplyCheck" xml:space="preserve"><value>Применить</value></data>
+  <data name="ModelApplyCheckHint" xml:space="preserve"><value>Записать найденное в описание модели и подключения</value></data>
+  <data name="ProbeRussianQuestion" xml:space="preserve"><value>Ответь одним предложением: что такое рекурсия?</value></data>
 </root>

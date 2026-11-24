@@ -20,19 +20,18 @@ public sealed partial class ConnectionModelRowViewModel : ObservableObject
     ];
 
     private readonly ServiceModel _service;
-    private readonly Action<ConnectionModelRowViewModel> _changed;
-    private readonly Action<ConnectionModelRowViewModel> _use;
+    private readonly ConnectionModelActions _actions;
     private readonly ModelDescription? _described;
     private readonly bool _isReady;
+    private ReasoningSource? _reasoning;
+    private ModelProbeReport? _checked;
+    private CancellationTokenSource? _checking;
 
     /// <param name="described">What the settings say about the model; <c>null</c> when it is not in the picker.</param>
-    /// <param name="changed">Saves the connection.</param>
-    /// <param name="use">Makes the model the conversation model.</param>
-    public ConnectionModelRowViewModel(
-        ServiceModel service, ModelDescription? described, bool isCurrent, Action<ConnectionModelRowViewModel> changed, Action<ConnectionModelRowViewModel> use)
+    public ConnectionModelRowViewModel(ServiceModel service, ModelDescription? described, bool isCurrent, ConnectionModelActions actions)
     {
         ArgumentNullException.ThrowIfNull(service);
-        (_service, _described, _changed, _use) = (service, described, changed, use);
+        (_service, _described, _actions, _reasoning) = (service, described, actions, described?.Reasoning);
         IsCurrent = isCurrent;
         IsEnabled = described is not null;
         Name = described?.Name ?? string.Empty;
@@ -69,6 +68,19 @@ public sealed partial class ConnectionModelRowViewModel : ObservableObject
 
     public string FamilyTitle => Title(Family);
 
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(CheckCommand))]
+    public partial bool IsChecking { get; private set; }
+
+    /// <summary>What the last check found, a line per probe; empty before the first check.</summary>
+    [ObservableProperty]
+    public partial IReadOnlyList<ModelProbeLine> Report { get; private set; } = [];
+
+    /// <summary>The check found something the settings do not say yet.</summary>
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(ApplyCheckCommand))]
+    public partial bool CanApplyCheck { get; private set; }
+
     /// <summary>The family choice, opened under its button.</summary>
     public IReadOnlyList<MenuItemViewModel> FamilyMenu =>
     [
@@ -87,16 +99,62 @@ public sealed partial class ConnectionModelRowViewModel : ObservableObject
 
         // Set by hand in the settings file: the row does not edit them and must not drop them.
         MaxOutputTokens = _described?.MaxOutputTokens,
-        Reasoning = _described?.Reasoning,
+        Reasoning = _reasoning,
         EditFormat = _described?.EditFormat,
     };
+
+    /// <summary>Asks the model itself what it can do; the report shows under the row.</summary>
+    [RelayCommand(CanExecute = nameof(CanCheck))]
+    private async Task CheckAsync()
+    {
+        _checking?.Cancel();
+        var checking = _checking = new CancellationTokenSource();
+        (IsChecking, Report, CanApplyCheck) = (true, [], false);
+        try
+        {
+            _checked = await _actions.Check(this, checking.Token);
+            Report = [.. _checked.Steps.Select(static step => new ModelProbeLine(step))];
+            CanApplyCheck = _checked.HasSuggestions;
+        }
+        catch (OperationCanceledException) when (checking.IsCancellationRequested)
+        {
+            _checked = null;
+        }
+        finally
+        {
+            if (ReferenceEquals(_checking, checking))
+            {
+                (_checking, IsChecking) = (null, false);
+            }
+
+            checking.Dispose();
+        }
+    }
+
+    private bool CanCheck() => !IsChecking;
+
+    /// <summary>Writes what the check found into the description; the response limit field belongs to the connection.</summary>
+    [RelayCommand(CanExecute = nameof(CanApplyCheck))]
+    private void ApplyCheck()
+    {
+        if (_checked is not { } report)
+        {
+            return;
+        }
+
+        _reasoning = report.Reasoning ?? _reasoning;
+        CanApplyCheck = false;
+        _actions.Apply(report);
+        Images = report.Images ?? Images;
+        _actions.Changed(this);
+    }
 
     /// <summary>Puts the model into the picker and makes it the conversation model.</summary>
     [RelayCommand]
     private void Use()
     {
         IsEnabled = true;
-        _use(this);
+        _actions.Use(this);
     }
 
     private Task Choose(ModelFamily? family)
@@ -111,7 +169,7 @@ public sealed partial class ConnectionModelRowViewModel : ObservableObject
         base.OnPropertyChanged(e);
         if (_isReady && e.PropertyName is nameof(IsEnabled) or nameof(Name) or nameof(Family) or nameof(ContextWindow) or nameof(Images))
         {
-            _changed(this);
+            _actions.Changed(this);
         }
     }
 

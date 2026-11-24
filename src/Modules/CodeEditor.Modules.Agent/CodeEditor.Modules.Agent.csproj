@@ -34,6 +34,7 @@
     <Using Include="CodeEditor.Modules.Agent.Services.Http" />
     <Using Include="CodeEditor.Modules.Agent.Services.Memory" />
     <Using Include="CodeEditor.Modules.Agent.Services.Models" />
+    <Using Include="CodeEditor.Modules.Agent.Services.Probes" />
     <Using Include="CodeEditor.Modules.Agent.Services.Prompts" />
     <Using Include="CodeEditor.Modules.Agent.Services.Settings" />
     <Using Include="CodeEditor.Modules.Agent.Services.Tools" />

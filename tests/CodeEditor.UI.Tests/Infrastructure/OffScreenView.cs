@@ -98,6 +98,7 @@ internal sealed class OffScreenView : IDisposable
 
     public string TextOf(string automationId) => Read(() => Element<FrameworkElement>(automationId) switch
     {
+        TextBlock { Inlines.Count: > 1 } block => string.Concat(block.Inlines.OfType<System.Windows.Documents.Run>().Select(static run => run.Text)),
         TextBlock block => block.Text,
         TextBox box => box.Text,
         ContentControl { Content: string text } => text,

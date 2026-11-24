@@ -105,6 +105,7 @@ public sealed class AgentModule : IModule
         services.AddSingleton<ModelDirectory>();
         services.AddSingleton<ModelManagerViewModel>();
         services.AddSingleton<IConnectionProbe>(_ => new ConnectionProbe());
+        services.AddSingleton<IModelProbe>(_ => new ModelProbe());
         services.AddSingleton<ConnectionStore>();
         services.AddSingleton<ConnectionServices>();
         services.AddSingleton<ConnectionsViewModel>();

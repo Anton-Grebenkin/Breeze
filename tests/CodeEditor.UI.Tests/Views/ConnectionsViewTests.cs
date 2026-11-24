@@ -1,6 +1,8 @@
 using CodeEditor.Core.Settings;
 using CodeEditor.Core.Storage;
 using CodeEditor.Modules.Agent.Services.Api;
+using CodeEditor.Modules.Agent.Services.Models;
+using CodeEditor.Modules.Agent.Services.Probes;
 using CodeEditor.Modules.Agent.Services.Settings;
 using CodeEditor.Modules.Agent.ViewModels.Models;
 using CodeEditor.Modules.Agent.Wpf.Views;
@@ -30,7 +32,7 @@ public sealed class ConnectionsViewTests : IDisposable
     [Fact]
     public void Gateway_IsAddedFromTheForm_ItsModelIsSwitchedOn_Described_AndChosen()
     {
-        var services = new ConnectionServices(new ConnectionStore(_options, _settings, _secrets), _probe, new FakeDialogs(), _settings, _options, new StatusBarViewModel());
+        var services = new ConnectionServices(new ConnectionStore(_options, _settings, _secrets), _probe, new FakeDialogs(), _settings, _options, new StatusBarViewModel(), new ModelCheck());
         _view.Show(() => new ConnectionsView { DataContext = new ConnectionsViewModel(services) });
         Assert.True(_view.IsShown("Agent.Connections.Empty"));
         Assert.False(_view.IsShown("Agent.Connections.New.AddUnchecked"));
@@ -55,7 +57,17 @@ public sealed class ConnectionsViewTests : IDisposable
         Assert.Equal(["По имени", "Claude", "GPT с рассуждениями", "GPT-4 и старше", "Gemini", "DeepSeek", "Qwen", "Другие сильные", "Простые и локальные"], _view.MenuOf("Agent.Connections.Family.team-pro"));
 
         _view.Type("Agent.Connections.Name.team-pro", "Старшая");
+
+        // The model check shows a line per probe; "Apply" writes what it found and goes away.
+        Assert.False(_view.IsShown("Agent.Connections.ApplyCheck.team-pro"));
+        _view.Press("Agent.Connections.Check.team-pro");
+        Assert.Equal("Вызов инструмента: вызывает инструмент", _view.TextOf("Agent.Connections.Probe.ToolCall"));
+        Assert.Equal("Изображение: видит изображения", _view.TextOf("Agent.Connections.Probe.Image"));
         _view.SaveScreenshot("connections-view");
+        _view.Press("Agent.Connections.ApplyCheck.team-pro");
+        Assert.False(_view.IsShown("Agent.Connections.ApplyCheck.team-pro"));
+        Assert.Equal((true, ReasoningSource.Native), (_options.CurrentValue.Connections[0].Models[0].Images, _options.CurrentValue.Connections[0].Models[0].Reasoning));
+
         _view.Press("Agent.Connections.Use.team-pro");
 
         Assert.Equal("gateway:team-pro", _options.CurrentValue.Model);
@@ -68,7 +80,7 @@ public sealed class ConnectionsViewTests : IDisposable
     public void FailedCheck_ShowsWhy_AndOffersToAddAnyway()
     {
         _probe.Failure = new System.Text.Json.JsonException("not a list");
-        var services = new ConnectionServices(new ConnectionStore(_options, _settings, _secrets), _probe, new FakeDialogs(), _settings, _options, new StatusBarViewModel());
+        var services = new ConnectionServices(new ConnectionStore(_options, _settings, _secrets), _probe, new FakeDialogs(), _settings, _options, new StatusBarViewModel(), new ModelCheck());
         _view.Show(() => new ConnectionsView { DataContext = new ConnectionsViewModel(services) });
 
         _view.Type("Agent.Connections.New.Endpoint", "http://localhost:8000/v1");
@@ -110,6 +122,21 @@ public sealed class ConnectionsViewTests : IDisposable
             Failure is null
                 ? Task.FromResult<IReadOnlyList<ServiceModel>>([new ServiceModel("team-pro", 64_000), new ServiceModel("team-fast")])
                 : Task.FromException<IReadOnlyList<ServiceModel>>(Failure);
+    }
+
+    private sealed class ModelCheck : IModelProbe
+    {
+        public Task<ModelProbeReport> RunAsync(AgentConnection connection, string? key, string model, CancellationToken cancellationToken) =>
+            Task.FromResult(new ModelProbeReport(
+                [
+                    new ModelProbeStep(ModelProbeKind.Answer, true, "отвечает"),
+                    new ModelProbeStep(ModelProbeKind.ToolCall, true, "вызывает инструмент"),
+                    new ModelProbeStep(ModelProbeKind.NestedArguments, false, "потеряны или искажены"),
+                    new ModelProbeStep(ModelProbeKind.Image, null, "видит изображения"),
+                ])
+            {
+                Images = true, Reasoning = ReasoningSource.Native,
+            });
     }
 
     private sealed class Secrets : ISecretStore
