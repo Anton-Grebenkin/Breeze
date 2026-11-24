@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -16,7 +17,6 @@ public sealed partial class ToolTrust(IFileSystem fileSystem, UserDataPaths path
 {
     public const string FileName = "trusted-tools.json";
 
-    private const int MaxFiles = 200;
     private const string Prefix = "sha256:";
 
     private readonly Lock _lock = new();
@@ -58,26 +58,30 @@ public sealed partial class ToolTrust(IFileSystem fileSystem, UserDataPaths path
         }
     }
 
-    /// <summary>Hash of the files in the tool folder with their relative paths. O(total size).</summary>
+    /// <summary>
+    /// Hash of every file in the tool folder with its relative path: the contents of the tool's own files, and the size
+    /// and write time of installed packages and build output. Those run too, but may be hundreds of megabytes, so a
+    /// reinstall or a replaced file asks again without reading them. O(size of the tool's own files + file count).
+    /// </summary>
     public string Hash(ToolDefinition tool)
     {
         ArgumentNullException.ThrowIfNull(tool);
         using var hash = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
-        foreach (var file in Files(tool.Folder).Order(StringComparer.Ordinal).Take(MaxFiles))
+        foreach (var (file, installed) in Files(tool.Folder, installed: false).OrderBy(static entry => entry.Path, StringComparer.Ordinal))
         {
             hash.AppendData(Encoding.UTF8.GetBytes(Path.GetRelativePath(tool.Folder, file).Replace('\\', '/') + "\0"));
-            hash.AppendData(fileSystem.ReadAllBytes(file));
+            hash.AppendData(installed
+                ? Encoding.UTF8.GetBytes(string.Create(CultureInfo.InvariantCulture, $"{fileSystem.GetFileLength(file)}:{fileSystem.GetLastWriteTimeUtc(file).Ticks}\0"))
+                : fileSystem.ReadAllBytes(file));
         }
 
         return Prefix + Convert.ToHexStringLower(hash.GetHashAndReset());
     }
 
-    // Installed packages and build output are not the tool's code.
-    private IEnumerable<string> Files(string folder) =>
-        fileSystem.EnumerateEntries(folder).SelectMany(entry =>
-            !entry.IsDirectory ? [entry.FullPath]
-            : PathExclusions.DefaultExcludedNames.Contains(entry.Name) ? []
-            : Files(entry.FullPath));
+    private IEnumerable<(string Path, bool Installed)> Files(string folder, bool installed) =>
+        fileSystem.EnumerateEntries(folder).SelectMany(entry => entry.IsDirectory
+            ? Files(entry.FullPath, installed || PathExclusions.DefaultExcludedNames.Contains(entry.Name))
+            : [(entry.FullPath, installed)]);
 
     private HashSet<string> Trusted()
     {

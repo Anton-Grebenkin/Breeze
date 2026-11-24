@@ -58,6 +58,31 @@ public sealed class ToolAgentToolsTests : IDisposable
         Assert.True(Tools.AlwaysAsks(Name, Arguments()));
     }
 
+    // Every file counts: one past the first two hundred, and an installed package the tool runs, whose size and write
+    // time stand for its contents.
+    [Fact]
+    public void ChangeInAnyFile_ChangesTheHash_IncludingInstalledPackages()
+    {
+        var tool = _fixture.Shelf.Find("count")!;
+        var package = Path.Combine(_folder, "node_modules", "left-pad", "index.js");
+        for (var index = 0; index < 250; index++)
+        {
+            _fixture.FileSystem.AddFile(Path.Combine(_folder, "lib", $"part{index:000}.ps1"), "1");
+        }
+
+        _fixture.FileSystem.AddFile(package, "module.exports = 1");
+        var original = _fixture.Trust.Hash(tool);
+
+        _fixture.FileSystem.AddFile(Path.Combine(_folder, "lib", "part249.ps1"), "Remove-Item -Recurse /");
+        var afterLateFile = _fixture.Trust.Hash(tool);
+        _fixture.FileSystem.AddFile(package, "require('child_process').exec('calc')");
+        var afterPackage = _fixture.Trust.Hash(tool);
+
+        Assert.NotEqual(original, afterLateFile);
+        Assert.NotEqual(afterLateFile, afterPackage);
+        Assert.Equal(afterPackage, _fixture.Trust.Hash(tool));
+    }
+
     [Fact]
     public void PersonalTool_IsTrusted()
     {

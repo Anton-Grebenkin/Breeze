@@ -8,8 +8,9 @@ namespace CodeEditor.Core.Files;
 /// </summary>
 /// <remarks>
 /// Supports the core git syntax: <c>*</c>, <c>?</c>, <c>**</c>, negation <c>!</c>, root anchoring (<c>/</c> at the
-/// start or in the middle) and directory-only rules (trailing <c>/</c>). Character classes <c>[...]</c> are passed
-/// to the regex as is.
+/// start or in the middle), directory-only rules (trailing <c>/</c>) and character classes <c>[a-z]</c>, <c>[!a]</c>.
+/// The file belongs to someone else's repository, so no line may fail the open: one that cannot be understood is
+/// skipped.
 /// </remarks>
 internal sealed class GitIgnoreRule
 {
@@ -54,17 +55,35 @@ internal sealed class GitIgnoreRule
             return null;
         }
 
-        var regex = new Regex(
-            (anchored ? "^" : "^(?:.*/)?") + GlobToRegex(pattern) + "$",
-            RegexOptions.IgnoreCase | RegexOptions.CultureInvariant,
-            MatchTimeout);
+        try
+        {
+            var regex = new Regex(
+                (anchored ? "^" : "^(?:.*/)?") + GlobToRegex(pattern) + "$",
+                RegexOptions.IgnoreCase | RegexOptions.CultureInvariant,
+                MatchTimeout);
 
-        return new GitIgnoreRule(regex, isNegation, directoryOnly);
+            return new GitIgnoreRule(regex, isNegation, directoryOnly);
+        }
+        catch (ArgumentException)
+        {
+            // A class the regex rejects ("[z-a]"): git matches nothing with such a line, and the folder still opens.
+            return null;
+        }
     }
 
     /// <param name="relativePath">Path from the root with <c>/</c> separators.</param>
-    public bool Matches(ReadOnlySpan<char> relativePath, bool isDirectory) =>
-        (!DirectoryOnly || isDirectory) && _regex.IsMatch(relativePath);
+    public bool Matches(ReadOnlySpan<char> relativePath, bool isDirectory)
+    {
+        try
+        {
+            return (!DirectoryOnly || isDirectory) && _regex.IsMatch(relativePath);
+        }
+        catch (RegexMatchTimeoutException)
+        {
+            // A pattern too slow for this path does not hide it; the file tree must not fail on one line.
+            return false;
+        }
+    }
 
     private static string GlobToRegex(string glob)
     {
@@ -87,20 +106,54 @@ internal sealed class GitIgnoreRule
             {
                 regex.Append("[^/]");
             }
-            else if (c == '[')
+            else if (c == '[' && ClassEnd(glob, i) is var end and > 0)
             {
-                regex.Append('[');
-            }
-            else if (c == ']')
-            {
-                regex.Append(']');
+                AppendClass(regex, glob.AsSpan(i + 1, end - i - 1));
+                i = end;
             }
             else
             {
+                // Includes a "[" that is never closed: a literal, as in git.
                 regex.Append(Regex.Escape(c.ToString()));
             }
         }
 
         return regex.ToString();
+    }
+
+    /// <returns>The index of the "]" closing the class opened at <paramref name="start"/>; -1 if it is never closed.</returns>
+    private static int ClassEnd(string glob, int start)
+    {
+        var first = start + 1;
+        if (first < glob.Length && glob[first] is '!' or '^')
+        {
+            first++;
+        }
+
+        // The first member may be "]" itself.
+        return first + 1 < glob.Length ? glob.IndexOf(']', first + 1) : -1;
+    }
+
+    // "[!a-z]" negates like "[^a-z]"; "\" and "[" are plain members in a glob but not in a regex class.
+    private static void AppendClass(StringBuilder regex, ReadOnlySpan<char> members)
+    {
+        regex.Append('[');
+        if (members[0] is '!' or '^')
+        {
+            regex.Append('^');
+            members = members[1..];
+        }
+
+        foreach (var member in members)
+        {
+            if (member is '\\' or '[' or ']' or '^')
+            {
+                regex.Append('\\');
+            }
+
+            regex.Append(member);
+        }
+
+        regex.Append(']');
     }
 }

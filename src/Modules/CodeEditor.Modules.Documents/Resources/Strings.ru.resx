@@ -70,6 +70,7 @@
   <data name="SheetAdded" xml:space="preserve"><value>Лист «{0}» добавлен в {1}.</value></data>
   <data name="SheetRenamed" xml:space="preserve"><value>Лист «{0}» переименован в «{1}» в {2}; ссылки на него в формулах, именах и диаграммах обновлены.</value></data>
   <data name="PdfCreated" xml:space="preserve"><value>{0} записан: страниц: {1}.</value></data>
+  <data name="PdfMissingGlyphs" xml:space="preserve"><value>Внимание: в шрифте PDF нет знаков {0} (разных знаков: {1}) — в файле на их месте пустые квадраты. Замените их текстом или знаками, которые есть в шрифте, и создайте файл заново.</value></data>
   <data name="PreviousInRecycleBin" xml:space="preserve"><value>Прежний файл — в корзине.</value></data>
   <data name="PreviewNotShown" xml:space="preserve"><value>Ничего не изменено: карточку подтверждения не удалось подготовить (возможно, файл был занят), и пользователь этого изменения не видел. Повторите вызов.</value></data>
   <data name="ChangedSincePreview" xml:space="preserve"><value>Ничего не изменено: {0} изменился после того, как пользователь увидел карточку подтверждения. Прочитайте его заново и повторите правку.</value></data>

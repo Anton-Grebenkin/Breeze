@@ -12,6 +12,13 @@ public sealed class ApplyPatchTests : IDisposable
 {
     private const string Twice = "class A\r\n{\r\n    void Run() { }\r\n}\r\nclass B\r\n{\r\n    void Run() { }\r\n}\r\n";
 
+    /// <summary>Three methods ending with the same line.</summary>
+    private const string Store =
+        "class Store\n{\n" +
+        "    async Task CreateAsync()\n    {\n        Add();\n        await SaveAsync();\n    }\n\n" +
+        "    async Task UpdateAsync()\n    {\n        Change();\n        await SaveAsync();\n    }\n\n" +
+        "    async Task DeleteAsync()\n    {\n        Remove();\n        await SaveAsync();\n    }\n}\n";
+
     private readonly EditorFixture _fixture = new();
     private readonly AgentFileState _fileState = new();
     private readonly EditingAgentTools _tools;
@@ -46,6 +53,47 @@ public sealed class ApplyPatchTests : IDisposable
         Assert.Contains("несколько раз", error.Message, StringComparison.Ordinal);
     }
 
+    // Codex-style patch: bare "@@" hunks in file order, where a line repeated in the file means "the next one below".
+    [Fact]
+    public async Task Hunks_GoTopToBottom_RepeatedLineIsTakenBelowThePreviousHunk()
+    {
+        AddStore();
+
+        await Invoke("*** Begin Patch\n*** Update File: src/Store.cs\n@@\n-    async Task UpdateAsync()\n+    async Task UpdateAsync(Token token)\n@@\n-        await SaveAsync();\n+        await SaveAsync(token);\n*** End Patch");
+
+        Assert.Equal(
+            Store.Replace("UpdateAsync()", "UpdateAsync(Token token)", StringComparison.Ordinal)
+                .Replace("Change();\n        await SaveAsync();", "Change();\n        await SaveAsync(token);", StringComparison.Ordinal),
+            Tab("Store.cs").Document.Buffer.GetText());
+    }
+
+    [Fact]
+    public async Task IdenticalHunks_TakeOccurrencesInARow()
+    {
+        AddStore();
+        const string hunk = "@@\n-        await SaveAsync();\n+        await SaveAsync(token);\n";
+
+        await Invoke($"*** Begin Patch\n*** Update File: src/Store.cs\n{hunk}{hunk}*** End Patch");
+
+        Assert.Equal(
+            Store.Replace("Add();\n        await SaveAsync();", "Add();\n        await SaveAsync(token);", StringComparison.Ordinal)
+                .Replace("Change();\n        await SaveAsync();", "Change();\n        await SaveAsync(token);", StringComparison.Ordinal),
+            Tab("Store.cs").Document.Buffer.GetText());
+    }
+
+    // The model may list hunks out of order or repeat a class anchor for the next method: both still apply.
+    [Fact]
+    public async Task HunkAboveThePreviousOne_AndRepeatedAnchor_AreStillFound()
+    {
+        AddStore();
+
+        await Invoke("*** Begin Patch\n*** Update File: src/Store.cs\n@@ class Store\n-        Remove();\n+        Erase();\n@@ class Store\n-        Add();\n+        Insert();\n*** End Patch");
+
+        Assert.Equal(
+            Store.Replace("Remove();", "Erase();", StringComparison.Ordinal).Replace("Add();", "Insert();", StringComparison.Ordinal),
+            Tab("Store.cs").Document.Buffer.GetText());
+    }
+
     [Fact]
     public async Task AddFile_CreatesAndOpensIt_AndPreviewShowsBoth()
     {
@@ -58,6 +106,13 @@ public sealed class ApplyPatchTests : IDisposable
         Assert.Contains("Созданы файлы: src/C.cs", result, StringComparison.Ordinal);
         Assert.Equal("class C { }\n", _fixture.FileSystem.ReadAllText(EditorFixture.PathOf("src/C.cs")));
         Assert.Contains(_fixture.Editors.Tabs, tab => tab.Title == "C.cs");
+    }
+
+    private void AddStore()
+    {
+        var path = EditorFixture.PathOf("src/Store.cs");
+        _fixture.FileSystem.AddFile(path, Store);
+        _fileState.RecordRead(path, Store, 1, 1);
     }
 
     private EditorTabViewModel Tab(string title) => _fixture.Editors.Tabs.OfType<EditorTabViewModel>().Single(tab => tab.Title == title);

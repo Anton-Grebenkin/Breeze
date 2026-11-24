@@ -16,4 +16,12 @@ public interface IOutputService
     IReadOnlyList<IOutputChannel> Channels { get; }
 
     IOutputChannel GetOrCreate(string name);
+
+    /// <summary>
+    /// Asks the panel to come forward with this channel: a failed build the user started is worth looking at. Nothing
+    /// happens where there is no panel.
+    /// </summary>
+    void Reveal(IOutputChannel channel)
+    {
+    }
 }

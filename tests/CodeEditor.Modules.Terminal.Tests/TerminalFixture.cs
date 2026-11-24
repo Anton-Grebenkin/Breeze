@@ -1,6 +1,7 @@
 using CodeEditor.Core.Context;
 using CodeEditor.Core.Documents;
 using CodeEditor.Core.Files;
+using CodeEditor.Core.Storage;
 using CodeEditor.Modules.Terminal.Services;
 using CodeEditor.Modules.Terminal.Services.Build;
 using CodeEditor.Modules.Terminal.Services.Commands;
@@ -36,9 +37,21 @@ internal sealed class TerminalFixture : IDisposable
         Build = new DotNetBuild(Runner, Target, Workspace, Output, SaveBeforeRun, TimeProvider.System, NullLogger<DotNetBuild>.Instance);
         Tests = new DotNetTests(Runner, Target, Workspace, Index, FileSystem, Output, SaveBeforeRun, NullLogger<DotNetTests>.Instance);
         Background = new BackgroundCommands(Runner, Workspace, TimeProvider.System, NullLogger<BackgroundCommands>.Instance);
+        Shell = new PowerShellMode(FileSystem, new UserDataPaths(UserData), NullLogger<PowerShellMode>.Instance);
+        Blocks = new CommandBlocks(Notifications, new InlineUiDispatcher());
     }
 
+    public FakeNotifications Notifications { get; } = new();
+
+    /// <summary>Antivirus blocks of agent commands and the user's notification about them.</summary>
+    public CommandBlocks Blocks { get; }
+
+    public static readonly string UserData = Path.GetFullPath(@"C:\user-data");
+
     public BackgroundCommands Background { get; }
+
+    /// <summary>The wrapping agent commands use; full until a run is blocked.</summary>
+    public PowerShellMode Shell { get; }
 
     /// <summary>The feed side of tool calls: output lines and the "To background" click.</summary>
     public FakeToolActivity Activity { get; } = new();

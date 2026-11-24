@@ -17,14 +17,15 @@ public static class ToolOutput
         }
 
         var cut = text.LastIndexOf('\n', maxCharacters - 1);
-        var kept = cut > 0 ? cut : maxCharacters;
+        var kept = cut >= maxCharacters / WastedShare ? cut : maxCharacters;
         return string.Concat(text.AsSpan(0, kept), "\n", string.Format(CultureInfo.CurrentCulture, Strings.OutputTruncated, kept, text.Length));
     }
 
     /// <summary>
-    /// Head and tail of a long text at line boundaries, with the middle replaced by an "N lines omitted" line. Command
-    /// output matters both at the start (what ran) and the end (result and errors), so the tail is longer than the
-    /// head. O(n) in text length.
+    /// Head and tail of a long text, with the middle replaced by an "N lines omitted" line. Command output matters
+    /// both at the start (what ran) and the end (result and errors), so the tail is longer than the head. The cuts are
+    /// at line boundaries unless that wastes over half of a part: a huge line (a JSON answer in one line) is cut by
+    /// characters, or it would vanish whole. O(n) in text length.
     /// </summary>
     public static string HeadAndTail(string text, int headCharacters, int tailCharacters)
     {
@@ -34,13 +35,17 @@ public static class ToolOutput
             return text;
         }
 
-        var headEnd = text.LastIndexOf('\n', headCharacters);
-        headEnd = headEnd > 0 ? headEnd : headCharacters;
-        var tailStart = text.IndexOf('\n', text.Length - tailCharacters);
-        tailStart = tailStart >= headEnd && tailStart < text.Length - 1 ? tailStart + 1 : text.Length - tailCharacters;
-        // A line feed at the head boundary ends the head's last line, not an omitted one.
-        var omitted = text.AsSpan(headEnd, tailStart - headEnd).Count('\n') - (text[headEnd] == '\n' ? 1 : 0);
-        var marker = "\n" + string.Format(CultureInfo.CurrentCulture, Strings.OutputOmittedLines, Math.Max(omitted, 1)) + "\n";
-        return string.Concat(text.AsSpan(0, headEnd), marker, text.AsSpan(tailStart));
+        var headLine = text.LastIndexOf('\n', headCharacters);
+        var headEnd = headLine >= headCharacters / WastedShare ? headLine : headCharacters;
+        var tailLine = text.IndexOf('\n', text.Length - tailCharacters) + 1;
+        var tailStart = tailLine > 0 && text.Length - tailLine >= tailCharacters / WastedShare ? tailLine : text.Length - tailCharacters;
+        // By lines, the omitted part starts with the line feed that ends the head's last line.
+        var marker = headEnd == headLine && tailStart == tailLine
+            ? string.Format(CultureInfo.CurrentCulture, Strings.OutputOmittedLines, Math.Max(text.AsSpan(headEnd, tailStart - headEnd).Count('\n') - 1, 1))
+            : string.Format(CultureInfo.CurrentCulture, Strings.OutputOmittedCharacters, tailStart - headEnd);
+        return string.Concat(text.AsSpan(0, headEnd), "\n" + marker + "\n", text.AsSpan(tailStart));
     }
+
+    /// <summary>A line boundary is used only if it keeps at least this share (1/N) of the allowed length.</summary>
+    private const int WastedShare = 2;
 }

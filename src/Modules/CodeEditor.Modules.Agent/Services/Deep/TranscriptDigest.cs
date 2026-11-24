@@ -6,7 +6,7 @@ namespace CodeEditor.Modules.Agent.Services.Deep;
 /// <summary>
 /// The work log as text for the advisor (ADR 0012): user requests, model notes, tool calls and shortened results; tool
 /// output fills most of the history, and the advisor needs only its start and end. Service blocks (context, reminder,
-/// snapshot, memory) are skipped. A long log keeps the latest parts; the first user request is always kept.
+/// snapshot, memory) and the harness's hints inside tool results (<see cref="HarnessNotes"/>) are skipped. A long log keeps the latest parts; the first user request is always kept.
 /// O(n) in message length.
 /// </summary>
 public static class TranscriptDigest
@@ -65,7 +65,7 @@ public static class TranscriptDigest
                     yield return "CALL " + Shorten(ToolCallText.Describe(call), ArgumentsLength);
                     break;
                 case FunctionResultContent result:
-                    yield return "RESULT: " + ToolResultPreview(result.Result?.ToString() ?? string.Empty);
+                    yield return "RESULT: " + ToolResultPreview(HarnessNotes.Strip(result.Result?.ToString() ?? string.Empty));
                     break;
             }
         }

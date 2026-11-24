@@ -16,6 +16,7 @@
   <data name="ProtectedFolder" xml:space="preserve"><value>«{0}» — служебная папка (история git, результаты сборки, история чатов): агент её не правит.</value></data>
   <data name="OutputTruncated" xml:space="preserve"><value>…(обрезано: показано {0} из {1} символов; уточните запрос)</value></data>
   <data name="OutputOmittedLines" xml:space="preserve"><value>… пропущено строк: {0} …</value></data>
+  <data name="OutputOmittedCharacters" xml:space="preserve"><value>… пропущено знаков: {0} …</value></data>
   <data name="FrontMatterNotClosed" xml:space="preserve"><value>Шапка не закрыта: добавьте строку --- после настроек.</value></data>
   <data name="FrontMatterBadLine" xml:space="preserve"><value>Строка {0}: ожидается «ключ: значение», пункт списка «- значение» или «имя: значение» под ключом.</value></data>
   <data name="FrontMatterDuplicateKey" xml:space="preserve"><value>Строка {0}: «{1}» уже задан выше.</value></data>

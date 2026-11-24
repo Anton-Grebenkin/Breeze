@@ -25,6 +25,7 @@ public sealed partial class ChatViewModel : ObservableObject, IFocusableContent,
     public static string ContinueText => Strings.ContinueRequest;
 
     public static string ExecutePlanText => Strings.ExecutePlanRequest;
+    public static string ApplyAnswerText => Strings.ApplyAnswerRequest;
 
     private readonly ChatHistory _history;
     private readonly ChatLinkOpener _links;
@@ -65,7 +66,7 @@ public sealed partial class ChatViewModel : ObservableObject, IFocusableContent,
         Session.QueueReturned += OnQueueReturned;
         _apiKey.Changed += OnApiKeyChanged;
         _workspace.Changed += OnWorkspaceChanged;
-        Session.LoadLatest();
+        _ = Session.LoadLatestAsync();
     }
 
     public event EventHandler? FocusRequested;
@@ -154,13 +155,14 @@ public sealed partial class ChatViewModel : ObservableObject, IFocusableContent,
     private Task ContinueAsync() =>
         Session.SendAsync(ContinueText, ActiveFile.IsAttached, ActiveFile.IsAttached ? ActiveFile.RelativePath : null);
 
-    /// <summary>Executes a Plan-mode plan in Agent mode: same history, all tools.</summary>
+    /// <summary>Carries out in Agent mode what another mode prepared: same history, all tools.</summary>
+    /// <param name="request">What to send; <c>null</c> for a Plan-mode plan, <see cref="ApplyAnswerText"/> for an Ask answer.</param>
     [RelayCommand(CanExecute = nameof(CanContinue))]
-    private async Task ExecutePlanAsync()
+    private async Task ExecutePlanAsync(string? request)
     {
         if (Mode.SetMode(AgentMode.Agent))
         {
-            await Session.SendAsync(ExecutePlanText, ActiveFile.IsAttached, ActiveFile.IsAttached ? ActiveFile.RelativePath : null);
+            await Session.SendAsync(request ?? ExecutePlanText, ActiveFile.IsAttached, ActiveFile.IsAttached ? ActiveFile.RelativePath : null);
         }
     }
 
@@ -170,10 +172,10 @@ public sealed partial class ChatViewModel : ObservableObject, IFocusableContent,
     private void Stop() => Session.Stop();
 
     [RelayCommand]
-    private void NewChat()
+    private async Task NewChatAsync()
     {
         Context.IsDetailsOpen = false;
-        Session.StartNew();
+        await Session.StartNewAsync();
         RequestFocus();
     }
 
@@ -195,22 +197,21 @@ public sealed partial class ChatViewModel : ObservableObject, IFocusableContent,
     }
 
     [RelayCommand]
-    private Task OpenChatAsync(string? id)
+    private async Task OpenChatAsync(string? id)
     {
-        if (id is not null && !Session.Open(id))
+        if (id is not null && !await Session.OpenAsync(id))
         {
             RefreshRecentChats();
         }
 
         RequestFocus();
-        return Task.CompletedTask;
     }
 
     /// <summary>Moves the open chat to the Recycle Bin and starts a new one.</summary>
     [RelayCommand]
-    private void DeleteChat()
+    private async Task DeleteChatAsync()
     {
-        Session.DeleteCurrent();
+        await Session.DeleteCurrentAsync();
         RequestFocus();
     }
 
@@ -293,6 +294,6 @@ public sealed partial class ChatViewModel : ObservableObject, IFocusableContent,
     private void OnWorkspaceChanged(object? sender, EventArgs e)
     {
         OnPropertyChanged(nameof(HasWorkspace));
-        Session.LoadLatest();
+        _ = Session.LoadLatestAsync();
     }
 }

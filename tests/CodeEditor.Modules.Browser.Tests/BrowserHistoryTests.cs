@@ -1,5 +1,6 @@
 using CodeEditor.Core.Storage;
 using CodeEditor.Modules.Browser.Services;
+using CodeEditor.Modules.Browser.Services.Tabs;
 using CodeEditor.Modules.Browser.ViewModels;
 using CodeEditor.Testing;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -12,11 +13,16 @@ public sealed class BrowserHistoryTests : IDisposable
     private static readonly string UserData = Path.GetFullPath(@"C:\user");
 
     private readonly FakeFileSystem _fileSystem = new FakeFileSystem().AddDirectory(UserData);
-    private readonly FakeBrowserEngine _browser = new();
+    private readonly BrowserTabs _tabs;
+    private readonly FakeBrowserPage _browser;
     private readonly ManualTimeProvider _time = new();
     private readonly BrowserHistory _history;
 
-    public BrowserHistoryTests() => _history = Create();
+    public BrowserHistoryTests()
+    {
+        _tabs = FakeBrowserEngine.Tabs(out _browser);
+        _history = Create();
+    }
 
     public void Dispose() => _history.Dispose();
 
@@ -62,7 +68,7 @@ public sealed class BrowserHistoryTests : IDisposable
     public void HistoryMenu_RecentPages_ThenAllAndClear()
     {
         _browser.Load("http://localhost:5000/orders?page=2", "Заказы");
-        using var panel = new BrowserViewModel(_browser, _history);
+        using var panel = new BrowserViewModel(_tabs, new InlineUiDispatcher(), _history);
 
         panel.ShowHistoryCommand.Execute(null);
 
@@ -73,12 +79,12 @@ public sealed class BrowserHistoryTests : IDisposable
     [Fact]
     public void HistoryMenu_Empty_SaysSo()
     {
-        using var panel = new BrowserViewModel(_browser, _history);
+        using var panel = new BrowserViewModel(_tabs, new InlineUiDispatcher(), _history);
 
         panel.ShowHistoryCommand.Execute(null);
 
         Assert.Equal("Страниц пока нет", Assert.Single(panel.HistoryMenu).Header);
     }
 
-    private BrowserHistory Create() => new(_browser, _fileSystem, new UserDataPaths(UserData), _time, NullLogger<BrowserHistory>.Instance);
+    private BrowserHistory Create() => new(_tabs, _fileSystem, new UserDataPaths(UserData), _time, NullLogger<BrowserHistory>.Instance);
 }

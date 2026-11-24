@@ -22,7 +22,7 @@ public sealed class UpdatesModule : IModule
 
     public void ConfigureServices(IServiceCollection services)
     {
-        services.AddSettingsSection<UpdateSettings>(UpdateSettings.Section);
+        services.AddSettingsSection<UpdateSettings>(UpdateSettings.Section, SettingScope.User);
         services.AddSingleton<IAppUpdater, VelopackUpdater>();
         services.AddSingleton<UpdateService>();
         services.AddSingleton<UpdateCommands>();

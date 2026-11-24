@@ -90,7 +90,7 @@ public sealed partial class AgentConversation : IDisposable
     public AgentRequestPreview Preview()
     {
         var options = _options.CurrentValue;
-        return new AgentRequestPreview(_prompt.Build(options), CollectTools(ModelProfiles.For(options.Model)));
+        return new AgentRequestPreview(_prompt.Build(options), CollectTools(ModelProfiles.For(options)));
     }
 
     /// <summary>Sends a message and streams the response: text, tool calls and their results.</summary>
@@ -127,7 +127,12 @@ public sealed partial class AgentConversation : IDisposable
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {
                 // The agent does not record a stopped turn; we do, or the model forgets the question and the calls.
-                StoppedTurnHistory.Keep(_session, _transcript.LastRequest, message);
+                // No session: the chat was reset while the request was being cancelled, and there is nothing to keep.
+                if (_session is { } session)
+                {
+                    StoppedTurnHistory.Keep(session, _transcript.LastRequest, message);
+                }
+
                 throw;
             }
             catch (Exception exception) when (exception is not OperationCanceledException && KeepFailedTurn(message))
@@ -226,9 +231,9 @@ public sealed partial class AgentConversation : IDisposable
 
         var options = _options.CurrentValue;
         _client = new RecordingChatClient(new BudgetChatClient(CompactingClient(options), _budget), _transcript);
-        var profile = ModelProfiles.For(options.Model);
+        var profile = ModelProfiles.For(options);
         var tools = CollectTools(profile);
-        LogAgentCreated(_logger, options.Model, EndpointHost(options.Endpoint), tools.Count, options.Temperature, options.MaxOutputTokens, options.ReasoningEffort);
+        LogAgentCreated(_logger, options.Model, EndpointHost(ModelRoutes.For(options).Endpoint), tools.Count, options.Temperature, options.MaxOutputTokens, options.ReasoningEffort);
         _agent = _client.AsAIAgent(new ChatClientAgentOptions
         {
             Name = AgentName,
@@ -250,15 +255,13 @@ public sealed partial class AgentConversation : IDisposable
     // must not reach the history). Summaries and cache warmup repeat the request as the model got it.
     private IChatClient CompactingClient(AgentOptions options)
     {
-        _summaryClient = _clients.Create(new AgentOptions
-        {
-            Endpoint = options.Endpoint,
-            Model = string.IsNullOrWhiteSpace(options.HelperModel) ? options.Model : options.HelperModel,
-        });
+        var helperModel = string.IsNullOrWhiteSpace(options.HelperModel) ? options.Model : options.HelperModel;
+        _summaryClient = _clients.Create(options.ForModel(helperModel));
         var model = _clients.Create(options);
         _warmup = _warmups.Wrap(model, options);
-        var summaries = new CompactionModels(model, () => _cache.LastOptions, _summaryClient);
-        return new DetachedMessagesChatClient(new ChatClientBuilder(new ModelHistoryChatClient(new LoggingChatClient(_warmup ?? model, options.Model, _cache, _meter, _logger), options.Endpoint, options.Model))
+        var route = ModelRoutes.For(options);
+        var summaries = CompactionModels.ForChat(model, _summaryClient, route, ModelRoutes.For(options, helperModel), () => _cache.LastOptions);
+        return new DetachedMessagesChatClient(new ChatClientBuilder(new ModelHistoryChatClient(new LoggingChatClient(_warmup ?? model, options.Model, _cache, _meter, _logger), route))
             .UseAIContextProviders(_compaction.CreateProvider(options, summaries, _meter))
             .Build());
     }

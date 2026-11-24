@@ -30,7 +30,7 @@ public sealed class DocumentsModule : IModule
 
     public void ConfigureServices(IServiceCollection services)
     {
-        services.AddSettingsSection<DocumentOptions>(DocumentOptions.Section);
+        services.AddSettingsSection<DocumentOptions>(DocumentOptions.Section, SettingScope.User);
         services.AddSingleton<DocumentViewerContext>();
         services.AddSingleton<IFileViewerProvider, DocumentViewerProvider>();
         services.AddSingleton<DocumentCommands>();

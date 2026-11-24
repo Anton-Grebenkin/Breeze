@@ -70,6 +70,7 @@
   <data name="SheetAdded" xml:space="preserve"><value>Added sheet '{0}' to {1}.</value></data>
   <data name="SheetRenamed" xml:space="preserve"><value>Renamed sheet '{0}' to '{1}' in {2}; references to it in formulas, names and charts are updated.</value></data>
   <data name="PdfCreated" xml:space="preserve"><value>{0} is written: {1} pages.</value></data>
+  <data name="PdfMissingGlyphs" xml:space="preserve"><value>Warning: the PDF font has no glyphs for {0} ({1} different characters) — the file shows empty boxes in their place. Replace them with text or symbols the font has, and create the file again.</value></data>
   <data name="PreviousInRecycleBin" xml:space="preserve"><value>The previous file is in the Recycle Bin.</value></data>
   <data name="PreviewNotShown" xml:space="preserve"><value>Nothing was changed: the confirmation card could not be prepared (the file may have been busy), so the user has not seen this change. Call again.</value></data>
   <data name="ChangedSincePreview" xml:space="preserve"><value>Nothing was changed: {0} changed after the user saw the confirmation card. Read it again and repeat the change.</value></data>

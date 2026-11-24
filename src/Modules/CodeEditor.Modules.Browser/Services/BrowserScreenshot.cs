@@ -35,6 +35,42 @@ public static class BrowserScreenshot
         return request.ToJsonString();
     }
 
+    /// <summary>
+    /// <c>Page.captureScreenshot</c> parameters for one element by its box (<see cref="BrowserScripts.Box"/>), no taller
+    /// than <see cref="MaxHeight"/>; <c>null</c> if the page has no such element or it has no size.
+    /// </summary>
+    public static string? ElementRequest(string box, BrowserImageFormat format)
+    {
+        JsonNode? element;
+        try
+        {
+            element = JsonNode.Parse(box);
+        }
+        catch (JsonException)
+        {
+            return null;
+        }
+
+        if (Number(element, "x") is not { } left || Number(element, "y") is not { } top
+            || Number(element, "width") is not { } width || Number(element, "height") is not { } height || width <= 0 || height <= 0)
+        {
+            return null;
+        }
+
+        var request = new JsonObject
+        {
+            ["format"] = format == BrowserImageFormat.Jpeg ? "jpeg" : "png",
+            ["clip"] = new JsonObject { ["x"] = left, ["y"] = top, ["width"] = width, ["height"] = Math.Min(height, MaxHeight), ["scale"] = 1 },
+            ["captureBeyondViewport"] = true,
+        };
+        if (format == BrowserImageFormat.Jpeg)
+        {
+            request["quality"] = JpegQuality;
+        }
+
+        return request.ToJsonString();
+    }
+
     /// <summary>The image from a <c>Page.captureScreenshot</c> response.</summary>
     /// <exception cref="BrowserException">The response has no image.</exception>
     public static byte[] Data(string response)

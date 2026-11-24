@@ -30,6 +30,7 @@
   <data name="ToggleVisibility" xml:space="preserve"><value>Toggle {0} Visibility</value></data>
   <data name="ShowToolWindow" xml:space="preserve"><value>Show {0}</value></data>
   <data name="OpenLog" xml:space="preserve"><value>Open Log File</value></data>
+  <data name="CommandFailed" xml:space="preserve"><value>The command "{0}" failed: {1}</value></data>
   <data name="RevealLogs" xml:space="preserve"><value>Reveal Logs Folder</value></data>
   <data name="SetLogLevel" xml:space="preserve"><value>Set Log Level…</value></data>
   <data name="LogUnavailable" xml:space="preserve"><value>Log is unavailable: could not open a file in {0}</value></data>

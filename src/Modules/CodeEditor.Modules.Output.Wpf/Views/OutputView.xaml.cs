@@ -1,12 +1,13 @@
 using System.Windows;
 using System.Windows.Threading;
+using CodeEditor.Core.Output;
 using CodeEditor.Modules.Output.ViewModels;
 
 namespace CodeEditor.Modules.Output.Wpf.Views;
 
 /// <summary>
-/// Output panel. While visible, polls the channel every <see cref="RefreshInterval"/> and scrolls to the end
-/// if the user was at the bottom. A hidden panel does nothing.
+/// Output panel. While visible, asks the channel every <see cref="RefreshInterval"/> for what is new, appends it and
+/// scrolls to the end if the user was at the bottom. A hidden panel does nothing.
 /// </summary>
 public sealed partial class OutputView
 {
@@ -16,6 +17,10 @@ public sealed partial class OutputView
     private const double BottomTolerance = 2;
 
     private readonly DispatcherTimer _timer;
+
+    // What the text box shows: which channel and how far it was read.
+    private IOutputChannel? _shown;
+    private OutputCursor _cursor = OutputCursor.None;
 
     public OutputView()
     {
@@ -47,8 +52,30 @@ public sealed partial class OutputView
             return;
         }
 
+        if (!ReferenceEquals(viewModel.SelectedChannel, _shown))
+        {
+            _shown = viewModel.SelectedChannel;
+            _cursor = OutputCursor.None;
+        }
+
+        var delta = viewModel.Read(_cursor);
+        _cursor = delta.Cursor;
+        if (delta.IsEmpty)
+        {
+            return;
+        }
+
         var wasAtBottom = OutputText.VerticalOffset + OutputText.ViewportHeight >= OutputText.ExtentHeight - BottomTolerance;
-        if (viewModel.Refresh() && wasAtBottom)
+        if (delta.IsReset)
+        {
+            OutputText.Text = delta.Text;
+        }
+        else
+        {
+            OutputText.AppendText(delta.Text);
+        }
+
+        if (wasAtBottom)
         {
             OutputText.ScrollToEnd();
         }

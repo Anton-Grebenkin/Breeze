@@ -19,6 +19,7 @@ public sealed class UpdateServiceTests : IDisposable
     private readonly CommandRegistry _commands = new();
     private readonly ManualTimeProvider _time = new();
     private readonly FakeAppWindows _windows = new();
+    private readonly FakeNotifications _notifications = new();
     private readonly UpdateService _service;
     private int _restarts;
 
@@ -32,7 +33,7 @@ public sealed class UpdateServiceTests : IDisposable
         }));
         var commandService = new CommandService(_commands, new ContextKeyService(), NullLogger<CommandService>.Instance);
         var product = new ProductInfo("Breeze", "0.1.0-alpha.1", "abcdef1234", new Uri("https://github.com/owner/breeze"));
-        _service = new UpdateService(_updater, _settings, product, _statusBar, _dialogs, _restart, commandService, _windows, _time, NullLogger<UpdateService>.Instance);
+        _service = new UpdateService(_updater, _settings, product, _statusBar, _dialogs, _restart, commandService, _windows, _time, NullLogger<UpdateService>.Instance, _notifications);
     }
 
     public void Dispose() => _service.Dispose();
@@ -51,7 +52,7 @@ public sealed class UpdateServiceTests : IDisposable
         Assert.Contains(_service.Item, _statusBar.Items);
         Assert.True(_service.Item.IsVisible);
         Assert.Equal("Обновление 0.1.0-alpha.2", _service.Item.Text);
-        Assert.Contains("0.1.0-alpha.2", _statusBar.Message, StringComparison.Ordinal);
+        Assert.Contains("0.1.0-alpha.2", _notifications.Shown[^1].Message, StringComparison.Ordinal);
         Assert.Empty(_dialogs.Confirmations);
     }
 
@@ -88,7 +89,7 @@ public sealed class UpdateServiceTests : IDisposable
         await _service.CheckAsync(interactive: true);
 
         Assert.Equal(0, _updater.Checks);
-        Assert.Contains("Setup.exe", _statusBar.Message, StringComparison.Ordinal);
+        Assert.Contains("Setup.exe", _notifications.Shown[^1].Message, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -98,7 +99,7 @@ public sealed class UpdateServiceTests : IDisposable
 
         Assert.Equal(UpdateState.Idle, _service.State);
         Assert.Equal(0, _updater.Downloads);
-        Assert.Equal("Установлена последняя версия Breeze — 0.1.0-alpha.1.", _statusBar.Message);
+        Assert.Equal("Установлена последняя версия Breeze — 0.1.0-alpha.1.", _notifications.Shown[^1].Message);
     }
 
     [Fact]
@@ -109,7 +110,7 @@ public sealed class UpdateServiceTests : IDisposable
         await _service.CheckAsync(interactive: true);
 
         Assert.Equal(UpdateState.Idle, _service.State);
-        Assert.Equal("Не удалось проверить обновления: нет сети", _statusBar.Message);
+        Assert.Equal("Не удалось проверить обновления: нет сети", _notifications.Shown[^1].Message);
     }
 
     [Fact]
@@ -121,7 +122,7 @@ public sealed class UpdateServiceTests : IDisposable
         _time.Advance(UpdateService.StartupDelay);
         await _service.BackgroundCheck;
 
-        Assert.Equal(StatusBarViewModel.ReadyMessage, _statusBar.Message);
+        Assert.Empty(_notifications.Shown);
     }
 
     [Fact]
@@ -134,7 +135,7 @@ public sealed class UpdateServiceTests : IDisposable
 
         Assert.Equal(UpdateState.Idle, _service.State);
         Assert.False(_service.Item.IsVisible);
-        Assert.Equal("Не удалось загрузить обновление 0.1.0-alpha.2: диск заполнен", _statusBar.Message);
+        Assert.Equal("Не удалось загрузить обновление 0.1.0-alpha.2: диск заполнен", _notifications.Shown[^1].Message);
     }
 
     [Fact]
@@ -173,7 +174,7 @@ public sealed class UpdateServiceTests : IDisposable
         await _service.RestartToUpdateAsync();
 
         Assert.Equal(0, _restarts);
-        Assert.Contains("ещё не загружено", _statusBar.Message, StringComparison.Ordinal);
+        Assert.Contains("ещё не загружено", _notifications.Shown[^1].Message, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -212,6 +213,6 @@ public sealed class UpdateServiceTests : IDisposable
 
         Assert.Equal(0, _restarts);
         Assert.Null(_restart.Relaunch);
-        Assert.StartsWith("Закройте другие окна Breeze (2)", _statusBar.Message, StringComparison.Ordinal);
+        Assert.StartsWith("Закройте другие окна Breeze (2)", _notifications.Shown[^1].Message, StringComparison.Ordinal);
     }
 }

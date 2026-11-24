@@ -40,7 +40,7 @@ public sealed class GitAgentToolsTests : IDisposable
         Assert.Equal("## main...origin/main\n M src/A.cs", result);
         var request = Assert.Single(_runner.Requests);
         Assert.Equal(("git", Root), (request.FileName, request.WorkingDirectory));
-        Assert.Equal(["--no-pager", "-c", "core.quotepath=false", "-c", "color.ui=false", "status", "--short", "--branch"], request.Arguments);
+        Assert.Equal(["--no-pager", "-c", "core.quotepath=false", "-c", "color.ui=false", "-c", "core.fsmonitor=false", "status", "--short", "--branch"], request.Arguments);
         Assert.Equal("0", request.Environment["GIT_TERMINAL_PROMPT"]);
         Assert.True(request.HideSecretVariables);
     }

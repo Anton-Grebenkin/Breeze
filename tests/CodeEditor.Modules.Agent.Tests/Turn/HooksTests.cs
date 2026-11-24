@@ -57,6 +57,21 @@ public sealed class HooksTests : IDisposable
         Assert.Contains("broken.ps1", Assert.Single(_fixture.Processes.Requests).Arguments[^1], StringComparison.Ordinal);
     }
 
+    // An antivirus refused the hook's script with the encoding prelude (nothing ran): the hook runs again as written.
+    [Fact]
+    public async Task HookRefusedByAntivirus_RunsAgainWithoutThePrelude()
+    {
+        UseHooks(new AgentHookSettings { PreToolUse = [new AgentHook { Command = "check.ps1" }] });
+        _fixture.Processes.Returns(1, "FullyQualifiedErrorId : ScriptContainedMaliciousContent").Returns(0, string.Empty);
+        _fixture.Client.CallTool("c1", "probe", new Dictionary<string, object?> { ["path"] = "a" }).Reply("Готово.");
+
+        await _fixture.SendAsync("прочитай");
+
+        Assert.Equal(1, _runs);
+        Assert.Equal(2, _fixture.Processes.Requests.Count);
+        Assert.Equal("check.ps1", _fixture.Processes.Requests[1].Arguments[^1]);
+    }
+
     [Fact]
     public async Task PostToolUse_ExitCode2_AddsItsWordToTheResult()
     {

@@ -16,6 +16,8 @@
     <PackageReference Include="xunit.v3" />
     <PackageReference Include="xunit.runner.visualstudio" />
     <PackageReference Include="FlaUI.UIA3" />
+    <!-- A headless page of the real engine for the browser tool's page scripts (HeadlessBrowserPage). -->
+    <PackageReference Include="Microsoft.Web.WebView2" />
   </ItemGroup>
 
   <ItemGroup>
@@ -35,6 +37,13 @@
                       ReferenceOutputAssembly="false" />
     <!-- The secret store, to write a test key for the fake model. -->
     <ProjectReference Include="..\..\src\Platform\CodeEditor.Core\CodeEditor.Core.csproj" />
+    <!-- The browser tool's page scripts and reading, run on the real engine. -->
+    <ProjectReference Include="..\..\src\Modules\CodeEditor.Modules.Browser\CodeEditor.Modules.Browser.csproj" />
+    <!-- The product's browser engine, run in a window off the screen (OffScreenBrowser). -->
+    <ProjectReference Include="..\..\src\Modules\CodeEditor.Modules.Browser.Wpf\CodeEditor.Modules.Browser.Wpf.csproj" />
+    <!-- Views of the product shown in a window off the screen (OffScreenView), with test doubles for their services. -->
+    <ProjectReference Include="..\..\src\Modules\CodeEditor.Modules.Agent.Wpf\CodeEditor.Modules.Agent.Wpf.csproj" />
+    <ProjectReference Include="..\CodeEditor.Testing\CodeEditor.Testing.csproj" />
   </ItemGroup>
 
   <ItemGroup>

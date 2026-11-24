@@ -30,7 +30,7 @@ public static class ModelRequest
     public static bool ThinksAloud(AgentOptions options)
     {
         ArgumentNullException.ThrowIfNull(options);
-        return options.ReasoningEffort != AgentReasoningEffort.None && ModelProfiles.For(options.Model).Reasoning == ReasoningSource.ThinkAloud;
+        return options.ReasoningEffort != AgentReasoningEffort.None && ModelProfiles.For(options).Reasoning == ReasoningSource.ThinkAloud;
     }
 
     private static ReasoningEffort? Level(AgentReasoningEffort effort) => effort switch

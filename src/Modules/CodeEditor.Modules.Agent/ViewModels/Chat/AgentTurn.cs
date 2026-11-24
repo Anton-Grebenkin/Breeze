@@ -38,6 +38,9 @@ public sealed class AgentTurn(
 
     public int StepLimit => stepLimit;
 
+    /// <summary>The model tried to change something in a mode that only reads (<see cref="ApprovalExecutor.ChangeRefused"/>).</summary>
+    public bool ChangeRefused => _approvals?.ChangeRefused == true;
+
     /// <summary>The turn hit the mode's step limit, so the result is intermediate.</summary>
     public bool ReachedStepLimit { get; private set; }
 
@@ -52,6 +55,7 @@ public sealed class AgentTurn(
         _model = new ModelExecutor(services.Conversation, cancellationToken);
         var workflow = AgentTurnWorkflow.Build(_model, _approvals, new ChecksExecutor(services.Checks, services.Budget, services.Deep, services.Queue, services.Images, cancellationToken));
         using var progress = new LiveToolRows(services.RunningCalls, _feed.RowOf, services.Time, services.Dispatcher);
+        using var retries = new RetryRow(services.Retries, text => _feed.Notice(ChatMessageKind.Status, text), services.Dispatcher, services.Time);
 
         Exception? failure = null;
         var run = await InProcessExecution.RunStreamingAsync(workflow, new TurnInput(message), cancellationToken: cancellationToken);

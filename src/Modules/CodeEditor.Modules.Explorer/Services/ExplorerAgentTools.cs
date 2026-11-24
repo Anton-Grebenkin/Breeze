@@ -49,7 +49,7 @@ public sealed class ExplorerAgentTools(
     public IEnumerable<AITool> CreateTools() =>
     [
         new ReadOnlyAIFunction(AIFunctionFactory.Create(ListDirectory, ListDirName, "Lists files and folders of a workspace folder (folders end with '/'). Hidden: .git, bin, obj, node_modules, .gitignore rules.")),
-        new ReadOnlyAIFunction(AIFunctionFactory.Create(ReadFileAsync, ReadFileName, "Reads a text file of the workspace, up to 1000 lines (about 40k characters) per call — usually the whole file; use startLine only for the remainder. Each line is prefixed with its number and a tab; the prefix is not part of the file. Unsaved editor changes are included.")),
+        new ReadOnlyAIFunction(AIFunctionFactory.Create(ReadFileAsync, ReadFileName, "Reads a text file of the workspace, up to 1000 lines (about 40k characters) per call — usually the whole file; use startLine only for the remainder. Each line is prefixed with its number and a tab; the prefix is not part of the file. A line over 40k characters is cut: read its rest with startColumn. Unsaved editor changes are included.")),
         new ReadOnlyAIFunction(AIFunctionFactory.Create(FindFiles, FindFilesName, "Finds workspace files by glob ('**/*.cs', 'src/**/Program.cs') or by a part of the relative path. Returns relative paths.")),
     ];
 
@@ -97,7 +97,8 @@ public sealed class ExplorerAgentTools(
     private async Task<string> ReadFileAsync(
         [Description("File path relative to the workspace root, or a file name / path ending that is unique in the workspace ('DictionaryRecord.cs').")] string path,
         [Description("First line to read, 1-based.")] int startLine = 1,
-        [Description("Maximum number of lines to return.")] int maxLines = DefaultMaxLines)
+        [Description("Maximum number of lines to return.")] int maxLines = DefaultMaxLines,
+        [Description("First character of startLine to read, 1-based: the rest of a line that was cut.")] int startColumn = 1)
     {
         var (file, resolvedNote) = ResolveFile(path);
         if (fileSystem.DirectoryExists(file))
@@ -119,7 +120,8 @@ public sealed class ExplorerAgentTools(
         var first = Math.Clamp(startLine, 1, Math.Max(1, lines.Length));
         var count = Math.Clamp(maxLines, 1, MaxLinesPerRead);
         var last = LastLineWithin(lines, first, Math.Min(lines.Length, first + count - 1));
-        if (fileState.RecordRead(file, text, first, last))
+        var skipped = Math.Max(startColumn, 1) - 1;
+        if (fileState.RecordRead(file, text, first, last) && skipped == 0)
         {
             return Format(Strings.ToolLinesUnchanged, first, last, relative);
         }
@@ -127,8 +129,7 @@ public sealed class ExplorerAgentTools(
         var output = new StringBuilder();
         for (var line = first; line <= last; line++)
         {
-            var content = lines[line - 1].TrimEnd('\r');
-            output.Append(CultureInfo.InvariantCulture, $"{line}\t{(content.Length > MaxCharactersPerRead ? content[..MaxCharactersPerRead] + "…" : content)}\n");
+            output.Append(CultureInfo.InvariantCulture, $"{line}\t{Shown(lines[line - 1].TrimEnd('\r'), line, line == first ? skipped : 0)}\n");
         }
 
         if (last < lines.Length)
@@ -140,8 +141,9 @@ public sealed class ExplorerAgentTools(
     }
 
     /// <summary>
-    /// Resolves a model-supplied path as is or, if missing, to the only indexed file with that name or path ending
-    /// ("DictionaryRecord.cs", "Domain/Dictionary.cs"); otherwise models ran text searches just to find the path.
+    /// Resolves a model-supplied path as is or, if missing, to the only indexed file with that path ending
+    /// ("DictionaryRecord.cs", "Domain/Dictionary.cs") or, with a wrongly guessed folder, with that name; otherwise
+    /// models ran text searches just to find the path.
     /// </summary>
     private (string File, string Note) ResolveFile(string path)
     {
@@ -153,17 +155,33 @@ public sealed class ExplorerAgentTools(
 
         var ending = path.Replace('\\', '/').TrimStart('.', '/');
         var suffix = "/" + ending;
-        var candidates = index.Files
-            .Where(candidate => !SensitivePaths.IsAgentData(candidate.RelativePath)
-                && (candidate.RelativePath.Equals(ending, StringComparison.OrdinalIgnoreCase) || candidate.RelativePath.EndsWith(suffix, StringComparison.OrdinalIgnoreCase)))
-            .Take(MaxAmbiguous + 1)
-            .ToList();
+        var candidates = Indexed(candidate => candidate.RelativePath.Equals(ending, StringComparison.OrdinalIgnoreCase) || candidate.RelativePath.EndsWith(suffix, StringComparison.OrdinalIgnoreCase));
+        if (candidates.Count == 0)
+        {
+            // Several files with this name are not listed here: the "not found" error suggests them.
+            var name = ending[(ending.LastIndexOf('/') + 1)..];
+            candidates = Indexed(candidate => candidate.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) is [var only] ? [only] : [];
+        }
+
         return candidates.Count switch
         {
             1 => (candidates[0].FullPath, Format(Strings.ToolPathResolved, path, candidates[0].RelativePath) + "\n"),
             > 1 => throw new AgentToolException(Format(Strings.ToolPathAmbiguous, path, string.Join(", ", candidates.Take(MaxAmbiguous).Select(candidate => candidate.RelativePath)))),
             _ => (file, string.Empty),
         };
+    }
+
+    private List<IndexedFile> Indexed(Func<IndexedFile, bool> matches) =>
+        [.. index.Files.Where(candidate => !SensitivePaths.IsAgentData(candidate.RelativePath) && matches(candidate)).Take(MaxAmbiguous + 1)];
+
+    // A line over the cap is cut and says where to continue: without that its rest could not be read at all.
+    private static string Shown(string content, int line, int skipped)
+    {
+        var from = Math.Min(skipped, content.Length);
+        var end = Math.Min(content.Length, from + MaxCharactersPerRead);
+        return end < content.Length
+            ? content[from..end] + Format(Strings.ToolLineCut, from + 1, end, content.Length, line, end + 1)
+            : content[from..];
     }
 
     /// <summary>Last line of the page within the character cap; the first line always fits (reading truncates it).</summary>

@@ -101,8 +101,7 @@ public sealed partial class BudgetTests(ITestOutputHelper output) : IDisposable
     private void Record(string measurement)
     {
         output.WriteLine(measurement);
-        var folder = Directory.CreateDirectory(Path.Combine(AppContext.BaseDirectory, "screenshots")).FullName;
-        File.AppendAllText(Path.Combine(folder, "budgets.txt"), $"{DateTime.Now:yyyy-MM-dd HH:mm} {measurement}{Environment.NewLine}");
+        BudgetLog.Record(measurement);
     }
 
     private static void CloseAndReopen(AppSession session, int cycles)

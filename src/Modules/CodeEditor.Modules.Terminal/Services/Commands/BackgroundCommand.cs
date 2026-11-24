@@ -83,6 +83,16 @@ public sealed class BackgroundCommand(int id, string command, string folder, Dat
         Signal();
     }
 
+    /// <summary>Drops the output so far: the run that produced it is replaced by another attempt.</summary>
+    public void ClearOutput()
+    {
+        lock (_gate)
+        {
+            _lines.Clear();
+            _read = 0;
+        }
+    }
+
     public void Finish(int? exitCode, bool stopped, DateTimeOffset at)
     {
         lock (_gate)

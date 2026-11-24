@@ -20,6 +20,7 @@
   <data name="FolderNotFound" xml:space="preserve"><value>Folder '{0}' not found.</value></data>
   <data name="KeybindingRuleNotObject" xml:space="preserve"><value>rule must be an object { "key": …, "command": … }</value></data>
   <data name="KeybindingRuleNoCommand" xml:space="preserve"><value>rule has no "command"</value></data>
+  <data name="KeybindingRuleUnknownCommand" xml:space="preserve"><value>there is no command '{0}'; the command palette lists the ids</value></data>
   <data name="KeybindingRuleUnknownKey" xml:space="preserve"><value>unknown key combination '{0}' for '{1}'</value></data>
   <data name="KeybindingRuleNoKey" xml:space="preserve"><value>rule '{0}' has no "key"</value></data>
   <data name="KeybindingRuleInvalidWhen" xml:space="preserve"><value>invalid condition '{0}' for '{1}': {2}</value></data>

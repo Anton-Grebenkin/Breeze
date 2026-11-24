@@ -23,12 +23,7 @@ public sealed partial class Advisor(
     public static AgentOptions Settings(AgentOptions agent)
     {
         ArgumentNullException.ThrowIfNull(agent);
-        return new AgentOptions
-        {
-            Endpoint = agent.Endpoint,
-            Api = agent.Api,
-            Model = string.IsNullOrWhiteSpace(agent.AdvisorModel) ? agent.Model : agent.AdvisorModel,
-        };
+        return agent.ForModel(string.IsNullOrWhiteSpace(agent.AdvisorModel) ? agent.Model : agent.AdvisorModel);
     }
 
     /// <returns>The advice, or <c>null</c> if the advisor did not answer.</returns>
@@ -36,7 +31,7 @@ public sealed partial class Advisor(
     {
         var agent = options.CurrentValue;
         var settings = Settings(agent);
-        var profile = ModelProfiles.For(settings.Model);
+        var profile = ModelProfiles.For(settings);
         try
         {
             using var client = new UsageCountingChatClient(clients.Create(settings), usage);

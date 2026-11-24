@@ -35,9 +35,9 @@ public static class CoreServiceCollectionExtensions
         services.AddSingleton<IFileIndex, FileIndex>();
         services.AddSingleton<IDocumentService, DocumentService>();
         services.AddSingleton<ISettingsService, SettingsService>();
-        services.AddSettingsSection<FilesOptions>(FilesOptions.Section);
+        services.AddSettingsSection<FilesOptions>(FilesOptions.Section, SettingScope.Folder);
         services.AddSingleton<ExcludeSettings>();
-        services.AddSettingsSection<LoggingOptions>(LoggingOptions.Section);
+        services.AddSettingsSection<LoggingOptions>(LoggingOptions.Section, SettingScope.User);
         services.AddSingleton<LogLevelSettings>();
         return services;
     }

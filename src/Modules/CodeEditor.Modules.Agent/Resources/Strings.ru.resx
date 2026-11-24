@@ -27,6 +27,8 @@
   <data name="ToolBudgetExhausted" xml:space="preserve"><value>Не выполнено: лимит шагов хода исчерпан. Подведи итог без вызова инструментов.</value></data>
   <data name="ToolRepeatNote" xml:space="preserve"><value>(Такой же вызов с теми же аргументами уже был в этом ходе. Не повторяй его — используй прежний результат или смени подход.)</value></data>
   <data name="ToolRepeatBlocked" xml:space="preserve"><value>Не выполнено: этот вызов с теми же аргументами повторяется уже в третий раз за ход. Смени подход или спроси пользователя.</value></data>
+  <data name="ToolSwitchedOff" xml:space="preserve"><value>Не выполнено: инструмент {0} отключён до конца хода, потому что в этой среде он не работает. {1}</value></data>
+  <data name="ToolSwitchedOffNote" xml:space="preserve"><value>Инструмент {0} отключён до конца хода: не вызывай его снова.</value></data>
   <data name="ToolArgumentsInvalid" xml:space="preserve"><value>Не выполнено: аргументы не подходят к параметрам инструмента ({0}). Параметры: {1}. Передавай массивы и объекты значениями JSON, а не строками, и исправь вызов, а не обходи его.</value></data>
   <data name="AdvisorBeforeEditResult" xml:space="preserve"><value>Пока не применено: перед первой правкой советник (другая модель) разобрал твой подход:
 
@@ -140,6 +142,11 @@
   <data name="ErrorService" xml:space="preserve"><value>Сервис вернул ошибку {0}: {1}</value></data>
   <data name="ErrorStream" xml:space="preserve"><value>Сервис оборвал ответ ошибкой: {0}</value></data>
   <data name="ErrorNoConnection" xml:space="preserve"><value>Нет связи с {0}. Проверьте подключение к интернету.</value></data>
+  <data name="ErrorConnectionLost" xml:space="preserve"><value>Связь с сервисом оборвалась посреди ответа.</value></data>
+  <data name="ErrorTimeout" xml:space="preserve"><value>Сервис не ответил вовремя.</value></data>
+  <data name="RetryWaiting" xml:space="preserve"><value>Повтор через {0} с (попытка {1} из {2}). {3}</value></data>
+  <data name="RetryRepeated" xml:space="preserve"><value>Запрос повторён (попытка {0} из {1}). {2}</value></data>
+  <data name="TurnStoppedNotice" xml:space="preserve"><value>Ход остановлен. Агент может продолжить с того места, где остановился.</value></data>
   <!-- Agent tool lines in the feed. -->
   <data name="FileForms" xml:space="preserve"><value>файл|файла|файлов</value></data>
   <data name="ToolAskUser" xml:space="preserve"><value>Вопрос пользователю</value></data>
@@ -186,6 +193,10 @@
   <data name="StepForms" xml:space="preserve"><value>шаг|шага|шагов</value></data>
   <data name="ContinueRequest" xml:space="preserve"><value>Продолжай с того места, где остановился.</value></data>
   <data name="ExecutePlanRequest" xml:space="preserve"><value>Выполни этот план.</value></data>
+  <data name="ApplyAnswerRequest" xml:space="preserve"><value>Примени правку из своего ответа.</value></data>
+  <data name="ApplyOffer" xml:space="preserve"><value>В ответе есть правка. Применить её можно в режиме «Агент».</value></data>
+  <data name="ApplyInAgentMode" xml:space="preserve"><value>Применить в режиме агента</value></data>
+  <data name="AgentModeMention" xml:space="preserve"><value>\bagent\s+mode\b|режим\w*\s+[«"]?агент</value></data>
   <data name="ChatOpenDetail" xml:space="preserve"><value>{0} · открыт</value></data>
   <data name="OpenChatPrompt" xml:space="preserve"><value>Открыть чат этой папки</value></data>
   <data name="NoSavedChats" xml:space="preserve"><value>Сохранённых чатов пока нет</value></data>
@@ -368,6 +379,7 @@
   <!-- Web access (ADR 0025). -->
   <data name="WebOnlyHttp" xml:space="preserve"><value>Читаются только адреса http и https: {0}</value></data>
   <data name="WebHttpError" xml:space="preserve"><value>{0} ответил {1} {2}.</value></data>
+  <data name="WebRedirected" xml:space="preserve"><value>{0} ответил {1} и перенаправляет на {2}. Запросите этот адрес.</value></data>
   <data name="WebNotText" xml:space="preserve"><value>{0} — не текстовая страница ({1}): прочитать её текстом нельзя.</value></data>
   <data name="WebUnreachable" xml:space="preserve"><value>{0} недоступен: {1}</value></data>
   <data name="WebTimedOut" xml:space="preserve"><value>{0} не ответил за {1} с.</value></data>
@@ -454,4 +466,99 @@ description: Стили XAML
   <data name="HookBlockedPrompt" xml:space="preserve"><value>Хук не пропустил сообщение: {0}</value></data>
   <data name="HookStopPrompt" xml:space="preserve"><value>Хук пользователя просит пока не заканчивать: {0}</value></data>
   <data name="HookStopStatus" xml:space="preserve"><value>Хук остановки: агент продолжает</value></data>
+  <!-- Web through the browser. -->
+  <data name="WebSearchThroughBrowser" xml:space="preserve"><value>Выдача поисковика, открытая в браузере редактора (без пересказа: источник читай через web_fetch):</value></data>
+  <data name="WebFetchBothFailed" xml:space="preserve"><value>{0} Через браузер страница тоже не открылась: {1}</value></data>
+  <data name="CommandFocusInput" xml:space="preserve"><value>Перейти к полю ввода</value></data>
+  <!-- Connections (ADR 0055) -->
+  <data name="ConnectionsTitle" xml:space="preserve"><value>Подключения</value></data>
+  <data name="ConnectionsHint" xml:space="preserve"><value>Свои сервисы моделей: шлюз на работе, API поставщика, локальный сервер. Ключ каждого хранится в хранилище секретов, а не в настройках.</value></data>
+  <data name="ConnectionsEmpty" xml:space="preserve"><value>Подключений пока нет. Добавьте первое ниже.</value></data>
+  <data name="ConnectionKeySet" xml:space="preserve"><value>ключ задан</value></data>
+  <data name="ConnectionKeyMissing" xml:space="preserve"><value>нет ключа</value></data>
+  <data name="ConnectionKeyless" xml:space="preserve"><value>ключ не нужен</value></data>
+  <data name="ConnectionSetKey" xml:space="preserve"><value>Задать ключ…</value></data>
+  <data name="ConnectionRemove" xml:space="preserve"><value>Удалить подключение</value></data>
+  <data name="ConnectionRefresh" xml:space="preserve"><value>Обновить список моделей</value></data>
+  <data name="ConnectionExpand" xml:space="preserve"><value>Модели подключения</value></data>
+  <data name="ConnectionRemoveQuestion" xml:space="preserve"><value>Удалить подключение «{0}»?</value></data>
+  <data name="ConnectionRemoveDetails" xml:space="preserve"><value>Ключ тоже удаляется. Модели этого подключения перестанут работать.</value></data>
+  <data name="ConnectionKeyPrompt" xml:space="preserve"><value>Вставьте ключ API подключения «{0}». Он хранится в хранилище секретов этого компьютера.</value></data>
+  <data name="ConnectionModelsSummary" xml:space="preserve"><value>Моделей: {0}, в списке выбора: {1}</value></data>
+  <data name="ConnectionFilterPlaceholder" xml:space="preserve"><value>Найти модель или ввести её имя у сервиса</value></data>
+  <data name="ConnectionAddModelHint" xml:space="preserve"><value>Добавить модель, которой нет в списке сервиса, по её имени</value></data>
+  <data name="ModelInPicker" xml:space="preserve"><value>Показывать в списке выбора моделей</value></data>
+  <data name="ModelUse" xml:space="preserve"><value>Выбрать</value></data>
+  <data name="ModelUseHint" xml:space="preserve"><value>Сделать моделью разговора</value></data>
+  <data name="ModelNamePlaceholder" xml:space="preserve"><value>Название для показа</value></data>
+  <data name="ModelWindowPlaceholder" xml:space="preserve"><value>Окно, токенов</value></data>
+  <data name="ModelImages" xml:space="preserve"><value>изображения</value></data>
+  <data name="ModelImagesHint" xml:space="preserve"><value>Модель видит изображения</value></data>
+  <data name="ModelFamilyHint" xml:space="preserve"><value>Что это за модель на самом деле: от этого зависят подсказки</value></data>
+  <data name="FamilyByName" xml:space="preserve"><value>По имени</value></data>
+  <data name="FamilyClaude" xml:space="preserve"><value>Claude</value></data>
+  <data name="FamilyGptReasoning" xml:space="preserve"><value>GPT с рассуждениями</value></data>
+  <data name="FamilyGpt" xml:space="preserve"><value>GPT-4 и старше</value></data>
+  <data name="FamilyGemini" xml:space="preserve"><value>Gemini</value></data>
+  <data name="FamilyDeepSeek" xml:space="preserve"><value>DeepSeek</value></data>
+  <data name="FamilyQwen" xml:space="preserve"><value>Qwen</value></data>
+  <data name="FamilyFrontier" xml:space="preserve"><value>Другие сильные</value></data>
+  <data name="FamilyOther" xml:space="preserve"><value>Простые и локальные</value></data>
+  <data name="ConnectionAddTitle" xml:space="preserve"><value>Добавить подключение</value></data>
+  <data name="ConnectionNamePlaceholder" xml:space="preserve"><value>Название, например Рабочий шлюз</value></data>
+  <data name="ConnectionEndpointPlaceholder" xml:space="preserve"><value>Адрес, обычно заканчивается на /v1</value></data>
+  <data name="ConnectionKeyPlaceholder" xml:space="preserve"><value>Ключ API</value></data>
+  <data name="ConnectionKeylessCheck" xml:space="preserve"><value>ключ не нужен</value></data>
+  <data name="ConnectionKeylessHint" xml:space="preserve"><value>Сервис не спрашивает ключ: Ollama, LM Studio</value></data>
+  <data name="ConnectionCheckAndAdd" xml:space="preserve"><value>Проверить и добавить</value></data>
+  <data name="ConnectionAddUnchecked" xml:space="preserve"><value>Добавить без проверки</value></data>
+  <data name="ConnectionChecking" xml:space="preserve"><value>Проверяю адрес…</value></data>
+  <data name="ConnectionCheckFailed" xml:space="preserve"><value>Проверка не прошла. {0}</value></data>
+  <data name="ConnectionAdded" xml:space="preserve"><value>Подключение «{0}» добавлено, моделей: {1}. Включите нужные.</value></data>
+  <data name="ConnectionAddedUnchecked" xml:space="preserve"><value>Подключение «{0}» добавлено без проверки. Введите имя модели, чтобы добавить её.</value></data>
+  <data name="ConnectionKeyRejected" xml:space="preserve"><value>Сервис не принял ключ.</value></data>
+  <data name="ConnectionNoModelList" xml:space="preserve"><value>По адресу {0} нет списка моделей. Проверьте адрес: обычно он заканчивается на /v1.</value></data>
+  <data name="ConnectionNotModelList" xml:space="preserve"><value>Ответ сервиса — не список моделей.</value></data>
+  <data name="CommandConnections" xml:space="preserve"><value>Агент: подключения и модели</value></data>
+  <data name="MenuConnections" xml:space="preserve"><value>Подключения и модели…</value></data>
+  <data name="ConnectionsAction" xml:space="preserve"><value>Подключения…</value></data>
+  <!-- Check the model (ADR 0055) -->
+  <data name="ProbeProtocol" xml:space="preserve"><value>Проверка идёт через Chat Completions, а у подключения другой протокол.</value></data>
+  <data name="ProbeAnswers" xml:space="preserve"><value>отвечает</value></data>
+  <data name="ProbeNoAnswer" xml:space="preserve"><value>не отвечает: {0}</value></data>
+  <data name="ProbeStatus" xml:space="preserve"><value>сервис ответил {0}</value></data>
+  <data name="ProbeNotJson" xml:space="preserve"><value>ответ сервиса — не JSON</value></data>
+  <data name="ProbeFailed" xml:space="preserve"><value>запрос не прошёл: {0}</value></data>
+  <data name="ProbeLimitNew" xml:space="preserve"><value>поле max_completion_tokens</value></data>
+  <data name="ProbeLimitLegacy" xml:space="preserve"><value>сервис принимает только старое поле max_tokens</value></data>
+  <data name="ProbeToolCalled" xml:space="preserve"><value>вызывает инструмент</value></data>
+  <data name="ProbeToolNotCalled" xml:space="preserve"><value>не вызвала инструмент: агент с этой моделью работать не сможет</value></data>
+  <data name="ProbeToolArgumentsBroken" xml:space="preserve"><value>аргументы вызова — не JSON</value></data>
+  <data name="ProbeTwoCalls" xml:space="preserve"><value>два вызова в одном ответе</value></data>
+  <data name="ProbeOneCall" xml:space="preserve"><value>один вызов за ответ: работа пойдёт медленнее</value></data>
+  <data name="ProbeNested" xml:space="preserve"><value>приходят целыми</value></data>
+  <data name="ProbeNestedLost" xml:space="preserve"><value>потеряны или искажены: правки нескольких файлов могут не проходить</value></data>
+  <data name="ProbeImageSeen" xml:space="preserve"><value>видит изображения</value></data>
+  <data name="ProbeImageNotSeen" xml:space="preserve"><value>не видит изображения</value></data>
+  <data name="ProbeImageRefused" xml:space="preserve"><value>сервис не принял картинку: {0}</value></data>
+  <data name="ProbeReasoningField" xml:space="preserve"><value>приходят отдельным полем</value></data>
+  <data name="ProbeReasoningInline" xml:space="preserve"><value>приходят в тексте ответа, в теге think</value></data>
+  <data name="ProbeReasoningNone" xml:space="preserve"><value>нет: агент попросит модель рассуждать вслух</value></data>
+  <data name="ProbeReasoningEffortRefused" xml:space="preserve"><value>сервис отклоняет поле reasoning_effort: оно не будет отправляться</value></data>
+  <data name="ProbeRussian" xml:space="preserve"><value>отвечает по-русски</value></data>
+  <data name="ProbeNotRussian" xml:space="preserve"><value>на вопрос по-русски ответила на другом языке</value></data>
+  <data name="ProbeTitleAnswer" xml:space="preserve"><value>Ответ</value></data>
+  <data name="ProbeTitleOutputLimit" xml:space="preserve"><value>Предел ответа</value></data>
+  <data name="ProbeTitleToolCall" xml:space="preserve"><value>Вызов инструмента</value></data>
+  <data name="ProbeTitleParallel" xml:space="preserve"><value>Несколько вызовов</value></data>
+  <data name="ProbeTitleNested" xml:space="preserve"><value>Вложенные аргументы</value></data>
+  <data name="ProbeTitleImage" xml:space="preserve"><value>Изображение</value></data>
+  <data name="ProbeTitleReasoning" xml:space="preserve"><value>Рассуждения</value></data>
+  <data name="ProbeTitleLanguage" xml:space="preserve"><value>Русский язык</value></data>
+  <data name="ModelCheck" xml:space="preserve"><value>Проверить</value></data>
+  <data name="ModelCheckHint" xml:space="preserve"><value>Несколько коротких запросов к модели: вызов инструмента, изображение, рассуждения. Тратит несколько тысяч токенов вашего ключа.</value></data>
+  <data name="ModelChecking" xml:space="preserve"><value>Проверяю модель…</value></data>
+  <data name="ModelApplyCheck" xml:space="preserve"><value>Применить</value></data>
+  <data name="ModelApplyCheckHint" xml:space="preserve"><value>Записать найденное в описание модели и подключения</value></data>
+  <data name="ProbeRussianQuestion" xml:space="preserve"><value>Ответь одним предложением: что такое рекурсия?</value></data>
 </root>

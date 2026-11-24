@@ -2,6 +2,7 @@ using System.Text.RegularExpressions;
 using CodeEditor.Modules.Agent.Services.Context;
 using CodeEditor.Modules.Agent.Services.Settings;
 using CodeEditor.Modules.Agent.Services.Tools;
+using CodeEditor.Modules.Agent.Services.Turn;
 using CodeEditor.Modules.Agent.Tests.Infrastructure;
 using CodeEditor.Modules.Agent.ViewModels.Chat;
 using Microsoft.Extensions.AI;
@@ -72,6 +73,27 @@ public sealed partial class ContextCompactionTests : IDisposable
         Assert.DoesNotContain("результат 0\nxxxx", last, StringComparison.Ordinal);
         Assert.Empty(_fixture.HelperClient.Requests);
     }
+
+    // Collapsing takes a read result out of the context, so reading the same thing again is not a loop: the repeat
+    // guard starts over, or the model can never get the text back (it read in circles on a long task).
+    [Fact]
+    public async Task ReadAgainAfterCollapse_IsNotARepeat()
+    {
+        _fixture.Options.Set(new AgentOptions { Model = AgentFixture.TestModel, ContextWindow = 30_000, MaxOutputTokens = 1_000 });
+        Script(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 0).Reply("Готово.");
+
+        await SendAsync();
+
+        // The request after call N carries its result in full: it is the newest one.
+        string[] rereads = [ResultOf(call: 12), ResultOf(call: 24)];
+        Assert.All(rereads, text => Assert.StartsWith("результат 0\nxxxx", text, StringComparison.Ordinal));
+        Assert.All(rereads, text => Assert.DoesNotContain(GuardedToolFunction.RepeatNote, text, StringComparison.Ordinal));
+    }
+
+    private string ResultOf(int call) =>
+        _fixture.Client.Requests[call + 1]
+            .SelectMany(message => message.Contents).OfType<FunctionResultContent>()
+            .Single(result => result.CallId == $"c{call}").Result?.ToString() ?? string.Empty;
 
     // The model reports a quarter of the framework's estimate (Russian text, reasoning): the raw estimate would collapse
     // at the eighth result, the corrected one says it's too early.
@@ -158,6 +180,17 @@ public sealed partial class ContextCompactionTests : IDisposable
         for (var n = 0; n < count; n++)
         {
             _fixture.Client.CallTool($"c{n}", "read_big", new Dictionary<string, object?> { ["n"] = n, ["size"] = size });
+        }
+
+        return _fixture.Client;
+    }
+
+    // Calls c0, c1, … read the given numbers in order.
+    private ScriptedChatClient Script(params int[] numbers)
+    {
+        for (var call = 0; call < numbers.Length; call++)
+        {
+            _fixture.Client.CallTool($"c{call}", "read_big", new Dictionary<string, object?> { ["n"] = numbers[call], ["size"] = 4_000 });
         }
 
         return _fixture.Client;

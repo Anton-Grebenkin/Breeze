@@ -27,6 +27,8 @@
   <data name="ToolBudgetExhausted" xml:space="preserve"><value>Not executed: the step limit for this turn is exhausted. Summarize without calling tools.</value></data>
   <data name="ToolRepeatNote" xml:space="preserve"><value>(An identical call with the same arguments was already made in this turn. Do not repeat it — use the previous result or change the approach.)</value></data>
   <data name="ToolRepeatBlocked" xml:space="preserve"><value>Not executed: this call with the same arguments is repeated for the third time in this turn. Change the approach or ask the user.</value></data>
+  <data name="ToolSwitchedOff" xml:space="preserve"><value>Not executed: {0} is switched off until the end of the turn because it does not work in this environment. {1}</value></data>
+  <data name="ToolSwitchedOffNote" xml:space="preserve"><value>{0} is switched off until the end of the turn: do not call it again.</value></data>
   <data name="ToolArgumentsInvalid" xml:space="preserve"><value>Not executed: the arguments don't match the tool's parameters ({0}). Parameters: {1}. Pass arrays and objects as JSON values, not as strings, and fix the call instead of working around it.</value></data>
   <data name="AdvisorBeforeEditResult" xml:space="preserve"><value>Not applied yet: before the first edit, an advisor (another model) reviewed your approach:
 
@@ -140,6 +142,11 @@ Notes from earlier chats; the agent sees this list at the start of every chat. T
   <data name="ErrorService" xml:space="preserve"><value>The service returned error {0}: {1}</value></data>
   <data name="ErrorStream" xml:space="preserve"><value>The service ended the answer with an error: {0}</value></data>
   <data name="ErrorNoConnection" xml:space="preserve"><value>Cannot reach {0}. Check your internet connection.</value></data>
+  <data name="ErrorConnectionLost" xml:space="preserve"><value>The connection to the service dropped in the middle of the answer.</value></data>
+  <data name="ErrorTimeout" xml:space="preserve"><value>The service did not answer in time.</value></data>
+  <data name="RetryWaiting" xml:space="preserve"><value>Retrying in {0} s (attempt {1} of {2}). {3}</value></data>
+  <data name="RetryRepeated" xml:space="preserve"><value>The request was repeated (attempt {0} of {1}). {2}</value></data>
+  <data name="TurnStoppedNotice" xml:space="preserve"><value>The turn was stopped. The agent can go on from where it stopped.</value></data>
   <!-- Agent tool lines in the feed. -->
   <data name="FileForms" xml:space="preserve"><value>file|files</value></data>
   <data name="ToolAskUser" xml:space="preserve"><value>Question for the user</value></data>
@@ -186,6 +193,10 @@ Notes from earlier chats; the agent sees this list at the start of every chat. T
   <data name="StepForms" xml:space="preserve"><value>step|steps</value></data>
   <data name="ContinueRequest" xml:space="preserve"><value>Continue from where you left off.</value></data>
   <data name="ExecutePlanRequest" xml:space="preserve"><value>Execute this plan.</value></data>
+  <data name="ApplyAnswerRequest" xml:space="preserve"><value>Apply the change from your answer.</value></data>
+  <data name="ApplyOffer" xml:space="preserve"><value>The answer holds a change. Agent mode can apply it.</value></data>
+  <data name="ApplyInAgentMode" xml:space="preserve"><value>Apply in Agent mode</value></data>
+  <data name="AgentModeMention" xml:space="preserve"><value>\bagent\s+mode\b</value></data>
   <data name="ChatOpenDetail" xml:space="preserve"><value>{0} · open</value></data>
   <data name="OpenChatPrompt" xml:space="preserve"><value>Open a chat from this folder</value></data>
   <data name="NoSavedChats" xml:space="preserve"><value>No saved chats yet</value></data>
@@ -368,6 +379,7 @@ Notes from earlier chats; the agent sees this list at the start of every chat. T
   <!-- Web access (ADR 0025). -->
   <data name="WebOnlyHttp" xml:space="preserve"><value>Only http and https addresses can be read: {0}</value></data>
   <data name="WebHttpError" xml:space="preserve"><value>{0} answered {1} {2}.</value></data>
+  <data name="WebRedirected" xml:space="preserve"><value>{0} answered {1} and redirects to {2}. Fetch that address.</value></data>
   <data name="WebNotText" xml:space="preserve"><value>{0} is not a text page ({1}): it cannot be read as text.</value></data>
   <data name="WebUnreachable" xml:space="preserve"><value>{0} is unreachable: {1}</value></data>
   <data name="WebTimedOut" xml:space="preserve"><value>{0} did not answer in {1} s.</value></data>
@@ -454,4 +466,99 @@ The agent gets the text when it reads or edits a matching file.
   <data name="HookBlockedPrompt" xml:space="preserve"><value>A hook stopped the message: {0}</value></data>
   <data name="HookStopPrompt" xml:space="preserve"><value>A user hook asks you not to finish yet: {0}</value></data>
   <data name="HookStopStatus" xml:space="preserve"><value>Stop hook: the agent goes on</value></data>
+  <!-- Web through the browser. -->
+  <data name="WebSearchThroughBrowser" xml:space="preserve"><value>The search engine's results, opened in the editor's browser (no digest: read a source with web_fetch):</value></data>
+  <data name="WebFetchBothFailed" xml:space="preserve"><value>{0} The browser did not open it either: {1}</value></data>
+  <data name="CommandFocusInput" xml:space="preserve"><value>Go to the Input Box</value></data>
+  <!-- Connections (ADR 0055) -->
+  <data name="ConnectionsTitle" xml:space="preserve"><value>Connections</value></data>
+  <data name="ConnectionsHint" xml:space="preserve"><value>Your own model services: a gateway at work, a vendor's API, a local server. Each key is kept in the secret store, not in settings.</value></data>
+  <data name="ConnectionsEmpty" xml:space="preserve"><value>No connections yet. Add one below.</value></data>
+  <data name="ConnectionKeySet" xml:space="preserve"><value>key set</value></data>
+  <data name="ConnectionKeyMissing" xml:space="preserve"><value>no key</value></data>
+  <data name="ConnectionKeyless" xml:space="preserve"><value>no key needed</value></data>
+  <data name="ConnectionSetKey" xml:space="preserve"><value>Set the key…</value></data>
+  <data name="ConnectionRemove" xml:space="preserve"><value>Remove the connection</value></data>
+  <data name="ConnectionRefresh" xml:space="preserve"><value>Refresh the model list</value></data>
+  <data name="ConnectionExpand" xml:space="preserve"><value>Models of the connection</value></data>
+  <data name="ConnectionRemoveQuestion" xml:space="preserve"><value>Remove the connection “{0}”?</value></data>
+  <data name="ConnectionRemoveDetails" xml:space="preserve"><value>Its key is removed too. Models of this connection stop working.</value></data>
+  <data name="ConnectionKeyPrompt" xml:space="preserve"><value>Paste the API key of “{0}”. It is kept in the secret store of this computer.</value></data>
+  <data name="ConnectionModelsSummary" xml:space="preserve"><value>Models: {0}, in the picker: {1}</value></data>
+  <data name="ConnectionFilterPlaceholder" xml:space="preserve"><value>Find a model or type its id</value></data>
+  <data name="ConnectionAddModelHint" xml:space="preserve"><value>Add a model the service does not list, by its id</value></data>
+  <data name="ModelInPicker" xml:space="preserve"><value>Show in the model picker</value></data>
+  <data name="ModelUse" xml:space="preserve"><value>Use</value></data>
+  <data name="ModelUseHint" xml:space="preserve"><value>Make it the conversation model</value></data>
+  <data name="ModelNamePlaceholder" xml:space="preserve"><value>Name to show</value></data>
+  <data name="ModelWindowPlaceholder" xml:space="preserve"><value>Window, tokens</value></data>
+  <data name="ModelImages" xml:space="preserve"><value>images</value></data>
+  <data name="ModelImagesHint" xml:space="preserve"><value>The model sees images</value></data>
+  <data name="ModelFamilyHint" xml:space="preserve"><value>Which model it really is: the prompts depend on it</value></data>
+  <data name="FamilyByName" xml:space="preserve"><value>By name</value></data>
+  <data name="FamilyClaude" xml:space="preserve"><value>Claude</value></data>
+  <data name="FamilyGptReasoning" xml:space="preserve"><value>GPT with reasoning</value></data>
+  <data name="FamilyGpt" xml:space="preserve"><value>GPT-4 and older</value></data>
+  <data name="FamilyGemini" xml:space="preserve"><value>Gemini</value></data>
+  <data name="FamilyDeepSeek" xml:space="preserve"><value>DeepSeek</value></data>
+  <data name="FamilyQwen" xml:space="preserve"><value>Qwen</value></data>
+  <data name="FamilyFrontier" xml:space="preserve"><value>Other strong</value></data>
+  <data name="FamilyOther" xml:space="preserve"><value>Simple or local</value></data>
+  <data name="ConnectionAddTitle" xml:space="preserve"><value>Add a connection</value></data>
+  <data name="ConnectionNamePlaceholder" xml:space="preserve"><value>Name, for example Work gateway</value></data>
+  <data name="ConnectionEndpointPlaceholder" xml:space="preserve"><value>Address, usually ends in /v1</value></data>
+  <data name="ConnectionKeyPlaceholder" xml:space="preserve"><value>API key</value></data>
+  <data name="ConnectionKeylessCheck" xml:space="preserve"><value>no key needed</value></data>
+  <data name="ConnectionKeylessHint" xml:space="preserve"><value>The service asks for no key: Ollama, LM Studio</value></data>
+  <data name="ConnectionCheckAndAdd" xml:space="preserve"><value>Check and add</value></data>
+  <data name="ConnectionAddUnchecked" xml:space="preserve"><value>Add without the check</value></data>
+  <data name="ConnectionChecking" xml:space="preserve"><value>Checking the address…</value></data>
+  <data name="ConnectionCheckFailed" xml:space="preserve"><value>The check failed. {0}</value></data>
+  <data name="ConnectionAdded" xml:space="preserve"><value>“{0}” is added, models: {1}. Switch on the ones you need.</value></data>
+  <data name="ConnectionAddedUnchecked" xml:space="preserve"><value>“{0}” is added without the check. Type a model id to add it.</value></data>
+  <data name="ConnectionKeyRejected" xml:space="preserve"><value>The service did not accept the key.</value></data>
+  <data name="ConnectionNoModelList" xml:space="preserve"><value>There is no model list at {0}. Check the address: it usually ends in /v1.</value></data>
+  <data name="ConnectionNotModelList" xml:space="preserve"><value>The answer of the service is not a model list.</value></data>
+  <data name="CommandConnections" xml:space="preserve"><value>Agent: Connections and Models</value></data>
+  <data name="MenuConnections" xml:space="preserve"><value>Connections and Models…</value></data>
+  <data name="ConnectionsAction" xml:space="preserve"><value>Connections…</value></data>
+  <!-- Check the model (ADR 0055) -->
+  <data name="ProbeProtocol" xml:space="preserve"><value>The check works over Chat Completions; this connection uses another protocol.</value></data>
+  <data name="ProbeAnswers" xml:space="preserve"><value>answers</value></data>
+  <data name="ProbeNoAnswer" xml:space="preserve"><value>no answer: {0}</value></data>
+  <data name="ProbeStatus" xml:space="preserve"><value>the service answered {0}</value></data>
+  <data name="ProbeNotJson" xml:space="preserve"><value>the answer of the service is not JSON</value></data>
+  <data name="ProbeFailed" xml:space="preserve"><value>the request failed: {0}</value></data>
+  <data name="ProbeLimitNew" xml:space="preserve"><value>the max_completion_tokens field</value></data>
+  <data name="ProbeLimitLegacy" xml:space="preserve"><value>only the older max_tokens field is accepted</value></data>
+  <data name="ProbeToolCalled" xml:space="preserve"><value>calls the tool</value></data>
+  <data name="ProbeToolNotCalled" xml:space="preserve"><value>did not call the tool: the agent cannot work with this model</value></data>
+  <data name="ProbeToolArgumentsBroken" xml:space="preserve"><value>the arguments of the call are not JSON</value></data>
+  <data name="ProbeTwoCalls" xml:space="preserve"><value>two calls in one reply</value></data>
+  <data name="ProbeOneCall" xml:space="preserve"><value>one call per reply: the work will go slower</value></data>
+  <data name="ProbeNested" xml:space="preserve"><value>arrive whole</value></data>
+  <data name="ProbeNestedLost" xml:space="preserve"><value>lost or distorted: edits of several files may fail</value></data>
+  <data name="ProbeImageSeen" xml:space="preserve"><value>sees images</value></data>
+  <data name="ProbeImageNotSeen" xml:space="preserve"><value>does not see images</value></data>
+  <data name="ProbeImageRefused" xml:space="preserve"><value>the service did not take the picture: {0}</value></data>
+  <data name="ProbeReasoningField" xml:space="preserve"><value>come in a field of their own</value></data>
+  <data name="ProbeReasoningInline" xml:space="preserve"><value>come inside the answer text, in a think tag</value></data>
+  <data name="ProbeReasoningNone" xml:space="preserve"><value>none: the agent will ask the model to think aloud</value></data>
+  <data name="ProbeReasoningEffortRefused" xml:space="preserve"><value>the service rejects the reasoning_effort field: it will not be sent</value></data>
+  <data name="ProbeRussian" xml:space="preserve"><value>answers in Russian</value></data>
+  <data name="ProbeNotRussian" xml:space="preserve"><value>answered a question in Russian in another language</value></data>
+  <data name="ProbeTitleAnswer" xml:space="preserve"><value>Answer</value></data>
+  <data name="ProbeTitleOutputLimit" xml:space="preserve"><value>Response limit</value></data>
+  <data name="ProbeTitleToolCall" xml:space="preserve"><value>Tool call</value></data>
+  <data name="ProbeTitleParallel" xml:space="preserve"><value>Several calls</value></data>
+  <data name="ProbeTitleNested" xml:space="preserve"><value>Nested arguments</value></data>
+  <data name="ProbeTitleImage" xml:space="preserve"><value>Image</value></data>
+  <data name="ProbeTitleReasoning" xml:space="preserve"><value>Reasoning</value></data>
+  <data name="ProbeTitleLanguage" xml:space="preserve"><value>Russian</value></data>
+  <data name="ModelCheck" xml:space="preserve"><value>Check</value></data>
+  <data name="ModelCheckHint" xml:space="preserve"><value>A few short requests to the model: a tool call, an image, reasoning. Spends a few thousand tokens of your key.</value></data>
+  <data name="ModelChecking" xml:space="preserve"><value>Checking the model…</value></data>
+  <data name="ModelApplyCheck" xml:space="preserve"><value>Apply</value></data>
+  <data name="ModelApplyCheckHint" xml:space="preserve"><value>Write what the check found into the description of the model and the connection</value></data>
+  <data name="ProbeRussianQuestion" xml:space="preserve"><value>Ответь одним предложением: что такое рекурсия?</value></data>
 </root>

@@ -12,11 +12,15 @@ namespace CodeEditor.Shell.Editors;
 /// </summary>
 public sealed class DocumentSaver(IDocumentService documents, IDialogService dialogs, StatusBarViewModel statusBar)
 {
+    /// <param name="ask">
+    /// Ask before overwriting a file changed on disk. Without asking (auto save) such a file is left alone: the tab
+    /// shows the conflict, and the user's own save asks.
+    /// </param>
     /// <returns><c>false</c> if the user declined to overwrite or the write failed.</returns>
-    public async Task<bool> SaveAsync(IDocument document)
+    public async Task<bool> SaveAsync(IDocument document, bool ask = true)
     {
-        if (document.HasExternalChanges && !dialogs.Confirm(
-                string.Format(CultureInfo.CurrentCulture, Strings.FileChangedOnDisk, document.Name), Strings.OverwriteQuestion, Strings.Overwrite))
+        if (document.HasExternalChanges && !(ask && dialogs.Confirm(
+                string.Format(CultureInfo.CurrentCulture, Strings.FileChangedOnDisk, document.Name), Strings.OverwriteQuestion, Strings.Overwrite)))
         {
             return false;
         }
@@ -25,6 +29,11 @@ public sealed class DocumentSaver(IDocumentService documents, IDialogService dia
         {
             await documents.SaveAsync(document);
             return true;
+        }
+        catch (DocumentChangedOnDiskException)
+        {
+            // Found only at the write; the document is flagged now, so the second pass asks.
+            return ask && await SaveAsync(document, ask);
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
         {

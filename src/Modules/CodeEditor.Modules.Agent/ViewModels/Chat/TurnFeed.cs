@@ -119,7 +119,7 @@ internal sealed class TurnFeed(ObservableCollection<ChatMessageViewModel> messag
     }
 
     /// <summary>Adds a harness row above the answer if it is in the feed, otherwise at the end.</summary>
-    public void Notice(ChatMessageKind kind, string text)
+    public ChatMessageViewModel Notice(ChatMessageKind kind, string text)
     {
         var message = new ChatMessageViewModel(kind, text);
         if (_round?.Answer is { } answer && messages.Contains(answer))
@@ -130,6 +130,8 @@ internal sealed class TurnFeed(ObservableCollection<ChatMessageViewModel> messag
         {
             messages.Add(message);
         }
+
+        return message;
     }
 
     // Tagged thinking goes to the reasoning block, the rest to the answer (without leading blank lines).

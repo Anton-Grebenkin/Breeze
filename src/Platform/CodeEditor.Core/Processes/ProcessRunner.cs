@@ -7,21 +7,23 @@ using CodeEditor.Core.Resources;
 namespace CodeEditor.Core.Processes;
 
 /// <summary>
-/// Windowless process with output redirected as UTF-8. Input gets the request's text, if any, and is closed, so a
-/// command waiting for user input gets end-of-input instead of hanging. Cancellation and timeout kill the whole process tree (builds start
+/// Windowless process with redirected output, read as UTF-8 with the console code page as a fallback
+/// (<see cref="ProcessOutputReader"/>). Input gets the request's text, if any, and is closed, so a command waiting for
+/// user input gets end-of-input instead of hanging. Cancellation and timeout kill the whole process tree (builds start
 /// MSBuild nodes, tests start hosts).
 /// </summary>
 public sealed class ProcessRunner : IProcessRunner
 {
     private static readonly TimeSpan KillWait = TimeSpan.FromSeconds(5);
 
+    // A grandchild that outlives the process may keep the output pipes open: don't wait for it forever.
+    private static readonly TimeSpan DrainWait = TimeSpan.FromSeconds(2);
+
     public async Task<ProcessResult> RunAsync(ProcessRequest request, Action<string>? onLine, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
         var output = new BoundedOutput();
         using var process = new Process { StartInfo = StartInfo(request) };
-        process.OutputDataReceived += (_, e) => Receive(e.Data, output, onLine);
-        process.ErrorDataReceived += (_, e) => Receive(e.Data, output, onLine);
 
         var started = Stopwatch.GetTimestamp();
         try
@@ -34,11 +36,21 @@ public sealed class ProcessRunner : IProcessRunner
         }
 
         // Output is read before input is written: a child that answers while reading would otherwise fill the pipe.
-        process.BeginOutputReadLine();
-        process.BeginErrorReadLine();
+        var reading = Task.WhenAll(
+            ProcessOutputReader.ReadLinesAsync(process.StandardOutput.BaseStream, line => Receive(line, output, onLine)),
+            ProcessOutputReader.ReadLinesAsync(process.StandardError.BaseStream, line => Receive(line, output, onLine)));
         await WriteInputAsync(process, request.Input);
 
-        var timedOut = await WaitAsync(process, request.Timeout, cancellationToken);
+        var timedOut = false;
+        try
+        {
+            timedOut = await WaitAsync(process, request.Timeout, cancellationToken);
+        }
+        finally
+        {
+            await ((Task)reading.WaitAsync(DrainWait, CancellationToken.None)).ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing);
+        }
+
         return new ProcessResult(timedOut ? -1 : process.ExitCode, output.Text, timedOut, Stopwatch.GetElapsedTime(started));
     }
 
@@ -91,13 +103,8 @@ public sealed class ProcessRunner : IProcessRunner
         }
     }
 
-    private static void Receive(string? line, BoundedOutput output, Action<string>? onLine)
+    private static void Receive(string line, BoundedOutput output, Action<string>? onLine)
     {
-        if (line is null)
-        {
-            return;
-        }
-
         output.Add(line);
         onLine?.Invoke(line);
     }
@@ -112,8 +119,6 @@ public sealed class ProcessRunner : IProcessRunner
             RedirectStandardInput = true,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
-            StandardOutputEncoding = Encoding.UTF8,
-            StandardErrorEncoding = Encoding.UTF8,
         };
         foreach (var argument in request.Arguments)
         {

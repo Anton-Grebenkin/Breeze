@@ -1,5 +1,7 @@
 using CodeEditor.Modules.Agent.Contracts;
 using CodeEditor.Modules.Browser.Services;
+using CodeEditor.Modules.Browser.Services.Agent;
+using CodeEditor.Modules.Browser.Services.Reading;
 using Microsoft.Extensions.AI;
 
 namespace CodeEditor.Modules.Browser.Tests;
@@ -11,13 +13,16 @@ namespace CodeEditor.Modules.Browser.Tests;
 /// </summary>
 public sealed class BrowserAgentToolsTests
 {
-    private readonly FakeBrowserEngine _browser = new();
+    private readonly BrowserAgentTabs _tabs;
+    private readonly FakeBrowserPage _browser;
     private readonly FakeAgentImages _images = new();
-    private readonly BrowserNetworkLog _network = new();
     private readonly AIFunction _tool;
 
-    public BrowserAgentToolsTests() =>
-        _tool = new BrowserAgentTools(_browser, new BrowserPageActions(_browser, _network), new PassThroughOutputStore(), _images).CreateTools().OfType<AIFunction>().Single();
+    public BrowserAgentToolsTests()
+    {
+        _tabs = FakeBrowserEngine.AgentTabs(out _browser);
+        _tool = new BrowserAgentTools(_tabs, new PassThroughOutputStore(), _images).CreateTools().OfType<AIFunction>().Single();
+    }
 
     [Fact]
     public async Task Navigate_OpensThePage_AndReturnsTheSnapshot()
@@ -25,7 +30,7 @@ public sealed class BrowserAgentToolsTests
         var result = await InvokeAsync(new() { ["action"] = "navigate", ["url"] = "http://localhost:5000/login" });
 
         Assert.Equal([new Uri("http://localhost:5000/login")], _browser.Navigations);
-        Assert.StartsWith("<browser_page url=\"http://localhost:5000/login\" title=\"Вход\">\n- heading \"Вход\"", result, StringComparison.Ordinal);
+        Assert.StartsWith("<browser_page tab=\"t1\" url=\"http://localhost:5000/login\" title=\"Вход\">\n- heading \"Вход\"", result, StringComparison.Ordinal);
         Assert.EndsWith("</browser_page>", result, StringComparison.Ordinal);
     }
 
@@ -38,7 +43,7 @@ public sealed class BrowserAgentToolsTests
         var script = _browser.Scripts[0];
         Assert.Contains("(\"e1\", \"a\\u0022); alert(1); (\\u0022\", true)", script, StringComparison.Ordinal);
         Assert.Equal(1, _browser.Waits);
-        Assert.Equal(BrowserScripts.Snapshot, _browser.Scripts[^1]);
+        Assert.Equal(BrowserSnapshot.Script, _browser.Scripts[^1]);
     }
 
     [Fact]
@@ -62,7 +67,7 @@ public sealed class BrowserAgentToolsTests
 
     [Theory]
     [InlineData("navigate", "file:///C:/secret.txt", "http")]
-    [InlineData("hover", null, "snapshot")]
+    [InlineData("teleport", null, "snapshot")]
     [InlineData("click", null, "ref")]
     public async Task BadCalls_AreExplained(string action, string? url, string expected)
     {
@@ -121,7 +126,7 @@ public sealed class BrowserAgentToolsTests
     [Fact]
     public async Task Preview_OfExternalSite_NamesIt()
     {
-        var preview = Assert.Single(await new BrowserAgentTools(_browser, new BrowserPageActions(_browser, _network), new PassThroughOutputStore(), _images)
+        var preview = Assert.Single(await new BrowserAgentTools(_tabs, new PassThroughOutputStore(), _images)
             .PreviewAsync(BrowserAgentTools.ToolName, new Dictionary<string, object?> { ["action"] = "navigate", ["url"] = "https://example.org/a" }, TestContext.Current.CancellationToken));
 
         Assert.Equal(("Агент хочет открыть страницу в браузере", "example.org", "GET https://example.org/a"), (preview.Title, preview.Header, preview.NewText));

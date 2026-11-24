@@ -1,4 +1,6 @@
+using CodeEditor.Modules.Agent.Services.Settings;
 using CodeEditor.Modules.Agent.Tests.Infrastructure;
+using CodeEditor.Modules.Agent.ViewModels.Chat;
 using Microsoft.Extensions.AI;
 
 namespace CodeEditor.Modules.Agent.Tests.Chat;
@@ -74,6 +76,68 @@ public sealed class ChatHistoryTests : IDisposable
         _fixture.Workspace.Open(AgentFixture.Root);
 
         Assert.Equal(2, _fixture.Chat.Messages.Count);
+    }
+
+    // To study a chat afterwards: every saved row has the time it appeared, a question also the model and the mode.
+    [Fact]
+    public async Task SavedRows_CarryTheirTime_AndQuestionsTheModelAndMode()
+    {
+        _fixture.Client.Reply("ответ");
+        await _fixture.SendAsync("вопрос");
+        _fixture.Time.Advance(TimeSpan.FromMinutes(5));
+
+        var saved = _fixture.CreateChat(_fixture.CreateHistory());
+        await saved.Session.LoadLatestAsync();
+
+        var question = saved.Messages[0];
+        Assert.Equal((AgentFixture.TestModel, AgentMode.Agent), (question.Model, question.Mode));
+        Assert.All(saved.Messages, message => Assert.Equal(_fixture.Time.GetLocalNow().AddMinutes(-5), message.At));
+        Assert.Null(saved.Messages[1].Model);
+    }
+
+    // A new chat started while a turn runs: the stopped turn is saved into its own chat, and nothing of it (the stop
+    // mark, an error) reaches the new one. It used to be lost, with its tail written into the next chat.
+    [Fact]
+    public async Task NewChatDuringTurn_SavesTheStoppedTurnIntoItsOwnChat()
+    {
+        _fixture.Client.Gate = new TaskCompletionSource();
+        _fixture.Client.Reply("начало", "никогда");
+        _fixture.Chat.Input = "длинный вопрос";
+        var sending = _fixture.Chat.SendCommand.ExecuteAsync(null);
+        await Wait.UntilAsync(() => _fixture.Chat.Messages.Count == 2 && _fixture.Chat.Messages[1].Text == "начало");
+
+        await _fixture.Chat.NewChatCommand.ExecuteAsync(null);
+        await sending;
+
+        Assert.Empty(_fixture.Chat.Messages);
+        Assert.Null(_fixture.Chat.Session.CurrentId);
+        Assert.Single(ChatFiles());
+        var saved = _fixture.CreateChat(_fixture.CreateHistory());
+        await saved.Session.LoadLatestAsync();
+        Assert.Equal(
+            [(ChatMessageKind.User, "длинный вопрос"), (ChatMessageKind.Assistant, "начало …(остановлено)")],
+            saved.Messages.Select(message => (message.Kind, message.Text)));
+    }
+
+    // Another folder opened while a turn runs: the turn stops, and its chat is not written into the new folder.
+    [Fact]
+    public async Task OtherFolderDuringTurn_DoesNotSaveTheTurnIntoTheNewFolder()
+    {
+        var other = Path.GetFullPath(@"C:\other");
+        _fixture.FileSystem.AddDirectory(other);
+        _fixture.Client.Gate = new TaskCompletionSource();
+        _fixture.Client.Reply("начало", "никогда");
+        _fixture.Chat.Input = "длинный вопрос";
+        var sending = _fixture.Chat.SendCommand.ExecuteAsync(null);
+        await Wait.UntilAsync(() => _fixture.Chat.Messages.Count == 2 && _fixture.Chat.Messages[1].Text == "начало");
+
+        _fixture.Workspace.Open(other);
+        await sending;
+
+        // The folder's chat opens right after the turn has wound down.
+        await Wait.UntilAsync(() => _fixture.Chat.Messages.Count == 0);
+        Assert.False(_fixture.Chat.IsBusy);
+        Assert.False(_fixture.FileSystem.DirectoryExists(Path.Combine(other, ".breeze", "agent")));
     }
 
     private List<string> ChatFiles() =>

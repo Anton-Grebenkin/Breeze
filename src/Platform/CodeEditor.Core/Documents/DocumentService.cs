@@ -10,7 +10,9 @@ namespace CodeEditor.Core.Documents;
 /// <summary>
 /// Open documents. Reading, encoding detection and writing run in the background; buffers are created and changed
 /// on the UI thread. On an external change a clean document reloads silently (like VS Code); a dirty one is
-/// flagged as a conflict for the user to resolve.
+/// flagged as a conflict for the user to resolve. Files the folder watcher does not report are checked by
+/// <see cref="UnwatchedDocuments"/>, and a save compares the write time itself, so no path overwrites a change on disk
+/// that nobody saw.
 /// </summary>
 public sealed partial class DocumentService : IDocumentService, IDisposable
 {
@@ -25,13 +27,15 @@ public sealed partial class DocumentService : IDocumentService, IDisposable
     private readonly Dictionary<string, Document> _byPath = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, Task<IDocument>> _opening = new(StringComparer.OrdinalIgnoreCase);
     private readonly List<IDocument> _documents = [];
+    private readonly UnwatchedDocuments _unwatched;
 
     public DocumentService(
         IFileSystem fileSystem,
         ITextBufferFactory buffers,
         IUiDispatcher dispatcher,
         IWorkspace workspace,
-        ILogger<DocumentService> logger)
+        ILogger<DocumentService> logger,
+        TimeProvider? time = null)
     {
         _fileSystem = fileSystem;
         _buffers = buffers;
@@ -39,6 +43,8 @@ public sealed partial class DocumentService : IDocumentService, IDisposable
         _workspace = workspace;
         _logger = logger;
         _workspace.FilesChanged += OnFilesChanged;
+        _unwatched = new UnwatchedDocuments(
+            workspace, fileSystem, dispatcher, time ?? TimeProvider.System, () => [.. _byPath.Values], document => _ = HandleExternalChangeAsync(document, FileChangeKind.Changed));
     }
 
     public IReadOnlyList<IDocument> Documents => _documents;
@@ -79,11 +85,24 @@ public sealed partial class DocumentService : IDocumentService, IDisposable
         var target = (Document)document;
         var text = target.Buffer.GetText();
 
-        await Task.Run(() =>
+        // A flagged document is saved by the decision of whoever saw the flag; an unflagged one must match the disk.
+        var decided = target.HasExternalChanges || target.IsDeletedOnDisk;
+        var written = await Task.Run(() =>
         {
+            if (!decided && _fileSystem.FileExists(target.FilePath) && _fileSystem.GetLastWriteTimeUtc(target.FilePath) != target.LastWriteTimeUtc)
+            {
+                return false;
+            }
+
             _fileSystem.WriteAllBytesAtomic(target.FilePath, TextFileCodec.Encode(text, target.Format));
             target.LastWriteTimeUtc = _fileSystem.GetLastWriteTimeUtc(target.FilePath);
+            return true;
         }, cancellationToken).ConfigureAwait(false);
+        if (!written)
+        {
+            await _dispatcher.InvokeAsync(() => target.SetExternalState(hasExternalChanges: true, isDeletedOnDisk: false)).ConfigureAwait(false);
+            throw new DocumentChangedOnDiskException(target.FilePath);
+        }
 
         await _dispatcher.InvokeAsync(() =>
         {
@@ -123,11 +142,16 @@ public sealed partial class DocumentService : IDocumentService, IDisposable
         {
             _documents.Remove(target);
             target.Detach();
+            _unwatched.Refresh();
             Closed?.Invoke(this, target);
         }
     }
 
-    public void Dispose() => _workspace.FilesChanged -= OnFilesChanged;
+    public void Dispose()
+    {
+        _workspace.FilesChanged -= OnFilesChanged;
+        _unwatched.Dispose();
+    }
 
     private async Task<IDocument> OpenCoreAsync(string path, CancellationToken cancellationToken)
     {
@@ -145,6 +169,7 @@ public sealed partial class DocumentService : IDocumentService, IDisposable
                 var document = new Document(path, buffer, format, lastWrite);
                 _byPath[path] = document;
                 _documents.Add(document);
+                _unwatched.Refresh();
                 Opened?.Invoke(this, document);
                 result = document;
                 uiTime = Stopwatch.GetElapsedTime(uiStarted);

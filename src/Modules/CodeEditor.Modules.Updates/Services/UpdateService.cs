@@ -1,5 +1,6 @@
 using System.Globalization;
 using CodeEditor.Core.Commands;
+using CodeEditor.Modules.Updates.Commands;
 using CodeEditor.Modules.Updates.Resources;
 using CodeEditor.Shell.Commands;
 using CodeEditor.Shell.Services;
@@ -20,6 +21,7 @@ namespace CodeEditor.Modules.Updates.Services;
 public sealed partial class UpdateService : IDisposable
 {
     public const string StatusItemId = "update";
+    public const string NotificationId = "update";
 
     /// <summary>The background check waits for startup to finish: opening the folder and tabs comes first.</summary>
     public static readonly TimeSpan StartupDelay = TimeSpan.FromSeconds(10);
@@ -31,6 +33,7 @@ public sealed partial class UpdateService : IDisposable
     private readonly IOptionsMonitor<UpdateSettings> _settings;
     private readonly ProductInfo _product;
     private readonly StatusBarViewModel _statusBar;
+    private readonly INotificationService _notifications;
     private readonly IDialogService _dialogs;
     private readonly AppRestart _restart;
     private readonly ICommandService _commands;
@@ -40,6 +43,7 @@ public sealed partial class UpdateService : IDisposable
     private readonly CancellationTokenSource _stopping = new();
     private readonly StatusBarItemViewModel _item = new(StatusItemId, StatusOrder) { IsVisible = false };
     private IDisposable? _registration;
+    private IDisposable? _notification;
     private string? _readyVersion;
 
     public UpdateService(
@@ -52,12 +56,14 @@ public sealed partial class UpdateService : IDisposable
         ICommandService commands,
         IAppWindows windows,
         TimeProvider time,
-        ILogger<UpdateService> logger)
+        ILogger<UpdateService> logger,
+        INotificationService notifications)
     {
         _updater = updater;
         _settings = settings;
         _product = product;
         _statusBar = statusBar;
+        _notifications = notifications;
         _dialogs = dialogs;
         _restart = restart;
         _commands = commands;
@@ -128,13 +134,13 @@ public sealed partial class UpdateService : IDisposable
     {
         if (State != UpdateState.Ready)
         {
-            _statusBar.Message = Strings.NothingToApply;
+            Notify(Strings.NothingToApply);
             return;
         }
 
         if (_windows.CountOthers() is var others and > 0)
         {
-            _statusBar.Message = Format(Strings.CloseOtherWindows, others);
+            Notify(Format(Strings.CloseOtherWindows, others));
             return;
         }
 
@@ -199,7 +205,7 @@ public sealed partial class UpdateService : IDisposable
         _readyVersion = version;
         _item.Text = Format(Strings.ReadyItem, version);
         _item.ToolTip = Strings.ReadyToolTip;
-        _statusBar.Message = Format(Strings.Ready, version);
+        Notify(Format(Strings.Ready, version), new NotificationAction(Strings.RestartConfirm, UpdateCommands.RestartId, IsPrimary: true));
         LogReady(_logger, version);
         return true;
     }
@@ -229,8 +235,16 @@ public sealed partial class UpdateService : IDisposable
     {
         if (show)
         {
-            _statusBar.Message = message;
+            Notify(message);
         }
+    }
+
+    // A notification stays until closed; the status bar line was gone with the next message, so a downloaded update
+    // or a failed check went unnoticed.
+    private void Notify(string message, params NotificationAction[] actions)
+    {
+        _notification?.Dispose();
+        _notification = _notifications.Show(new Notification(NotificationId, message, actions));
     }
 
     private static string Format(string template, params object[] arguments) =>

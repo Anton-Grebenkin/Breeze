@@ -26,7 +26,11 @@ internal static partial class MarkdownInlines
         "c", "java", "vb", "fs", "sql", "resx", "editorconfig", "gitignore",
     }.ToFrozenSet(StringComparer.Ordinal);
 
-    public static void AddTo(InlineCollection target, ContainerInline? source)
+    /// <param name="insideLink">
+    /// The inlines are a link's text: nothing in it becomes a link of its own. WPF throws on a hyperlink inside a
+    /// hyperlink, and one such answer broke the whole feed.
+    /// </param>
+    public static void AddTo(InlineCollection target, ContainerInline? source, bool insideLink = false)
     {
         if (source is null)
         {
@@ -35,7 +39,7 @@ internal static partial class MarkdownInlines
 
         foreach (var inline in source)
         {
-            if (Convert(inline) is { } converted)
+            if (Convert(inline, insideLink) is { } converted)
             {
                 target.Add(converted);
             }
@@ -51,29 +55,30 @@ internal static partial class MarkdownInlines
     }
 
     // ContainerInline subclasses (emphasis, link) must be matched before ContainerInline itself.
-    private static WpfInline? Convert(MdInline inline) => inline switch
+    private static WpfInline? Convert(MdInline inline, bool insideLink) => inline switch
     {
         LiteralInline literal => new Run(literal.Content.ToString()),
-        CodeInline code => Code(code.Content),
-        EmphasisInline emphasis => Emphasis(emphasis),
-        LinkInline link => Link(link.Url ?? string.Empty, link),
-        AutolinkInline autolink => Link(autolink.IsEmail ? "mailto:" + autolink.Url : autolink.Url, text: autolink.Url),
+        CodeInline code => Code(code.Content, linkPaths: !insideLink),
+        EmphasisInline emphasis => Emphasis(emphasis, insideLink),
+        LinkInline link when !insideLink => Link(link.Url ?? string.Empty, link),
+        AutolinkInline autolink when !insideLink => Link(autolink.IsEmail ? "mailto:" + autolink.Url : autolink.Url, text: autolink.Url),
+        AutolinkInline autolink => new Run(autolink.Url),
         LineBreakInline lineBreak => lineBreak.IsHard ? new LineBreak() : new Run(" "),
         HtmlEntityInline entity => new Run(entity.Transcoded.ToString()),
         HtmlInline html => new Run(html.Tag),
         TaskList task => new Run(task.Checked ? "☑ " : "☐ "),
-        ContainerInline container => Container(new Span(), container),
+        ContainerInline container => Container(new Span(), container, insideLink),
         _ => null,
     };
 
-    private static WpfInline Code(string text)
+    private static WpfInline Code(string text, bool linkPaths)
     {
         var run = new Run(text);
         run.SetResourceReference(TextElement.FontFamilyProperty, "Font.Code");
         run.SetResourceReference(TextElement.FontSizeProperty, CodeFontSizeKey);
         run.SetResourceReference(TextElement.BackgroundProperty, ThemeKeys.MarkdownInlineCodeBackground);
         run.SetResourceReference(TextElement.ForegroundProperty, ThemeKeys.MarkdownInlineCodeForeground);
-        if (!LooksLikeFilePath(text))
+        if (!linkPaths || !LooksLikeFilePath(text))
         {
             return run;
         }
@@ -83,9 +88,9 @@ internal static partial class MarkdownInlines
         return link;
     }
 
-    private static Span Emphasis(EmphasisInline emphasis)
+    private static Span Emphasis(EmphasisInline emphasis, bool insideLink)
     {
-        var span = Container(new Span(), emphasis);
+        var span = Container(new Span(), emphasis, insideLink);
         if (emphasis.DelimiterChar == '~')
         {
             span.TextDecorations = TextDecorations.Strikethrough;
@@ -110,7 +115,7 @@ internal static partial class MarkdownInlines
         var link = CreateHyperlink(url);
         if (content?.FirstChild is not null)
         {
-            Container(link, content);
+            Container(link, content, insideLink: true);
         }
         else
         {
@@ -127,10 +132,10 @@ internal static partial class MarkdownInlines
         return link;
     }
 
-    private static TSpan Container<TSpan>(TSpan span, ContainerInline source)
+    private static TSpan Container<TSpan>(TSpan span, ContainerInline source, bool insideLink)
         where TSpan : Span
     {
-        AddTo(span.Inlines, source);
+        AddTo(span.Inlines, source, insideLink);
         return span;
     }
 

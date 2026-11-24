@@ -63,7 +63,7 @@ public sealed class ToolRowsTests : IDisposable
         await _fixture.SendAsync("проверь");
 
         var restored = _fixture.CreateChat(_fixture.CreateHistory());
-        restored.Session.LoadLatest();
+        await restored.Session.LoadLatestAsync();
 
         var row = Assert.Single(restored.Messages, message => message.Kind == ChatMessageKind.Tool);
         Assert.Equal(("Проверен a.cs", AgentToolIcon.Read, "итог: ok"), (row.Text, row.Tool!.Icon, row.Tool.Detail));

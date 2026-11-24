@@ -93,6 +93,39 @@ public sealed class AgentLoopTests : IDisposable
         Assert.True(Chat.ContinueCommand.CanExecute(null));
     }
 
+    // An Ask answer that holds a change (the model says Agent mode can apply it, or it tried to edit and was refused)
+    // gets "Apply in Agent mode": one click instead of switching the mode and retyping the request.
+    [Theory]
+    [InlineData("Чтобы исправить, замените строку 12. Применить правку можно в режиме «Агент».", false, true)]
+    [InlineData("Replace line 12; Agent mode can apply it.", false, true)]
+    [InlineData("Нужно заменить строку 12.", true, true)]
+    [InlineData("Метод вызывается из трёх мест.", false, false)]
+    public async Task AskMode_AnswerWithAChange_OffersToApplyItInAgentMode(string answer, bool triesToEdit, bool offered)
+    {
+        _fixture.Options.Set(new AgentOptions { Model = AgentFixture.TestModel, Mode = AgentMode.Ask });
+        _fixture.Conversation.Tools.Add(new ApprovalRequiredAIFunction(AIFunctionFactory.Create((string path) => "ok", "edit_probe")));
+        if (triesToEdit)
+        {
+            _fixture.Client.CallTool("c1", "edit_probe", new Dictionary<string, object?> { ["path"] = "a.cs" });
+        }
+
+        _fixture.Client.Reply(answer).Reply("Сделал.");
+
+        await _fixture.SendAsync("как исправить?");
+
+        Assert.Equal(offered ? ChatMessageKind.ApplyOffer : ChatMessageKind.Assistant, Chat.Messages[^1].Kind);
+        if (!offered)
+        {
+            return;
+        }
+
+        await Chat.ExecutePlanCommand.ExecuteAsync(ChatViewModel.ApplyAnswerText);
+
+        Assert.Equal(AgentMode.Agent, _fixture.Options.CurrentValue.Mode);
+        Assert.Equal(ChatViewModel.ApplyAnswerText, _fixture.Client.Requests[^1][^1].Question());
+        Assert.Equal("Сделал.", Chat.Messages[^1].Text);
+    }
+
     [Fact]
     public async Task PlanMode_AnswerOffersExecution_WhichSwitchesToAgent()
     {
@@ -152,6 +185,36 @@ public sealed class AgentLoopTests : IDisposable
 
         Assert.Equal("собрано", afterEdit?.ToString());
         Assert.EndsWith(GuardedToolFunction.RepeatNote, afterFailedEdit?.ToString(), StringComparison.Ordinal);
+    }
+
+    // A tool that cannot work here (antivirus blocks every command) is not called again until the next turn.
+    [Fact]
+    public async Task UnavailableTool_IsSwitchedOff_UntilTheNextTurn()
+    {
+        var budget = new TurnBudget();
+        budget.Begin();
+        using var writeLock = new SemaphoreSlim(1);
+        var runs = 0;
+        var run = new GuardedToolFunction(AIFunctionFactory.Create(Blocked, "run_command"), budget, writeLock, NullLogger.Instance);
+        var token = TestContext.Current.CancellationToken;
+
+        var first = (await run.InvokeAsync(Arguments("echo 1"), token))?.ToString();
+        var second = (await run.InvokeAsync(Arguments("echo 2"), token))?.ToString();
+        budget.Begin();
+        await run.InvokeAsync(Arguments("echo 3"), token);
+
+        Assert.StartsWith("Ошибка: Антивирус блокирует команды.", first, StringComparison.Ordinal);
+        Assert.EndsWith("<reminder>Инструмент run_command отключён до конца хода: не вызывай его снова.</reminder>", first, StringComparison.Ordinal);
+        Assert.Equal("Ошибка: Не выполнено: инструмент run_command отключён до конца хода, потому что в этой среде он не работает. Антивирус блокирует команды.", second);
+        Assert.Equal(2, runs);
+
+        string Blocked(string command)
+        {
+            runs++;
+            throw new AgentToolException("Антивирус блокирует команды.\nScriptContainedMaliciousContent") { ToolUnavailable = true };
+        }
+
+        static AIFunctionArguments Arguments(string command) => new(new Dictionary<string, object?> { ["command"] = command });
     }
 
     [Theory]

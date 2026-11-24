@@ -43,7 +43,7 @@ public sealed class GitModule : IModule
 
     public void ConfigureServices(IServiceCollection services)
     {
-        services.AddSettingsSection<GitOptions>(GitOptions.Section);
+        services.AddSettingsSection<GitOptions>(GitOptions.Section, SettingScope.User);
         services.AddSingleton<GitRunner>();
         services.AddSingleton<GitAgentTools>();
         services.AddSingleton<IAgentToolProvider>(provider => provider.GetRequiredService<GitAgentTools>());

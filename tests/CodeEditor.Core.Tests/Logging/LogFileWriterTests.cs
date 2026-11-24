@@ -98,13 +98,34 @@ public sealed class LogFileWriterTests : IDisposable
         var foreign = Path.Combine(_folder, "notes.txt");
         File.WriteAllText(old, "старый");
         File.WriteAllText(foreign, "чужой");
-        File.SetLastWriteTimeUtc(old, _time.GetUtcNow().UtcDateTime.AddDays(-8));
-        File.SetLastWriteTimeUtc(foreign, _time.GetUtcNow().UtcDateTime.AddDays(-30));
+        var recent = Path.Combine(_folder, "codeeditor-20250201.log");
+        File.WriteAllText(recent, "три недели назад");
+        File.SetLastWriteTimeUtc(old, _time.GetUtcNow().UtcDateTime.AddDays(-31));
+        File.SetLastWriteTimeUtc(recent, _time.GetUtcNow().UtcDateTime.AddDays(-21));
+        File.SetLastWriteTimeUtc(foreign, _time.GetUtcNow().UtcDateTime.AddDays(-60));
 
         Assert.True(Create().Complete(Timeout));
 
         Assert.False(File.Exists(old));
+        Assert.True(File.Exists(recent));
         Assert.True(File.Exists(foreign));
+    }
+
+    // A month of verbose logs must not fill the disk: past the total size limit the oldest files go first.
+    [Fact]
+    public void FilesOverTheTotalSizeLimit_AreDeletedOldestFirst()
+    {
+        Directory.CreateDirectory(_folder);
+        string[] files = [.. Enumerable.Range(1, 4).Select(day => Path.Combine(_folder, $"codeeditor-2025030{day}.log"))];
+        for (var index = 0; index < files.Length; index++)
+        {
+            File.WriteAllText(files[index], new string('x', 1_000));
+            File.SetLastWriteTimeUtc(files[index], _time.GetUtcNow().UtcDateTime.AddDays(index - files.Length));
+        }
+
+        Assert.True(Create(new LogFileLimits(MaxFileSize: 5_000, MaxFilesPerDay: 3, RetentionDays: 30, MaxTotalSize: 2_500)).Complete(Timeout));
+
+        Assert.Equal([false, false, true, true], files.Select(File.Exists));
     }
 
     [Fact]

@@ -1,5 +1,6 @@
 using CodeEditor.Core.Commands;
 using CodeEditor.Core.Menus;
+using CodeEditor.Modules.Agent.Contracts;
 using CodeEditor.Modules.Agent.Resources;
 using CodeEditor.Modules.Agent.Rules;
 using CodeEditor.Shell.Commands;
@@ -41,6 +42,7 @@ public sealed class AgentCommands(
         AddPanel(commands, AgentCommandIds.PickMode, Strings.CommandPickMode, panel => panel.Mode.PickModeCommand.Execute(null));
         // No ManageModels/UseSupportedModels commands: the picker is limited to the ModelCatalog models for now.
         AddPanel(commands, AgentCommandIds.PickModel, Strings.CommandPickModel, panel => panel.Model.PickModelCommand.Execute(null));
+        AddPanel(commands, AgentCommandIds.Connections, Strings.CommandConnections, panel => panel.Model.ShowConnectionsCommand.Execute(null));
         AddPanel(commands, AgentCommandIds.PickHelperModel, Strings.CommandPickHelperModel, panel => panel.Model.PickHelperModelCommand.Execute(null));
         AddPanel(commands, AgentCommandIds.PickExplorerModel, Strings.CommandPickExplorerModel, panel => panel.Model.PickExplorerModelCommand.Execute(null));
         AddPanel(commands, AgentCommandIds.AttachFiles, Strings.CommandAttachFiles, panel => panel.Attachments.PickCommand.Execute(null));
@@ -53,10 +55,12 @@ public sealed class AgentCommands(
         AddPanel(commands, AgentCommandIds.AcceptChanges, Strings.CommandAcceptChanges, panel => panel.Changes.AcceptCommand.Execute(null));
         AddPanel(commands, AgentCommandIds.RevertChanges, Strings.CommandRevertChanges, panel => panel.Changes.RevertAllCommand.Execute(null));
         Add(commands, AgentCommandIds.MoveToBackground, Strings.CommandMoveToBackground, MoveToBackground);
+        _registrations.Add(commands.Register(new CommandDefinition(AgentChatCommands.AddToInput, Strings.CommandFocusInput, AddToInputAsync, Category)));
         _registrations.Add(commands.Register(new CommandDefinition(AgentCommandIds.OpenMemory, Strings.CommandOpenMemory, (_, _) => OpenMemoryAsync(), Category)));
         _registrations.Add(commands.Register(new CommandDefinition(AgentCommandIds.OpenRules, Strings.CommandOpenRules, (_, _) => OpenRulesAsync(), Category)));
 
         _registrations.Add(menus.Register(MenuItemDefinition.ForCommand(MenuIds.Manage, AgentCommandIds.SetApiKey, SettingsGroup, title: Strings.MenuApiKey)));
+        _registrations.Add(menus.Register(MenuItemDefinition.ForCommand(MenuIds.Manage, AgentCommandIds.Connections, SettingsGroup, order: 1, title: Strings.MenuConnections)));
         _registrations.Add(menus.Register(MenuItemDefinition.ForCommand(MenuIds.Manage, AgentCommandIds.OpenMemory, SettingsGroup, order: 2, title: Strings.MenuOpenMemory)));
         _registrations.Add(menus.Register(MenuItemDefinition.ForCommand(MenuIds.Manage, AgentCommandIds.OpenRules, SettingsGroup, order: 3, title: Strings.MenuOpenRules)));
     }
@@ -145,6 +149,19 @@ public sealed class AgentCommands(
             apiKey.Clear();
             statusBar.Message = Strings.ApiKeyDeleted;
         }
+    }
+
+    // Another module hands over text (a page, a selection): it joins what is typed, and the user finishes the request.
+    private async ValueTask AddToInputAsync(object? argument, CancellationToken cancellationToken)
+    {
+        await commandService.ExecuteAsync(ToolWindowAreaViewModel.ShowCommandId(AgentModule.ToolWindowId), cancellationToken: cancellationToken);
+        var panel = chat();
+        if (argument is string { Length: > 0 } text)
+        {
+            panel.Input = panel.Input.Trim().Length == 0 ? text : panel.Input.TrimEnd() + "\n\n" + text;
+        }
+
+        panel.RequestFocus();
     }
 
     private void Add(ICommandRegistry commands, string id, string title, Action handler) =>

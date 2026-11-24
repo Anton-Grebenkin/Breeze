@@ -75,7 +75,7 @@ public static class FamilyPrompts
         ModelFamily.GptReasoning => (GptReasoning, GptReasoningReminder),
         ModelFamily.Gpt => (Gpt, GptReminder),
         ModelFamily.Gemini => (Gemini, GeminiReminder),
-        ModelFamily.DeepSeek or ModelFamily.Frontier => (Frontier, FrontierReminder),
+        ModelFamily.DeepSeek or ModelFamily.Qwen or ModelFamily.Frontier => (Frontier, FrontierReminder),
         _ => (Direct, DirectReminder),
     };
 }

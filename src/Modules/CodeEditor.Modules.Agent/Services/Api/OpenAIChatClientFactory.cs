@@ -9,14 +9,15 @@ using OpenAI;
 namespace CodeEditor.Modules.Agent.Services.Api;
 
 /// <summary>
-/// Client for an OpenAI-compatible API at the configured endpoint: the services (<see cref="AgentServices"/>) expose
-/// models of many vendors in this format, so no other connector is needed. Protocol per <see cref="AgentApi"/>: OpenAI
+/// Client for an OpenAI-compatible API at the address the model reference leads to (<see cref="ModelRoutes"/>): the
+/// built-in services (<see cref="AgentServices"/>) and the user's connections expose models of many vendors in this
+/// format, so no other connector is needed. Protocol per <see cref="AgentApi"/>: OpenAI
 /// models use the Responses API when the service supports it (GPT-6+ cannot call tools while reasoning via Chat
 /// Completions), Claude uses Anthropic Messages when the dialect says so (<see cref="AnthropicMessagesChatClient"/>),
 /// the rest use Chat Completions. Fields missing from the library come from model and dialect together
 /// (<see cref="RequestExtensions"/>, ADR 0021). One conversation key per chat (<see cref="PromptCacheKey"/>).
 /// </summary>
-public sealed class OpenAIChatClientFactory(ISecretStore secrets, PromptCacheKey cacheKey, UserDataPaths paths, TimeProvider time) : IChatClientFactory
+public sealed class OpenAIChatClientFactory(ISecretStore secrets, PromptCacheKey cacheKey, UserDataPaths paths, TimeProvider time, RequestRetries retries) : IChatClientFactory
 {
     public const string OpenAIVendorPrefix = "openai/";
     public const string AnthropicVendorPrefix = "anthropic/";
@@ -24,6 +25,9 @@ public sealed class OpenAIChatClientFactory(ISecretStore secrets, PromptCacheKey
 
     /// <summary>xAI header: requests with the same value go to the same server, where their cache lives.</summary>
     public const string GrokConversationHeader = "x-grok-conv-id";
+
+    // The library wants a key even where the service asks for none.
+    private const string KeylessPlaceholder = "none";
 
     public IChatClient Create(AgentOptions options)
     {
@@ -35,7 +39,7 @@ public sealed class OpenAIChatClientFactory(ISecretStore secrets, PromptCacheKey
             clientOptions.AddPolicy(traffic, PipelinePosition.PerTry);
         }
 
-        return Create(options, new ApiKeyCredential(key), clientOptions);
+        return Create(options, new ApiKeyCredential(key), clientOptions, retries: retries);
     }
 
     /// <summary>API key and endpoint, shared by chat and the model list.</summary>
@@ -44,21 +48,25 @@ public sealed class OpenAIChatClientFactory(ISecretStore secrets, PromptCacheKey
     {
         ArgumentNullException.ThrowIfNull(options);
         ArgumentNullException.ThrowIfNull(secrets);
-        var key = secrets.Get(AgentServices.SecretFor(options.Endpoint))
-            ?? throw new AgentConfigurationException(Strings.ErrorNoApiKey);
-        return Uri.TryCreate(options.Endpoint, UriKind.Absolute, out var endpoint)
+        var route = ModelRoutes.For(options);
+        var key = secrets.Get(route.SecretName)
+            ?? (route.Keyless ? KeylessPlaceholder : throw new AgentConfigurationException(Strings.ErrorNoApiKey));
+        return Uri.TryCreate(route.Endpoint, UriKind.Absolute, out var endpoint)
             ? (key, endpoint)
-            : throw new AgentConfigurationException(string.Format(CultureInfo.CurrentCulture, Strings.ErrorEndpointNotUrl, options.Endpoint));
+            : throw new AgentConfigurationException(string.Format(CultureInfo.CurrentCulture, Strings.ErrorEndpointNotUrl, route.Endpoint));
     }
 
     /// <summary>Client over the given transport options: tests plug in their own transport and see the request body.</summary>
     /// <param name="streamRetryDelays">Failed stream retry pauses (<see cref="StreamFailureChatClient"/>); <c>null</c> for defaults.</param>
-    internal static IChatClient Create(AgentOptions options, ApiKeyCredential key, OpenAIClientOptions clientOptions, IReadOnlyList<TimeSpan>? streamRetryDelays = null)
+    /// <param name="retries">Where a pause before a retry is reported; <c>null</c> for nowhere.</param>
+    internal static IChatClient Create(
+        AgentOptions options, ApiKeyCredential key, OpenAIClientOptions clientOptions, IReadOnlyList<TimeSpan>? streamRetryDelays = null, RequestRetries? retries = null)
     {
-        var dialect = AgentServices.DialectFor(options.Endpoint);
+        var route = ModelRoutes.For(options);
+        var dialect = route.Dialect;
 
         // Some services want the id without the vendor; routing decisions and the profile use the full id.
-        var model = dialect.ShortModelIds ? ModelVendors.ShortName(options.Model) : options.Model;
+        var model = dialect.ShortModelIds ? ModelVendors.ShortName(route.Model) : route.Model;
         IChatClient chat;
         if (UsesMessages(options))
         {
@@ -73,16 +81,22 @@ public sealed class OpenAIChatClientFactory(ISecretStore secrets, PromptCacheKey
                 : client.GetChatClient(model).AsIChatClient();
         }
 
-        chat = new StreamFailureChatClient(chat, streamRetryDelays);
+        chat = new StreamFailureChatClient(chat, streamRetryDelays, retries, failure => AgentErrors.Describe(failure, options));
         return new EmptyContentFilterChatClient(dialect.EmptyReplyPlaceholder ? new ProxyPlaceholderChatClient(chat) : chat);
     }
 
     /// <param name="conversationKey">Conversation key for the provider cache (<see cref="PromptCacheKey"/>); <c>null</c> for none.</param>
     internal static OpenAIClientOptions ClientOptions(AgentOptions options, Uri endpoint, Func<string>? conversationKey = null)
     {
-        var dialect = AgentServices.DialectFor(options.Endpoint);
+        var route = ModelRoutes.For(options);
+        var dialect = route.Dialect;
         var clientOptions = new OpenAIClientOptions { Endpoint = endpoint };
         clientOptions.AddPolicy(new ErrorBodyPolicy(), PipelinePosition.PerCall);
+        foreach (var (name, value) in route.Headers)
+        {
+            clientOptions.AddPolicy(new HeaderPolicy(name, () => value), PipelinePosition.PerCall);
+        }
+
         var edits = RequestExtensions.For(options, dialect, conversationKey);
         if (edits.Count > 0)
         {
@@ -92,7 +106,7 @@ public sealed class OpenAIChatClientFactory(ISecretStore secrets, PromptCacheKey
 
         if (!UsesResponses(options) && !UsesMessages(options))
         {
-            var thinksAloud = ModelProfiles.For(options.Model).Reasoning == ReasoningSource.ThinkAloud;
+            var thinksAloud = ModelProfiles.For(route).Reasoning == ReasoningSource.ThinkAloud;
             clientOptions.AddPolicy(new ReasoningFieldPolicy(keepReasoning: !thinksAloud), PipelinePosition.PerCall);
         }
 
@@ -104,25 +118,26 @@ public sealed class OpenAIChatClientFactory(ISecretStore secrets, PromptCacheKey
         return clientOptions;
     }
 
-    /// <summary>Claude goes via Anthropic Messages when the service dialect says so and the protocol setting is automatic.</summary>
+    /// <summary>
+    /// Anthropic Messages: when the connection says so, or for Claude when the service dialect says so and the protocol
+    /// setting is automatic.
+    /// </summary>
     public static bool UsesMessages(AgentOptions options)
     {
-        ArgumentNullException.ThrowIfNull(options);
-        return options.Api == AgentApi.Auto
-            && options.Model.StartsWith(AnthropicVendorPrefix, StringComparison.OrdinalIgnoreCase)
-            && AgentServices.DialectFor(options.Endpoint).ClaudeMessages;
+        var route = ModelRoutes.For(options);
+        return route.Api == AgentApi.Messages
+            || (route.Api == AgentApi.Auto && route.IsVendor(AnthropicVendorPrefix) && route.Dialect.ClaudeMessages);
     }
 
     public static bool UsesResponses(AgentOptions options)
     {
-        ArgumentNullException.ThrowIfNull(options);
-        return options.Api switch
+        var route = ModelRoutes.For(options);
+        return route.Api switch
         {
             AgentApi.Responses => true,
-            AgentApi.ChatCompletions => false,
-            _ => (options.Model.StartsWith(OpenAIVendorPrefix, StringComparison.OrdinalIgnoreCase)
-                    || options.Endpoint.Contains("api.openai.com", StringComparison.OrdinalIgnoreCase))
-                && AgentServices.DialectFor(options.Endpoint).OpenAIProtocol == AgentApi.Responses,
+            AgentApi.ChatCompletions or AgentApi.Messages => false,
+            _ => (route.IsVendor(OpenAIVendorPrefix) || route.Endpoint.Contains("api.openai.com", StringComparison.OrdinalIgnoreCase))
+                && route.Dialect.OpenAIProtocol == AgentApi.Responses,
         };
     }
 }

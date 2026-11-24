@@ -52,7 +52,11 @@ public sealed class WebPageReader : IDisposable
             using var response = await _http.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
             if (!response.IsSuccessStatusCode)
             {
-                throw new AgentToolException(Format(Strings.WebHttpError, url, (int)response.StatusCode, response.ReasonPhrase ?? string.Empty));
+                // A redirect the client did not follow (https to http, too many hops): without the target the model
+                // only saw "301" and guessed addresses.
+                throw new AgentToolException(response.Headers.Location is { } target
+                    ? Format(Strings.WebRedirected, url, (int)response.StatusCode, new Uri(response.RequestMessage?.RequestUri ?? url, target))
+                    : Format(Strings.WebHttpError, url, (int)response.StatusCode, response.ReasonPhrase ?? string.Empty));
             }
 
             var type = response.Content.Headers.ContentType;

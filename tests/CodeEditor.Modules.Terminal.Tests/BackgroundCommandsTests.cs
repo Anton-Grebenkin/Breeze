@@ -24,7 +24,7 @@ public sealed class BackgroundCommandsTests : IDisposable
 
     public BackgroundCommandsTests()
     {
-        _run = new CommandAgentTools(_fixture.Workspace, _fixture.FileSystem, _fixture.Output, _fixture.SaveBeforeRun, _fixture.Outputs, _fixture.Background, _fixture.Activity)
+        _run = new CommandAgentTools(_fixture.Workspace, _fixture.FileSystem, _fixture.Output, _fixture.SaveBeforeRun, _fixture.Outputs, _fixture.Background, _fixture.Activity, _fixture.Shell, _fixture.Blocks)
             .CreateTools().OfType<AIFunction>().Single();
         _tools = new BackgroundCommandTools(_fixture.Background, _fixture.Outputs, _fixture.Activity).CreateTools().OfType<AIFunction>().ToDictionary(tool => tool.Name);
     }

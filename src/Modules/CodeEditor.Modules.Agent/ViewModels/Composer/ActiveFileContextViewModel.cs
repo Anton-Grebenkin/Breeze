@@ -1,5 +1,6 @@
 using System.Globalization;
 using CodeEditor.Core.Files;
+using CodeEditor.Modules.Agent.Contracts.Context;
 using CodeEditor.Modules.Agent.Resources;
 using CodeEditor.Shell.Editors;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -9,15 +10,17 @@ namespace CodeEditor.Modules.Agent.ViewModels.Composer;
 
 /// <summary>
 /// The active tab's file as message context, like VS Code's "current file": a chip above the input box; clicking it
-/// excludes or includes the file. The model gets only the path and reads what it needs with tools.
+/// excludes or includes the file. The model gets only the path and reads what it needs with tools. Next to it sit the
+/// chips of other modules (<see cref="Switches"/>: browser tabs).
 /// </summary>
 public sealed partial class ActiveFileContextViewModel : ObservableObject, IDisposable
 {
     private readonly EditorAreaViewModel _editors;
     private readonly IWorkspace _workspace;
 
-    public ActiveFileContextViewModel(EditorAreaViewModel editors, IWorkspace workspace)
+    public ActiveFileContextViewModel(EditorAreaViewModel editors, IWorkspace workspace, IEnumerable<IAgentContextSwitch>? switches = null)
     {
+        Switches = [.. (switches ?? []).Select(source => new ContextSwitchViewModel(source))];
         _editors = editors;
         _workspace = workspace;
         _editors.ActiveDocumentChanged += OnActiveDocumentChanged;
@@ -25,6 +28,8 @@ public sealed partial class ActiveFileContextViewModel : ObservableObject, IDisp
 
     /// <summary>Active file path relative to the folder (full outside it); <c>null</c> when no tab is open.</summary>
     public string? RelativePath => _editors.Active?.FilePath is { } path ? Relative(path) : null;
+
+    public IReadOnlyList<ContextSwitchViewModel> Switches { get; }
 
     public string? FileName => _editors.Active?.Title;
 
@@ -38,7 +43,14 @@ public sealed partial class ActiveFileContextViewModel : ObservableObject, IDisp
         ? string.Format(CultureInfo.CurrentCulture, Strings.ActiveFileShared, RelativePath)
         : Strings.ActiveFileNotShared;
 
-    public void Dispose() => _editors.ActiveDocumentChanged -= OnActiveDocumentChanged;
+    public void Dispose()
+    {
+        _editors.ActiveDocumentChanged -= OnActiveDocumentChanged;
+        foreach (var chip in Switches)
+        {
+            chip.Dispose();
+        }
+    }
 
     [RelayCommand]
     private void Toggle() => IsAttached = !IsAttached;

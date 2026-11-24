@@ -52,7 +52,7 @@ public sealed class GitCli(GitRunner runner)
         try
         {
             // Process start is synchronous and can take tens of ms (antivirus scan): keep it off the UI thread.
-            result = await Task.Run(() => runner.RunAsync(scoped, onLine, cancellationToken, timeout), cancellationToken).ConfigureAwait(false);
+            result = await Task.Run(() => runner.RunAsync(scoped, onLine, cancellationToken, timeout, forUser: true), cancellationToken).ConfigureAwait(false);
         }
         catch (InvalidOperationException exception)
         {

@@ -51,12 +51,7 @@ public sealed class ExploreAgent(SubagentRunner runner, ReadOnlyToolSet readTool
     private async Task<string> ExploreAsync(string question, CancellationToken cancellationToken)
     {
         var agent = options.CurrentValue;
-        var model = new AgentOptions
-        {
-            Endpoint = agent.Endpoint,
-            Api = agent.Api,
-            Model = string.IsNullOrWhiteSpace(agent.ExplorerModel) ? agent.Model : agent.ExplorerModel,
-        };
+        var model = agent.ForModel(string.IsNullOrWhiteSpace(agent.ExplorerModel) ? agent.Model : agent.ExplorerModel);
         var report = await runner.RunAsync(new SubagentRunner.Run(model, Instructions, agent.ExplorerReasoningEffort, MaxRequests), Request(question), readTools.Tools, cancellationToken);
         return report.Length == 0 ? Strings.ExplorerNoAnswer : ToolOutput.Limit(report, MaxReportCharacters);
     }

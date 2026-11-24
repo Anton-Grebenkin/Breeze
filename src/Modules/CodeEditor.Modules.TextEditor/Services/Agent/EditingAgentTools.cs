@@ -37,6 +37,7 @@ public sealed class EditingAgentTools(
         "Edits files with a patch in the apply_patch (V4A) format. Wrap it in '*** Begin Patch' and '*** End Patch'. " +
         "For each file write '*** Update File: <path>' followed by hunks: an optional '@@ <line>' naming a nearby unique line above the change " +
         "(a class or method signature), then lines prefixed with ' ' (context, about 3 lines before and after), '-' (removed) or '+' (added). " +
+        "Write the hunks of a file in file order: each is matched below the previous one. " +
         "A new file is '*** Add File: <path>' with every line prefixed by '+'. Paths are relative to the workspace root. " +
         "Read the file first; context must match it exactly. To delete or move files use delete_file or move_file. " +
         "The whole patch is shown to the user as a diff and applied after approval.";

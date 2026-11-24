@@ -1,5 +1,6 @@
 using System.Collections.Frozen;
 using System.Text.RegularExpressions;
+using CodeEditor.Modules.Agent.Contracts.Files;
 
 namespace CodeEditor.Modules.Terminal.Services.Commands;
 
@@ -18,8 +19,17 @@ public static partial class ReadOnlyTools
 
     private static readonly FrozenSet<string> GitGlobalOptions = FrozenSet.ToFrozenSet(["--no-pager", "-P", "--no-optional-locks"], StringComparer.Ordinal);
 
-    /// <summary>git flags that write files or launch programs.</summary>
-    private static readonly string[] GitUnsafePrefixes = ["--output", "--ext-diff", "--textconv", "-O", "--open-files-in-pager", "--exec", "--upload-pack", "--config"];
+    /// <summary>
+    /// git flags that write files, launch programs, or read files git does not track: untracked and ignored files are
+    /// where secrets live (<c>git grep --no-index -e . </c> prints <c>.env</c>).
+    /// </summary>
+    private static readonly string[] GitUnsafePrefixes =
+    [
+        "--output", "--ext-diff", "--textconv", "-O", "--open-files-in-pager", "--exec", "--upload-pack", "--config",
+        "--no-index", "--untracked", "--no-exclude-standard",
+    ];
+
+    private static readonly char[] Wildcards = ['*', '?', '['];
 
     private static readonly FrozenSet<string> GitBranchListing = FrozenSet.ToFrozenSet(
         ["-a", "-r", "-v", "-vv", "--list", "--all", "--remotes", "--show-current", "--verbose"], StringComparer.Ordinal);
@@ -61,6 +71,12 @@ public static partial class ReadOnlyTools
 
         var arguments = words.Skip(index + 1).ToList();
         if (arguments.Any(argument => GitUnsafePrefixes.Any(prefix => argument.StartsWith(prefix, StringComparison.Ordinal))))
+        {
+            return false;
+        }
+
+        // A file named outright is checked as an argument; a mask (".en*", "*") names it without saying so.
+        if (arguments.Any(argument => !argument.StartsWith('-') && argument.IndexOfAny(Wildcards) >= 0 && SensitivePaths.MayMatchSecret(argument)))
         {
             return false;
         }

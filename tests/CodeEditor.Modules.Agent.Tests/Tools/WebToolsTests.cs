@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using CodeEditor.Modules.Agent.Contracts;
+using CodeEditor.Modules.Agent.Contracts.Web;
 using CodeEditor.Modules.Agent.Services.Api;
 using CodeEditor.Modules.Agent.Services.Conversation;
 using CodeEditor.Modules.Agent.Services.Settings;
@@ -119,11 +120,74 @@ public sealed class WebToolsTests : IDisposable
         Assert.True(ReadOnlyAIFunction.IsReadOnly(tools.Single(tool => tool.Name == WebAgentTools.SearchName)));
     }
 
+    // A service without its own search (a local model): the search engine's results come from the editor's browser.
+    [Fact]
+    public async Task Search_WithoutServerSearch_GoesThroughTheBrowser()
+    {
+        _fixture.Options.Set(new AgentOptions { Endpoint = "http://localhost:11434/v1", Model = "qwen3" });
+        var browser = new FakeWebBrowser { Hits = [new("Channel<T>", "https://learn.microsoft.com/c", "Каналы."), new("Blog", "https://blog.example/x", string.Empty)] };
+        using var reader = new WebPageReader();
+        var tools = new WebAgentTools(reader, Search(), _fixture.Outputs, browser).CreateTools().OfType<AIFunction>().ToList();
+
+        var result = (await tools.Single(tool => tool.Name == WebAgentTools.SearchName).InvokeAsync(new AIFunctionArguments { ["query"] = "c# channel" }, TestContext.Current.CancellationToken))?.ToString();
+
+        Assert.Equal(
+            "<web_search query=\"c# channel\">\nВыдача поисковика, открытая в браузере редактора (без пересказа: источник читай через web_fetch):\n" +
+            "1. Channel<T> — https://learn.microsoft.com/c\n   Каналы.\n2. Blog — https://blog.example/x\n</web_search>",
+            result);
+        Assert.Equal(["c# channel"], browser.Queries);
+
+        // Without a browser such a service has no search tool at all, as before.
+        Assert.DoesNotContain(new WebAgentTools(reader, Search(), _fixture.Outputs).CreateTools(), tool => tool.Name == WebAgentTools.SearchName);
+    }
+
+    // A site that turns a bare HTTP client away is read through the browser; the tag says so.
+    [Fact]
+    public async Task Fetch_RefusedByTheSite_IsReadThroughTheBrowser()
+    {
+        using var reader = new WebPageReader(new Refusing());
+        var browser = new FakeWebBrowser { Page = "# Статья\n\nТекст." };
+        var fetch = new WebAgentTools(reader, Search(), _fixture.Outputs, browser).CreateTools().OfType<AIFunction>().Single(tool => tool.Name == WebAgentTools.FetchName);
+
+        var result = (await fetch.InvokeAsync(new AIFunctionArguments { ["url"] = "https://example.org/a" }, TestContext.Current.CancellationToken))?.ToString();
+
+        Assert.Equal("<web_page url=\"https://example.org/a\" via=\"browser\">\n# Статья\n\nТекст.\n</web_page>", result);
+
+        browser.Page = null;
+        var error = await Assert.ThrowsAsync<AgentToolException>(async () => await fetch.InvokeAsync(new AIFunctionArguments { ["url"] = "https://example.org/a" }, TestContext.Current.CancellationToken));
+        Assert.Contains("403", error.Message, StringComparison.Ordinal);
+        Assert.Contains("Через браузер страница тоже не открылась", error.Message, StringComparison.Ordinal);
+    }
+
     private WebAgentTools Tools() => new(new WebPageReader(), Search(), _fixture.Outputs);
 
     private WebSearchClient Search() => new(_fixture.Secrets, _fixture.Options, _fixture.HelperUsage, _fixture.UserData, TimeProvider.System);
 
     private static Dictionary<string, object?> Url(string url) => new() { ["url"] = url };
+
+    private sealed class FakeWebBrowser : IWebBrowserAccess
+    {
+        public IReadOnlyList<WebSearchHit> Hits { get; init; } = [];
+
+        public string? Page { get; set; }
+
+        public List<string> Queries { get; } = [];
+
+        public Task<IReadOnlyList<WebSearchHit>> SearchAsync(string query, CancellationToken cancellationToken)
+        {
+            Queries.Add(query);
+            return Task.FromResult(Hits);
+        }
+
+        public Task<string> ReadAsync(Uri url, CancellationToken cancellationToken) =>
+            Page is { } page ? Task.FromResult(page) : Task.FromException<string>(new AgentToolException("нет сети"));
+    }
+
+    private sealed class Refusing : HttpMessageHandler
+    {
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken) =>
+            Task.FromResult(new HttpResponseMessage(HttpStatusCode.Forbidden) { RequestMessage = request });
+    }
 
     /// <summary>Records the request URI and body and replies with the given text.</summary>
     private sealed class SearchServer(string body, string type = "application/json") : HttpMessageHandler

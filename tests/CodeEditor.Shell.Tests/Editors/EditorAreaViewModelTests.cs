@@ -178,6 +178,29 @@ public sealed class EditorAreaViewModelTests : IDisposable
         Assert.Contains("изменён на диске", Assert.Single(_fixture.Dialogs.Confirmations), StringComparison.Ordinal);
     }
 
+    // No watcher event came (the path is excluded, or the event was missed): the save itself notices the change, asks
+    // once and overwrites only on a yes.
+    [Fact]
+    public async Task Save_OverAChangeNobodyNoticed_AsksToOverwrite()
+    {
+        var tab = await _fixture.OpenAsync("a.cs");
+        tab.Document.Buffer.Replace(0, 0, "// ");
+        _fixture.FileSystem.AddFile(EditorAreaFixture.PathOf("a.cs"), "чужая правка");
+        _fixture.FileSystem.Touch(EditorAreaFixture.PathOf("a.cs"));
+        _fixture.Dialogs.ConfirmAnswer = false;
+
+        await Area.SaveActiveAsync();
+
+        Assert.Equal("чужая правка", _fixture.FileSystem.ReadAllText(EditorAreaFixture.PathOf("a.cs")));
+        Assert.Contains("изменён на диске", Assert.Single(_fixture.Dialogs.Confirmations), StringComparison.Ordinal);
+
+        _fixture.Dialogs.ConfirmAnswer = true;
+        await Area.SaveActiveAsync();
+
+        Assert.StartsWith("// ", _fixture.FileSystem.ReadAllText(EditorAreaFixture.PathOf("a.cs")), StringComparison.Ordinal);
+        Assert.False(tab.Document.IsDirty);
+    }
+
     [Fact]
     public async Task ActiveDirty_UpdatesContextKey()
     {

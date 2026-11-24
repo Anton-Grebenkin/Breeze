@@ -12,6 +12,8 @@ public sealed partial class CommandService(
     IContextKeyService context,
     ILogger<CommandService> logger) : ICommandService
 {
+    public event EventHandler<CommandFailedEventArgs>? Failed;
+
     public bool CanExecute(string commandId) =>
         registry.TryGet(commandId, out var command) && context.Evaluate(command.When);
 
@@ -49,6 +51,7 @@ public sealed partial class CommandService(
 #pragma warning restore CA1031
         {
             LogFailed(logger, exception, commandId);
+            Failed?.Invoke(this, new CommandFailedEventArgs(command, exception));
             return CommandExecutionStatus.Failed;
         }
     }

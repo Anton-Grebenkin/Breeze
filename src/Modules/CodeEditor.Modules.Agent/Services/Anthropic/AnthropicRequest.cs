@@ -88,7 +88,7 @@ internal static class AnthropicRequest
     private static void AddTools(JsonObject body, ChatOptions? options)
     {
         var tools = options?.Tools?.OfType<AIFunctionDeclaration>().ToList() ?? [];
-        if (tools.Count == 0 || options?.ToolMode is NoneChatToolMode)
+        if (tools.Count == 0)
         {
             return;
         }
@@ -99,7 +99,13 @@ internal static class AnthropicRequest
             ["description"] = tool.Description,
             ["input_schema"] = JsonNode.Parse(tool.JsonSchema.GetRawText()),
         })]);
-        if (options?.ToolMode is RequiredChatToolMode required)
+        // Tools switched off (a turn's last request) still go with their definitions: Anthropic rejects a history
+        // with tool calls but no tools, and the cached prefix, which starts with the tools, stays the same.
+        if (options?.ToolMode is NoneChatToolMode)
+        {
+            body["tool_choice"] = new JsonObject { ["type"] = "none" };
+        }
+        else if (options?.ToolMode is RequiredChatToolMode required)
         {
             body["tool_choice"] = required.RequiredFunctionName is { } name
                 ? new JsonObject { ["type"] = "tool", ["name"] = name }

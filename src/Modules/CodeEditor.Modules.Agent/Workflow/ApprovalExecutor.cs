@@ -8,10 +8,11 @@ using Microsoft.Extensions.AI;
 namespace CodeEditor.Modules.Agent.Workflow;
 
 /// <summary>
-/// The approvals node of the turn graph (ADR 0013): decides on model requests. Decided without asking: edits in a
-/// read-only mode (refused with a reason), the first edit in Deep mode (goes to the advisor first), commands allowed by
-/// a module policy, and tools allowed for the chat or by the accept-edits mode. The rest become cards sent to the
-/// <c>approve</c> port; the user decides, and the responses go back to the model in one message.
+/// The approvals node of the turn graph (ADR 0013): decides on model requests. Decided without asking: changes in a
+/// read-only mode (refused with a reason; reading a page is not a change), the first edit in Deep mode (goes to the
+/// advisor first), commands allowed by a module policy, and tools allowed for the chat or by the accept-edits mode.
+/// The rest become cards sent to the <c>approve</c> port; the user decides, and the responses go back to the model in
+/// one message.
 /// </summary>
 /// <param name="approvals">What approves itself: edits (<see cref="AgentApprovals.Auto"/>), everything (<see cref="AgentApprovals.Full"/>).</param>
 public sealed class ApprovalExecutor(
@@ -35,6 +36,9 @@ public sealed class ApprovalExecutor(
 
     /// <summary>Decisions in the turn, for the log.</summary>
     public int Count { get; private set; }
+
+    /// <summary>The model tried to change something in a mode that only reads: its answer holds a change it could not make.</summary>
+    public bool ChangeRefused { get; private set; }
 
     protected override ProtocolBuilder ConfigureProtocol(ProtocolBuilder protocolBuilder) =>
         protocolBuilder.SendsMessage<ApprovalPending>().SendsMessage<TurnInput>().ConfigureRoutes(routes => routes
@@ -65,8 +69,9 @@ public sealed class ApprovalExecutor(
     // A decision without the user, or a card; an automatic card is already decided.
     private async Task<(ToolApprovalRequestContent, AIContent?, ApprovalCardViewModel?)> PrepareAsync(ToolApprovalRequestContent request, CancellationToken cancellationToken)
     {
-        if (!AgentModes.CanChange(mode))
+        if (!cards.AllowedIn(mode, request))
         {
+            ChangeRefused = true;
             return (request, request.CreateResponse(false, string.Format(CultureInfo.CurrentCulture, Strings.ChangesUnavailableInMode, AgentModes.Title(mode))), null);
         }
 

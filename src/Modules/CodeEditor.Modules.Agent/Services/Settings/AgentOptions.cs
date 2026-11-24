@@ -17,7 +17,11 @@ public sealed class AgentOptions
 
     public string Endpoint { get; set; } = DefaultEndpoint;
 
+    /// <summary>The model: an id of the service at <see cref="Endpoint"/>, or <c>connection:model</c> for a model of one of <see cref="Connections"/>.</summary>
     public string Model { get; set; } = DefaultModel;
+
+    /// <summary>The user's own connections (ADR 0055), read only from the user's settings.</summary>
+    public List<AgentConnection> Connections { get; set; } = [];
 
     /// <summary>API protocol: by model, Chat Completions or Responses.</summary>
     public AgentApi Api { get; set; } = AgentApi.Auto;
@@ -110,4 +114,7 @@ public sealed class AgentOptions
     /// sites (<see cref="WebApprovals.DefaultHosts"/>); "Always allow" on a card adds the site here.
     /// </summary>
     public List<string> WebHosts { get; set; } = [];
+
+    /// <summary>Settings for another model over the same services: a helper, the scout, the advisor, the search.</summary>
+    public AgentOptions ForModel(string model) => new() { Endpoint = Endpoint, Api = Api, Connections = Connections, Model = model };
 }

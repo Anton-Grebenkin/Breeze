@@ -88,11 +88,14 @@ public sealed class ChatHistory(ChatHistoryStore store, AgentConversation conver
 
     private static ChatTranscriptMessage ToTranscript(ChatMessageViewModel message) =>
         message.Approval is { } card
-            ? new ChatTranscriptMessage(ChatMessageKind.Approval, $"{card.Title} — {card.StateText}")
+            ? new ChatTranscriptMessage(ChatMessageKind.Approval, $"{card.Title} — {card.StateText}") { At = message.At }
             : new ChatTranscriptMessage(message.Kind, message.Text)
             {
                 Attachment = message.Attachment,
                 Files = message.Files,
+                At = message.At,
+                Model = message.Model,
+                Mode = message.Mode,
                 Tool = message.Tool is { } tool ? new ChatTranscriptTool(tool.Icon, tool.Detail, tool.FilePath, tool.IsFailure, tool.IsExploration) : null,
             };
 

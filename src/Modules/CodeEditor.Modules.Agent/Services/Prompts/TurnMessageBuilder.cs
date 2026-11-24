@@ -29,14 +29,14 @@ public sealed partial class TurnMessageBuilder(
     public async Task<ChatMessage> BuildAsync(string text, bool includeActiveEditor, bool startsChat, AgentMode? previousMode, IReadOnlyList<string> files, CancellationToken cancellationToken)
     {
         var hooked = await PromptHooksAsync(text, cancellationToken);
-        var lines = new List<string> { string.Create(CultureInfo.InvariantCulture, $"Date: {time.GetLocalNow():yyyy-MM-dd}.") };
+        var lines = new List<string> { string.Create(CultureInfo.InvariantCulture, $"Date: {time.GetLocalNow():yyyy-MM-dd}."), ModelLine(options.CurrentValue) };
         var request = new AgentContextRequest(includeActiveEditor, text);
         foreach (var provider in providers)
         {
             lines.AddRange(await CollectAsync(provider, request, cancellationToken));
         }
 
-        var seesImages = ModelProfiles.For(options.CurrentValue.Model).SeesImages;
+        var seesImages = ModelProfiles.For(options.CurrentValue).SeesImages;
         List<AIContent> contents = [new TextContent(text), .. await attachments.ReadAsync(files, seesImages, cancellationToken)];
         if (startsChat)
         {
@@ -51,6 +51,13 @@ public sealed partial class TurnMessageBuilder(
         contents.Add(new TextContent($"<context>\n{string.Join('\n', lines)}\n</context>"));
         contents.Add(new TextContent($"<reminder>{Reminder(options.CurrentValue, text, previousMode)}</reminder>"));
         return new ChatMessage(ChatRole.User, contents);
+    }
+
+    // Without this line the model named itself by guess when asked, and could not tell which service it runs through.
+    private static string ModelLine(AgentOptions options)
+    {
+        var route = ModelRoutes.For(options);
+        return $"Model: {route.Model} via {route.ServiceTitle}.";
     }
 
     /// <exception cref="HookBlockedException">A hook stopped the message.</exception>
@@ -77,7 +84,7 @@ public sealed partial class TurnMessageBuilder(
             previousMode is { } previous && previous != options.Mode ? PromptSections.ModeChange(previous, options.Mode) : string.Empty,
             PromptSections.ModeReminder(options.Mode),
             AgentModes.CanChange(options.Mode) && TaskRequirements.AreSeveral(text) ? PromptSections.RequirementsReminder : string.Empty,
-            ModelProfiles.For(options.Model).Reminder,
+            ModelProfiles.For(options).Reminder,
             RequestLanguage.Reminder(text, thinksAloud),
             thinksAloud ? PromptSections.ThinkAloudReminder : string.Empty,
         ];

@@ -1,5 +1,7 @@
 using CodeEditor.Modules.Agent.Contracts.Feed;
 using CodeEditor.Modules.Browser.Services;
+using CodeEditor.Modules.Browser.Services.Agent;
+using CodeEditor.Modules.Browser.Services.Tabs;
 using CodeEditor.Modules.Browser.ViewModels;
 using CodeEditor.Testing;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -22,8 +24,7 @@ public sealed class BrowserPanelTests
     [Fact]
     public async Task Go_OpensTheAddress_StateFollowsTheBrowser()
     {
-        var browser = new FakeBrowserEngine();
-        using var panel = new BrowserViewModel(browser) { Address = "localhost:5000" };
+        using var panel = new BrowserViewModel(FakeBrowserEngine.Tabs(out var browser), new InlineUiDispatcher()) { Address = "localhost:5000" };
 
         await panel.GoCommand.ExecuteAsync(null);
 
@@ -35,8 +36,7 @@ public sealed class BrowserPanelTests
     [Fact]
     public async Task Open_PutsTheAddressIntoTheBar_AndNavigates()
     {
-        var browser = new FakeBrowserEngine();
-        using var panel = new BrowserViewModel(browser);
+        using var panel = new BrowserViewModel(FakeBrowserEngine.Tabs(out var browser), new InlineUiDispatcher());
 
         await panel.OpenAsync(new Uri("http://localhost:8080"));
 
@@ -47,8 +47,8 @@ public sealed class BrowserPanelTests
     [Fact]
     public async Task BrowserFailure_IsShownInThePanel()
     {
-        var browser = new FakeBrowserEngine { Failure = new BrowserException("Браузер недоступен: нет WebView2") };
-        using var panel = new BrowserViewModel(browser) { Address = "localhost:5000" };
+        using var panel = new BrowserViewModel(FakeBrowserEngine.Tabs(out var browser), new InlineUiDispatcher()) { Address = "localhost:5000" };
+        browser.Failure = new BrowserException("Браузер недоступен: нет WebView2");
 
         await panel.GoCommand.ExecuteAsync(null);
 
@@ -64,15 +64,16 @@ public sealed class BrowserPanelTests
         Assert.Equal(preapproved, Approvals(out _).IsPreapproved(BrowserAgentTools.ToolName, Call("navigate", url)));
 
     [Fact]
-    public void PageActions_AtOnce_AllowAlwaysAddsTheSite()
+    public void PageActions_AtOnce_OpeningASiteOffersNoRule_AListedSiteOpensAtOnce()
     {
         var approvals = Approvals(out var settings);
 
         Assert.True(approvals.IsPreapproved(BrowserAgentTools.ToolName, Call("click", null)));
         Assert.Null(approvals.SuggestRule(BrowserAgentTools.ToolName, Call("navigate", "http://localhost:5000")));
-        Assert.Equal("example.org", approvals.SuggestRule(BrowserAgentTools.ToolName, Call("navigate", "https://example.org/x")));
-        approvals.AllowAlways(BrowserAgentTools.ToolName, "example.org");
-        Assert.Equal(new[] { "example.org" }, settings.Written[BrowserApprovals.AllowedHostsKey]);
+
+        // A site allowed once is remembered by itself, so the card needs no "always allow".
+        Assert.Null(approvals.SuggestRule(BrowserAgentTools.ToolName, Call("navigate", "https://example.org/x")));
+        Assert.Empty(settings.Written);
     }
 
     [Fact]
@@ -102,7 +103,7 @@ public sealed class BrowserPanelTests
     private static BrowserApprovals Approvals(out FakeSettingsService settings)
     {
         settings = new FakeSettingsService();
-        return new BrowserApprovals(new TestOptionsMonitor<BrowserOptions>(new BrowserOptions()), new FakeBrowserEngine(), settings, NullLogger<BrowserApprovals>.Instance);
+        return new BrowserApprovals(new TestOptionsMonitor<BrowserOptions>(new BrowserOptions()), new BrowserAgentTabs(new BrowserTabs(new FakeBrowserEngine())), settings, NullLogger<BrowserApprovals>.Instance);
     }
 
     private static Dictionary<string, object?> Call(string action, string? url) => new() { ["action"] = action, ["url"] = url };

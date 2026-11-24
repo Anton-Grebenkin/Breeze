@@ -16,8 +16,11 @@ public enum ModelFamily
 
     DeepSeek,
 
+    /// <summary>Qwen 3 and newer; a family of its own so that a gateway model can be described as one.</summary>
+    Qwen,
+
     /// <summary>
-    /// Strong models of other vendors (Grok, Qwen 3, Kimi, GLM, MiniMax, MiMo): call tools in batches unless asked to go
+    /// Strong models of other vendors (Grok, Kimi, GLM, MiniMax, MiMo): call tools in batches unless asked to go
     /// step by step (with a step-by-step rule Grok made only 1–2 calls per request).
     /// </summary>
     Frontier,

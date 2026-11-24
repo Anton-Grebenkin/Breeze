@@ -1,6 +1,7 @@
 using CodeEditor.Core.Commands;
 using CodeEditor.Core.Modules;
 using CodeEditor.Core.Output;
+using CodeEditor.Core.Threading;
 using CodeEditor.Modules.Output.Resources;
 using CodeEditor.Modules.Output.Services;
 using CodeEditor.Modules.Output.ViewModels;
@@ -50,5 +51,16 @@ public sealed class OutputModule : IModule
                 services.GetRequiredService<OutputViewModel>().Clear();
                 return ValueTask.CompletedTask;
             }, category: Strings.ModuleName)));
+
+        // A channel asks to be shown (a failed build): select it and bring the panel forward, on the UI thread.
+        if (services.GetRequiredService<IOutputService>() is OutputService output)
+        {
+            var dispatcher = services.GetRequiredService<IUiDispatcher>();
+            output.RevealRequested += (_, channel) => dispatcher.Post(() =>
+            {
+                services.GetRequiredService<OutputViewModel>().SelectedChannel = channel;
+                _ = services.GetRequiredService<ICommandService>().ExecuteAsync(ToolWindowAreaViewModel.ShowCommandId(ToolWindowId));
+            });
+        }
     }
 }

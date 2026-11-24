@@ -37,6 +37,21 @@ public sealed class ToolArgumentRepairTests : IDisposable
         Assert.Equal("[not an array param]", arguments["note"]);
     }
 
+    // "null" as text in an optional parameter means "left out" (it became a git revision and a folder named "null");
+    // in a required one it stays a value.
+    [Fact]
+    public void Repair_NullAsTextInOptionalParameter_IsLeftOut()
+    {
+        var function = AIFunctionFactory.Create((string command, string? cwd = null, string? revision = null) => command, "f");
+        var arguments = new AIFunctionArguments(new Dictionary<string, object?> { ["command"] = "null", ["cwd"] = "null", ["revision"] = " NULL " });
+
+        var repaired = ToolArgumentRepair.Repair(arguments, function.JsonSchema);
+
+        Assert.Equal(["cwd", "revision"], repaired);
+        Assert.Equal(["command"], arguments.Keys);
+        Assert.Equal("null", arguments["command"]);
+    }
+
     // Brackets inside JSON strings don't count; an extra closing one is dropped, missing ones are appended.
     [Theory]
     [InlineData("""[{"a": "x}"}}]""", """[{"a": "x}"}]""")]

@@ -24,7 +24,7 @@ public sealed partial class SubagentRunner(IChatClientFactory clients, AgentFile
         budget.Begin(AgentMode.Ask, run.MaxRequests, reflectsOnExploration: false);
         using var isolation = fileState.IsolateReads();
         using var writeLock = new SemaphoreSlim(1, 1);
-        var profile = ModelProfiles.For(run.Model.Model);
+        var profile = ModelProfiles.For(run.Model);
         using var client = new FunctionInvokingChatClient(new BudgetChatClient(new UsageCountingChatClient(clients.Create(run.Model), usage), budget))
         {
             AllowConcurrentInvocation = true,

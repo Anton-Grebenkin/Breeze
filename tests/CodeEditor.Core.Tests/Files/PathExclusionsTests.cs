@@ -43,6 +43,56 @@ public sealed class PathExclusionsTests
         Assert.Equal(excluded, PathExclusions.FromGitIgnore(rule).IsExcluded(path, isDirectory));
     }
 
+    [Theory]
+    [InlineData("*.[oa]", "lib.a", true)]
+    [InlineData("*.[oa]", "lib.c", false)]
+    [InlineData("data[0-9].bin", "data7.bin", true)]
+    [InlineData("data[!0-9].bin", "data7.bin", false)]
+    [InlineData("data[!0-9].bin", "datax.bin", true)]
+    [InlineData("a[]b].txt", "a].txt", true)]
+    [InlineData("page[", "page[", true)]
+    public void CharacterClasses_MatchLikeGit(string rule, string path, bool excluded) =>
+        Assert.Equal(excluded, PathExclusions.FromGitIgnore(rule).IsExcluded(path, isDirectory: false));
+
+    // The file comes with someone else's repository: a line that cannot be understood is skipped, the rest still work,
+    // and the folder opens (it used to throw, at every start when the session was restored).
+    [Theory]
+    [InlineData("[z-a]")]
+    [InlineData("x[b-a]y")]
+    [InlineData("[")]
+    [InlineData("[!")]
+    [InlineData("[]")]
+    [InlineData(@"\")]
+    [InlineData("a**[")]
+    public void LineThatCannotBeUnderstood_IsSkipped(string line)
+    {
+        var exclusions = PathExclusions.FromGitIgnore(line + "\n*.tmp\n");
+
+        Assert.True(exclusions.IsExcluded("a.tmp", isDirectory: false));
+        Assert.False(exclusions.IsExcluded("src/Program.cs", isDirectory: false));
+    }
+
+    // Any line of glob punctuation parses and matches without an exception.
+    [Fact]
+    public void AnyLine_NeverThrows()
+    {
+        const string alphabet = @"[]!^-*?/\.{}()+|$a z#";
+        var random = new Random(20261123);
+        string[] paths = ["a", "src/a.z", "a/[z]/-.a", new string('a', 200) + "/z"];
+
+        for (var index = 0; index < 5_000; index++)
+        {
+            var line = string.Concat(Enumerable.Range(0, random.Next(1, 14)).Select(_ => alphabet[random.Next(alphabet.Length)]));
+            var exclusions = PathExclusions.FromGitIgnore(line);
+
+            foreach (var path in paths)
+            {
+                exclusions.IsExcluded(path, isDirectory: false);
+                exclusions.IsExcluded(path, isDirectory: true);
+            }
+        }
+    }
+
     [Fact]
     public void Negation_ReincludesPath_LastRuleWins()
     {

@@ -40,7 +40,7 @@ public sealed class TerminalModule : IModule
 
     public void ConfigureServices(IServiceCollection services)
     {
-        services.AddSettingsSection<TerminalOptions>(TerminalOptions.Section);
+        services.AddSettingsSection<TerminalOptions>(TerminalOptions.Section, SettingScope.Folder);
         services.AddUserOnlySetting(CommandApprovals.AllowedCommandsKey);
         services.AddSingleton<IAgentApprovalPolicy, CommandApprovals>();
         services.TryAddSingleton(TimeProvider.System);
@@ -52,6 +52,8 @@ public sealed class TerminalModule : IModule
         services.AddSingleton<IAgentToolProvider, BuildAgentTools>();
         services.AddSingleton<IAgentVerifier, DotNetVerifier>();
         services.AddSingleton<BackgroundCommands>();
+        services.AddSingleton<PowerShellMode>();
+        services.AddSingleton<CommandBlocks>();
         services.AddSingleton<IAgentTurnNotes, BackgroundCommandNotes>();
         services.AddSingleton<IAgentRunningJobs, RunningJobs>();
         services.AddSingleton<IAgentToolProvider, BackgroundCommandTools>();

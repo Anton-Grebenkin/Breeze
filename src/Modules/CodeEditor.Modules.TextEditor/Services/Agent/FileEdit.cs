@@ -16,4 +16,11 @@ public sealed record FileEdit(
     /// </summary>
     [JsonIgnore]
     public IReadOnlyList<string> Anchors { get; init; } = [];
+
+    /// <summary>
+    /// An <c>apply_patch</c> hunk: hunks of a file go top to bottom, each is searched below the previous one
+    /// (<see cref="HunkLocator"/>).
+    /// </summary>
+    [JsonIgnore]
+    public bool IsHunk { get; init; }
 }

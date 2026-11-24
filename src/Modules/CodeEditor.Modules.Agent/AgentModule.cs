@@ -35,11 +35,16 @@ public sealed class AgentModule : IModule
 
     public void ConfigureServices(IServiceCollection services)
     {
-        services.AddSettingsSection<AgentOptions>(AgentOptions.Section);
+        services.AddSettingsSection<AgentOptions>(AgentOptions.Section, SettingScope.Folder);
         services.AddUserOnlySetting(ModelSettingsViewModel.ApprovalsKey);
         services.AddUserOnlySetting(WebApprovals.HostsKey);
         services.AddUserOnlySetting(ServiceMenu.EndpointKey);
+        services.AddUserOnlySetting(AgentOptions.Section + ".connections");
         services.AddUserOnlySetting(AgentOptions.Section + ".hooks");
+
+        // Writing every request to disk and paid cache warm-up are the user's call, not a repository's.
+        services.AddUserOnlySetting(AgentOptions.Section + ".trafficLog");
+        services.AddUserOnlySetting(AgentOptions.Section + ".cacheWarmup");
         services.AddSingleton<ApiKeyState>();
         services.AddSingleton<RulesProblemReporter>();
         services.AddSingleton<ProjectInstructions>();
@@ -47,6 +52,7 @@ public sealed class AgentModule : IModule
         services.AddSingleton<SystemPrompt>();
         services.AddSingleton<TurnMessageBuilder>();
         services.AddSingleton<PromptCacheKey>();
+        services.AddSingleton<RequestRetries>();
         services.AddSingleton<IChatClientFactory, OpenAIChatClientFactory>();
         services.AddSingleton<TurnBudget>();
         services.AddSingleton<TurnWatchdog>();
@@ -98,6 +104,11 @@ public sealed class AgentModule : IModule
         services.AddSingleton<IModelListClient, OpenAIModelListClient>();
         services.AddSingleton<ModelDirectory>();
         services.AddSingleton<ModelManagerViewModel>();
+        services.AddSingleton<IConnectionProbe>(_ => new ConnectionProbe());
+        services.AddSingleton<IModelProbe>(_ => new ModelProbe());
+        services.AddSingleton<ConnectionStore>();
+        services.AddSingleton<ConnectionServices>();
+        services.AddSingleton<ConnectionsViewModel>();
         services.AddSingleton<ModelSettingsViewModel>();
         services.AddSingleton<ActiveFileContextViewModel>();
         services.AddSingleton<AttachmentReader>();
@@ -149,6 +160,7 @@ public sealed class AgentModule : IModule
             provider.GetRequiredService<ToolImages>(),
             provider.GetRequiredService<ToolCallObservers>(),
             provider.GetRequiredService<RunningToolCalls>(),
+            provider.GetRequiredService<RequestRetries>(),
             provider.GetRequiredService<IUiDispatcher>(),
             provider.GetRequiredService<TimeProvider>()));
         services.AddSingleton<ChatSession>();

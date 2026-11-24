@@ -1,12 +1,13 @@
 using System.Text.Json;
 using CodeEditor.Core.Files;
 using CodeEditor.Core.Storage;
+using CodeEditor.Modules.Browser.Services.Tabs;
 using Microsoft.Extensions.Logging;
 
 namespace CodeEditor.Modules.Browser.Services;
 
 /// <summary>
-/// Pages opened in the browser panel, by the user or the agent, newest first, kept in <c>browser-history.json</c> in user
+/// Pages opened in any browser tab, by the user or the agent, newest first, kept in <c>browser-history.json</c> in user
 /// data: the address bar menu and "Browser: Recent Pages" offer them again. Cookies, the page cache and site storage
 /// already live in the browser profile (<c>WebView2</c> in user data). The file is read on first use and written in the
 /// background, in order.
@@ -16,7 +17,7 @@ public sealed partial class BrowserHistory : IDisposable
     public const int Capacity = 200;
     public const string FileName = "browser-history.json";
 
-    private readonly IBrowserEngine _browser;
+    private readonly BrowserTabs _tabs;
     private readonly IFileSystem _fileSystem;
     private readonly UserDataPaths _paths;
     private readonly TimeProvider _time;
@@ -25,14 +26,14 @@ public sealed partial class BrowserHistory : IDisposable
     private List<BrowserVisit>? _visits;
     private Task _writing = Task.CompletedTask;
 
-    public BrowserHistory(IBrowserEngine browser, IFileSystem fileSystem, UserDataPaths paths, TimeProvider time, ILogger<BrowserHistory> logger)
+    public BrowserHistory(BrowserTabs tabs, IFileSystem fileSystem, UserDataPaths paths, TimeProvider time, ILogger<BrowserHistory> logger)
     {
-        _browser = browser;
+        _tabs = tabs;
         _fileSystem = fileSystem;
         _paths = paths;
         _time = time;
         _logger = logger;
-        _browser.StateChanged += OnStateChanged;
+        _tabs.PageChanged += OnPageChanged;
     }
 
     /// <summary>The history changed; raised on the thread that changed it.</summary>
@@ -63,12 +64,14 @@ public sealed partial class BrowserHistory : IDisposable
         Changed?.Invoke(this, EventArgs.Empty);
     }
 
-    public void Dispose() => _browser.StateChanged -= OnStateChanged;
+    public void Dispose() => _tabs.PageChanged -= OnPageChanged;
 
-    // A page counts once it has loaded; its title often arrives a moment later and updates the entry.
-    private void OnStateChanged(object? sender, EventArgs e)
+    // A page counts once it has loaded, with an answer from its server: a tab kept from the last run or an address that
+    // did not open is not a visit. The title often arrives a moment later and updates the entry.
+    private void OnPageChanged(object? sender, BrowserTabEventArgs e)
     {
-        if (_browser.IsLoading || _browser.Url is not { Scheme: "http" or "https" } url)
+        var page = e.Tab.Page;
+        if (page.IsLoading || page.StatusCode is null || page.Url is not { Scheme: "http" or "https" } url)
         {
             return;
         }
@@ -76,7 +79,7 @@ public sealed partial class BrowserHistory : IDisposable
         bool changed;
         lock (_gate)
         {
-            changed = Record(url.AbsoluteUri, _browser.Title);
+            changed = Record(url.AbsoluteUri, page.Title);
             if (changed)
             {
                 Save();

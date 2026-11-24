@@ -17,9 +17,10 @@
     <EmbeddedResource Include="Highlighting\Definitions\*.xshd" LogicalName="Highlighting.%(Filename)%(Extension)" />
   </ItemGroup>
 
-  <!-- Module tests check the highlighting definitions and the color classifier. -->
+  <!-- Module tests check the highlighting definitions and the color classifier; the typing benchmark uses the definitions. -->
   <ItemGroup>
     <InternalsVisibleTo Include="CodeEditor.Modules.TextEditor.Tests" />
+    <InternalsVisibleTo Include="CodeEditor.Benchmarks" />
   </ItemGroup>
 
   <ItemGroup>

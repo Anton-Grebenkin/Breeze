@@ -29,6 +29,9 @@ public static class FragmentLocator
     private const int LineTolerance = 10;
     private const string EscapedQuote = "\\\"";
 
+    /// <summary>Where to search and how to choose among several occurrences.</summary>
+    private readonly record struct Search(int From, int? Line, bool FirstWins);
+
     private enum LineMatch
     {
         TrailingSpace,
@@ -42,18 +45,33 @@ public static class FragmentLocator
         ArgumentNullException.ThrowIfNull(text);
         ArgumentNullException.ThrowIfNull(oldText);
         ArgumentNullException.ThrowIfNull(newText);
-        return Exact(text, oldText, newText, relative, line)
-            ?? Exact(text, StraightQuotes(oldText), StraightQuotes(newText), relative, line)
-            ?? ByLines(text, oldText, newText, relative, LineMatch.TrailingSpace, line)
-            ?? ByLines(text, oldText, newText, relative, LineMatch.Indent, line)
-            ?? ByLines(text, oldText, newText, relative, LineMatch.Typography, line)
-            ?? Unescaped(text, oldText, newText, relative, line)
-            ?? throw NotFound(text, oldText, relative);
+        return Find(text, oldText, newText, relative, new Search(From: 0, line, FirstWins: false)) ?? throw NotFound(text, oldText, relative);
     }
+
+    /// <summary>
+    /// The first occurrence at or below an offset, for a fragment whose place the caller has already pinned (a patch
+    /// anchor, the previous hunk): several occurrences are not an error here.
+    /// </summary>
+    /// <returns><c>null</c> if the fragment is not there.</returns>
+    public static LocatedFragment? LocateBelow(string text, string oldText, string newText, string relative, int from)
+    {
+        ArgumentNullException.ThrowIfNull(text);
+        ArgumentNullException.ThrowIfNull(oldText);
+        ArgumentNullException.ThrowIfNull(newText);
+        return Find(text, oldText, newText, relative, new Search(Math.Clamp(from, 0, text.Length), Line: null, FirstWins: true));
+    }
+
+    private static LocatedFragment? Find(string text, string oldText, string newText, string relative, Search search) =>
+        Exact(text, oldText, newText, relative, search)
+        ?? Exact(text, StraightQuotes(oldText), StraightQuotes(newText), relative, search)
+        ?? ByLines(text, oldText, newText, relative, LineMatch.TrailingSpace, search)
+        ?? ByLines(text, oldText, newText, relative, LineMatch.Indent, search)
+        ?? ByLines(text, oldText, newText, relative, LineMatch.Typography, search)
+        ?? Unescaped(text, oldText, newText, relative, search);
 
     // The model over-escaped quotes (cref=\"X\" with a literal backslash) and no exact match exists:
     // unescape both fragments and warn.
-    private static LocatedFragment? Unescaped(string text, string oldText, string newText, string relative, int? line)
+    private static LocatedFragment? Unescaped(string text, string oldText, string newText, string relative, Search search)
     {
         if (!oldText.Contains(EscapedQuote, StringComparison.Ordinal))
         {
@@ -61,23 +79,28 @@ public static class FragmentLocator
         }
 
         var (old, replacement) = (oldText.Replace(EscapedQuote, "\"", StringComparison.Ordinal), newText.Replace(EscapedQuote, "\"", StringComparison.Ordinal));
-        var fragment = Exact(text, old, replacement, relative, line) ?? ByLines(text, old, replacement, relative, LineMatch.Indent, line);
+        var fragment = Exact(text, old, replacement, relative, search) ?? ByLines(text, old, replacement, relative, LineMatch.Indent, search);
         return fragment is null ? null : fragment with
         {
             Warning = Format(Strings.QuotesUnescaped, relative),
         };
     }
 
-    private static LocatedFragment? Exact(string text, string oldText, string newText, string relative, int? line)
+    private static LocatedFragment? Exact(string text, string oldText, string newText, string relative, Search search)
     {
-        var offsets = Occurrences(text, oldText);
+        var offsets = Occurrences(text, oldText, search);
         if (offsets.Count == 0)
         {
             return null;
         }
 
+        if (offsets.Count == 1)
+        {
+            return new LocatedFragment(offsets[0], oldText.Length, newText, null);
+        }
+
         var lines = offsets.Select(offset => LineOf(text, offset)).ToList();
-        var index = offsets.Count == 1 ? 0 : Pick(lines, line) ?? throw Ambiguous(text, relative, lines);
+        var index = Pick(lines, search.Line) ?? throw Ambiguous(text, relative, lines);
         return new LocatedFragment(offsets[index], oldText.Length, newText, null);
     }
 
@@ -93,14 +116,16 @@ public static class FragmentLocator
         return ordered[0].Distance <= LineTolerance && ordered[1].Distance > ordered[0].Distance ? ordered[0].Index : null;
     }
 
-    private static LocatedFragment? ByLines(string text, string oldText, string newText, string relative, LineMatch match, int? hint)
+    private static LocatedFragment? ByLines(string text, string oldText, string newText, string relative, LineMatch match, Search search)
     {
         var lines = TextLines.Split(text);
         var wanted = TextLines.Split(oldText);
         var trailingBreak = wanted.Count > 1 && wanted[^1].End == wanted[^1].Start;
         var count = trailingBreak ? wanted.Count - 1 : wanted.Count;
-        var starts = Enumerable.Range(0, Math.Max(0, lines.Count - count + 1))
+        var from = FirstLineAt(lines, search.From);
+        var starts = Enumerable.Range(from, Math.Max(0, lines.Count - count + 1 - from))
             .Where(start => Enumerable.Range(0, count).All(i => SameLine(text, lines[start + i], oldText, wanted[i], match)))
+            .Take(search.FirstWins ? 1 : int.MaxValue)
             .ToList();
         if (starts.Count == 0)
         {
@@ -110,7 +135,7 @@ public static class FragmentLocator
         if (starts.Count > 1)
         {
             var numbers = starts.Select(start => start + 1).ToList();
-            starts = [starts[Pick(numbers, hint) ?? throw Ambiguous(text, relative, numbers)]];
+            starts = [starts[Pick(numbers, search.Line) ?? throw Ambiguous(text, relative, numbers)]];
         }
 
         var first = lines[starts[0]];
@@ -208,7 +233,7 @@ public static class FragmentLocator
 
     private static string Format(string format, params object[] arguments) => string.Format(CultureInfo.CurrentCulture, format, arguments);
 
-    private static List<int> Occurrences(string text, string fragment)
+    private static List<int> Occurrences(string text, string fragment, Search search)
     {
         var offsets = new List<int>();
         if (fragment.Length == 0)
@@ -216,12 +241,28 @@ public static class FragmentLocator
             return offsets;
         }
 
-        for (var index = text.IndexOf(fragment, StringComparison.Ordinal); index >= 0; index = text.IndexOf(fragment, index + 1, StringComparison.Ordinal))
+        for (var index = text.IndexOf(fragment, search.From, StringComparison.Ordinal); index >= 0; index = text.IndexOf(fragment, index + 1, StringComparison.Ordinal))
         {
             offsets.Add(index);
+            if (search.FirstWins)
+            {
+                break;
+            }
         }
 
         return offsets;
+    }
+
+    // A line-by-line match starts on a whole line: the first one at or below the offset.
+    private static int FirstLineAt(IReadOnlyList<TextLine> lines, int offset)
+    {
+        var index = 0;
+        while (index < lines.Count && lines[index].Start < offset)
+        {
+            index++;
+        }
+
+        return index;
     }
 
     private static int LineOf(string text, int offset) => text.AsSpan(0, offset).Count('\n') + 1;

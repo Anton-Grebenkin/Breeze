@@ -35,6 +35,47 @@ public sealed class ToolOutputTests : IDisposable
     [Fact]
     public void HeadAndTail_ShortText_IsUnchanged() => Assert.Equal("a\nb", ToolOutput.HeadAndTail("a\nb", 10, 10));
 
+    // One huge line between short ones (an API answer after the exit code line) is cut by characters, not dropped.
+    [Fact]
+    public void HeadAndTail_HugeLine_IsCutByCharacters()
+    {
+        var text = "Код выхода 0\n" + new string('a', 10_000) + new string('b', 10_000) + "\nготово";
+
+        var preview = ToolOutput.HeadAndTail(text, 400, 600);
+
+        Assert.StartsWith("Код выхода 0\naaaa", preview, StringComparison.Ordinal);
+        Assert.EndsWith("bbbb\nготово", preview, StringComparison.Ordinal);
+        Assert.Contains($"\n… пропущено знаков: {text.Length - 1_000} …\n", preview, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Limit_HugeLine_KeepsTheAllowedLength() =>
+        Assert.StartsWith("ok\n" + new string('a', 97) + "\n…(обрезано: показано 100 из", ToolOutput.Limit("ok\n" + new string('a', 500), 100), StringComparison.Ordinal);
+
+    // JSON in one line is saved indented: the head shows its structure and read_file pages it by lines.
+    [Fact]
+    public void LongJsonLine_IsSavedIndented()
+    {
+        _fixture.Workspace.Open(AgentFixture.Root);
+        var json = "{\"items\":[" + string.Join(',', Enumerable.Range(1, 2_000).Select(id => $"{{\"id\":{id},\"name\":\"запись {id}\"}}")) + "]}";
+
+        var result = _fixture.Outputs.Fit("Код выхода 0\n" + json + "\n", "run_command");
+
+        var saved = _fixture.FileSystem.ReadAllText(Assert.Single(_fixture.FileSystem.EnumerateEntries(Outputs)).FullPath);
+        Assert.StartsWith("Код выхода 0\n{\n  \"items\": [\n    {\n      \"id\": 1,\n      \"name\": \"запись 1\"\n    },", saved, StringComparison.Ordinal);
+        Assert.StartsWith("Код выхода 0\n{\n  \"items\": [", result, StringComparison.Ordinal);
+        Assert.Contains("пропущено строк:", result, StringComparison.Ordinal);
+        Assert.Contains("\"name\": \"запись 2000\"", result, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void LongLineThatIsNotJson_StaysAsItIs()
+    {
+        var text = "{ not json " + new string('x', 30_000);
+
+        Assert.Equal(text, JsonLines.Unfold(text));
+    }
+
     [Fact]
     public void ShortOutput_GoesAsIs() => Assert.Equal("коротко", _fixture.Outputs.Fit("коротко", "run_command"));
 

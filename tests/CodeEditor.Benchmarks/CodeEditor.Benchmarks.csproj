@@ -2,9 +2,17 @@
 
   <!-- Hot path benchmarks. See CONTRIBUTING.md for the run command. -->
 
+  <!-- Windows and WPF: the typing benchmark runs the editor's text model and highlighter (AvalonEdit), without a window. -->
   <PropertyGroup>
     <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
   </PropertyGroup>
+
+  <!-- WPF drops the implicit System.IO (Path clashes in XAML); there is no XAML here. -->
+  <ItemGroup>
+    <Using Include="System.IO" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" />
@@ -15,6 +23,8 @@
     <ProjectReference Include="..\..\src\Platform\CodeEditor.Shell\CodeEditor.Shell.csproj" />
     <ProjectReference Include="..\..\src\Modules\CodeEditor.Modules.Search\CodeEditor.Modules.Search.csproj" />
     <ProjectReference Include="..\..\src\Modules\CodeEditor.Modules.Viewers\CodeEditor.Modules.Viewers.csproj" />
+    <ProjectReference Include="..\..\src\Modules\CodeEditor.Modules.TextEditor\CodeEditor.Modules.TextEditor.csproj" />
+    <ProjectReference Include="..\..\src\Modules\CodeEditor.Modules.TextEditor.Wpf\CodeEditor.Modules.TextEditor.Wpf.csproj" />
     <ProjectReference Include="..\CodeEditor.Testing\CodeEditor.Testing.csproj" />
   </ItemGroup>
 

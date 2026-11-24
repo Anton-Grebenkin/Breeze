@@ -29,6 +29,39 @@
   </Style>
 
   <!-- Message text is selectable and copyable, not editable. -->
+  <!-- "Show in picker" switch: track and thumb, no animation. -->
+  <Style x:Key="ToggleButton.Switch" TargetType="ToggleButton">
+    <Setter Property="Width" Value="28" />
+    <Setter Property="Height" Value="16" />
+    <Setter Property="Focusable" Value="True" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="ToggleButton">
+          <Border x:Name="Track" CornerRadius="8" BorderThickness="1"
+                  BorderBrush="{DynamicResource Brush.Input.Border}" Background="{DynamicResource Brush.Input.Background}">
+            <Ellipse x:Name="Thumb" Width="10" Height="10" Margin="3,0" HorizontalAlignment="Left"
+                     Fill="{DynamicResource Brush.Text.Secondary}" />
+          </Border>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsChecked" Value="True">
+              <Setter TargetName="Track" Property="Background" Value="{DynamicResource Brush.Accent}" />
+              <Setter TargetName="Track" Property="BorderBrush" Value="{DynamicResource Brush.Accent}" />
+              <Setter TargetName="Thumb" Property="HorizontalAlignment" Value="Right" />
+              <Setter TargetName="Thumb" Property="Fill" Value="{DynamicResource Brush.Accent.Foreground}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+              <Setter TargetName="Track" Property="Opacity" Value="0.6" />
+            </Trigger>
+            <Trigger Property="IsKeyboardFocused" Value="True">
+              <Setter TargetName="Track" Property="BorderBrush" Value="{DynamicResource Brush.Focus.Border}" />
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
   <Style x:Key="TextBox.Message" TargetType="TextBox">
     <Setter Property="IsReadOnly" Value="True" />
     <Setter Property="TextWrapping" Value="Wrap" />
@@ -242,10 +275,17 @@
     <ContentControl Margin="12,4,8,4" Content="{Binding Approval}" ContentTemplate="{StaticResource ApprovalTemplate}" Focusable="False" />
   </DataTemplate>
 
+  <!-- A turn's error; while it is the last row, the turn can go on with one click. -->
   <DataTemplate x:Key="Message.Error" DataType="{x:Type chat:ChatMessageViewModel}">
-    <TextBox Margin="12,4,8,4" Style="{StaticResource TextBox.Message}" Text="{Binding Text, Mode=OneWay}"
-             Foreground="{DynamicResource Brush.Error.Foreground}"
-             AutomationProperties.AutomationId="Agent.Message" AutomationProperties.Name="{Binding Author}" />
+    <StackPanel Margin="12,4,8,4">
+      <TextBox Style="{StaticResource TextBox.Message}" Text="{Binding Text, Mode=OneWay}"
+               Foreground="{DynamicResource Brush.Error.Foreground}"
+               AutomationProperties.AutomationId="Agent.Message" AutomationProperties.Name="{Binding Author}" />
+      <Button Margin="0,6,0,0" HorizontalAlignment="Left" Style="{StaticResource Button.Secondary}" Content="{x:Static res:Strings.Continue}"
+              Visibility="{Binding CanContinue, Converter={StaticResource BoolToVisibility}}"
+              Command="{Binding DataContext.ContinueCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+              AutomationProperties.AutomationId="Agent.ContinueAfterError" />
+    </StackPanel>
   </DataTemplate>
 
   <!-- Harness notice: the turn hit the request limit; continue. -->
@@ -277,6 +317,21 @@
   </DataTemplate>
 
   <!-- Agent question: option buttons and a free-form answer; the turn waits. A restored feed shows only the text. -->
+  <!-- An Ask-mode answer with a change: apply it in Agent mode without switching the mode and retyping. -->
+  <DataTemplate x:Key="Message.ApplyOffer" DataType="{x:Type chat:ChatMessageViewModel}">
+    <controls:AutomationBorder Margin="12,4,8,4" Padding="8,6" CornerRadius="6" BorderThickness="1"
+                               BorderBrush="{DynamicResource Brush.Widget.Border}"
+                               AutomationProperties.AutomationId="Agent.ApplyOffer">
+      <StackPanel>
+        <TextBox Style="{StaticResource TextBox.Message}" Foreground="{DynamicResource Brush.Text.Secondary}" Text="{Binding Text, Mode=OneWay}" />
+        <Button Margin="0,6,0,0" HorizontalAlignment="Left" Style="{StaticResource Button.Primary}" Content="{x:Static res:Strings.ApplyInAgentMode}"
+                Command="{Binding DataContext.ExecutePlanCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                CommandParameter="{x:Static chat:ChatViewModel.ApplyAnswerText}"
+                AutomationProperties.AutomationId="Agent.ApplyInAgentMode" />
+      </StackPanel>
+    </controls:AutomationBorder>
+  </DataTemplate>
+
   <DataTemplate x:Key="Message.Question" DataType="{x:Type chat:ChatMessageViewModel}">
     <controls:AutomationBorder Margin="12,4,8,4" Padding="8" CornerRadius="6" BorderThickness="1"
                                BorderBrush="{DynamicResource Brush.Accent}"
@@ -324,7 +379,8 @@
                                      Error="{StaticResource Message.Error}"
                                      Notice="{StaticResource Message.Notice}"
                                      Question="{StaticResource Message.Question}"
-                                     Handoff="{StaticResource Message.Handoff}" />
+                                     Handoff="{StaticResource Message.Handoff}"
+                                     ApplyOffer="{StaticResource Message.ApplyOffer}" />
 
   <views:FeedTemplateSelector x:Key="FeedTemplateSelector" Block="{StaticResource Feed.Block}" Messages="{StaticResource MessageTemplateSelector}" />
 

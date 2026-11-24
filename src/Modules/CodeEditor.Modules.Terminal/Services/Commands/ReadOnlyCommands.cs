@@ -19,13 +19,28 @@ public static partial class ReadOnlyCommands
     [
         "get-childitem", "gci", "ls", "dir", "test-path", "resolve-path", "rvpa", "get-item", "gi", "get-location", "gl",
         "pwd", "split-path", "join-path", "measure-object", "measure", "select-object", "select", "where-object", "where",
-        "?", "foreach-object", "foreach", "%", "sort-object", "sort", "group-object", "group", "format-list", "fl",
+        "?", "sort-object", "sort", "group-object", "group", "format-list", "fl",
         "format-table", "ft", "format-wide", "fw", "out-string", "out-null", "out-host", "write-output", "echo", "write",
         "write-host", "get-date", "get-filehash", "get-command", "gcm", "convertfrom-json", "convertto-json", "get-unique",
         "compare-object", "convertfrom-csv", "convertto-csv", "test-json", "get-itemproperty", "gp", "start-sleep", "sleep",
         "set-location", "sl", "cd", "chdir", "push-location", "pushd", "pop-location", "popd", "get-process", "gps", "ps",
         "get-service", "gsv", "get-nettcpconnection", "get-help", "whoami", "hostname", "netstat", "tasklist",
     ], StringComparer.Ordinal);
+
+    /// <summary>
+    /// Properties <c>ForEach-Object</c> may read by name (<c>gci | % FullName</c>). Any other member could be a method:
+    /// <c>gci x | % Delete</c> removes files, <c>Get-Process | % Kill</c> ends processes.
+    /// </summary>
+    private static readonly FrozenSet<string> ReadMembers = FrozenSet.ToFrozenSet(
+    [
+        "name", "fullname", "basename", "extension", "length", "count", "directory", "directoryname", "parent", "root",
+        "exists", "mode", "attributes", "lastwritetime", "lastwritetimeutc", "creationtime", "creationtimeutc",
+        "lastaccesstime", "isreadonly", "psiscontainer", "pschildname", "psparentpath", "target", "linktype", "id",
+        "processname", "path", "line", "linenumber", "filename", "pattern", "value", "key", "keys", "values", "status",
+        "displayname", "servicename", "starttype", "definition", "source", "version", "commandtype", "hash", "algorithm",
+        "localport", "remoteport", "localaddress", "remoteaddress", "state", "owningprocess", "cpu", "workingset",
+        "starttime", "mainwindowtitle", "company", "description", "product", "fileversion",
+    ], StringComparer.OrdinalIgnoreCase);
 
     /// <summary>Commands that print file contents: only files named outright (<see cref="ReadsNamedFiles"/>).</summary>
     private static readonly FrozenSet<string> ContentReaders = FrozenSet.ToFrozenSet(
@@ -81,6 +96,7 @@ public static partial class ReadOnlyCommands
             "docker" => ReadOnlyTools.IsDockerRead(words),
             "test-netconnection" or "tnc" => ReadOnlyTools.IsLocalProbe(words),
             "invoke-webrequest" or "iwr" or "invoke-restmethod" or "irm" or "curl" => ReadOnlyTools.IsLocalHttpGet(words),
+            "foreach-object" or "foreach" or "%" => ReadsProperties(words),
             _ when ContentReaders.Contains(name) => ReadsNamedFiles(name, words),
             _ => Cmdlets.Contains(name) || ReadOnlyTools.IsVersionQuery(words),
         };
@@ -100,6 +116,12 @@ public static partial class ReadOnlyCommands
         var name = word.ToLowerInvariant();
         return name.EndsWith(".exe", StringComparison.Ordinal) ? name[..^4] : name;
     }
+
+    // A script block is a segment of its own and is checked there; a member named here ("% Name", "-MemberName:Name")
+    // must be a known property. Arguments for a method ("% Replace a b") are not property names either.
+    private static bool ReadsProperties(IReadOnlyList<string> words) =>
+        words.Skip(1).All(static word => !word.StartsWith('-') ? ReadMembers.Contains(word)
+            : word.IndexOf(':') is not (var colon and > 0) || ReadMembers.Contains(word[(colon + 1)..]));
 
     // "$files" or "$f -eq 1" use a value; "$files = Get-ChildItem src" assigns a read-only command's output and
     // "$port = 5432" a literal. Another operator ("+=") or a changing command on the right goes to approval.

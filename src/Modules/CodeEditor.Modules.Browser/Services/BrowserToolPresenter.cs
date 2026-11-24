@@ -21,6 +21,10 @@ public sealed class BrowserToolPresenter : IAgentToolPresenter
             BrowserAgentTools.Navigate => Site(call.Text("url")),
             BrowserAgentTools.Click => Format(Strings.FeedClick, call.Text("ref") ?? "?"),
             BrowserAgentTools.Type => Format(Strings.FeedType, call.Text("ref") ?? "?"),
+            BrowserAgentTools.Hover => Format(Strings.FeedHover, call.Text("ref") ?? "?"),
+            BrowserAgentTools.Drag => Format(Strings.FeedDrag, call.Text("ref") ?? "?"),
+            BrowserAgentTools.Upload => Format(Strings.FeedUpload, call.Text("path") ?? "?"),
+            BrowserAgentTools.Dialog => Strings.FeedDialog,
             BrowserAgentTools.Press => Format(Strings.FeedPress, call.Text("key") ?? "?"),
             BrowserAgentTools.Scroll => Strings.FeedScroll,
             BrowserAgentTools.WaitFor => Format(Strings.FeedWaitFor, call.Text("text") ?? "?"),
@@ -31,13 +35,20 @@ public sealed class BrowserToolPresenter : IAgentToolPresenter
             BrowserAgentTools.Network => Strings.FeedNetwork,
             BrowserAgentTools.Response => Format(Strings.FeedResponse, call.Text("id") ?? "?"),
             BrowserAgentTools.Evaluate => Strings.FeedEvaluate,
+            BrowserAgentTools.Request => Format(Strings.FeedRequest, (call.Text("method") ?? "GET").ToUpperInvariant() + " " + (call.Text("url") ?? "?")),
             BrowserAgentTools.Screenshot => Strings.FeedScreenshot,
+            BrowserAgentTools.Read => Strings.FeedRead,
+            BrowserAgentTools.Find => Format(Strings.FeedFind, call.Text("text") ?? "?"),
+            BrowserAgentTools.Tabs => Strings.FeedTabs,
+            BrowserAgentTools.OpenTab => call.Text("url") is { Length: > 0 } opened ? Site(opened) : Strings.FeedOpenTab,
+            BrowserAgentTools.SelectTab => Format(Strings.FeedSelectTab, call.Text("tab") ?? "?"),
+            BrowserAgentTools.CloseTab => Format(Strings.FeedCloseTab, call.Text("tab") ?? string.Empty).TrimEnd(),
             _ => Strings.FeedSnapshot,
         };
         return new AgentToolView(AgentToolIcon.Web, Format(Strings.FeedTitle, detail))
         {
             IsExploration = action is BrowserAgentTools.Snapshot or BrowserAgentTools.Console or BrowserAgentTools.Screenshot
-                or BrowserAgentTools.Network or BrowserAgentTools.Response,
+                or BrowserAgentTools.Network or BrowserAgentTools.Response or BrowserAgentTools.Tabs or BrowserAgentTools.Read or BrowserAgentTools.Find,
         };
     }
 

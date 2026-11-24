@@ -1,4 +1,5 @@
 using CodeEditor.Core.Processes;
+using CodeEditor.Modules.Agent.Contracts;
 using CodeEditor.Modules.Terminal.Services.Commands;
 
 namespace CodeEditor.Modules.Terminal.Tests;
@@ -34,6 +35,47 @@ public sealed class PowerShellLauncherTests
         {
             Environment.SetEnvironmentVariable(secret, null);
         }
+    }
+
+    // Running text from an environment variable through a script block is what antivirus blocks (ADR 0052).
+    [Fact]
+    public void Script_IsPlainText_WithoutCodeFromTheEnvironment()
+    {
+        var request = PowerShellLauncher.Request("git status", Folder, TimeSpan.FromSeconds(60));
+
+        Assert.Contains("\n& {\ngit status\n}\n", request.Arguments[^1], StringComparison.Ordinal);
+        Assert.DoesNotContain("ScriptBlock", request.Arguments[^1], StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain(request.Environment, variable => variable.Value.Contains("git status", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void Script_TooLongForACommandLine_IsRejected() =>
+        Assert.Contains("слишком длинная", Assert.Throws<AgentToolException>(() =>
+            PowerShellLauncher.Request("Write-Output '" + new string('x', PowerShellLauncher.MaxScriptLength) + "'", Folder, TimeSpan.FromSeconds(60))).Message, StringComparison.Ordinal);
+
+    // A trailing comment must not swallow the epilogue; a here-string keeps its lines.
+    [Fact]
+    public async Task AgentPowerShell_TrailingComment_AndHereString_KeepTheExitCode()
+    {
+        const string command = "$text = @'\nпервая\nвторая\n'@\nWrite-Output $text\ncmd /c exit 7 # код выхода";
+
+        var result = await _runner.RunAsync(PowerShellLauncher.Request(command, Folder, TimeSpan.FromSeconds(60)), null, TestContext.Current.CancellationToken);
+
+        Assert.Equal(7, result.ExitCode);
+        Assert.Contains("первая\nвторая\n", result.Output.ReplaceLineEndings("\n"), StringComparison.Ordinal);
+    }
+
+    // Without the prologue PowerShell writes in the console code page: the output is still readable.
+    [Fact]
+    public async Task AgentPowerShell_Bare_RunsTheCommandAlone_AndOutputIsReadable()
+    {
+        var request = PowerShellLauncher.Request("Write-Output '░▒▓█'; cmd /c exit 3", Folder, TimeSpan.FromSeconds(60), PowerShellWrapping.Bare);
+
+        var result = await _runner.RunAsync(request, null, TestContext.Current.CancellationToken);
+
+        Assert.Equal("Write-Output '░▒▓█'; cmd /c exit 3", request.Arguments[^1]);
+        Assert.NotEqual(0, result.ExitCode);
+        Assert.Contains("░▒▓█", result.Output, StringComparison.Ordinal);
     }
 
     [Fact]

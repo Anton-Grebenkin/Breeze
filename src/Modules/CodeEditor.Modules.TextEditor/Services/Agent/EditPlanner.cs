@@ -59,7 +59,7 @@ public sealed class EditPlanner(IWorkspace workspace, IFileSystem fileSystem, ID
             throw new AgentToolException(problem);
         }
 
-        var located = edits.Select(edit => Locate(text, edit, relative, crlf)).OrderBy(fragment => fragment.Offset).ToList();
+        var located = Locate(text, edits, relative, crlf).OrderBy(fragment => fragment.Offset).ToList();
         var replacements = located.Select(fragment => new TextReplacement(fragment.Offset, fragment.Length, fragment.NewText)).ToList();
         EnsureNoOverlap(replacements, relative);
         return new PlannedFileEdit(path, relative, text, Apply(text, replacements), replacements)
@@ -68,24 +68,26 @@ public sealed class EditPlanner(IWorkspace workspace, IFileSystem fileSystem, ID
         };
     }
 
-    private static LocatedFragment Locate(string text, FileEdit edit, string relative, bool crlf)
+    // apply_edits fragments are independent; apply_patch hunks depend on their order (HunkLocator).
+    private static List<LocatedFragment> Locate(string text, IReadOnlyList<FileEdit> edits, string relative, bool crlf)
     {
-        if (string.IsNullOrEmpty(edit.OldText))
+        if (edits.Any(edit => string.IsNullOrEmpty(edit.OldText)))
         {
             throw Error(Strings.EmptyOldText, relative);
         }
 
-        var (oldText, newText) = (Normalize(edit.OldText, crlf), Normalize(edit.NewText ?? string.Empty, crlf));
-        var start = BelowAnchors(text, edit.Anchors, relative);
-
-        // Below an "@@" anchor take the first exact match, as Codex does: the anchor already pinned the place.
-        if (edit.Anchors.Count > 0 && text.IndexOf(oldText, start, StringComparison.Ordinal) is var first and >= 0)
+        var hunks = new HunkLocator(text, relative);
+        var hunksLeft = edits.Where(edit => edit.IsHunk).CountBy(edit => edit.OldText, StringComparer.Ordinal).ToDictionary(StringComparer.Ordinal);
+        var located = new List<LocatedFragment>(edits.Count);
+        foreach (var edit in edits)
         {
-            return new LocatedFragment(first, oldText.Length, newText, null);
+            var (oldText, newText) = (Normalize(edit.OldText, crlf), Normalize(edit.NewText ?? string.Empty, crlf));
+            located.Add(edit.IsHunk
+                ? hunks.Locate(oldText, newText, edit.Anchors, repeatsLater: --hunksLeft[edit.OldText] > 0)
+                : FragmentLocator.Locate(text, oldText, newText, relative, edit.Line));
         }
 
-        var fragment = start == 0 ? FragmentLocator.Locate(text, oldText, newText, relative, edit.Line) : FragmentLocator.Locate(text[start..], oldText, newText, relative);
-        return fragment with { Offset = fragment.Offset + start };
+        return located;
     }
 
     // Compaction took the file text out of the conversation, but fragments found exactly once show the model still
@@ -93,24 +95,6 @@ public sealed class EditPlanner(IWorkspace workspace, IFileSystem fileSystem, ID
     private static bool AllFoundOnce(string text, IReadOnlyList<FileEdit> edits, bool crlf) =>
         edits.All(edit => edit.Anchors.Count == 0 && !string.IsNullOrEmpty(edit.OldText) && Normalize(edit.OldText, crlf) is var old
             && text.IndexOf(old, StringComparison.Ordinal) is var first and >= 0 && text.IndexOf(old, first + 1, StringComparison.Ordinal) < 0);
-
-    /// <summary>Search start: the line after the last anchor; anchors match in order, each below the previous.</summary>
-    private static int BelowAnchors(string text, IReadOnlyList<string> anchors, string relative)
-    {
-        var position = 0;
-        foreach (var anchor in anchors.Select(anchor => anchor.Trim()).Where(anchor => anchor.Length > 0))
-        {
-            var found = text.IndexOf(anchor, position, StringComparison.Ordinal);
-            if (found < 0)
-            {
-                throw Error(Strings.AnchorNotFound, relative, anchor);
-            }
-
-            position = text.IndexOf('\n', found) is var end and >= 0 ? end + 1 : text.Length;
-        }
-
-        return position;
-    }
 
     private static void EnsureNoOverlap(List<TextReplacement> replacements, string relative)
     {

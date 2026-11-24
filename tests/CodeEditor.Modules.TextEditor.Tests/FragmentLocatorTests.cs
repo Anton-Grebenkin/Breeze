@@ -130,6 +130,22 @@ public sealed class FragmentLocatorTests
         Assert.Equal(expectedLine, text.AsSpan(0, found.Offset).Count('\n'));
     }
 
+    // Below an offset the first occurrence wins, exact or by lines (a wrong indent here); none below is not an error.
+    [Theory]
+    [InlineData("    Save();", 0, 2)]
+    [InlineData("    Save();", 30, 6)]
+    [InlineData("Save();", 30, 6)]
+    [InlineData("  Save();", 30, 6)]
+    [InlineData("    Save();", 60, -1)]
+    public void Below_TakesTheFirstOccurrence(string fragment, int from, int expectedLine)
+    {
+        const string text = "class A\n{\n    Save();\n}\nclass B\n{\n    Save();\n}\n";
+
+        var found = FragmentLocator.LocateBelow(text, fragment, "    Store();", "A.cs", from);
+
+        Assert.Equal(expectedLine, found is null ? -1 : text.AsSpan(0, found.Offset).Count('\n'));
+    }
+
     // Each occurrence comes with the lines above it: the class or method that makes it unique.
     [Fact]
     public void Ambiguous_ShowsEachOccurrenceWithLinesAbove()

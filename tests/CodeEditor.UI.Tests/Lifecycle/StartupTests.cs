@@ -19,6 +19,8 @@ public sealed partial class StartupTests(AppSession session) : IClassFixture<App
         var milliseconds = long.Parse(StartupTimePattern().Match(message).Groups[1].Value, CultureInfo.InvariantCulture);
         var startup = TimeSpan.FromMilliseconds(milliseconds);
 
+        // The number itself, not only pass or fail: a start that creeps towards the budget shows in the file.
+        BudgetLog.Record($"Старт до первого кадра: {milliseconds} мс");
         Assert.True(startup <= PerformanceBudgets.ColdStart,
             $"Старт занял {milliseconds} мс, бюджет {PerformanceBudgets.ColdStart.TotalMilliseconds} мс.");
     }

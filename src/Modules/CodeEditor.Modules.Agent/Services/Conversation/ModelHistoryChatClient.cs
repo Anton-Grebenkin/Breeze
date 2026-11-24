@@ -12,7 +12,7 @@ namespace CodeEditor.Modules.Agent.Services.Conversation;
 /// - a model without vision gets a note instead of the history's images, which it would reject.
 /// Requests carry adapted copies: the history keeps everything, so switching back brings the reasoning back.
 /// </summary>
-internal sealed class ModelHistoryChatClient(IChatClient inner, string endpoint, string model) : DelegatingChatClient(inner)
+internal sealed class ModelHistoryChatClient(IChatClient inner, string endpoint, string model, ModelProfile? profile = null) : DelegatingChatClient(inner)
 {
     public const string OriginKey = "breeze.origin";
 
@@ -20,7 +20,12 @@ internal sealed class ModelHistoryChatClient(IChatClient inner, string endpoint,
     private const string FernetPrefix = "gAAAAA";
 
     private readonly string _origin = Origin(endpoint, model);
-    private readonly ModelProfile _profile = ModelProfiles.For(model);
+    private readonly ModelProfile _profile = profile ?? ModelProfiles.For(model);
+
+    public ModelHistoryChatClient(IChatClient inner, ModelRoute route)
+        : this(inner, route.Endpoint, route.Model, ModelProfiles.For(route))
+    {
+    }
 
     /// <summary>Who wrote a reasoning part: the service host and the model.</summary>
     public static string Origin(string endpoint, string model) =>

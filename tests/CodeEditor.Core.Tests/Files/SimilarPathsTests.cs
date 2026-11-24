@@ -21,8 +21,15 @@ public sealed class SimilarPathsTests
     [Fact]
     public void FileName_SuggestsTheFileFirst() =>
         Assert.Equal(
-            ["src/Acme.Catalog/Migrations/CatalogDbContextModelSnapshot.cs", "src/Acme.Catalog", "tests/Acme.Catalog.Tests", "src/Acme.Catalog/Migrations"],
+            ["src/Acme.Catalog/Migrations/CatalogDbContextModelSnapshot.cs", "src/Acme.Catalog/Migrations", "src/Acme.Catalog", "tests/Acme.Catalog.Tests"],
             SimilarPaths.Suggest(Files, "**/Catalog/Migrations/CatalogDbContextModelSnapshot.cs"));
+
+    // A guessed file name that does not exist: files with the same beginning, then the nearest folder, not "src".
+    [Fact]
+    public void GuessedFileName_SuggestsFilesWithItsBeginning_ThenTheNearestFolder() =>
+        Assert.Equal(
+            ["tests/Acme.Catalog.Tests/ProductTests.cs", "src/Acme.Catalog/Domain/Products/Product.cs", "src/Acme.Catalog/Domain/Products", "src/Acme.Catalog/Domain", "src/Acme.Catalog"],
+            SimilarPaths.Suggest(Files, "src/Acme.Catalog/Domain/Products/Product.Prices.cs"));
 
     [Fact]
     public void ExactFolderName_ComesFirst() =>
