@@ -107,7 +107,8 @@ public sealed class ModelProbe(PipelineTransport? transport = null) : IModelProb
     // A service that refuses the picture and a model that cannot tell its colour both mean "no images".
     private static (ModelProbeStep Step, bool Images) Image(ModelProbeReply reply)
     {
-        var seen = reply.IsAnswer && reply.Content.Contains(ModelProbeRequests.ImageColour, StringComparison.OrdinalIgnoreCase);
+        var left = reply.Content.IndexOf(ModelProbeRequests.ImageLeftColour, StringComparison.OrdinalIgnoreCase);
+        var seen = reply.IsAnswer && left >= 0 && reply.Content.IndexOf(ModelProbeRequests.ImageRightColour, left, StringComparison.OrdinalIgnoreCase) > left;
         var detail = seen ? Strings.ProbeImageSeen : reply.IsAnswer ? Strings.ProbeImageNotSeen : Format(Strings.ProbeImageRefused, reply.Error);
         return (new ModelProbeStep(ModelProbeKind.Image, null, detail), seen);
     }

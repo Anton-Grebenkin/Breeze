@@ -52,7 +52,7 @@ public sealed class ModelProbeTests
     [Fact]
     public async Task StrictServiceWithAPlainModel_IsFoundOut_FieldByField()
     {
-        var gateway = new Gateway { IsStrict = true, CallsTools = false, SeesImages = false, Reasons = false, AnswersInRussian = false };
+        var gateway = new Gateway { IsStrict = true, CallsTools = false, AcceptsImages = false, Reasons = false, AnswersInRussian = false };
 
         var report = await RunAsync(gateway);
 
@@ -76,9 +76,12 @@ public sealed class ModelProbeTests
     [Fact]
     public async Task ModelThatCallsOnce_AndLosesNestedFields_AndThinksInItsAnswer()
     {
-        var gateway = new Gateway { CallsTwice = false, KeepsNested = false, ReasoningInline = true };
+        var gateway = new Gateway { CallsTwice = false, KeepsNested = false, ReasoningInline = true, SeesImages = false };
 
         var report = await RunAsync(gateway);
+
+        // A model that cannot see the picture names a colour anyway: one guessed colour is not sight.
+        Assert.Equal(("не видит изображения", false), (report.Steps.Single(step => step.Kind == ModelProbeKind.Image).Detail, report.Images));
 
         Assert.Equal(
             [(ModelProbeKind.ParallelToolCalls, null), (ModelProbeKind.NestedArguments, false)],
@@ -133,6 +136,9 @@ public sealed class ModelProbeTests
 
         public bool KeepsNested { get; init; } = true;
 
+        /// <summary>The service takes a picture; a model that does not see it still names a colour.</summary>
+        public bool AcceptsImages { get; init; } = true;
+
         public bool SeesImages { get; init; } = true;
 
         public bool Reasons { get; init; } = true;
@@ -158,7 +164,8 @@ public sealed class ModelProbeTests
             var text = body["messages"]![0]!["content"] is JsonValue value ? value.GetValue<string>() : string.Empty;
             if (body["messages"]![0]!["content"] is JsonArray)
             {
-                return SeesImages ? Message("Red.") : Error(HttpStatusCode.BadRequest, "image input is not supported");
+                return !AcceptsImages ? Error(HttpStatusCode.BadRequest, "image input is not supported")
+                    : Message(SeesImages ? "Left: blue. Right: yellow." : "The square is red.");
             }
 
             if (body["tools"] is not null)

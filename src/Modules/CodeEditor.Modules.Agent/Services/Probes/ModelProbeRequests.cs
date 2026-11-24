@@ -16,16 +16,20 @@ internal static class ModelProbeRequests
     public const string WeatherTool = "get_weather";
     public const string OrderTool = "create_order";
 
-    /// <summary>The colour of the picture sent to the model.</summary>
-    public const string ImageColour = "red";
+    /// <summary>
+    /// The colours of the picture's halves, left then right. Two colours in order cannot be guessed blind, while a
+    /// model that does not see the picture readily names one common colour.
+    /// </summary>
+    public const string ImageLeftColour = "blue";
+    public const string ImageRightColour = "yellow";
 
     // Room for a reasoning model to think before it answers or calls.
     private const int ReplyLimit = 512;
     private const int ReasoningLimit = 1024;
 
-    // A 32×32 plain red PNG.
-    private const string RedSquare =
-        "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAAKklEQVR42mO4IyJCU8QwasGoBaMWjFowasGoBaMWjFowasGoBaMWDBULAJ3LED19/LmKAAAAAElFTkSuQmCC";
+    // A 64×32 PNG: the left half blue, the right half yellow.
+    private const string TwoColours =
+        "iVBORw0KGgoAAAANSUhEUgAAAEAAAAAgCAIAAAAt/+nTAAAAPklEQVR42u3PMQ0AMAgAMERwo2T+VaCECw07+JrUQKNen5rOUyEgICAgICAgICAgICAgICAgICAgICAg8GsBhnaAtYT1rfUAAAAASUVORK5CYII=";
 
     public static JsonObject Answer(string model, string limitField) => Request(model, limitField, ReplyLimit, "Reply with the single word: OK");
 
@@ -47,8 +51,8 @@ internal static class ModelProbeRequests
         {
             ["role"] = "user",
             ["content"] = new JsonArray(
-                new JsonObject { ["type"] = "text", ["text"] = "What colour is the square in the picture? Answer with one English word." },
-                new JsonObject { ["type"] = "image_url", ["image_url"] = new JsonObject { ["url"] = "data:image/png;base64," + RedSquare } }),
+                new JsonObject { ["type"] = "text", ["text"] = "The picture has two halves. Name the colour of the left half and of the right half, in English: left, then right." },
+                new JsonObject { ["type"] = "image_url", ["image_url"] = new JsonObject { ["url"] = "data:image/png;base64," + TwoColours } }),
         });
         return request;
     }
