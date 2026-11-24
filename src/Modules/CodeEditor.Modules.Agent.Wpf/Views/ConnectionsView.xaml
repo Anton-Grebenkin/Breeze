@@ -36,7 +36,8 @@
             <DockPanel>
               <Button DockPanel.Dock="Left" Margin="0,0,4,0" Padding="8,2" Style="{StaticResource Button.Secondary}"
                       Content="{Binding FamilyTitle}" ToolTip="{x:Static res:Strings.ModelFamilyHint}" Click="OnMenuButtonClick"
-                      AutomationProperties.AutomationId="{Binding Id, StringFormat=Agent.Connections.Family.{0}}" AutomationProperties.Name="{x:Static res:Strings.ModelFamilyHint}">
+                      AutomationProperties.AutomationId="{Binding Id, StringFormat=Agent.Connections.Family.{0}}"
+                      AutomationProperties.Name="{Binding FamilyTitle}" AutomationProperties.HelpText="{x:Static res:Strings.ModelFamilyHint}">
                 <Button.ContextMenu>
                   <ContextMenu ItemsSource="{Binding FamilyMenu}" ItemContainerStyle="{StaticResource MenuItem.Bound}"
                                AutomationProperties.AutomationId="Agent.Connections.FamilyMenu" />

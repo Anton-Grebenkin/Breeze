@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Threading;
 using CodeEditor.Modules.Terminal.Resources;
 using CodeEditor.Modules.Terminal.ViewModels;
@@ -27,6 +28,7 @@ public sealed partial class TerminalView : UserControl
 
     // Focus requested before the page could take it: the first show creates the view and loads the page later.
     private bool _focusPending;
+    private IInputElement? _focusedAtRequest;
 
     public TerminalView(TerminalWebEnvironment environment, IThemeService themes, ILogger<TerminalView> logger)
     {
@@ -135,16 +137,22 @@ public sealed partial class TerminalView : UserControl
     private void OnFocusRequested(object? sender, EventArgs e)
     {
         _focusPending = true;
+        _focusedAtRequest = Keyboard.FocusedElement;
         FocusPage();
     }
 
+    // The page takes a moment to load. If the user has moved on meanwhile — opened a menu, clicked into the editor —
+    // the focus stays where they put it: taking it would close the menu under their hand.
     private void FocusPage() => Dispatcher.BeginInvoke(DispatcherPriority.Input, () =>
     {
         if (_focusPending && _page is { IsReady: true } page)
         {
             _focusPending = false;
-            page.Control.Focus();
-            page.Post(TerminalPageMessages.Focus());
+            if (Keyboard.FocusedElement is null || ReferenceEquals(Keyboard.FocusedElement, _focusedAtRequest))
+            {
+                page.Control.Focus();
+                page.Post(TerminalPageMessages.Focus());
+            }
         }
     });
 
